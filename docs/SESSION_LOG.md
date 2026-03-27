@@ -87,6 +87,15 @@
 
 ---
 
+### 2026-03-27 — Writing style guide: Gary Halbert + 50 hooks added
+- Installed PyMuPDF (python -m pip) to extract PDF text — resolved the scan blocker
+- 50 Hooks PDF (One Peak Creative): fully extracted — 19 hook templates translated to JoyMaze parent audience examples (controversy, exclusion, myth buster, hack, identity, exclusivity, nobody talking, diagnosis, emotional relief, experiment, regret, warning, pattern interrupt, mistake prevention, lazy win, speed, skeptic, proof, transformation)
+- Halbert Copywriting Method PDF: 125-page scanned image — zero extractable text. Principles incorporated from The Boron Letters and Gary Halbert newsletter (well-documented source material): 12 principles with JoyMaze translations (hungry crowd, A-pile/B-pile, So What? test, slippery slide, specificity = credibility, because principle, desire before belief, P.S. as second hook, etc.)
+- Sales Letters PDF (555 pages): B2B template collection — limited social media value. Extracted Booher's 3-part intro structure (arouse interest → explain benefit → name next step) and added to Halbert section
+- Style guide: 383 → 561 lines. Now covers Vitale (18 modules) + Halbert method + 50 native social hooks
+
+---
+
 ### 2026-03-27 — Writing style guide expanded: full 18-module synthesis
 - Read and extracted all 18 Hypnotic Writing modules (docx text extraction via PowerShell)
 - Modules covered: Mindset, Language Techniques, Psychology & Persuasion, Sentence Structures, Storytelling, Headlines & Hooks, Writing Formula, Editing System, Sales Page Architecture, Email Sequences, Ads, Product Descriptions, Social Content, Funnels, Objection Handling, VEO3, Advanced Editing, Viral Refinement Engine

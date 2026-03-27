@@ -68,6 +68,18 @@
 
 ---
 
+### 2026-03-27 — Gary Halbert method + 50 hooks added to style guide
+- **Topics:** Extracting Gary Halbert and 50 hooks PDF content, translating into JoyMaze style guide
+- **PDF extraction:** Installed PyMuPDF — finally solved the PDF reading problem
+- **50 Hooks (One Peak Creative):** TikTok/Reels hook cheat sheet fully extracted. 19 hook categories translated to parent-audience JoyMaze copy with 2 ready examples each
+- **Gary Halbert:** PDF is a 125-page scan with zero text. Principles incorporated from The Boron Letters + his newsletter — 12 core principles, all translated with JoyMaze parent examples
+- **Sales Letters (Booher):** B2B letter templates, limited relevance. Extracted 3-part intro structure
+- **Key Halbert principles added:** Hungry Crowd theory, A-pile/B-pile, "So What?" test, Slippery Slide, Specificity = Credibility, the "Because" principle, Desire Before Belief, P.S. as second hook
+- **Style guide now covers:** Joe Vitale (Modules 1-18) + Gary Halbert method + 50 native social hooks = 561 lines, one injected file
+- **Next:** Generate real content and review output quality improvement
+
+---
+
 ### 2026-03-27 — Full 18-module Hypnotic Writing synthesis into style guide
 - **Topics:** Deep study of all 18 Hypnotic Writing modules, expanding the master style guide
 - **Source material studied:**
