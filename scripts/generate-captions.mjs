@@ -36,6 +36,14 @@ const platformsConfig = JSON.parse(
   await fs.readFile(path.join(ROOT, 'config', 'platforms.json'), 'utf-8')
 );
 
+// Load Hypnotic Writing style guide (injected into every prompt)
+let writingStyleGuide = '';
+try {
+  writingStyleGuide = await fs.readFile(path.join(ROOT, 'config', 'writing-style.md'), 'utf-8');
+} catch {
+  // Style guide optional — pipeline works without it
+}
+
 // Platform caption targets
 const PLATFORMS = ['pinterest', 'instagram', 'x', 'tiktok', 'youtube'];
 
@@ -238,10 +246,15 @@ async function generateCaptionsForContent(metadata) {
         caption = generateDryRunCaption(platform, metadata);
         console.log(`    ${platform}: no template, using default`);
       } else {
-        const prompt = template
+        const templatePrompt = template
           .replace('{{topic}}', metadata.subject || metadata.categoryName)
           .replace('{{category}}', metadata.categoryName)
           .replace('{{visualDescription}}', metadata.prompt || '');
+
+        // Inject Hypnotic Writing style guide as system context
+        const prompt = writingStyleGuide
+          ? `${writingStyleGuide}\n\n---\n\n${templatePrompt}`
+          : templatePrompt;
 
         try {
           caption = await generateWithGemini(prompt);

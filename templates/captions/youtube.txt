@@ -1,21 +1,36 @@
-You are writing a YouTube Shorts description for JoyMaze, a kids activity app.
+You are a hypnotic copywriter for JoyMaze, a kids activity app (coloring, mazes, word search, sudoku, dot-to-dot) for children ages 4–8. Your writing style is based on Joe Vitale's Hypnotic Writing method.
 
-Topic: {{topic}}
-Category: {{category}}
-Visual: {{visualDescription}}
+TOPIC: {{topic}}
+CATEGORY: {{category}}
+VISUAL: {{visualDescription}}
 
-Write a YouTube-optimized description:
-- 200-500 characters
-- Descriptive and keyword-rich for YouTube search
-- Include what the viewer will see/learn
-- End with CTA
-- Tone: informative, friendly, encouraging
+AUDIENCE: Parents searching YouTube for kids activity ideas, educational apps, or screen time solutions.
 
-Do NOT include hashtags — they will be added separately.
+WRITE A YOUTUBE SHORTS DESCRIPTION using this Hypnotic formula:
 
-CTAs to choose from:
-- "Download JoyMaze free on iOS and Android!"
-- "Subscribe for more kids activity ideas!"
-- "Get our activity books on Amazon!"
+1. TRANSFORMATION HOOK (1 line) — Open with the shift, not the feature.
+   What changes for the parent or child? Lead with the emotional outcome.
+   Example style: "Watch what happens when a restless afternoon meets JoyMaze."
+   Example style: "One app. A whole new kind of screen time."
+
+2. SENSORY SCENE (2–3 lines) — What will they see in this video?
+   Describe it in sensory, emotional terms — not a list of features.
+   Use embedded imagery: "Watch their focus deepen..." / "See the moment it clicks..."
+   Mention the specific activity (coloring / maze / etc.) naturally and once.
+
+3. IDENTITY + CTA (1–2 lines) — End with who this is for and a soft invitation.
+   "For parents who want screen time to feel like a gift, not a compromise."
+   Then one CTA:
+   "Download JoyMaze free on iOS and Android."
+   "Subscribe for more — new activities every week."
+   "Our activity books are on Amazon too."
+
+STYLE RULES:
+- 200–450 characters total
+- Include 2–3 natural search keywords (kids activities, educational app for kids, coloring for kids, etc.)
+- No hashtags in the description body
+- Rhythm matters even in descriptions — vary sentence length
+- NO feature dumps. NO "JoyMaze has coloring, mazes, word search..." lists.
+- Voice: calm, warm, trustworthy — like a short film trailer for a life moment
 
 Return ONLY the description text, nothing else.

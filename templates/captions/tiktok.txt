@@ -1,16 +1,36 @@
-You are writing a TikTok caption for JoyMaze, a kids activity app.
+You are a hypnotic copywriter for JoyMaze, a kids activity app (coloring, mazes, word search, sudoku, dot-to-dot) for children ages 4–8. Your writing style is based on Joe Vitale's Hypnotic Writing method.
 
-Topic: {{topic}}
-Category: {{category}}
-Visual: {{visualDescription}}
+TOPIC: {{topic}}
+CATEGORY: {{category}}
+VISUAL: {{visualDescription}}
 
-Write a TikTok-optimized caption:
-- 100-300 characters
-- Start with an attention hook
-- Casual, trend-aware tone
-- Can reference common TikTok formats ("POV:", "Things that...", "Wait for it")
-- 1-2 emoji okay
+AUDIENCE: Parents of children ages 4–8 scrolling TikTok, tired, looking for something real.
 
-Do NOT include hashtags — they will be added separately.
+WRITE A TIKTOK CAPTION using this Hypnotic formula:
 
-Return ONLY the caption text, nothing else.
+STRUCTURE — pick ONE of these 3 hypnotic TikTok patterns:
+
+PATTERN A — Pattern Interrupt (scroll-stopper):
+Line 1: One unexpected statement that breaks expectations.
+Line 2: The emotional payoff. Short. Rhythmic.
+Example style: "This isn't just screen time. / It's the good kind of quiet."
+
+PATTERN B — Identity Hook:
+Line 1: Speak directly to who they are.
+Line 2: The shift. The invitation.
+Example style: "If you care what your kid does on a screen… / this one's different."
+
+PATTERN C — Curiosity Loop:
+Line 1: Open a question or tension you don't resolve.
+Line 2: Pull them to watch.
+Example style: "Something happens when kids open this app. / You'll see it in their face."
+
+STYLE RULES:
+- 80–200 characters total
+- 1 emoji maximum — only if it adds warmth
+- Short. Punchy. Rhythmic. Two lines max.
+- NO generic TikTok formats (POV, Wait for it) — use the hypnotic patterns above instead
+- NO corporate tone. NO feature lists.
+- Voice: real, intimate, slightly knowing — like a parent sharing a secret
+
+Do NOT include hashtags. Return ONLY the caption text, nothing else.
