@@ -68,6 +68,22 @@
 
 ---
 
+### 2026-03-27 — Real Halbert book extracted, placeholder replaced
+- **Topics:** Extracting actual Halbert book content; user created docx versions of scanned PDFs
+- **What happened:** Previous session used knowledge-based placeholder for Halbert. User created docx. Full content extracted via Python zipfile + XML parsing.
+- **Book:** "The Halbert Copywriting Method Part III" by Bond Halbert (Gary's son). About editing copy for sales — the complete greased slide formula.
+- **Key material added:**
+  - The Greased Slide concept: every sentence must make the reader fall into the next
+  - 4 editing stages: Eye Relief → Clarity → Keep Reading → Punch Up
+  - So What? test: proved 4x sales lift in split test — cut everything a busy selfish reader would skip
+  - Words people secretly hate: teach/learn/work/earn → show/discover/get — table with JoyMaze translations
+  - 15-point editing checklist: That hunt, pronoun hunt, big word hunt, qualifier hunt, adverb hunt, I→You formula, punch-at-end rule, cliffhanger techniques
+  - Read-aloud rule: if it doesn't flow spoken, it won't flow read
+- **Style guide now at 670 lines** — all real extracted material: Vitale (18 modules) + Halbert (real book) + 50 hooks
+- **Next:** Generate a real content piece to test output quality improvement
+
+---
+
 ### 2026-03-27 — Gary Halbert method + 50 hooks added to style guide
 - **Topics:** Extracting Gary Halbert and 50 hooks PDF content, translating into JoyMaze style guide
 - **PDF extraction:** Installed PyMuPDF — finally solved the PDF reading problem

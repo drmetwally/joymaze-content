@@ -87,6 +87,20 @@
 
 ---
 
+### 2026-03-27 — Real Halbert content extracted and added (replaces placeholder)
+- User created docx versions of the scanned PDFs — unlocked actual book content
+- Extracted The Halbert Copywriting Method Part III (Bond Halbert) in full via Python/zipfile
+- Replaced the 12 generic "Boron Letters knowledge" placeholder principles with the actual 4-stage editing formula from the book:
+  - Stage 1 (Eye Relief): paragraph rules, break-at-and sentence technique, subheads as benefit bullets
+  - Stage 2 (Greased Slide/Clarity): read-aloud rule, That hunt, pronoun hunt, big word hunt, repeat word hunt, transitions library
+  - Stage 3 (Keep Reading): cliffhanger techniques, punch-at-end rule, anchor/hook promise technique
+  - Stage 4 (Punch Up): So What? test with JoyMaze examples, words-people-hate swap table, qualifier hunt, adverb hunt, I→You formula, power word method, emphasis hierarchy, Because technique, but→yet swap
+  - Added complete 15-point Halbert editing checklist
+- 50 hooks docx confirmed identical to PDF — no new content
+- Style guide: 561 → 670 lines; now has real extracted material from all 3 sources
+
+---
+
 ### 2026-03-27 — Writing style guide: Gary Halbert + 50 hooks added
 - Installed PyMuPDF (python -m pip) to extract PDF text — resolved the scan blocker
 - 50 Hooks PDF (One Peak Creative): fully extracted — 19 hook templates translated to JoyMaze parent audience examples (controversy, exclusion, myth buster, hack, identity, exclusivity, nobody talking, diagnosis, emotional relief, experiment, regret, warning, pattern interrupt, mistake prevention, lazy win, speed, skeptic, proof, transformation)
