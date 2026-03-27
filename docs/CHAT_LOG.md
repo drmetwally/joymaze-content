@@ -68,6 +68,19 @@
 
 ---
 
+### 2026-03-27 — Hypnotic Writing framework: full pipeline implementation
+- **Topics:** Applying Joe Vitale Hypnotic Writing to image prompts, video frames, content calendar, and agent skills
+- **Completed:**
+  - generate-images.mjs: all prompts now emotionally evocative (sensory scenes, identity-first); rotating hypnotic text overlay libraries per category
+  - generate-videos.mjs: intro "Screen time that feels like a gift." | outro "When you're ready, JoyMaze is waiting." | per-category slide overlay pools
+  - content-calendar.mjs: every DAILY_MIX category now has `hypnoticAngle` and `hook`; daily plan output surfaces both for every content piece
+  - All 4 agent skills rewritten with hypnotic formulas (committed alongside scripts)
+- **Framework status:** COMPLETE. Every generated output — captions, image overlays, video frames, content plans — now runs through the Hypnotic Writing system
+- **Style entry point:** config/writing-style.md is injected as system context into every AI caption call; all other hypnotic elements are baked directly into prompts and templates
+- **Next:** First live post — generate images manually, import + caption via Groq, push to Pinterest
+
+---
+
 ### 2026-03-27 — API activation, Gemini suspension, Groq + Ollama fallback chain
 - **Topics:** Gemini API key setup, Google account suspension, multi-provider fallback strategy, disk space management, Ollama local AI
 - **Gemini API:** Key set and briefly confirmed working (listModels + generateContent both succeeded), then suspended after billing was enabled — Google fraud detection false positive

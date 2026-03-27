@@ -87,6 +87,16 @@
 
 ---
 
+### 2026-03-27 — Hypnotic Writing framework: images, videos, calendar pipeline
+- Updated generate-images.mjs: all 10 category prompts rewritten with emotional/sensory scene direction; replaced single static textOverlay per category with rotating `textOverlays` array of 2-4 hypnotic micro-phrases picked randomly each run
+- Updated generate-videos.mjs: intro tagline changed to "Screen time that feels like a gift."; outro CTA changed to "When you're ready, JoyMaze is waiting." / "Free on iOS & Android"; added SLIDE_OVERLAYS map (per category pool of hypnotic overlay text) + pickSlideOverlay() function wired into prepareSlideFrame()
+- Updated content-calendar.mjs: added `hypnoticAngle` (emotional strategy) and `hook` (opening line) to all 10 DAILY_MIX categories; generatePlan() now prints both fields per content piece
+- Updated all 4 agent skills: caption-writer, content-strategist, image-generator, video-producer — all rewritten with Hypnotic Writing formulas
+- Committed as single commit: "Apply Hypnotic Writing framework to image, video, and calendar pipelines" (7 files, 362 insertions, 164 deletions)
+- Hypnotic Writing framework now COMPLETE across all pipeline steps
+
+---
+
 ### 2026-03-27 — API keys live + Groq + Ollama fallback chain
 - Set valid GOOGLE_AI_API_KEY in .env (Gemini confirmed working briefly)
 - Gemini account suspended by Google fraud detection after billing was added

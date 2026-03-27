@@ -50,6 +50,13 @@
 - **Decision:** Create a dedicated JoyMaze Google account (e.g., joymaze.app@gmail.com). Use it for all Google services, Gemini API, YouTube, Play console, and as the owner account for social media business profiles. Keep Amazon KDP on Ahmed's personal account.
 - **Consequences:** Clean separation of personal and business. Easier to add team members later. If personal account is ever locked, business continues. One account to manage all JoyMaze platform access.
 
+### ADR-007: Joe Vitale Hypnotic Writing as brand voice system
+- **Date:** 2026-03-27
+- **Status:** accepted
+- **Context:** Generic AI-generated captions produce flat, corporate-sounding copy. Ahmed provided Hypnotic Writing source material (book, summaries, GPT training PDFs). Need a consistent, distinctive brand voice across all content touchpoints.
+- **Decision:** Implement Joe Vitale's Hypnotic Writing framework as the single brand voice system. A master style bible (config/writing-style.md) is injected into every AI caption prompt. Image prompts, video frame text, and content calendar angles follow the same 6-step Social Formula: Hook → Mirror → Shift → Message → Invitation → Emotional Echo. Key techniques: pattern interrupts, identity activation, VAK sensory language, curiosity loops, embedded commands.
+- **Consequences:** All generated copy sounds distinctively human, emotionally resonant, and parent-targeted. Changing the style is one file edit (writing-style.md). The framework applies automatically to every new piece. Risk: model may not always follow the formula perfectly — review high-visibility posts before publishing.
+
 ### ADR-006: Anthropic API key not required
 - **Date:** 2026-03-25
 - **Status:** accepted
