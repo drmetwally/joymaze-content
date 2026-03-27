@@ -1,0 +1,103 @@
+{
+  "name": "JoyMaze — Daily Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 0,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "trigger-midnight",
+      "name": "Midnight Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd D:\\Joymaze-Content && node scripts/generate-images.mjs --count 12",
+        "timeout": 600
+      },
+      "id": "generate-images",
+      "name": "Generate 12 Images",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [500, 200]
+    },
+    {
+      "parameters": {
+        "command": "cd D:\\Joymaze-Content && node scripts/generate-captions.mjs",
+        "timeout": 300
+      },
+      "id": "generate-captions",
+      "name": "Generate Captions",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [750, 200]
+    },
+    {
+      "parameters": {
+        "command": "cd D:\\Joymaze-Content && node scripts/generate-videos.mjs --count 2 --duration 30",
+        "timeout": 600
+      },
+      "id": "generate-videos",
+      "name": "Generate 2 Videos",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [500, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "const fs = require('fs');\nconst path = require('path');\nconst queueDir = 'D:\\\\Joymaze-Content\\\\output\\\\queue';\nconst files = fs.readdirSync(queueDir).filter(f => f.endsWith('.json'));\nconst items = files.map(f => JSON.parse(fs.readFileSync(path.join(queueDir, f), 'utf-8')));\nconst pending = items.filter(i => Object.values(i.platforms || {}).some(p => p.status === 'pending'));\nreturn [{ json: { totalGenerated: items.length, pendingPosts: pending.length, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "summary",
+      "name": "Generation Summary",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Midnight Trigger": {
+      "main": [
+        [
+          { "node": "Generate 12 Images", "type": "main", "index": 0 },
+          { "node": "Generate 2 Videos", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Generate 12 Images": {
+      "main": [
+        [
+          { "node": "Generate Captions", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Generate Captions": {
+      "main": [
+        [
+          { "node": "Generation Summary", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Generate 2 Videos": {
+      "main": [
+        [
+          { "node": "Generation Summary", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "JoyMaze" },
+    { "name": "content-generation" }
+  ]
+}

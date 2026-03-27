@@ -1,0 +1,103 @@
+{
+  "name": "JoyMaze — Scheduled Poster",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtMinute": 0,
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "trigger-2h",
+      "name": "Every 2 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const fs = require('fs');\nconst path = require('path');\nconst queueDir = 'D:\\\\Joymaze-Content\\\\output\\\\queue';\nconst files = fs.readdirSync(queueDir).filter(f => f.endsWith('.json'));\nconst items = [];\nfor (const f of files) {\n  const data = JSON.parse(fs.readFileSync(path.join(queueDir, f), 'utf-8'));\n  if (data.captions && data.type !== 'video') {\n    const hasPending = Object.values(data.platforms || {}).some(p => p.status === 'pending');\n    if (hasPending) items.push({ json: data });\n  }\n}\nreturn items.slice(0, 2);"
+      },
+      "id": "read-queue",
+      "name": "Read Next 2 From Queue",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd D:\\Joymaze-Content && node scripts/post-content.mjs --limit 2 --platform pinterest",
+        "timeout": 120
+      },
+      "id": "post-pinterest",
+      "name": "Post to Pinterest",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [750, 200]
+    },
+    {
+      "parameters": {
+        "command": "cd D:\\Joymaze-Content && node scripts/post-content.mjs --limit 2 --platform instagram",
+        "timeout": 120
+      },
+      "id": "post-instagram",
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [750, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "const input = $input.all();\nconst results = input.map(i => i.json);\nreturn [{ json: { posted: results.length, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "log-results",
+      "name": "Log Results",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Every 2 Hours": {
+      "main": [
+        [
+          { "node": "Read Next 2 From Queue", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Read Next 2 From Queue": {
+      "main": [
+        [
+          { "node": "Post to Pinterest", "type": "main", "index": 0 },
+          { "node": "Post to Instagram", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Post to Pinterest": {
+      "main": [
+        [
+          { "node": "Log Results", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Post to Instagram": {
+      "main": [
+        [
+          { "node": "Log Results", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "JoyMaze" },
+    { "name": "posting" }
+  ]
+}

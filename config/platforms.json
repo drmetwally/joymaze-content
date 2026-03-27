@@ -1,0 +1,90 @@
+{
+  "pinterest": {
+    "name": "Pinterest",
+    "enabled": true,
+    "imageSize": { "width": 1000, "height": 1500 },
+    "aspectRatio": "2:3",
+    "captionMaxLength": 500,
+    "hashtagLimit": 20,
+    "supportsLinks": true,
+    "supportsVideo": true,
+    "videoMaxDuration": 900,
+    "postingTimes": ["08:00", "12:00", "17:00", "20:00"],
+    "contentTypes": ["image", "video"]
+  },
+  "instagram": {
+    "name": "Instagram",
+    "enabled": true,
+    "imageSizes": {
+      "square": { "width": 1080, "height": 1080 },
+      "portrait": { "width": 1080, "height": 1350 }
+    },
+    "defaultImageSize": { "width": 1080, "height": 1080 },
+    "aspectRatios": ["1:1", "4:5"],
+    "captionMaxLength": 2200,
+    "hashtagLimit": 30,
+    "supportsLinks": false,
+    "supportsVideo": true,
+    "videoMaxDuration": 90,
+    "videoSize": { "width": 1080, "height": 1920 },
+    "postingTimes": ["07:00", "11:00", "14:00", "19:00"],
+    "contentTypes": ["image", "reel", "story"]
+  },
+  "x": {
+    "name": "X (Twitter)",
+    "enabled": true,
+    "imageSize": { "width": 1200, "height": 675 },
+    "aspectRatio": "16:9",
+    "captionMaxLength": 280,
+    "hashtagLimit": 5,
+    "supportsLinks": true,
+    "supportsVideo": true,
+    "videoMaxDuration": 140,
+    "dailyPostLimit": 50,
+    "monthlyPostLimit": 1500,
+    "postingTimes": ["08:00", "12:00", "17:00"],
+    "contentTypes": ["image", "video"]
+  },
+  "tiktok": {
+    "name": "TikTok",
+    "enabled": true,
+    "videoSize": { "width": 1080, "height": 1920 },
+    "aspectRatio": "9:16",
+    "captionMaxLength": 2200,
+    "hashtagLimit": 5,
+    "supportsLinks": false,
+    "supportsVideo": true,
+    "videoMaxDuration": 60,
+    "postingTimes": ["07:00", "10:00", "19:00"],
+    "contentTypes": ["video"]
+  },
+  "youtube": {
+    "name": "YouTube Shorts",
+    "enabled": true,
+    "videoSize": { "width": 1080, "height": 1920 },
+    "aspectRatio": "9:16",
+    "captionMaxLength": 5000,
+    "hashtagLimit": 15,
+    "supportsLinks": true,
+    "supportsVideo": true,
+    "videoMaxDuration": 60,
+    "postingTimes": ["10:00", "14:00", "18:00"],
+    "contentTypes": ["video"]
+  },
+  "brand": {
+    "name": "JoyMaze",
+    "mascot": "Joyo",
+    "website": "joymaze.com",
+    "watermarkOpacity": 0.7,
+    "watermarkPosition": "bottom-right",
+    "ctaFontSize": 28,
+    "borderWidth": 0,
+    "colors": {
+      "primary": "#FF6B35",
+      "secondary": "#4ECDC4",
+      "accent": "#FFE66D",
+      "text": "#2C3E50",
+      "background": "#FFFFFF"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "name": "JoyMaze — Analytics Collector",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "trigger-nightly",
+      "name": "Nightly at 11 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Placeholder: Collect engagement metrics from each platform\n// This will be implemented when platform APIs are fully connected\nconst fs = require('fs');\nconst path = require('path');\nconst queueDir = 'D:\\\\Joymaze-Content\\\\output\\\\queue';\nconst files = fs.readdirSync(queueDir).filter(f => f.endsWith('.json'));\nlet posted = 0, pending = 0, failed = 0;\nfor (const f of files) {\n  const data = JSON.parse(fs.readFileSync(path.join(queueDir, f), 'utf-8'));\n  for (const [, p] of Object.entries(data.platforms || {})) {\n    if (p.status === 'posted') posted++;\n    else if (p.status === 'failed') failed++;\n    else pending++;\n  }\n}\nreturn [{ json: { date: new Date().toISOString().slice(0, 10), totalPosted: posted, totalPending: pending, totalFailed: failed } }];"
+      },
+      "id": "collect-stats",
+      "name": "Collect Queue Stats",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Write daily stats to analytics log\nconst fs = require('fs');\nconst stats = $input.first().json;\nconst logPath = 'D:\\\\Joymaze-Content\\\\output\\\\analytics.jsonl';\nfs.appendFileSync(logPath, JSON.stringify(stats) + '\\n');\nreturn [{ json: { ...stats, logged: true } }];"
+      },
+      "id": "log-analytics",
+      "name": "Append to Analytics Log",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 300]
+    }
+  ],
+  "connections": {
+    "Nightly at 11 PM": {
+      "main": [
+        [
+          { "node": "Collect Queue Stats", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Collect Queue Stats": {
+      "main": [
+        [
+          { "node": "Append to Analytics Log", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "JoyMaze" },
+    { "name": "analytics" }
+  ]
+}

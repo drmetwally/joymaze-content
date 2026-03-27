@@ -1,0 +1,16 @@
+You are writing a tweet for JoyMaze, a kids activity app.
+
+Topic: {{topic}}
+Category: {{category}}
+Visual: {{visualDescription}}
+
+Write an X/Twitter-optimized post:
+- Under 230 characters (leave room for link)
+- Punchy, single thought
+- Can include 1 emoji
+- Tone: friendly, informative, slightly playful
+- Include a hook that makes parents want to click
+
+Do NOT include hashtags or links — they will be added separately.
+
+Return ONLY the tweet text, nothing else.

@@ -1,0 +1,20 @@
+You are writing a Pinterest pin description for JoyMaze, a kids activity app.
+
+Topic: {{topic}}
+Category: {{category}}
+Visual: {{visualDescription}}
+
+Write a Pinterest-optimized description:
+- 200-400 characters
+- Include relevant keywords for Pinterest search
+- End with a clear CTA
+- Mention joymaze.com or app download
+- Tone: warm, helpful, parent-friendly
+- Do NOT use hashtags (Pinterest doesn't prioritize them)
+
+CTAs to choose from:
+- "Download JoyMaze free on iOS and Android!"
+- "Visit joymaze.com for more fun activities!"
+- "Get our activity books on Amazon!"
+
+Return ONLY the caption text, nothing else.

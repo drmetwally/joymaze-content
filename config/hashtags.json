@@ -1,0 +1,89 @@
+{
+  "pools": {
+    "core": [
+      "#JoyMaze", "#JoymazeApp", "#Joyo", "#KidsActivities", "#KidsGames",
+      "#ChildrensActivities", "#LearningThroughPlay", "#EducationalGames"
+    ],
+    "coloring": [
+      "#ColoringPages", "#KidsColoring", "#ColoringForKids", "#ColoringFun",
+      "#ColoringActivity", "#DigitalColoring", "#ColoringTime", "#ArtForKids",
+      "#KidsArt", "#CreativeKids"
+    ],
+    "mazes": [
+      "#MazeGame", "#MazeForKids", "#MazePuzzle", "#KidsMaze",
+      "#PuzzleTime", "#BrainGames", "#ProblemSolving", "#MazeFun"
+    ],
+    "wordSearch": [
+      "#WordSearch", "#WordSearchPuzzle", "#KidsWordSearch", "#WordGames",
+      "#SpellingFun", "#VocabularyBuilder", "#WordPuzzle"
+    ],
+    "sudoku": [
+      "#KidsSudoku", "#SudokuForKids", "#NumberPuzzle", "#MathGames",
+      "#LogicPuzzle", "#NumberFun", "#MathForKids"
+    ],
+    "dotToDot": [
+      "#DotToDot", "#ConnectTheDots", "#DotToDotForKids", "#NumberLearning",
+      "#CountingFun", "#FollowTheNumbers"
+    ],
+    "matching": [
+      "#MatchingGame", "#MemoryGame", "#KidsMemoryGame", "#MatchingPuzzle",
+      "#BrainTraining", "#ConcentrationGame"
+    ],
+    "parenting": [
+      "#ParentingTips", "#MomLife", "#DadLife", "#ParentingHacks",
+      "#KidsEducation", "#ScreenTimeThatMatters", "#MomHacks",
+      "#ParentingWin", "#FamilyFun", "#KidsAndParents"
+    ],
+    "education": [
+      "#EarlyLearning", "#PreschoolActivities", "#KindergartenReady",
+      "#HomeschoolActivities", "#STEMKids", "#LearnAndPlay",
+      "#EducationalApp", "#KidsLearning", "#FunLearning"
+    ],
+    "books": [
+      "#ActivityBook", "#KidsActivityBook", "#ColoringBook", "#MazeBook",
+      "#AmazonKDP", "#ChildrensBook", "#PrintableActivities",
+      "#BusyBook", "#QuietTimeActivities"
+    ],
+    "engagement": [
+      "#WouldYouRather", "#ThisOrThat", "#KidsChallenge", "#FunFacts",
+      "#DidYouKnow", "#TagAParent", "#ParentChallenge"
+    ],
+    "seasonal": {
+      "spring": ["#SpringActivities", "#EasterCrafts", "#SpringBreakFun"],
+      "summer": ["#SummerActivities", "#SummerFun", "#SummerLearning", "#KeepKidsBusy"],
+      "fall": ["#FallActivities", "#BackToSchool", "#HalloweenFun", "#AutumnCrafts"],
+      "winter": ["#WinterActivities", "#ChristmasCrafts", "#HolidayFun", "#SnowDayActivities"]
+    }
+  },
+  "platformDefaults": {
+    "pinterest": {
+      "count": 15,
+      "pools": ["core", "parenting", "education"],
+      "alwaysInclude": ["#JoyMaze", "#KidsActivities"]
+    },
+    "instagram": {
+      "count": 25,
+      "pools": ["core", "parenting", "education", "engagement"],
+      "alwaysInclude": ["#JoyMaze", "#KidsActivities", "#LearningThroughPlay"]
+    },
+    "x": {
+      "count": 3,
+      "pools": ["core"],
+      "alwaysInclude": ["#JoyMaze"]
+    },
+    "tiktok": {
+      "count": 4,
+      "pools": ["core", "engagement"],
+      "alwaysInclude": ["#JoyMaze"]
+    },
+    "youtube": {
+      "count": 10,
+      "pools": ["core", "education"],
+      "alwaysInclude": ["#JoyMaze", "#KidsActivities"]
+    }
+  },
+  "rotation": {
+    "strategy": "random-from-pool",
+    "avoidRepeatWithinDays": 3
+  }
+}

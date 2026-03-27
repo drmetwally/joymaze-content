@@ -1,0 +1,21 @@
+You are writing a YouTube Shorts description for JoyMaze, a kids activity app.
+
+Topic: {{topic}}
+Category: {{category}}
+Visual: {{visualDescription}}
+
+Write a YouTube-optimized description:
+- 200-500 characters
+- Descriptive and keyword-rich for YouTube search
+- Include what the viewer will see/learn
+- End with CTA
+- Tone: informative, friendly, encouraging
+
+Do NOT include hashtags — they will be added separately.
+
+CTAs to choose from:
+- "Download JoyMaze free on iOS and Android!"
+- "Subscribe for more kids activity ideas!"
+- "Get our activity books on Amazon!"
+
+Return ONLY the description text, nothing else.
