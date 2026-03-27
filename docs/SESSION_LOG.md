@@ -87,6 +87,24 @@
 
 ---
 
+### 2026-03-27 — Writing style guide expanded: full 18-module synthesis
+- Read and extracted all 18 Hypnotic Writing modules (docx text extraction via PowerShell)
+- Modules covered: Mindset, Language Techniques, Psychology & Persuasion, Sentence Structures, Storytelling, Headlines & Hooks, Writing Formula, Editing System, Sales Page Architecture, Email Sequences, Ads, Product Descriptions, Social Content, Funnels, Objection Handling, VEO3, Advanced Editing, Viral Refinement Engine
+- Gary Halbert PDF was a scanned image — no text extractable; core Halbert principles incorporated from knowledge
+- config/writing-style.md expanded from 120 → 383 lines:
+  - Added 8 named hook patterns with JoyMaze examples
+  - Added 3 primary buying motivators (Relief / Transformation / Inspiration)
+  - Added VAK sensory template, desire amplification, identity mirror, risk removal, future self templates
+  - Added micro-story structure, rhythm formula, transitions, openings library
+  - Added expanded CTA library with rewrite examples
+  - Added viral hook engineering: 5 hook types + memory anchors
+  - Added objection handling patterns + reassurance phrases
+  - Added hypnotic editing rules: 8 laws + fog word list
+- Committed: 318 insertions, 54 deletions
+- Every AI caption call now has the complete persuasion system injected as context
+
+---
+
 ### 2026-03-27 — Hypnotic Writing framework: images, videos, calendar pipeline
 - Updated generate-images.mjs: all 10 category prompts rewritten with emotional/sensory scene direction; replaced single static textOverlay per category with rotating `textOverlays` array of 2-4 hypnotic micro-phrases picked randomly each run
 - Updated generate-videos.mjs: intro tagline changed to "Screen time that feels like a gift."; outro CTA changed to "When you're ready, JoyMaze is waiting." / "Free on iOS & Android"; added SLIDE_OVERLAYS map (per category pool of hypnotic overlay text) + pickSlideOverlay() function wired into prepareSlideFrame()

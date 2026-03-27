@@ -68,6 +68,29 @@
 
 ---
 
+### 2026-03-27 — Full 18-module Hypnotic Writing synthesis into style guide
+- **Topics:** Deep study of all 18 Hypnotic Writing modules, expanding the master style guide
+- **Source material studied:**
+  - All docx modules from D:\Books and Publishing\Hypnotic writing GPT\ (Modules 1–18)
+  - Gary Halbert PDF was scanned image — unreadable; principles incorporated from knowledge
+  - 50 Hooks PDF also scanned — same limitation
+- **What was extracted and added to config/writing-style.md:**
+  - 8 hook patterns with JoyMaze-specific example lines
+  - 3 buying motivators (Relief, Transformation, Inspiration) mapped to parent psychology
+  - Full sensory template library (VAK + emotional)
+  - 4 persuasion templates: desire amplification, identity mirror, risk removal, future self
+  - Micro-story structure with JoyMaze scene examples
+  - Hypnotic sentence rhythm + transitions + contradiction/mystery/story openings
+  - Expanded CTA rewrite library (weak → hypnotic transformations)
+  - Viral engineering section: 5 hook types + 5 memory anchors
+  - Objection handling for 4 common parent objections
+  - 8 hypnotic editing laws + fog word removal list
+- **Style guide:** 120 lines → 383 lines; still a single injected context file
+- **Impact:** All future AI caption calls automatically use the full persuasion system
+- **Next:** Run generate-captions.mjs with real content to see new output quality
+
+---
+
 ### 2026-03-27 — Hypnotic Writing framework: full pipeline implementation
 - **Topics:** Applying Joe Vitale Hypnotic Writing to image prompts, video frames, content calendar, and agent skills
 - **Completed:**
