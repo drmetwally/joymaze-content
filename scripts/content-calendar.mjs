@@ -26,18 +26,78 @@ const SHOW_WEEK = args.includes('--week');
 const GENERATE = args.includes('--generate');
 const SHOW_STATS = args.includes('--stats');
 
-// Content categories with daily rotation weights
+// Content categories with daily rotation weights and hypnotic angles
 const DAILY_MIX = [
-  { category: 'coloring-preview', perDay: 2, label: 'Coloring Previews' },
-  { category: 'parent-tips', perDay: 2, label: 'Parent Tips' },
-  { category: 'app-feature', perDay: 1, label: 'App Features' },
-  { category: 'book-preview', perDay: 1, label: 'Book Previews' },
-  { category: 'fun-facts', perDay: 1, label: 'Fun Facts' },
-  { category: 'joyo-mascot', perDay: 1, label: 'Joyo Mascot' },
-  { category: 'motivation', perDay: 1, label: 'Quotes' },
-  { category: 'engagement', perDay: 1, label: 'Engagement Posts' },
-  { category: 'seasonal', perDay: 1, label: 'Seasonal' },
-  { category: 'before-after', perDay: 1, label: 'Before/After' },
+  {
+    category: 'coloring-preview',
+    perDay: 2,
+    label: 'Coloring Previews',
+    hypnoticAngle: 'The quiet focus — a child reaching for crayons, the world going still.',
+    hook: 'Let them get lost in color.',
+  },
+  {
+    category: 'parent-tips',
+    perDay: 2,
+    label: 'Parent Tips',
+    hypnoticAngle: 'The identity shift — from screen guilt to screen pride. Science gives them permission.',
+    hook: 'What great parents already know.',
+  },
+  {
+    category: 'app-feature',
+    perDay: 1,
+    label: 'App Features',
+    hypnoticAngle: 'The absorption moment — when a child goes quiet and deeply focused. That\'s the proof.',
+    hook: 'Watch them focus.',
+  },
+  {
+    category: 'book-preview',
+    perDay: 1,
+    label: 'Book Previews',
+    hypnoticAngle: 'The lasting gift — something physical that outlasts any toy, any trend.',
+    hook: 'A gift they will come back to.',
+  },
+  {
+    category: 'fun-facts',
+    perDay: 1,
+    label: 'Fun Facts',
+    hypnoticAngle: 'The reframe — play is research. Fun is learning. The science confirms what parents already felt.',
+    hook: 'The science behind the fun.',
+  },
+  {
+    category: 'joyo-mascot',
+    perDay: 1,
+    label: 'Joyo Mascot',
+    hypnoticAngle: 'The friend — Joyo is who kids want to be with. Emotional connection before the app.',
+    hook: 'He loves what your kids love.',
+  },
+  {
+    category: 'motivation',
+    perDay: 1,
+    label: 'Quotes',
+    hypnoticAngle: 'The permission — timeless words that validate what parents already believe deep down.',
+    hook: 'Screen time can be sacred time.',
+  },
+  {
+    category: 'engagement',
+    perDay: 1,
+    label: 'Engagement Posts',
+    hypnoticAngle: 'The choice — give kids agency, give parents a window into their child\'s world.',
+    hook: 'Which calls to them?',
+  },
+  {
+    category: 'seasonal',
+    perDay: 1,
+    label: 'Seasonal',
+    hypnoticAngle: 'The moment — right now, this season, this feeling. Timely and alive.',
+    hook: 'Made for right now.',
+  },
+  {
+    category: 'before-after',
+    perDay: 1,
+    label: 'Before/After',
+    hypnoticAngle: 'The transformation — the blank page becomes theirs. Potential turned into pride.',
+    hook: 'Watch it come alive.',
+  },
 ];
 
 // Optimal posting times per platform
@@ -168,6 +228,8 @@ function generatePlan() {
   for (const item of DAILY_MIX) {
     for (let i = 0; i < item.perDay; i++) {
       console.log(`  ${imageIdx}. [${item.category}] ${item.label}`);
+      if (item.hook) console.log(`       Hook: "${item.hook}"`);
+      if (item.hypnoticAngle) console.log(`       Angle: ${item.hypnoticAngle}`);
       imageIdx++;
     }
   }

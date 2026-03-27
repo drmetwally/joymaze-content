@@ -43,79 +43,123 @@ const CATEGORIES = [
   {
     id: 'coloring-preview',
     name: 'Coloring Page Preview',
-    prompt: 'A beautiful kids coloring page showing {{subject}}, clean black outlines on white background, simple shapes suitable for ages 4-8, cute cartoon style',
+    prompt: 'A beautiful, inviting kids coloring page showing {{subject}}, clean bold outlines on white background, simple rounded shapes for ages 4-8, warm cartoon style — the kind that makes a child reach for their crayons immediately',
     subjects: ['a friendly dinosaur', 'a magical unicorn', 'a happy puppy', 'an underwater scene with fish', 'a rocket ship in space', 'a butterfly garden'],
-    textOverlay: 'Color Me!',
+    textOverlays: [
+      'Let them get lost in color.',
+      'Watch what happens next.',
+      'The page is waiting for them.',
+      'Their hands. Their rules.',
+    ],
   },
   {
     id: 'parent-tips',
     name: 'Activity Tips for Parents',
-    prompt: 'A clean, modern infographic-style illustration about {{subject}}, bright cheerful colors, kid-friendly design, educational theme',
+    prompt: 'A clean, warm infographic-style illustration about {{subject}}, soft pastel palette, educational warmth — the kind of design that makes parents feel like great decision-makers',
     subjects: ['5 benefits of mazes for kids brain development', 'why coloring helps fine motor skills', 'how word search builds vocabulary', 'screen time that actually helps kids learn', 'fun ways to practice counting at home'],
-    textOverlay: '{{subject}}',
+    textOverlays: [
+      'This one surprised us too.',
+      'Worth knowing.',
+      'The science is in the fun.',
+      'What great parents already know.',
+    ],
   },
   {
     id: 'app-feature',
     name: 'App Feature Highlight',
-    prompt: 'A vibrant, playful illustration showing a child happily playing {{subject}}, cartoon style, bright colors, cheerful atmosphere, no real human faces',
+    prompt: 'A warm, vibrant illustration showing a child completely absorbed in {{subject}}, soft glow of concentration, cartoon style, joyful colors — the quiet focus parents dream of seeing, no real human faces',
     subjects: ['a colorful maze game on a tablet', 'a fun word search puzzle', 'an engaging sudoku for kids', 'a dot-to-dot animal drawing', 'a matching memory card game'],
-    textOverlay: 'Try it in JoyMaze!',
+    textOverlays: [
+      'Watch them focus.',
+      'This is what good screen time looks like.',
+      'One tap. Real learning.',
+      'Something shifts when they open this.',
+    ],
   },
   {
     id: 'book-preview',
     name: 'Book Preview',
-    prompt: 'A mockup of a colorful kids activity book cover about {{subject}}, professional book design, vibrant colors, fun typography, child-friendly',
+    prompt: 'A beautifully crafted kids activity book cover for {{subject}}, professional design with warm playful colors — the kind of book that looks like a promise of fun guaranteed, child-friendly typography',
     subjects: ['mazes and puzzles for kids', 'coloring adventures for ages 4-8', 'word search fun for young minds', 'brain games activity book'],
-    textOverlay: 'Available on Amazon!',
+    textOverlays: [
+      'A gift they will come back to.',
+      'Activities that outlast any toy.',
+      'Keep it meaningful.',
+      'Available on Amazon.',
+    ],
   },
   {
     id: 'fun-facts',
     name: 'Fun Facts / Did You Know',
-    prompt: 'A colorful, educational illustration showing {{subject}}, kid-friendly infographic style, bright colors, fun cartoon elements',
+    prompt: 'A colorful, inviting educational illustration about {{subject}}, kid-friendly infographic warmth, bright cheerful design that makes learning feel like discovery rather than study',
     subjects: ['a brain with puzzle pieces showing learning', 'colorful letters and words floating', 'numbers and math symbols in a fun pattern', 'a maze shaped like a brain'],
-    textOverlay: 'Did You Know?',
+    textOverlays: [
+      'This changed how we think about play.',
+      'The science behind the fun.',
+      'Did you know?',
+      'Every parent should see this.',
+    ],
   },
   {
     id: 'joyo-mascot',
     name: 'Joyo Mascot Scene',
-    prompt: 'A cute, friendly cartoon mascot character (round, colorful, cheerful expression) {{subject}}, kids illustration style, bright vibrant colors, white background',
+    prompt: 'Joyo — a round, colorful, irresistibly cheerful cartoon mascot character — {{subject}}, bright vibrant kids illustration style, white background — the kind of character children feel like befriending immediately',
     subjects: ['waving hello happily', 'solving a maze puzzle', 'painting with a big brush', 'reading a book surrounded by stars', 'celebrating with confetti'],
-    textOverlay: '',
+    textOverlays: [
+      '',
+      'Meet Joyo.',
+      'He loves what your kids love.',
+    ],
   },
   {
     id: 'motivation',
     name: 'Quotes & Motivation',
-    prompt: 'A beautiful, minimal background with soft pastel colors and subtle kid-friendly decorative elements like stars, clouds, or crayons, perfect for text overlay',
+    prompt: 'A serene, beautiful background with soft pastel colors and gentle kid-friendly elements — scattered stars, soft clouds, resting crayons — warm and still, like a room just after laughter fades',
     subjects: [''],
-    textOverlay: '{{quote}}',
+    textOverlays: ['{{quote}}'],
     quotes: [
       'Every child is an artist.',
-      'Play is the highest form of research. — Einstein',
-      'Learning is a treasure that follows its owner everywhere.',
-      'Children learn as they play. Most importantly, in play children learn how to learn.',
-      'The more that you read, the more things you will know.',
+      'Play is the highest form of research.',
+      'The quietest rooms hold the biggest discoveries.',
+      'A child absorbed in play is learning everything.',
+      'Screen time can be sacred time.',
     ],
   },
   {
     id: 'engagement',
     name: 'User Engagement',
-    prompt: 'A split-screen comparison illustration showing {{subject}}, colorful cartoon style, kid-friendly, bright and fun, clear visual distinction between two options',
+    prompt: 'A vivid, playful split-screen illustration showing {{subject}}, colorful cartoon style, fun visual contrast — designed to make a child point at the screen and choose',
     subjects: ['two different maze paths side by side', 'two coloring styles of the same animal', 'easy vs hard puzzle comparison', 'two cute animal characters'],
-    textOverlay: 'Which one would YOU pick?',
+    textOverlays: [
+      'Which calls to them?',
+      'Which would YOUR child pick?',
+      'Let them decide.',
+      'Two paths. One magic moment.',
+    ],
   },
   {
     id: 'seasonal',
     name: 'Seasonal Content',
-    prompt: 'A festive, cheerful illustration of {{subject}}, kid-friendly cartoon style, bright colors, seasonal decorations, fun and inviting',
+    prompt: 'A festive, inviting illustration of {{subject}}, warm kid-friendly cartoon style, seasonal colors that feel like a celebration is just beginning — not a decoration but an atmosphere',
     subjects: ['spring flowers and butterflies coloring theme', 'summer beach maze adventure', 'fall leaves and pumpkin activities', 'winter snowflake puzzles'],
-    textOverlay: 'Seasonal Fun!',
+    textOverlays: [
+      'Made for right now.',
+      'This week\'s favorite activity.',
+      'The season inside the screen.',
+      'New season. Same joy.',
+    ],
   },
   {
     id: 'before-after',
     name: 'Before/After Coloring',
-    prompt: 'A side-by-side comparison of {{subject}}, left side is black and white outline, right side is beautifully colored, kid-friendly cartoon style',
+    prompt: 'A compelling side-by-side illustration of {{subject}}: left side is a black and white outline full of quiet potential, right side is beautifully colored and alive — cartoon style that makes you want to reach for a crayon',
     subjects: ['a cute cat drawing', 'a tropical fish scene', 'a castle with towers', 'a garden with flowers'],
-    textOverlay: 'Before & After',
+    textOverlays: [
+      'Watch it come alive.',
+      'Before their hands. After their hands.',
+      'The transformation is the point.',
+      'Color changes everything.',
+    ],
   },
 ];
 
@@ -265,7 +309,11 @@ function pickRandom(arr) {
 async function generateContentPiece(category, index) {
   const subject = pickRandom(category.subjects);
   const prompt = category.prompt.replace('{{subject}}', subject);
-  let textOverlay = category.textOverlay;
+
+  // Pick from hypnotic overlay library if available, otherwise fall back to legacy field
+  let textOverlay = category.textOverlays?.length
+    ? pickRandom(category.textOverlays)
+    : (category.textOverlay || '');
 
   if (textOverlay === '{{quote}}' && category.quotes) {
     textOverlay = pickRandom(category.quotes);

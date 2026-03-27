@@ -40,6 +40,26 @@ const VIDEO_COUNT = countIdx !== -1 ? parseInt(args[countIdx + 1], 10) : 1;
 const durIdx = args.indexOf('--duration');
 const TARGET_DURATION = durIdx !== -1 ? parseInt(args[durIdx + 1], 10) : 30;
 
+// Hypnotic micro-phrases for slide overlays — keyed by content category
+const SLIDE_OVERLAYS = {
+  'coloring-preview': ['Let them get lost in color.', 'The page is waiting.', 'Their hands. Their rules.'],
+  'parent-tips': ['Worth knowing.', 'The science is in the fun.', 'This one surprised us.'],
+  'app-feature': ['Watch them focus.', 'One tap. Real learning.', 'Something shifts.'],
+  'book-preview': ['A gift they come back to.', 'Activities that outlast any toy.'],
+  'fun-facts': ['The science behind the fun.', 'Play is research.', 'Did you know?'],
+  'joyo-mascot': ['He loves what they love.', 'Meet Joyo.'],
+  'motivation': ['Screen time can be sacred time.', 'Every child is an artist.'],
+  'engagement': ['Which calls to them?', 'Let them decide.'],
+  'seasonal': ['Made for right now.', 'New season. Same joy.'],
+  'before-after': ['Watch it come alive.', 'Color changes everything.'],
+};
+
+function pickSlideOverlay(category, fallback) {
+  const pool = SLIDE_OVERLAYS[category];
+  if (pool?.length) return pool[Math.floor(Math.random() * pool.length)];
+  return fallback || '';
+}
+
 // Video specs
 const VIDEO_WIDTH = 1080;
 const VIDEO_HEIGHT = 1920;
@@ -79,7 +99,7 @@ async function createIntroFrame() {
       </defs>
       <rect width="${VIDEO_WIDTH}" height="${VIDEO_HEIGHT}" fill="url(#bg)" />
       <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 - 60}" text-anchor="middle" font-family="Arial, sans-serif" font-size="80" fill="white" font-weight="bold">JoyMaze</text>
-      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 + 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="rgba(255,255,255,0.9)">Fun Learning Games for Kids</text>
+      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 + 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="rgba(255,255,255,0.9)">Screen time that feels like a gift.</text>
     </svg>`;
 
   let frame = sharp(Buffer.from(svg)).png();
@@ -110,10 +130,10 @@ async function createOutroFrame() {
         </linearGradient>
       </defs>
       <rect width="${VIDEO_WIDTH}" height="${VIDEO_HEIGHT}" fill="url(#bg)" />
-      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 - 120}" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" fill="white" font-weight="bold">Download JoyMaze</text>
-      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 - 40}" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" fill="white" font-weight="bold">FREE Today!</text>
-      <rect x="${VIDEO_WIDTH / 2 - 200}" y="${VIDEO_HEIGHT / 2 + 20}" width="400" height="60" rx="30" fill="white" />
-      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 + 60}" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#FF6B35" font-weight="bold">iOS &amp; Android</text>
+      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 - 120}" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" fill="white" font-weight="bold">When you&#39;re ready,</text>
+      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 - 40}" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" fill="white" font-weight="bold">JoyMaze is waiting.</text>
+      <rect x="${VIDEO_WIDTH / 2 - 220}" y="${VIDEO_HEIGHT / 2 + 20}" width="440" height="60" rx="30" fill="white" />
+      <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 + 60}" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" fill="#FF6B35" font-weight="bold">Free on iOS &amp; Android</text>
       <text x="${VIDEO_WIDTH / 2}" y="${VIDEO_HEIGHT / 2 + 150}" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="rgba(255,255,255,0.9)">joymaze.com</text>
     </svg>`;
 
@@ -241,7 +261,8 @@ async function generateSlideshowVideo(queueItems, videoIndex) {
     }
 
     console.log(`    Slide: ${item.id} (${item.categoryName})`);
-    const slideBuffer = await prepareSlideFrame(imagePath, item.textOverlay || item.categoryName);
+    const slideText = pickSlideOverlay(item.category, item.textOverlay || item.categoryName);
+    const slideBuffer = await prepareSlideFrame(imagePath, slideText);
     frames.push({ buffer: slideBuffer, durationFrames: FPS * SECONDS_PER_SLIDE });
   }
 
