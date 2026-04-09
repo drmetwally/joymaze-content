@@ -26,79 +26,204 @@ const SHOW_WEEK = args.includes('--week');
 const GENERATE = args.includes('--generate');
 const SHOW_STATS = args.includes('--stats');
 
-// Content categories with daily rotation weights and hypnotic angles
-const DAILY_MIX = [
+// ========== STORY ARCHETYPES (Slots 1-5) ==========
+// See docs/CONTENT_ARCHETYPES.md for full definitions and example executions.
+
+// All 6 pure story archetypes — 3 appear per day (odd/even rotation)
+const STORY_ARCHETYPES = [
   {
-    category: 'coloring-preview',
-    perDay: 2,
-    label: 'Coloring Previews',
-    hypnoticAngle: 'The quiet focus — a child reaching for crayons, the world going still.',
-    hook: 'Let them get lost in color.',
+    category: 'story-restless-afternoon',
+    label: 'Story: The Restless Afternoon',
+    archetype: 1,
+    marketingLevel: 'none',
+    hook: 'It was 3:47pm on a Tuesday.',
+    hypnoticAngle: 'Overwhelm → Calm. A restless child finds their anchor. No product. Pure story.',
   },
   {
-    category: 'parent-tips',
-    perDay: 2,
-    label: 'Parent Tips',
-    hypnoticAngle: 'The identity shift — from screen guilt to screen pride. Science gives them permission.',
-    hook: 'What great parents already know.',
+    category: 'story-discovery',
+    label: 'Story: The Discovery',
+    archetype: 2,
+    marketingLevel: 'none',
+    hook: 'I didn\'t think it would hold her attention for more than five minutes.',
+    hypnoticAngle: 'Skepticism → Surprise. Parent tries something. Low expectations. Then: it works.',
   },
   {
-    category: 'app-feature',
-    perDay: 1,
-    label: 'App Features',
-    hypnoticAngle: 'The absorption moment — when a child goes quiet and deeply focused. That\'s the proof.',
-    hook: 'Watch them focus.',
+    category: 'story-nostalgia',
+    label: 'Story: Childhood Nostalgia',
+    archetype: 3,
+    marketingLevel: 'none',
+    hook: 'Remember when a box of crayons felt like the whole world?',
+    hypnoticAngle: 'Longing → Warmth. A timeless childhood feeling a child today still gets to have.',
   },
   {
-    category: 'book-preview',
-    perDay: 1,
-    label: 'Book Previews',
-    hypnoticAngle: 'The lasting gift — something physical that outlasts any toy, any trend.',
-    hook: 'A gift they will come back to.',
+    category: 'story-quiet-room',
+    label: 'Story: The Quiet Room',
+    archetype: 4,
+    marketingLevel: 'none',
+    hook: 'All she wanted was twenty minutes.',
+    hypnoticAngle: 'Guilt → Relief. The exhale when screen time finally feels okay. No pitch.',
   },
   {
-    category: 'fun-facts',
-    perDay: 1,
-    label: 'Fun Facts',
-    hypnoticAngle: 'The reframe — play is research. Fun is learning. The science confirms what parents already felt.',
-    hook: 'The science behind the fun.',
+    category: 'story-curious-child',
+    label: 'Story: The Curious Child',
+    archetype: 5,
+    marketingLevel: 'none',
+    hook: 'He stared at it for four minutes.',
+    hypnoticAngle: 'Wonder → Pride. The child is the hero. Solving, creating, asking to come back.',
   },
   {
-    category: 'joyo-mascot',
-    perDay: 1,
-    label: 'Joyo Mascot',
-    hypnoticAngle: 'The friend — Joyo is who kids want to be with. Emotional connection before the app.',
-    hook: 'He loves what your kids love.',
-  },
-  {
-    category: 'motivation',
-    perDay: 1,
-    label: 'Quotes',
-    hypnoticAngle: 'The permission — timeless words that validate what parents already believe deep down.',
-    hook: 'Screen time can be sacred time.',
-  },
-  {
-    category: 'engagement',
-    perDay: 1,
-    label: 'Engagement Posts',
-    hypnoticAngle: 'The choice — give kids agency, give parents a window into their child\'s world.',
-    hook: 'Which calls to them?',
-  },
-  {
-    category: 'seasonal',
-    perDay: 1,
-    label: 'Seasonal',
-    hypnoticAngle: 'The moment — right now, this season, this feeling. Timely and alive.',
-    hook: 'Made for right now.',
-  },
-  {
-    category: 'before-after',
-    perDay: 1,
-    label: 'Before/After',
-    hypnoticAngle: 'The transformation — the blank page becomes theirs. Potential turned into pride.',
-    hook: 'Watch it come alive.',
+    category: 'story-before-i-knew',
+    label: 'Story: Before I Knew This',
+    archetype: 6,
+    marketingLevel: 'none',
+    hook: 'For a long time, I felt like I was doing it wrong.',
+    hypnoticAngle: 'Frustration → Clarity. The parent who found a better way. Story ends at the shift.',
   },
 ];
+
+// Fixed story slots (1 marketing + 1 pattern interrupt)
+const STORY_FIXED = [
+  {
+    category: 'story-parent-who-chose',
+    label: 'Story: The Parent Who Chose',
+    archetype: 7,
+    marketingLevel: 'subtle',
+    hook: 'She didn\'t just hand her daughter a tablet.',
+    hypnoticAngle: 'Identity → Confidence. JoyMaze appears as the setting — once, naturally. Not the hero.',
+    ctaNote: 'CTA in first comment only.',
+  },
+  {
+    category: 'pattern-interrupt',
+    label: 'Pattern Interrupt / Myth-Bust',
+    archetype: null,
+    marketingLevel: 'none',
+    hook: 'Everything you think you know about kids and screens is wrong.',
+    hypnoticAngle: 'Curiosity or myth-bust. Edutainment. No product mention. Pure value.',
+  },
+];
+
+// ========== ACTIVITY ARCHETYPES (Slots 6-10) ==========
+// Actual puzzles & printable activities. High save/share potential.
+// See docs/CONTENT_ARCHETYPES.md A1–A5.
+
+const ACTIVITY_TYPES = [
+  {
+    category: 'activity-maze',
+    label: 'Activity: Maze Puzzle',
+    archetype: 'A1',
+    marketingLevel: 'watermark',
+    hook: 'Can your kid find the path?',
+    skill: 'Problem-solving, spatial reasoning, focus',
+    difficulty: ['easy', 'medium', 'hard'],
+  },
+  {
+    category: 'activity-word-search',
+    label: 'Activity: Word Search',
+    archetype: 'A2',
+    marketingLevel: 'watermark',
+    hook: 'Find all 8 words!',
+    skill: 'Vocabulary, letter recognition, focus',
+    difficulty: ['easy', 'medium', 'hard'],
+  },
+  {
+    category: 'activity-matching',
+    label: 'Activity: Matching / Spot-the-Difference',
+    archetype: 'A3',
+    marketingLevel: 'watermark',
+    hook: 'Which two are exactly the same?',
+    skill: 'Observation, memory, attention to detail',
+    difficulty: ['easy', 'medium', 'hard'],
+  },
+  {
+    category: 'activity-tracing',
+    label: 'Activity: Tracing / Drawing',
+    archetype: 'A4',
+    marketingLevel: 'watermark',
+    hook: 'Trace the path to help Joyo!',
+    skill: 'Fine motor skills, hand-eye coordination',
+    difficulty: ['easy', 'medium'],
+  },
+  {
+    category: 'activity-quiz',
+    label: 'Activity: Quiz / Visual Puzzle',
+    archetype: 'A5',
+    marketingLevel: 'watermark',
+    hook: 'How many can YOU spot?',
+    skill: 'Logic, counting, pattern recognition',
+    difficulty: ['easy', 'medium', 'hard'],
+  },
+];
+
+// Difficulty rotation: Easy on Mon/Thu, Medium on Tue/Fri, Hard on Wed/Sat
+const DIFFICULTY_BY_DAY = ['easy', 'easy', 'medium', 'hard', 'easy', 'medium', 'hard'];
+//                         Sun     Mon     Tue      Wed     Thu     Fri      Sat
+
+function getDifficulty(date) {
+  return DIFFICULTY_BY_DAY[date.getDay()];
+}
+
+// ========== DAILY MIX BUILDER ==========
+
+// Build the 10-post daily mix: 5 story + 5 activity
+function buildDailyMix(date) {
+  const d = date || new Date();
+  const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+  const isOdd = dayOfYear % 2 === 1;
+  const isSunday = d.getDay() === 0;
+  const difficulty = getDifficulty(d);
+
+  if (isSunday) {
+    return {
+      label: 'Sunday — Best-of Repost (story + activity top performers)',
+      isRepost: true,
+      archetypes: [1, 2, 3, 4, 5, 6],
+      activityTypes: ACTIVITY_TYPES.map(a => a.category),
+      slots: [],
+    };
+  }
+
+  // 3 rotating story archetypes (odd/even day)
+  const storyRotation = isOdd
+    ? STORY_ARCHETYPES.filter(s => [1, 3, 5].includes(s.archetype))
+    : STORY_ARCHETYPES.filter(s => [2, 4, 6].includes(s.archetype));
+
+  const storySlots = [
+    ...storyRotation.map(s => ({ ...s, type: 'story' })),
+    { ...STORY_FIXED[0], type: 'story' },    // Archetype 7
+    { ...STORY_FIXED[1], type: 'story' },    // Pattern interrupt
+  ];
+
+  // 5 activity slots (all 5 types daily, difficulty rotates)
+  const activitySlots = ACTIVITY_TYPES.map(a => ({
+    ...a,
+    type: 'activity',
+    todayDifficulty: difficulty,
+  }));
+
+  return {
+    label: `${isOdd ? 'Odd' : 'Even'} Day — Arch ${isOdd ? '1,3,5' : '2,4,6'} + Activities (${difficulty})`,
+    isRepost: false,
+    slots: [...storySlots, ...activitySlots],
+  };
+}
+
+// Legacy flat list for backward compat with showStatus() category counting
+const DAILY_MIX = [
+  ...STORY_ARCHETYPES.map(s => ({ ...s, perDay: 1 })),
+  ...STORY_FIXED.map(s => ({ ...s, perDay: 1 })),
+  ...ACTIVITY_TYPES.map(a => ({ ...a, perDay: 1 })),
+];
+
+// Video plan — 1 per day when ready (Archetype 8: Kids Story)
+const VIDEO_PLAN = {
+  category: 'kids-story-video',
+  label: 'Kids Story Video — Joyo\'s Story Corner',
+  archetype: 8,
+  marketingLevel: 'none',
+  format: '5–8 images + text overlays + soft music, 45–60s',
+  hook: 'Joyo narrates. Pure kids story. Zero product. Maximum shareability.',
+  ctaNote: 'No CTA anywhere — not in post, not in comment. Story only.',
+};
 
 // Optimal posting times per platform
 const POSTING_SCHEDULE = {
@@ -175,6 +300,8 @@ async function showStatus() {
  */
 function showWeekPlan() {
   console.log('=== This Week\'s Content Plan ===\n');
+  console.log('Strategy: 5 story posts (3 pure + 1 marketing + 1 pattern interrupt) + 5 activity posts');
+  console.log('Daily target: 10 image posts + 1 video (if ready)\n');
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const today = new Date();
@@ -187,22 +314,26 @@ function showWeekPlan() {
     date.setDate(monday.getDate() + i);
     const dateStr = date.toISOString().slice(0, 10);
     const isToday = i === ((dayOfWeek + 6) % 7);
+    const mix = buildDailyMix(date);
 
     console.log(`${days[i]} ${dateStr}${isToday ? ' (TODAY)' : ''}`);
 
-    // Rotate categories — shift by day index for variety
-    const dayMix = [...DAILY_MIX];
-    for (let j = 0; j < i; j++) {
-      dayMix.push(dayMix.shift());
+    if (mix.isRepost) {
+      console.log('  REPOST DAY — pick top performers from the week (story + activity)');
+    } else {
+      console.log(`  ${mix.label}`);
+      console.log('  Story posts (5):');
+      for (const item of mix.slots.filter(s => s.type === 'story')) {
+        const tag = item.marketingLevel === 'none' ? '' :
+          item.marketingLevel === 'subtle' ? ' [subtle]' : ' [direct]';
+        console.log(`    - ${item.label}${tag}`);
+      }
+      console.log('  Activity posts (5):');
+      for (const item of mix.slots.filter(s => s.type === 'activity')) {
+        console.log(`    - ${item.label} [${item.todayDifficulty}]`);
+      }
     }
-
-    const totalImages = dayMix.reduce((sum, c) => sum + c.perDay, 0);
-    console.log(`  Images: ${totalImages} planned`);
-    for (const item of dayMix.slice(0, 5)) {
-      console.log(`    - ${item.label} x${item.perDay}`);
-    }
-    console.log(`    ... and ${dayMix.length - 5} more categories`);
-    console.log(`  Videos: 1-2 slideshows`);
+    console.log(`  Video: ${VIDEO_PLAN.label} (if ready)`);
     console.log('');
   }
 
@@ -220,31 +351,48 @@ function generatePlan() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dateStr = tomorrow.toISOString().slice(0, 10);
   const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][tomorrow.getDay()];
+  const mix = buildDailyMix(tomorrow);
 
   console.log(`=== Content Plan: ${dayName} ${dateStr} ===\n`);
 
-  console.log('Image Content (12 pieces):');
-  let imageIdx = 1;
-  for (const item of DAILY_MIX) {
-    for (let i = 0; i < item.perDay; i++) {
-      console.log(`  ${imageIdx}. [${item.category}] ${item.label}`);
-      if (item.hook) console.log(`       Hook: "${item.hook}"`);
-      if (item.hypnoticAngle) console.log(`       Angle: ${item.hypnoticAngle}`);
-      imageIdx++;
-    }
+  if (mix.isRepost) {
+    console.log('REPOST DAY — pick top performers from the week.');
+    console.log('Check analytics: npm run analytics:report');
+    return;
   }
 
-  console.log('\nVideo Content (2 pieces):');
-  console.log('  1. Slideshow — best 5-8 images with transitions');
-  console.log('  2. Feature highlight — single activity deep dive');
+  console.log(`${mix.label}\n`);
 
-  console.log('\nGenerate commands:');
-  console.log(`  node scripts/generate-images.mjs --count 12`);
-  console.log(`  node scripts/generate-captions.mjs`);
-  console.log(`  node scripts/generate-videos.mjs --count 2`);
+  console.log('Story Posts (5):');
+  let idx = 1;
+  for (const item of mix.slots.filter(s => s.type === 'story')) {
+    const mktTag = item.marketingLevel === 'none' ? 'pure story' :
+      item.marketingLevel === 'subtle' ? 'subtle marketing' : 'direct marketing';
+    console.log(`  ${idx}. [${item.category}] ${item.label} (${mktTag})`);
+    if (item.hook) console.log(`       Hook: "${item.hook}"`);
+    if (item.hypnoticAngle) console.log(`       Angle: ${item.hypnoticAngle}`);
+    if (item.ctaNote) console.log(`       CTA: ${item.ctaNote}`);
+    idx++;
+  }
 
-  console.log('\nOr run the full pipeline:');
-  console.log('  npm run generate:all');
+  console.log('\nActivity Posts (5):');
+  for (const item of mix.slots.filter(s => s.type === 'activity')) {
+    console.log(`  ${idx}. [${item.category}] ${item.label} — ${item.todayDifficulty} difficulty`);
+    console.log(`       Hook: "${item.hook}"`);
+    console.log(`       Skill: ${item.skill}`);
+    idx++;
+  }
+
+  console.log(`\nVideo (1 — if ready):`);
+  console.log(`  [${VIDEO_PLAN.category}] ${VIDEO_PLAN.label}`);
+  console.log(`       Format: ${VIDEO_PLAN.format}`);
+
+  console.log('\nDaily workflow:');
+  console.log('  1. npm run daily              # Archive old + generate prompts');
+  console.log('  2. Generate images in Gemini  # 5 story + 5 activity images');
+  console.log('  3. npm run import:raw         # Brand + queue');
+  console.log('  4. npm run generate:captions  # AI captions');
+  console.log('  5. npm run post               # Publish');
 }
 
 /**

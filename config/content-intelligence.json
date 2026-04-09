@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "generated_at": null,
+    "week_of": null,
+    "status": "none",
+    "applied_at": null,
+    "entropy_score": null,
+    "inputs_summary": {}
+  },
+  "new_themes": [],
+  "new_hooks": [],
+  "new_ctas": [],
+  "new_pattern_interrupts": [],
+  "intelligence_summary": {}
+}

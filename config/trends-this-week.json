@@ -1,0 +1,81 @@
+{
+  "generated": "2026-04-05",
+  "valid_until": "2026-04-12",
+  "sources": [
+    "google_trends",
+    "seasonal_calendar"
+  ],
+  "trending_themes": [
+    {
+      "theme": "Easter",
+      "score": 500
+    },
+    {
+      "theme": "Garden/Flowers",
+      "score": 330
+    },
+    {
+      "theme": "Spring Animals",
+      "score": 300
+    },
+    {
+      "theme": "Spring",
+      "score": 150
+    },
+    {
+      "theme": "Ocean/Underwater",
+      "score": 30
+    },
+    {
+      "theme": "Forest/Woodland",
+      "score": 30
+    },
+    {
+      "theme": "Bugs/Insects",
+      "score": 30
+    }
+  ],
+  "boost_themes": [
+    "Easter",
+    "Garden/Flowers",
+    "Spring Animals",
+    "Spring",
+    "Ocean/Underwater"
+  ],
+  "rising_searches": [
+    "resurrection coloring pages for kids",
+    "lds coloring pages for kids",
+    "good friday coloring pages for kids",
+    "april coloring pages",
+    "april coloring pages for kids",
+    "funny coloring pages for kids",
+    "christian coloring pages for kids",
+    "easter coloring pages"
+  ],
+  "upcoming_moments": [
+    {
+      "event": "Easter Sunday",
+      "date": "2026-04-04",
+      "days_away": 0
+    },
+    {
+      "event": "Spring Break",
+      "date": "2026-03-28",
+      "days_away": 0,
+      "is_break": true
+    },
+    {
+      "event": "Earth Day",
+      "date": "2026-04-21",
+      "days_away": 17
+    }
+  ],
+  "caption_keywords": [
+    "screen-free",
+    "printable",
+    "quiet time",
+    "ages 4-8",
+    "easter printables for kids",
+    "spring break activities for kids"
+  ]
+}

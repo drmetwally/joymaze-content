@@ -10,6 +10,7 @@
  *   node scripts/generate-captions.mjs              # Full run (uses Claude API)
  *   node scripts/generate-captions.mjs --dry-run     # Test with sample captions
  *   node scripts/generate-captions.mjs --id 2026-03-21-coloring-preview-00  # Single item
+ *   node scripts/generate-captions.mjs --force       # Regenerate even if captions already exist
  */
 
 import 'dotenv/config';
@@ -25,6 +26,7 @@ const TEMPLATES_DIR = path.join(ROOT, 'templates', 'captions');
 // Parse CLI args
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const FORCE = args.includes('--force');
 const idIdx = args.indexOf('--id');
 const FILTER_ID = idIdx !== -1 ? args[idIdx + 1] : null;
 
@@ -44,28 +46,52 @@ try {
   // Style guide optional — pipeline works without it
 }
 
+// Load dynamic CTAs and hooks from intelligence system (silent fallback if files don't exist)
+let dynamicCtas = {};
+try {
+  const raw = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'cta-library.json'), 'utf-8'));
+  dynamicCtas = raw.ctas || {};
+} catch {}
+
+let dynamicHookSupplement = '';
+try {
+  const raw = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8'));
+  const hooks = (raw.hooks || [])
+    .filter(h => h.brand_safe === true)
+    .sort((a, b) => ((b.performance_score ?? -1) - (a.performance_score ?? -1)))
+    .slice(0, 10);
+  if (hooks.length > 0) {
+    dynamicHookSupplement = '\n\n## TOP-PERFORMING HOOKS (use as inspiration, not verbatim):\n'
+      + hooks.map(h => `[${(h.hook_type || 'hook').replace(/_/g, ' ')}] "${h.text}"`).join('\n');
+  }
+} catch {}
+
 // Platform caption targets
 const PLATFORMS = ['pinterest', 'instagram', 'x', 'tiktok', 'youtube'];
 
-// CTAs for rotation
+// CTAs for rotation — soft only (no hard "Download now!" energy)
 const CTAS = {
   app: [
-    'Download JoyMaze free on iOS and Android!',
-    'Try JoyMaze — fun learning games for kids!',
-    'Get JoyMaze free today!',
+    'More activities at joymaze.com',
+    'Link in bio for more',
+    'For more kids activities → joymaze.com',
+  ],
+  both: [
+    'More activities at joymaze.com',
+    'More printables at joymaze.com',
+    'Link in bio for more',
   ],
   website: [
-    'Visit joymaze.com for more!',
-    'More fun at joymaze.com!',
+    'More at joymaze.com',
+    'More activities at joymaze.com',
   ],
   books: [
-    'Get our activity books on Amazon!',
-    'Our kids activity books are on Amazon!',
-    'Check out our activity books on Amazon!',
+    'More printables at joymaze.com',
+    'Find more printable activities at joymaze.com',
   ],
   bio: [
-    'Link in bio for free download!',
-    'Link in bio!',
+    'Link in bio for more',
+    'For more activities → link in bio',
   ],
 };
 
@@ -109,6 +135,24 @@ function generateHashtags(platform, categoryId) {
     'motivation': 'parenting',
     'engagement': 'engagement',
     'seasonal': 'education',
+    // Activity post categories
+    'activity-maze': 'mazes',
+    'activity-word-search': 'wordSearch',
+    'activity-matching': 'matching',
+    'activity-tracing': 'tracing',
+    'activity-quiz': 'quiz',
+    'activity-dot-to-dot': 'dotToDotActivity',
+    'activity-sudoku': 'sudoku',
+    'activity-coloring': 'coloringActivity',
+    // ASMR video categories
+    'asmr-coloring': 'asmr',
+    'asmr-maze': 'asmr',
+    'asmr-tracing': 'asmr',
+    'asmr-drawing': 'asmr',
+    // Story post categories
+    'story': 'parenting',
+    'story-marketing': 'parenting',
+    'pattern-interrupt': 'engagement',
   };
 
   const categoryPool = categoryMap[categoryId] || 'core';
@@ -142,13 +186,27 @@ function generateHashtags(platform, categoryId) {
 }
 
 /**
- * Load caption template for a platform
+ * Load caption template for a platform (auto-selects asmr/activity template by format/category)
  */
-async function loadTemplate(platform) {
-  const templatePath = path.join(TEMPLATES_DIR, `${platform}.txt`);
+async function loadTemplate(platform, categoryId, format) {
+  // ASMR format gets its own templates
+  if (format === 'asmr') {
+    const asmrPath = path.join(TEMPLATES_DIR, `${platform}-asmr.txt`);
+    try { return await fs.readFile(asmrPath, 'utf-8'); } catch {}
+  }
+
+  // Use activity-specific templates for activity categories
+  const isActivity = categoryId?.startsWith('activity-');
+  const templateName = isActivity ? `${platform}-activity` : platform;
+  const templatePath = path.join(TEMPLATES_DIR, `${templateName}.txt`);
   try {
     return await fs.readFile(templatePath, 'utf-8');
   } catch {
+    // Fall back to default platform template
+    if (isActivity) {
+      const fallback = path.join(TEMPLATES_DIR, `${platform}.txt`);
+      try { return await fs.readFile(fallback, 'utf-8'); } catch {}
+    }
     return null;
   }
 }
@@ -158,7 +216,7 @@ async function loadTemplate(platform) {
  */
 async function generateWithGemini(prompt) {
   const { GoogleGenerativeAI } = await import('@google/generative-ai');
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+  const genAI = new GoogleGenerativeAI(process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const result = await model.generateContent(prompt);
@@ -169,20 +227,29 @@ async function generateWithGemini(prompt) {
  * Generate caption using Groq free API (fallback 1)
  * Free tier: 14,400 req/day on llama-3.3-70b
  */
-async function generateWithGroq(prompt) {
+async function generateWithGroq(prompt, retries = 2) {
   const OpenAI = (await import('openai')).default;
   const client = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: 'https://api.groq.com/openai/v1',
   });
 
-  const response = await client.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [{ role: 'user', content: prompt }],
-    max_tokens: 500,
-  });
-
-  return response.choices[0].message.content.trim();
+  try {
+    const response = await client.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 500,
+    });
+    return response.choices[0].message.content.trim();
+  } catch (err) {
+    // Retry on 429 rate limit — wait 65s for the Groq per-minute window to reset
+    if (retries > 0 && err.status === 429) {
+      console.log(`    [Groq 429] Rate limit hit — waiting 65s then retrying (${retries} retries left)...`);
+      await new Promise(r => setTimeout(r, 65000));
+      return generateWithGroq(prompt, retries - 1);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -205,6 +272,35 @@ async function generateWithOllama(prompt) {
   });
 
   return response.choices[0].message.content.trim();
+}
+
+/**
+ * Generate an X thread reply — a 2nd tweet posted as a reply to own main tweet.
+ * The reply adds resolution, insight, or engagement bait that continues the hook.
+ */
+async function generateXThreadReply(mainCaption, metadata) {
+  const isActivity = metadata.category?.startsWith('activity-');
+  const isStory = metadata.category === 'story' || metadata.type === 'video';
+  const topic = metadata.subject || metadata.categoryName || 'kids activity';
+
+  let replyPrompt;
+  if (isActivity) {
+    replyPrompt = `You just posted this on X:\n"${mainCaption}"\n\nNow write the FIRST REPLY from the same author — a single tweet (under 280 chars) that:\n- Either gives the answer/result, OR asks parents what their kid scored/drew/found\n- Ends with a soft call to "drop it in the comments" or "tell us below"\n- Warm, brief, no hashtags\n- Topic: ${topic}\n\nReturn ONLY the reply tweet text, nothing else.`;
+  } else if (isStory) {
+    replyPrompt = `You just posted this hook on X:\n"${mainCaption}"\n\nNow write the FIRST REPLY from the same author — a single tweet (under 280 chars) that:\n- Delivers the resolution or emotional payoff of the story\n- Ends on a feeling, not a promotion\n- No CTA, no hashtags, no "download JoyMaze"\n- Topic: ${topic}\n\nReturn ONLY the reply tweet text, nothing else.`;
+  } else {
+    replyPrompt = `You just posted this on X:\n"${mainCaption}"\n\nNow write the FIRST REPLY from the same author — a single tweet (under 280 chars) that:\n- Adds one deeper insight or unexpected fact about ${topic}\n- OR asks a question parents will want to answer ("Which one does your kid love?")\n- Warm, specific, no hashtags, no CTA\n\nReturn ONLY the reply tweet text, nothing else.`;
+  }
+
+  try {
+    const reply = await generateWithGroq(replyPrompt);
+    return reply.trim().slice(0, 280);
+  } catch {
+    // Fallback defaults per content type
+    if (isActivity) return `What did your kid think? Drop the result below 👇`;
+    if (isStory) return `That's what happens when a child trusts their imagination. Every story starts with one brave step.`;
+    return `Which activity does your kid always come back to? Drop it below 👇`;
+  }
 }
 
 /**
@@ -241,33 +337,46 @@ async function generateCaptionsForContent(metadata) {
       caption = generateDryRunCaption(platform, metadata);
       console.log(`    [DRY RUN] ${platform}: generated sample caption`);
     } else {
-      const template = await loadTemplate(platform);
+      const template = await loadTemplate(platform, metadata.category, metadata.format);
       if (!template) {
         caption = generateDryRunCaption(platform, metadata);
         console.log(`    ${platform}: no template, using default`);
       } else {
+        // Activity-specific template variables
+        const isActivity = metadata.category?.startsWith('activity-');
+        const activityType = isActivity ? metadata.category.replace('activity-', '').replace(/-/g, ' ') : '';
+        const difficulty = metadata.difficulty || 'medium';
+
         const templatePrompt = template
           .replace('{{topic}}', metadata.subject || metadata.categoryName)
-          .replace('{{category}}', metadata.categoryName)
-          .replace('{{visualDescription}}', metadata.prompt || '');
+          .replace('{{category}}', metadata.categoryName || metadata.category)
+          .replace('{{visualDescription}}', metadata.prompt || '')
+          .replace('{{activityType}}', activityType)
+          .replace('{{difficulty}}', difficulty);
 
-        // Inject Hypnotic Writing style guide as system context
-        const prompt = writingStyleGuide
-          ? `${writingStyleGuide}\n\n---\n\n${templatePrompt}`
+        // Full prompt: style guide + template (for Gemini and Groq — large context models)
+        const fullPrompt = writingStyleGuide
+          ? `${writingStyleGuide}${dynamicHookSupplement}\n\n---\n\n${templatePrompt}`
           : templatePrompt;
 
+        // Short prompt: template only (for Ollama — llama3.2:3b has limited context)
+        const shortPrompt = templatePrompt;
+
+        // Fallback chain: Groq (primary) → Vertex/Gemini → Ollama (local)
         try {
-          caption = await generateWithGemini(prompt);
-          console.log(`    ${platform}: generated via Gemini`);
+          caption = await generateWithGroq(fullPrompt);
+          console.log(`    ${platform}: generated via Groq`);
+          // Rate limit guard: 30 req/min on Groq free tier
+          await new Promise(r => setTimeout(r, 2500));
         } catch (err) {
-          console.log(`    ${platform}: Gemini failed (${err.message.slice(0, 80)}...), trying Groq...`);
+          console.log(`    ${platform}: Groq failed (${err.message.slice(0, 80)}...), trying Vertex/Gemini...`);
           try {
-            caption = await generateWithGroq(prompt);
-            console.log(`    ${platform}: generated via Groq`);
+            caption = await generateWithGemini(fullPrompt);
+            console.log(`    ${platform}: generated via Vertex/Gemini`);
           } catch (err2) {
-            console.log(`    ${platform}: Groq failed (${err2.message.slice(0, 80)}...), trying Ollama...`);
+            console.log(`    ${platform}: Vertex failed (${err2.message.slice(0, 80)}...), trying Ollama...`);
             try {
-              caption = await generateWithOllama(prompt);
+              caption = await generateWithOllama(shortPrompt);
               console.log(`    ${platform}: generated via Ollama (local)`);
             } catch (err3) {
               console.error(`    ${platform}: all providers failed, using default`);
@@ -281,9 +390,18 @@ async function generateCaptionsForContent(metadata) {
     // Generate hashtags
     const hashtags = generateHashtags(platform, metadata.category);
 
-    // Pick a CTA
-    const ctaPool = platform === 'instagram' ? CTAS.bio :
-                    metadata.category === 'book-preview' ? CTAS.books : CTAS.app;
+    // Pick a CTA based on where the activity lives
+    const BOOK_ONLY_CATEGORIES = ['activity-tracing', 'activity-quiz', 'book-preview'];
+    const APP_AND_BOOK_CATEGORIES = ['activity-maze', 'activity-word-search', 'activity-matching',
+                                     'activity-dot-to-dot', 'activity-sudoku', 'activity-coloring'];
+    const ctaType = platform === 'instagram' ? 'bio' :
+                    BOOK_ONLY_CATEGORIES.includes(metadata.category) ? 'books' :
+                    APP_AND_BOOK_CATEGORIES.includes(metadata.category) ? 'both' : 'app';
+    const hardcodedCtaPool = CTAS[ctaType] || CTAS.app;
+    const dynamicCtaPool = (dynamicCtas[platform]?.[ctaType] || [])
+      .filter(c => c.brand_safe === true)
+      .map(c => c.text);
+    const ctaPool = [...hardcodedCtaPool, ...dynamicCtaPool];
     const cta = pickRandom(ctaPool);
 
     // Assemble final caption
@@ -294,13 +412,23 @@ async function generateCaptionsForContent(metadata) {
       finalCaption = `${caption}\n\n${hashtags.join(' ')}`;
     }
 
-    captions[platform] = {
+    const captionEntry = {
       text: finalCaption,
       rawCaption: caption,
       hashtags,
       cta,
       characterCount: finalCaption.length,
     };
+
+    // X thread: generate a reply tweet for engagement (story resolution, puzzle hint, etc.)
+    if (platform === 'x' && !DRY_RUN) {
+      try {
+        const reply1 = await generateXThreadReply(caption, metadata);
+        captionEntry.thread = { tweet1: finalCaption, reply1 };
+      } catch { /* thread is optional — post single tweet if this fails */ }
+    }
+
+    captions[platform] = captionEntry;
   }
 
   return captions;
@@ -311,7 +439,7 @@ async function generateCaptionsForContent(metadata) {
  */
 async function main() {
   console.log('=== JoyMaze Caption Generation Pipeline ===');
-  console.log(`Mode: ${DRY_RUN ? 'DRY RUN (no API calls)' : 'LIVE (Gemini → Groq → Ollama → default)'}`);
+  console.log(`Mode: ${DRY_RUN ? 'DRY RUN (no API calls)' : 'LIVE (Groq → Vertex/Gemini → Ollama → default)'}`);
   if (FILTER_ID) console.log(`Filter: ${FILTER_ID}`);
   console.log('');
 
@@ -346,8 +474,8 @@ async function main() {
       continue;
     }
 
-    // Skip if captions already exist (unless dry-run to allow re-testing)
-    if (metadata.captions && !DRY_RUN) {
+    // Skip if captions already exist (unless dry-run or --force)
+    if (metadata.captions && !DRY_RUN && !FORCE) {
       console.log(`  Skipping ${metadata.id}: captions already generated`);
       skipped++;
       continue;

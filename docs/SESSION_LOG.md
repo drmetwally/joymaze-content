@@ -4,6 +4,128 @@
 
 ---
 
+## 2026-04-09 — [Agent: Claude] — output/raw/ folder structure pruned + rebuilt
+
+**Files changed:** `output/raw/` (filesystem only)
+
+- **Retired folders deleted:** `pattern/`, `story/`, `story-marketing/` (all were empty)
+- **New inspiration folders created:** `fact-card/`, `challenge/`, `quiet/`, `printable/`, `identity/`
+- **Activity folders kept:** `maze/`, `wordsearch/`, `matching/`, `tracing/`, `quiz/`, `coloring/`, `dottodot/`, `sudoku/`
+- **Coloring + dottodot + sudoku retained** — user confirmed these are core JoyMaze activities, not retired
+- **import-raw.mjs already had all mappings** — no code changes needed; folder names map correctly to category types
+- Updated memory (`project_content_slots.md`), SESSION_LOG, CHAT_LOG, DAILY_CHEATSHEET
+
+---
+
+## 2026-04-08 — [Agent: Claude] — X text post pipeline wired into scheduler
+
+**Files changed:** `scripts/daily-scheduler.mjs`, `scripts/generate-x-posts.mjs`, `package.json`, `docs/TASKS.md`
+
+- **Ambiguous Codex task resolved:** The blocked `daily-scheduler.mjs` task said "insert after caption generation" — but `generate-captions.mjs` is a manual step not in the scheduler. Clarified that `generate-x-posts.mjs` is a completely independent pipeline (text posts, not image captions) and needs no caption anchor.
+- **Writing brain fix (`generate-x-posts.mjs`):** `config/writing-style.md` was injected as a prefix inside the `user` message. Split into proper `system` message (writing-style.md) + `user` message (generation task). LLMs weight system messages more authoritatively — ensures Halbert voice and brand rules govern all output.
+- **Scheduler integration:** `generate-x-posts.mjs` added as unconditional step in `runDailyJob()` after ASMR brief, before analytics/posting. `totalSteps` base updated 2→3. 60s timeout.
+- **npm scripts added:** `x:generate`, `x:generate:dry`, `x:text:post`, `x:text:post:dry`. Also added `generate-x-posts.mjs` to `npm run daily` chain.
+- **Note for next agent:** `post-x-scheduled.mjs` is NOT in the daily scheduler — it runs hourly via Windows Task Scheduler and drips from `output/queue/x-text-YYYY-MM-DD.json`. The daily job only generates the queue file.
+
+---
+
+### 2026-04-07 — Self-learning intelligence system built + key fix
+
+**Archive bug fix:**
+- `archive-queue.mjs`: fixed `.json`-only extension filter (now includes `.md`); removed early `return` on empty queue so all sweep sections (prompts, ASMR, stories, videos) always run
+
+**Theme repetition fix (`generate-prompts.mjs`):**
+- `THEME_POOL` added as 61-entry JS array (was advisory text); theme selection moved entirely into code — LLM gets mandatory assignments, not free choice
+- `pickActivityThemes()`: extended lookback 3→7 days, now scans `output/archive/prompts/` too
+- `MERGED_THEME_POOL` pattern: 61 hardcoded + dynamic themes merged at startup
+- `STORY_SETTINGS` pool added: 50 entries with location/timeOfDay/ambiance → injected per slot
+- `ART_STYLES` expanded 14→28, `PATTERN_INTERRUPT_POOL` expanded 22→36
+- Trend boost wired at code level: trending themes get up to 2 of 5 priority slots
+
+**Self-learning intelligence system (full build):**
+- `config/theme-pool-dynamic.json`, `hooks-library.json`, `cta-library.json`, `pattern-interrupt-dynamic.json`, `content-intelligence.json` — 5 new config files
+- `scripts/apply-intelligence.mjs` — Levenshtein dedup, eviction scoring, aging pass, performance score rolling average
+- `scripts/intelligence-refresh.mjs` — 6 Gemini search-grounded competitor queries, Gemini 2.5 Flash synthesis, dual-pass brand safety (blocklist + Groq SAFE/REVIEW/REJECT), entropy check (0-10)
+- `generate-captions.mjs` updated: dynamic CTAs merged, top-10 dynamic hooks injected into style guide
+- `generate-prompts.mjs` updated: `loadDynamicPools()`, hook examples in system prompt
+- `daily-scheduler.mjs` updated: Monday intelligence refresh block (intelligence-refresh + apply-intelligence before prompt generation)
+- `package.json`: 7 new `intelligence:*` npm scripts
+- **API key fix:** `GOOGLE_AI_API_KEY` was suspended — all Gemini calls in `intelligence-refresh.mjs`, `generate-captions.mjs`, `generate-images.mjs` updated to use `VERTEX_API_KEY` as primary
+- **Verified:** `intelligence-refresh.mjs --dry-run` successful — 5 themes, 7 hooks, 3 CTAs, 4 interrupts, entropy 2.0/10
+
+---
+
+### 2026-04-04 — Archetype 7 + Pattern Interrupt rotation fix
+- Problem: Arch 7 always sent `{ type: 'subtle-marketing' }` with no scene info → LLM defaulted to "parent + tablet on couch" every day. Pattern Interrupt hardcoded `myth-bust` sub-type → "screen time + brain lightbulb" every day.
+- Fix 1: Added 20-scene `ARCH7_SCENES` pool to `generate-prompts.mjs` — day-of-year cycling, 20-day rotation before any repeat
+- Fix 2: Added 22-topic `PATTERN_INTERRUPT_POOL` (6 sub-types: myth-bust, did-you-know, surprising-stat, counterintuitive, seasonal-hook, edutainment) — 22-day rotation
+- Fix 3: Rich slot descriptions now sent to LLM: "TODAY'S SCENE: Restaurant booth…" instead of just "subtle-marketing"
+- Fix 4: `loadRecentThemes()` extended to track Arch 7 settings + pattern-interrupt topics in dedup
+- Fix 5: System prompt updated: pattern-interrupt rule now references 6 rotating sub-types instead of static "myth-bust"
+- Verified: dry run shows unique scene + topic per day for 7 consecutive days
+- Session ended without logs being saved (quota exhausted)
+
+---
+
+### 2026-04-05 — ASMR video pipeline fixes + pencil animation
+- Fixed hookText scope error (const inside if-block, referenced outside) — hoisted to let before block
+- Fixed revealPx scope error (same pattern) — hoisted to let before if/else
+- Fixed 7s gap + sketchy motion: replaced easeInOut with linear progress for reveal sweep
+- Fixed video cut at 24s: removed -shortest FFmpeg flag, added aloop=-1 + -t ${totalDuration}
+- Removed outro (JoyMaze logo branding screen) — not trendy for short-form video
+- Reduced hold from 3s → 1.5s. New total: 31.5s
+- Added Pinterest + X to ASMR queue metadata; added video support to postToPinterest
+- Added pencil animation: analyzePathY() pre-scans solution image to find path Y per column, buildPencilSvg() composites pencil at reveal edge, tracks solution path height as it sweeps
+- Maze reveal: left-to-right wipe kept (Ahmed prefers it over crossfade — more "flare")
+- archive-queue.mjs: added ASMR + stories + videos sweep — all output types now auto-archived daily
+- Manually archived: 8 ASMR briefs, 10 story episodes, 6 video files
+
+---
+
+### 2026-04-05 — Confirmed Monday pipeline timing
+- Tomorrow (2026-04-06) is Monday — first full Monday run of npm run daily
+- Will execute: archive → analytics:collect → trends → scorecard:save → generate:prompts → story:ideas → asmr:brief
+- First time scorecard and trends will both run in sequence in production
+
+---
+
+### 2026-04-05 — Weekly Scorecard + performance-weights.json
+- Built `scripts/weekly-scorecard.mjs` — reads queue + archive metadata, computes save rate per archetype category, ranks by save rate, assigns weights (×1.5 boost / ×1.0 neutral / ×0.6 reduce)
+- Writes `config/performance-weights.json` — consumed by `loadPerformanceContext()` in `generate-prompts.mjs` on every run
+- `--monday-only` flag: runs in `npm run daily` on Mondays only; other days silently skip
+- Wired into `npm run daily`: order is archive → analytics:collect → trends (Mon) → scorecard:save (Mon) → generate:prompts → story:ideas → asmr:brief
+- Added `npm run scorecard` and `npm run scorecard:save` standalone commands
+- TASKS.md: Weekly Scorecard marked [x]
+
+---
+
+### 2026-04-05 — Quality Gate: post-generation prompt scoring
+- Built `scorePrompts()` in `generate-prompts.mjs` — second Groq call using `llama-3.1-8b-instant` after generation
+- Scoring rubric: 8 criteria mapped to conversion principles (sensory anchor, peak engagement, abandoned alternative, expression specificity, art style, dimensions, caption hook, puzzle spec)
+- Thresholds: ≥7 = pass, 5-6 = flagged, <5 = rejected
+- Console table printed after every generation run; score badges (`> ✓ / ⚠ / ✗`) injected into saved `.md` file per prompt
+- File header gets score summary line: `# Quality Gate: avg X/10 · N pass · N flagged · N rejected`
+- Safe fallback: if scoring API call fails, generation still saves unmodified
+- TASKS.md: Quality Gate marked [x]
+
+---
+
+### 2026-04-05 — Prompt quality fixes + startup protocol overhaul
+- Fixed Bug 1: Sunday within-day dedup — added MANDATORY WITHIN-DAY UNIQUENESS block to Sunday user prompt (different activity type, theme, art style, child age/gender per prompt). Root cause: Sunday prompt had no within-day dedup constraint, causing #1/#5 near-identical (word search + music repeated).
+- Fixed Bug 2: Activity CTA repetition — added ACTIVITY CTA VARIETY IS MANDATORY rule to system prompt with 8 distinct CTA patterns. No more "find its way home" x3 in one day.
+- Fixed Bug 3: Theme coherence — added rule: story setting and activity shown must match environmental mood.
+- Updated CLAUDE.md startup protocol: now reads TASKS.md + MEMORY.md (relevant files) + CONTENT_ARCHETYPES.md lines 1-50+530-583 + SESSION_LOG (last 20 lines). Memory is now mandatory regardless of quota.
+- Updated stale memories: project_vertex_api.md (Vertex not in use), project_asmr_plan.md (shelved), feedback_token_efficiency.md (4-file startup).
+
+---
+
+### 2026-04-04 — Fix archive sweep to include raw subfolders
+- Bug: `archive-queue.mjs` raw sweep used flat `readdir(RAW_DIR)` — missed images in subfolders (story/, activity/, etc.)
+- Fix: replaced flat readdir with `readdir(withFileTypes: true)`, iterates subdirectories one level deep, collects image candidates from each
+- Archive destination unchanged: all raw files flatten to `archive/{date}/raw/`
+
+---
+
 ### 2026-03-21 — Initial project scaffold
 - Created full project directory structure
 - Set up package.json with all dependencies
@@ -155,6 +277,46 @@
 
 ---
 
+### 2026-03-28 — Pipeline test + caption quality fixes
+- Verified end-to-end: import-raw, generate-captions (dry-run + live), post-content dry-run, calendar — all working
+- Confirmed Groq is live and producing Hypnotic Writing quality captions (tested Archetype 1 story item — output verified)
+- Root cause of bad existing captions: all 7 queue items had fallback default captions from a previous session when Groq/Gemini were unavailable
+- Added --force flag to generate-captions.mjs: re-runs captions on already-captioned items
+- Added Groq 429 retry-with-backoff: waits 65s and retries up to 2 times on rate limit (30 req/min free tier)
+- Added 2.5s delay after each successful Groq call: paces requests to stay under rate limit during normal daily runs
+- Fixed Ollama fallback: now uses short prompt (template only, not full 670-line style guide) — llama3.2:3b context limit was causing silent failures
+- Regenerated all 7 queue items with --force (Groq rate-limited from test runs today → fell to Ollama; quality acceptable, not ideal)
+- Normal daily flow (10 new items) will use Groq cleanly — rate limit only triggered from bulk test runs
+
+---
+
+### 2026-03-27 — Story-First Content Architecture implemented
+- Created docs/CONTENT_ARCHETYPES.md — 8 story archetypes with 3-beat structure, full example executions, CTA rules, weekly rotation guide, and Joyo's Story Corner video archetype
+- Added STORY-FIRST CONTENT ARCHITECTURE section to config/writing-style.md (670 → 730 lines): archetype cheat sheet, 3-beat structure, daily mix rules, CTA placement, Arch 8 video guidelines
+- Refactored content-calendar.mjs DAILY_MIX: replaced topic-based categories (coloring-preview, parent-tips, etc.) with story-archetype-based mix — 6 pure story archetypes + 2 Arch 7 subtle + 1 myth-bust + 1 marketing anchor = 10 posts/day
+- Added VIDEO_PLAN constant for Archetype 8 (Kids Story Video — Joyo's Story Corner, 45-60s, zero CTA)
+- generatePlan() and showWeekPlan() now output archetype names, marketing level, hook, angle, and CTA placement per slot
+- Daily target confirmed: 10 image posts + 1 short video (if ready)
+
+---
+
+### 2026-03-28 — First live Pinterest posts + prompt generator
+- Set up Pinterest Business account (Publisher/media, Education focus)
+- Created privacy policy page at joymaze.com/privacy (Puzz Publishing LLC ownership noted)
+- Created Pinterest Developer app (ID: 1556985), completed OAuth flow for write-scoped token
+- Built generate-prompts.mjs: AI-powered image prompt generator fed by full writing-style.md + CONTENT_ARCHETYPES.md
+  - Uses Groq (primary) + Ollama (fallback), outputs archetype-specific prompts with emotional beats, art direction, caption hooks
+  - Added npm run generate:prompts command
+- Generated 7 images via Gemini using archetype-informed prompts
+- Imported all 7 → 28 platform-sized branded images via import-raw
+- Generated captions for all 7 via Ollama (Groq rate-limited from batch volume)
+- Fixed post-content.mjs: added sharp JPEG compression, sandbox API routing, image_url upload via temp hosting (sandbox base64 bug workaround)
+- Posted 6 of 7 pins to Pinterest sandbox (1 failed due to Pinterest 500 — their bug)
+- Full pipeline proven end-to-end: prompt gen → image creation → brand compositing → caption gen → API posting
+- Blocker for public pins: need Standard API access (requires demo video submission)
+
+---
+
 ### 2026-03-25 — Setup test + API key discovery
 - Ran full end-to-end test: import-raw.mjs produced 4 platform-sized branded images from test image
 - Caption generation tested live: GOOGLE_AI_API_KEY and ANTHROPIC_API_KEY both return invalid errors
@@ -164,3 +326,415 @@
 - Decision: create dedicated JoyMaze Google account (joymaze.app@gmail.com or similar) for all business services
 - Recommended account structure: JoyMaze Google account owns YouTube, Google Play, Gemini API, Google Ads; KDP stays on personal Amazon account
 - Next: Ahmed creates JoyMaze Google account, gets Gemini API key, then re-run end-to-end test
+
+---
+
+### 2026-03-29 — Queue archive + Story video pipeline + Analytics pipeline
+- Built archive-queue.mjs: moves old queue items + images to output/archive/{date}/
+- Added `npm run daily` = archive + generate:prompts (clean daily workflow)
+- Built generate-story-video.mjs: full Archetype 8 "Joyo's Story Corner" video pipeline
+  - Ken Burns zoom/pan, 0.5s crossfade transitions, narration text overlays
+  - Joyo mascot intro/outro, optional background music (faded, 30% volume)
+  - `--init` scaffolds story folder + story.json template
+  - Tested end-to-end: 7 slides → 1560 frames → 52s MP4 via FFmpeg
+- Built collect-analytics.mjs: Pinterest pin analytics (impressions, saves, clicks, outbound clicks)
+  - Sandbox detection, 24h-old pin skip, token refresh on 401, rate limiting
+- Built analytics-report.mjs: top performers, category breakdown, hook analysis, save rate
+- Modified generate-prompts.mjs: auto-injects performance data into Groq prompts (feedback loop)
+- Fixed pre-existing Sunday rotation bug (Sunday returns archetypes, not slots)
+- Added 6 npm scripts: archive, daily, generate:story, analytics:collect, analytics:report, analytics
+
+### 2026-03-29 (session 2) — Activity/Puzzle Content Strategy (5+5 daily mix)
+- Strategic shift: 10 daily posts = 5 story + 5 activity (actual puzzles/printables)
+- Added 5 activity archetypes (A1-A5): maze, word search, matching, tracing, quiz
+- Updated CONTENT_ARCHETYPES.md with full activity archetype definitions + updated daily mix table
+- Updated writing-style.md with activity copywriting section (hooks, voice shift, platform rules)
+- Updated hashtags.json: added tracing + quiz pools
+- Restructured content-calendar.mjs: 5 story + 5 activity slots, difficulty rotation (Easy/Med/Hard by day)
+- Updated generate-prompts.mjs: separate story vs activity prompt generation, activity-specific rules
+- Updated import-raw.mjs: 5 new activity categories with auto-detection from filenames
+- Created 5 activity caption templates (pinterest/instagram/x/tiktok/youtube-activity.txt)
+- Updated generate-captions.mjs: activity template routing + activity-specific template variables
+
+---
+
+### 2026-03-29 (session 3) — Slideshow video pump upgrade + X/Instagram posting live
+- Rewrote generate-videos.mjs from basic static slideshow to production video pump:
+  - Ken Burns effect (zoom-in, pan-right, pan-left, pan-down) with 10% overscan
+  - 0.5s crossfade transitions between all slides (ported from generate-story-video.mjs)
+  - Fade-in from black on intro, fade-out to black on outro
+  - Text overlay with fade-in animation per slide (category-specific hypnotic phrases)
+  - Optional background music with fade in/out, 30% volume (auto-discovers from assets/audio/)
+  - Activity category overlays added (maze, word search, matching, tracing, quiz)
+  - New CLI flags: --music, --no-music, --category (activity|story|specific)
+  - Frame-by-frame generation (not static duplication) — every frame is unique
+  - Tested: 3 slides → 420 frames → 14s MP4 (1080x1920, H.264, 30fps)
+- Fixed Instagram posting: replaced broken _publicImageUrl requirement with temp URL upload (same as Pinterest)
+- Verified X/Twitter posting: twitter-api-v2 code works, connects and authenticates (401 = invalid token, not code bug)
+- Added npm scripts: generate:video, post:x, post:instagram, post:pinterest
+- All 3 platforms (Pinterest, Instagram, X) now code-complete for image posting
+
+---
+
+### 2026-03-31 — Story video polish: sync fix, cinematic intro/outro, TTS speed control, dimension fix
+- Sync fixed: audio now drives slide timing bidirectionally — `max(3.0, spoken + 0.5s)` replaces `max(slide.duration, spoken + 0.5s)`. Fast VO shortens scenes; slow VO extends them. Scenes never run out of sync.
+- Intro redesigned: black screen, "EPISODE N" spaced caps + title in white, cinematic fade in/out. VO narrates title; intro duration stretches to match.
+- Outro redesigned: black screen, "The End" + dim title + JoyMaze logo + joymaze.com. No gradient, no mascot, no "See you next time!"
+- TTS speed control: `--speed` flag (default 0.9). OpenAI uses native API `speed` param; Edge TTS uses FFmpeg `atempo` post-process.
+- Landscape dimension fix: `smartResize()` added to both `import-raw.mjs` and `generate-story-video.mjs`. Landscape images → portrait/square canvases now use blur-background letterbox instead of harsh center-crop. Applies universally to all platform exports.
+- Video filename collision fixed: TTS provider appended to filename (`ep01-openai.mp4`, `ep01-edge.mp4`, `ep01.mp4`).
+- OpenAI API key configured and validated in .env (sk-proj-...).
+- DAILY_CHEATSHEET.md updated with full story video workflow, TTS commands, speed flag, troubleshooting rows.
+
+### 2026-03-30 — ASMR video pipeline + prompt diversity + activity pool expansion + story TTS comparison
+- Added generate-asmr-video.mjs: ASMR activity video format (Archetype 9) — AI progression sequences, no VO, slow Ken Burns (6%), 1s crossfades, MUSIC_VOLUME=0.15, minimal intro/outro
+- Added 5 ASMR caption templates (instagram/tiktok/youtube/pinterest/x-asmr.txt) — calm, meditative tone
+- Added Archetype 9 to CONTENT_ARCHETYPES.md and hashtags.json (15 ASMR hashtag pool)
+- Added 3-day theme dedup to generate-prompts.mjs: scans recent prompt files, blocks repeated activity themes, story scenes, art styles
+- Expanded activity pool from 5 to 8 types (added dot-to-dot, sudoku, coloring from app)
+- CTA routing: app+books categories vs books-only categories — fix for CTA mismatch
+- Added raw file archiving to archive-queue.mjs (mtime-based sweep) — prevents double-import
+- Gemini permanently suspended (Google Cloud) — made Groq direct primary, Gemini last resort
+- Fixed DAILY_CHEATSHEET.md with full filename-to-category mapping table
+- Slideshow coherence: thematic grouping by category + --slides manual override flag (generate-videos.mjs)
+- Story video Ep01 scaffolded: "The Fox and the Frozen River" — 7 slides, full narration written
+- Added TTS voiceover support to generate-story-video.mjs:
+  - `--tts openai`: OpenAI tts-1, voice nova (~$0.01/story)
+  - `--tts edge`: Microsoft Edge TTS, voice JennyNeural (free, no key)
+  - Per-slide audio padded to slide duration → concatenated with intro silence → mixed with music at 12% ducked
+  - npm run generate:story:openai / generate:story:edge for comparison runs
+  - Installed msedge-tts npm package
+
+### 2026-03-29 (session 4) — First production run + video posting automation
+- First full production run: 10 posts (5 story + 5 activity) posted to X/Twitter
+  - Images generated in Gemini, imported via import:raw, captioned via Groq, posted via post:x
+  - Fixed generic "General" category issue: filenames without keywords default to general; manually patched queue metadata with proper categories/subjects for this run
+  - All 10 posted successfully, $0.10 in X credits
+- Added video posting to post-content.mjs:
+  - X: chunked MP4 upload via twitter-api-v2 (EUploadMimeType.Mp4, 5MB chunks)
+  - Instagram: Reels support via Graph API (media_type: 'REELS', video_url)
+  - Auto-detects video vs image queue items — same `npm run post:x` command handles both
+  - Tested: generated 14s slideshow → captioned → posted to X as video tweet
+- Added --force-full flag to generate-prompts.mjs (bypasses Sunday "best-of repost" mode)
+- Updated prompt generator: art style must always be specified explicitly and varied across prompts
+- Updated DAILY_CHEATSHEET.md with video posting workflow
+- Lesson learned: name raw files with keywords (maze-ocean.png, story-coloring.png) for auto-detection
+
+### 2026-03-31 (session 2) — Story video audio fix + pipeline hardening + ASMR plan
+- Completed lossless WAV audio chain fix in generate-story-video.mjs:
+  - All intermediate TTS files (raw, padded, silence, concat) now use pcm_s16le WAV instead of MP3
+  - Encoding chain: TTS → WAV → pad WAV → concat WAV → AAC (1 lossy step, down from 4)
+  - OpenAI TTS response_format changed from 'mp3' to 'wav'; Edge TTS atempo output changed to pcm_s16le WAV
+  - Shaky VO root cause eliminated (was: MP3 encoder-delay artifacts at segment boundaries)
+  - ep01 re-rendered: 43.4s MP4, lossless narration confirmed in output log
+- Added --voice flag to generate-story-video.mjs (OpenAI voices: nova, fable, shimmer, alloy, echo, onyx)
+- Fixed import-raw.mjs detectCategory() bug: split-by-hyphen keyword matching caused "story-dot castle" to detect as activity-dot-to-dot. Replaced with explicit CATEGORY_KEYWORDS map — requires full keyword match (dot-to-dot, not dot).
+- 11 posts published to X: 9 activity + 1 pattern-interrupt + 1 story video (ep01)
+- Story idea generator upgraded (generate-story-ideas.mjs):
+  - Added --slides N flag for variable slide count (tested: 10-slide generation)
+  - Added `character` field to JSON output — consistent physical description of main character
+  - Rewrote IMAGE PROMPT RULES section with full cinematography spec: required camera framing, time-of-day progression, character design consistency, foreground/background depth, bad/good example baked in from ep02 rewrite
+  - Added npm run generate:story:idea:long (10-slide shortcut)
+  - Validation now checks against SLIDE_COUNT, not hardcoded 7
+- ep02 scaffolded: "The Little Luminous Leafwing" (10 slides) — all 10 image-prompts manually rewritten with proper cinematography (6 distinct camera framings, full light progression golden hour → dusk → night → pre-dawn → dawn)
+- Gold standard maze prompt added to generate-prompts.mjs (Example C) — AI now uses proven simple maze format instead of over-specified layout descriptions
+- Mindstorm: ASMR video production options documented (see ACTIVE_SPRINT.md Next Session)
+
+### 2026-04-01 — Full pipeline automation + TikTok/YouTube + ASMR brief generator
+
+- Added TikTok (Content Posting API v2) and YouTube Shorts (Data API v3) posting functions to post-content.mjs
+- Added `npm run post:tiktok`, `npm run post:youtube`
+- Daily scheduler updated: auto-posts to all 4 platforms (Pinterest + TikTok + YouTube + X) every morning
+- Added `npm run publish` = generate:captions + post (single command for end of creative session)
+- Created scripts/generate-asmr-brief.mjs — daily ASMR brief generator using Groq + style guide + analytics
+  - Picks type (coloring/maze) by day rotation, generates image prompts + hook text in one Groq call
+  - Creates output/asmr/[type]-[slug]/activity.json + brief.md ready for Ahmed to drop images into
+- Daily scheduler: story brief + ASMR brief now run by default every morning (--no-story / --no-asmr to skip)
+- Story TTS: default speed changed 0.9 → 0.75 (slowest natural). Voice cycles per episode (nova→shimmer→fable→alloy→echo→onyx)
+- Image prompt generator: fixed activity prompts missing dimension rules (root cause: examples B+C lacked the field — model follows examples over templates)
+- Maze prompt: added explicit fill-in-the-blank template + warning not to use narrative style from Example B
+- Fixed today's prompts manually: maze rebuilt to golden standard, dot-to-dot replaced with Gemini enhancement prompt
+- Windows Task Scheduler configured: daily job runs at 9 AM (--now flag, "run only when logged on")
+- First successful automated daily run confirmed via scheduler.log
+- First image posts published today (2026-04-01) via npm run publish
+
+---
+
+### 2026-04-02 -- Competitive intelligence report
+- Researched top kids activity brands on Pinterest and Instagram (Busy Toddler, Kids Activities Blog, Fantastic Fun and Learning, TheDadLab, Raising Superstars, Planning Playtime, 3Dinosaurs)
+- Analyzed Pinterest 2026 algorithm changes: Idea Pins get 9x more saves than standard pins
+- Documented Pinterest Parenting Trend Report 2026 data: screen-free +200%, educational activities +280%, sensory play +1070%
+- Analyzed Instagram format benchmarks: carousels 0.55% > reels 0.52% > single image
+- Identified 8 content gaps: educational/developmental framing, seasonal content, screen-free positioning, Idea Pins, lead magnet freebie, UGC, comparison content, parent tips
+- Created prioritized action plan: 15 items across immediate/short/medium/long term
+- Output: docs/COMPETITIVE_INTELLIGENCE.md
+
+### 2026-04-02 — Vertex AI integration, prompt system upgrade, competitor-driven marketing overhaul
+- Fixed generate-prompts.mjs crash: unescaped backticks in template literal (line 287-289)
+- Tested Vertex AI Express API key: Imagen 4.0, Veo 3.0, Gemini 2.5/3.x all accessible
+- Built generate-images-vertex.mjs: separate Imagen 4.0 track for story posts, safety rewrite via Gemini 2.5 Flash
+- Imagen child safety: prompts with children return empty {}; Gemini rewrites to hands/POV/environment composition
+- Prompt cleaning: strips dimensions, aspect ratios, age refs, whitespace instructions before sending to Imagen
+- Major system prompt upgrade in generate-prompts.mjs: Imagen-compatible composition, 8 hook types rotation, developmental skill framing, screen-free positioning, seasonal awareness, 25+ theme pool
+- Competitor analysis: Busy Toddler, Kids Activities Blog, TheDadLab, Fantastic Fun and Learning, Raising Superstars
+- Hashtag expansion: 4 new pools (screenfree, printables, developmental, quiettime), Pinterest/Instagram defaults updated
+- "FREE Printable" badge: green overlay on all activity posts via import-raw.mjs
+- Decision: activity posts stay manual (ChatGPT/Gemini UI), Imagen only for story posts
+- Decision: puzzle algorithm generators NOT worth building for content pipeline (ROI too low vs visual quality)
+- Added ASMR brief generation to daily pipeline (npm run daily now runs 4 steps)
+- Hook text overlays on image posts: Halbert-style scroll-stoppers auto-added during import:raw
+  - Story posts: curiosity/emotional hooks (20 templates)
+  - Activity posts: challenge hooks (18 templates, 3 support {theme} personalization)
+  - Pattern-interrupt posts: 6 dedicated templates
+  - Bottom-center dark bar, white bold text, font scales for landscape
+  - Override via sidecar JSON or --no-hooks flag
+- Video hook intro: replaced black title card with 2-phase intro (first image + hook text 2.5s → title card 2s)
+- Video CTA outro: replaced "The End" with emotional echo on last image (2.5s) → soft CTA card with logo + invitation (3.5s)
+- All copy follows Gary Halbert greased slide principles: punch at the end, curiosity loops, soft invitations
+- Dot-to-dot gold standard prompt (EXAMPLE D): large bold numbered dots, black line art, pastel bg, decorative corners, difficulty tiers (15-70 dots)
+- Fixed category misdetection: "story-doing a maze activity" was matching 'maze' before 'story'. Now checks filename-start first, contains second.
+- Built folder-based category system: output/raw/story/, output/raw/maze/, etc. Folder overrides filename detection. Name files anything.
+- Cleaned stale queue files from misdetected run, reimported + regenerated all 10 captions correctly
+
+---
+
+### 2026-04-03 — Vertex parser fix, raw subfolders, dot-to-dot enforcement
+- Created all 11 category subfolders under output/raw/ (story, maze, wordsearch, etc.) so Ahmed can drop images by folder
+- Fixed Vertex Imagen script: prompt parser expected `1. **[STORY]` format but prompts file uses `### 1. [STORY]` markdown headings. Updated regexes to handle both formats.
+- Reinforced dot-to-dot enforced template: LLM was ignoring Example D template in system prompt. Added explicit reminder in user prompt's MANDATORY activity section referencing both maze (Example C) and dot-to-dot (Example D) templates.
+
+---
+
+### 2026-04-04 (session 2) — Full caption template rewrite: Vitale + Halbert enforcement
+
+- Rewrote all 14 caption templates (5 story + 5 activity + 4 ASMR) to enforce Hypnotic Writing + Halbert standards
+- **All templates now include:** style guide injection line at top, HALBERT FINAL PASS block (4 rules), strong/weak examples
+- **ASMR templates (4 complete rewrites):**
+  - instagram-asmr.txt: 3-beat formula (Sensory Transport → Insight Line → Identity+Save), 350-600 chars
+  - tiktok-asmr.txt: 3 hypnotic patterns (Sensory Anchor / Identity Quiet / Curiosity Pause), <180 chars, banned POV format
+  - x-asmr.txt: 2 patterns (Atmospheric / Insight Line), <220 chars, every word load-bearing
+  - youtube-asmr.txt: Sensory Title Line + Sensory Scene + Brand Close, SEO keyword embedded in feeling not bolted on
+- **Activity templates (5 complete rewrites):**
+  - pinterest-activity.txt: Formula A (Challenge) + Formula B (Micro-Story), 200-380 chars
+  - instagram-activity.txt: Formula A (Challenge) + Formula B (Mirror/Micro-Story), 400-700 chars
+  - tiktok-activity.txt: 3 patterns (Challenge Interrupt / Identity Hook / Micro-Story Flash), banned POV format
+  - x-activity.txt: 3 patterns (Halbert Punch / Micro Curiosity / Identity+Insight), <220 chars
+  - youtube-activity.txt: Transformation Hook + Micro-Story+Skill + Identity+CTA, 250-450 chars
+- **Story templates (5 micro-fixes):** Added style guide injection + Halbert final-pass block to pinterest, instagram, x, tiktok, youtube
+- All fog word bans now explicit: beautiful, wonderful, amazing, great, really, very, perfect, incredible
+
+---
+
+### 2026-04-05 — Prompt generation: Sunday structure fix + within-day uniqueness
+
+**Problems diagnosed:**
+- Sunday `getTodaysMix()` returned no slots — just `archetypes: [1..6]` and `isRepost: true`. `buildUserPrompt` sent a freeform instruction to the LLM with zero structure → 10 story posts, 0 activity posts, hallucinated archetypes ("The Parent Who Chose"), duplicate settings (two prompts in "cozy living room", two at "desk in bedroom"), repeated art styles (watercolor x2), same age/gender repeated 3× in one batch.
+- Root cause: Sunday had a special freeform path that bypassed all slot-level constraints weekdays use.
+
+**Fixes applied to `scripts/generate-prompts.mjs`:**
+1. **Sunday slots structure:** Sunday now returns proper slots — 5 story (Arch 1-6, 5 rotating weekly via `weekNum % 6`) + 5 activity (same `pickTodaysActivities()` as weekdays). `isRepost: true` kept as flag only.
+2. **Child profiles pre-assigned:** Added `CHILD_PROFILES` array (4F, 6M, 5F, 7M, 8F) + `getChildProfilesForToday()` rotating by day-of-year. Each story slot (all days, not just Sunday) now has `childProfile` injected into the slot description. LLM cannot default to same age/gender repeatedly.
+3. **Setting uniqueness mandate:** Added "SETTING UNIQUENESS" rule to MANDATORY section in `buildUserPrompt` — explicit list of varied locations, no two prompts may share same room.
+4. **Sunday `isRepost` freeform branch removed** from `buildUserPrompt`. Sunday now flows through the same structured slot path as weekdays. Only a header note remains ("no Arch 7, no Pattern Interrupt, no tablet/phone").
+5. **Art style collision:** Pre-assigned via `getArtStylesForToday()` per slot (was already in weekday path, now Sunday uses it too) — 14-style pool, offset by day-of-year × 7, all 5 slots get distinct styles.
+
+**Files changed:** `scripts/generate-prompts.mjs`
+**Verified:** `--dry-run` shows correct structure: 5 story with beats/styles/child profiles, 5 activity slots.
+
+---
+
+### 2026-04-05 — Prompt output format fix (slot echo + missing dimensions)
+
+**Problem:** LLM was echoing slot instruction text into output headers (e.g., "1. [STORY] Archetype 2 (pure-story). Freeze this beat: Beat 1...") instead of generating clean structured output. Also omitting dimensions and Hook type field from image prompts.
+
+**Root cause:** Slot descriptions were single-line runs that visually resembled output headers. No explicit "do not echo" instruction. Dimensions mandate was in system prompt but not reinforced in user prompt output rules.
+
+**Fixes in `scripts/generate-prompts.mjs`:**
+- Slot descriptions restructured to multi-line labeled blocks (`Slot N: Archetype X — pure-story\n  Beat: ...\n  Art style: ...\n  Child: ...`) — clearly instruction format, not output format
+- Added `━━━ INPUT INSTRUCTIONS — do NOT copy these into your output ━━━` divider with explicit mandate
+- Added `━━━ OUTPUT RULES ━━━` section reinforcing all required fields including: dimensions at end of every story prompt, dimensions + watermark space at end of every activity prompt
+- Seasonal note per slot is now inline in the slot block (not appended to the single line)
+
+---
+
+### 2026-04-05 — Trend signal pipeline built (collect-trends.mjs)
+
+**What was built:**
+- `scripts/collect-trends.mjs` — weekly trend signal collector
+  - Source 1: Google Trends (`google-trends-api`) — rising related queries for 8 target keywords, mapped to internal theme labels
+  - Source 2: Rich seasonal calendar — all parenting-relevant moments (holidays, school breaks, national activity days) with urgency scoring (days_away → boost weight)
+  - Easter computed dynamically via Meeus/Jones/Butcher algorithm
+  - Output: `config/trends-this-week.json` — boost_themes, rising_searches, upcoming_moments, caption_keywords
+  - Stale after 8 days — prompts warn if expired
+  - `--dry-run` flag for preview; `--monday-only` flag for daily automation
+- `scripts/generate-prompts.mjs` — added `loadTrendSignals()` function
+  - Reads `config/trends-this-week.json`, injects TREND SIGNALS block into user prompt
+  - Tells LLM: trending themes, upcoming moments with urgency, rising search queries to weave into captions
+  - Silent fallback if no file exists — never blocks generation
+- `package.json` — added `npm run trends`, `npm run trends:dry`
+- `npm run daily` — `collect-trends.mjs --monday-only` injected between archive and generate-prompts
+- `google-trends-api` installed as dependency
+
+**Verified:** Dry-run confirmed Easter (TODAY) + Spring Break (TODAY) + Earth Day (17 days) detected. Google Trends returned real rising queries. Trend block flows correctly into generate-prompts user prompt.
+
+---
+
+### 2026-04-06 — Content quality + story system overhaul
+
+**What was built:**
+
+**Prompt quality gate hardened:**
+- `scripts/generate-prompts.mjs` — added coloring correctness (−5) and dot-to-dot correctness (−5) rules to scorer; added explicit warning when scorer returns no output (was silently failing); added `regeneratePrompt()` function + auto-regen loop (up to 2 rounds for score <5 prompts)
+- Fixed root cause of today's bad prompts: coloring page said "colored with bright pastel colors"; dot-to-dot said "thick outlines". Both now instant-fail the scorer and trigger regen.
+- Added Example E (coloring page template) and fixed Example D (dot-to-dot — removed pre-drawn outline instruction) in the system prompt
+
+**Archive pipeline:**
+- `scripts/archive-queue.mjs` — added `output/prompts/` sweep; daily prompts now archived to `output/archive/prompts/` alongside other assets
+
+**ASMR brief generator hardened:**
+- `scripts/generate-asmr-brief.mjs` — added `trends-this-week.json` injection into prompt; rewrote blank image description to be explicit (ZERO color, black+white only); added per-type critical rule with explicit anti-patterns for coloring blank
+
+**Story generator overhauled:**
+- `scripts/generate-story-ideas.mjs`:
+  - Default slides: 7 → 8
+  - 3-act structure replaced with 8-beat viral arc (The Grab / Stakes / Attempt / Deepening / Break / Turn / Resolution / Echo)
+  - Added HOOK-FIRST architecture rule (Beat 1 = one sentence, drop into action)
+  - Added SHARE TRIGGER section (Beat 8 = one sentence, three proven techniques)
+  - Added CHARACTER REPETITION rule to image prompt spec (full description inline every slide)
+  - Added `trends-this-week.json` injection into user prompt
+  - Added `performance-weights.json` injection (graceful if missing)
+  - max_tokens: 2500 → 5000
+  - Removed "leave bottom 10% blank" from story image prompts (compositor handles watermarks)
+
+**Story ep01 image prompts rewritten manually:**
+- `output/stories/ep01-.../image-prompts.md` — all 7 slides rewritten with full character description inline, distinct lighting progression, named foreground elements, specific posture/expression, no bottom-10% instruction
+
+**Memory:**
+- Added `project_story_phase2.md` — Phase 2 plan locked: story-level analytics → story-performance-weights.json → auto-weighted arc selection. Trigger: 8+ published episodes with analytics data.
+
+---
+
+### 2026-04-06 (continued) — Pinterest video posting fix
+
+**Problem:** ASMR and story videos failing to post to Pinterest with 400 error. Root cause: code was uploading video to catbox.moe then passing `source_type: 'video_url'` — that source type does not exist in Pinterest's API.
+
+**Fix (`scripts/post-content.mjs`):**
+- Replaced catbox video upload + `video_url` approach with Pinterest's mandatory 3-step video flow:
+  1. `POST /v5/media` → get `media_id` + S3 presigned `upload_url` + `upload_parameters`
+  2. Upload mp4 directly to S3 presigned URL (multipart form with all upload_parameters)
+  3. Poll `GET /v5/media/{media_id}` every 5s until `status: succeeded` (max 30 attempts / ~2.5 min)
+  4. Create pin with `source_type: video_id` + `media_id`
+- Hoisted `apiBase` const to top of `postToPinterest()` so it's available for both media register and pin create calls
+- Removed duplicate `apiBase` declaration
+
+**Note:** If sandbox API doesn't support video uploads, switch `PINTEREST_API_BASE` to `https://api.pinterest.com` (production) to test.
+
+---
+
+## 2026-04-07 — Pipeline fixes: Pinterest cover image, X threads, story video pacing
+
+**Files changed:** `scripts/post-content.mjs`, `scripts/generate-captions.mjs`, `scripts/generate-story-video.mjs`, `docs/TASKS.md`
+
+### Pinterest cover image
+- Added `extractVideoThumbnail(videoPath)` — extracts frame at 1s via FFmpeg, saves to OS temp dir
+- After video upload + media_id confirmed, extracts thumbnail → uploads via `uploadTempImage()` → passes `cover_image_url` in pin body
+- Added `import { execSync } from 'child_process'` and `import { tmpdir } from 'os'`
+
+### X thread format
+- Added `generateXThreadReply(mainCaption, metadata)` in `generate-captions.mjs` — one Groq call, returns reply tweet ≤280 chars
+- 3 reply types: activity (score/result + "drop it below"), story (resolution, no CTA), default (insight or "which one does your kid love?")
+- After X caption is generated, thread reply is auto-generated and stored as `captions.x.thread = { tweet1, reply1 }`
+- `postToX()` in `post-content.mjs`: if `caption.thread.reply1` exists, posts it as reply using `in_reply_to_tweet_id` via Twitter API v2
+- Image posts unaffected — thread is additive, not a replacement
+
+### Story video pacing
+- Removed CTA outro entirely — `OUTRO_CTA_DURATION` and `OUTRO_ECHO_DURATION` constants removed
+- `OUTRO_DURATION = 1.5s` — just a clean fade-to-black on last story image
+- `MAX_SCENE_DURATION = 4.5s` — non-TTS slides clamped; TTS path logs a warning if exceeded (can't cap TTS without cutting audio)
+- `createOutroFrames()` rewritten: no text, no CTA, just hold + fade to black over 1.5s
+- Default story template updated: 9 slides at 3-4s each, 1-sentence narration per slide
+- Slide count validation updated: 6-15 (was 3-12)
+
+**Pending (Codex tasks):** `x-thread-story.txt` and `x-thread-puzzle.txt` templates with JSON output format for smarter per-type thread generation.
+
+---
+
+## 2026-04-07 — [Agent: Claude] — Story video outro: loop-friendly clean cut + AGENTS.md protocol
+
+**Files changed:** `scripts/generate-story-video.mjs`, `docs/AGENTS.md`, `docs/TASKS.md`
+
+### Story video outro revision
+- Revised from fade-to-black (1.5s) to zero outro — `OUTRO_DURATION = 0`
+- `createOutroFrames()` call removed entirely from main loop
+- Outro silence segment removed from narration track (`buildNarrationTrack`) — `allSegments` now only `[introPaddedPath, ...paddedClips]`
+- `totalNarration` log line fixed: removed `outroBuf` reference
+- Result: video ends cleanly on last Ken Burns frame — platform loops naturally back to hook
+
+### AGENTS.md multi-agent protocol
+- Added full shared communication protocol: what both agents read at session start, what both write at session end (TASKS.md → SESSION_LOG.md → CHAT_LOG.md order)
+- Added "Rules That Protect Both Agents" table (no cross-file renames, no TASKS.md reformatting, always --dry-run, npm script pairs)
+- Added handoff signals: Codex leaves `[CODEX DONE — needs Claude review]` when judgment needed
+- Updated JoyMaze context block with 3 new file pointers
+- Codex prompt pattern now includes end-of-task logging instruction
+
+### X text post scheduler
+- Full Codex spec written into TASKS.md: 3 tasks (`generate-x-posts.mjs`, `post-x-scheduled.mjs`, `daily-scheduler.mjs` patch)
+- Confirmed X text posts and X image posts are completely separate pipelines
+
+---
+
+## 2026-04-07 — [Agent: Codex] — X thread templates + X text scheduler build
+
+**Files changed:** `templates/captions/x-thread-story.txt`, `templates/captions/x-thread-puzzle.txt`, `scripts/generate-x-posts.mjs`, `scripts/post-x-scheduled.mjs`, `docs/TASKS.md`, `docs/AGENTS.md`
+
+- Added `templates/captions/x-thread-story.txt` and `templates/captions/x-thread-puzzle.txt` as strict JSON prompt templates for story and puzzle X threads.
+- Built `scripts/generate-x-posts.mjs` to generate daily standalone X text posts from writing style + optional trends/hooks inputs, save them to `output/queue/x-text-YYYY-MM-DD.json`, and support `--dry-run`.
+- Extended story text posts beyond the original single-reply spec: story hooks now allow stronger scene-based hooks, up to 280 chars per tweet, and multi-reply threads via `replies[]`; `reply1` is still written as the first reply for backward compatibility.
+- Built `scripts/post-x-scheduled.mjs` to post due X text posts by hour, chain the full `replies[]` thread, and persist `tweetId` + `replyIds` incrementally so retries do not duplicate the root tweet.
+- Verified `node scripts/post-x-scheduled.mjs --dry-run` against today's queue file.
+- Remaining ambiguity: `docs/TASKS.md` says to add `generate-x-posts.mjs` after `generate-captions.mjs` in `daily-scheduler.mjs`, but the current scheduler does not run `generate-captions.mjs` at all. [CODEX DONE — needs Claude review]
+
+---
+
+## 2026-04-07 — [Agent: Codex] — Coordination docs sync + CODEX startup refresh
+
+**Files changed:** `docs/TASKS.md`, `docs/AGENTS.md`, `docs/CHAT_LOG.md`, `CODEX.md`
+
+- Synced the task board to mark completed Codex X-thread/X-scheduler work done and marked the `daily-scheduler.mjs` patch as blocked pending clarification.
+- Added a current handoff note in `docs/AGENTS.md` so the unresolved scheduler insertion point is visible at session start.
+- Read the full `docs/` set and rewrote `CODEX.md` to use the live startup read order (`AGENTS.md` → `docs/TASKS.md` → `MEMORY.md` → `docs/AGENTS.md` → latest `docs/SESSION_LOG.md`) instead of the stale `ACTIVE_SPRINT.md` flow.
+- Added durable project context to `CODEX.md`: Phase 0 constraints, platform roles, story/activity operating model, hybrid manual+automation workflow, AI stack, and the current blocked scheduler note.
+
+---
+
+## 2026-04-08 — [Claude] — YouTube OAuth + 4am auto-post scheduler
+
+**Files changed:** `scripts/get-youtube-token.mjs` (used + can delete), `scripts/daily-scheduler.mjs`, `scripts/setup-post-task.ps1`, `package.json`
+
+- YouTube OAuth completed: ran get-youtube-token.mjs, exchanged auth code, YOUTUBE_REFRESH_TOKEN written to .env. YouTube posting now live.
+- Added 4am Cairo auto-post cron to daily-scheduler.mjs: posts queued images + videos to Pinterest/TikTok/YouTube/X at 4:00 AM Africa/Cairo (= 6 PM Pacific peak window). Separate from 9am generation job.
+- New --post-now flag + npm run scheduler:post-now for manual trigger of posting-only job.
+- Created scripts/setup-post-task.ps1 + ran it as Administrator: Windows Task Scheduler task "JoyMaze 4am Post" created, StartWhenAvailable=true (runs on next login if PC was off at 4am).
+- Confirmed existing tasks: "Joymaze Daily" (9am, last ran today) + "JoyMaze X Posts" (hourly drip) both live.
+
+---
+
+## 2026-04-08 — [Claude] — Maze gold standard + template update
+
+**Files changed:** `scripts/generate-prompts.mjs`
+
+- Added Example E (Ancient Egypt Hard maze) to gold standard pool — confirmed by Ahmed to produce a perfect maze in Gemini.
+- Key new structural element: explicit corner decoration instruction ("Add small decorative elements, such as X and Y, to the corners of the page") — not in Example C, now folded into all maze prompts.
+- Updated master maze fill-in-the-blank template to include corner decoration line. Removed "solvable in under X minutes" line (Egypt prompt proved it unnecessary).
+- Note on the original Example C template: "solvable in X minutes" removed from canonical template going forward.
+
+---
+
+## 2026-04-09 — [Claude] — Activity videos, Pinterest demo, story narration fix
+
+**Files changed:** `scripts/generate-activity-video.mjs` (new), `scripts/get-pinterest-token.mjs` (new), `docs/PINTEREST_DEMO_GUIDE.md` (new), `scripts/generate-story-ideas.mjs`, `docs/DAILY_CHEATSHEET.md`, `package.json`
+
+- Built `generate-activity-video.mjs`: converts maze/matching/quiz/tracing/dot-to-dot queue items into 15s YouTube Shorts. Hook text from queue JSON overlays full duration (no fade, no CTA). Uses -tt.png variant directly (already 1080x1920). crayon.mp3 audio. Outputs *-yt-short.mp4 + new queue JSON (type: youtube). npm scripts: `generate:activity:video` + `generate:activity:video:dry`. Dry run confirmed 4/5 items eligible (coloring correctly skipped).
+- Built `scripts/get-pinterest-token.mjs`: full OAuth authorization_code flow demo script (mirrors get-youtube-token.mjs pattern). Shows Pinterest auth screen → user approves → code exchanged → tokens received → live pin created. Built for second Standard API demo submission. Saved recording guide to `docs/PINTEREST_DEMO_GUIDE.md`.
+- Fixed story narration word count: `generate-story-ideas.mjs` prompt now enforces **15 words max per slide** (was unbounded). First story had 7–10s TTS per slide vs 3–4s target — root cause was no word count ceiling, not slide count. Added beat-by-beat examples proving 15 words is sufficient for full story quality. Testing over next few days.
+- Updated DAILY_CHEATSHEET.md: added automated 4am posting section, STEP 4B (activity puzzle videos), YouTube to Step 8, new troubleshooting rows.

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JoyMaze — Organic Growth Roadmap</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Georgia', serif;
+    color: #1a1a2e;
+    background: #fff;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+
+  .cover .logo-area {
+    margin-bottom: 48px;
+  }
+
+  .cover .brand {
+    font-size: 48px;
+    font-weight: 900;
+    color: #f5a623;
+    letter-spacing: -1px;
+    font-family: 'Arial Black', sans-serif;
+  }
+
+  .cover .brand span {
+    color: #fff;
+  }
+
+  .cover .tagline {
+    font-size: 16px;
+    color: #a8c7fa;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .cover h1 {
+    font-size: 42px;
+    color: #fff;
+    font-family: 'Georgia', serif;
+    line-height: 1.25;
+    max-width: 640px;
+    margin-bottom: 24px;
+  }
+
+  .cover .subtitle {
+    font-size: 18px;
+    color: #a8c7fa;
+    max-width: 520px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  .cover .date {
+    font-size: 13px;
+    color: #6b8cba;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .cover .reminder {
+    margin-top: 56px;
+    padding: 28px 40px;
+    background: rgba(245, 166, 35, 0.12);
+    border: 1px solid rgba(245, 166, 35, 0.3);
+    border-radius: 12px;
+    max-width: 560px;
+  }
+
+  .cover .reminder p {
+    color: #f5d67a;
+    font-size: 17px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ── CONTENT ── */
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+
+  h2 {
+    font-size: 28px;
+    color: #0f3460;
+    margin-bottom: 16px;
+    margin-top: 48px;
+    font-family: 'Georgia', serif;
+    border-bottom: 3px solid #f5a623;
+    padding-bottom: 10px;
+  }
+
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-size: 19px;
+    color: #16213e;
+    margin-bottom: 10px;
+    margin-top: 32px;
+    font-family: 'Arial', sans-serif;
+    font-weight: 700;
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: #2d2d44;
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    background: #f0f7ff;
+    border-left: 5px solid #0f3460;
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .callout.orange {
+    background: #fff8ee;
+    border-left-color: #f5a623;
+  }
+
+  .callout.green {
+    background: #f0fdf4;
+    border-left-color: #22c55e;
+  }
+
+  .callout.red {
+    background: #fff1f0;
+    border-left-color: #ef4444;
+  }
+
+  .callout strong {
+    display: block;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+
+  .callout p {
+    margin: 0;
+    font-size: 16px;
+    color: #1a1a2e;
+  }
+
+  /* ── PHASE CARDS ── */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 28px 0;
+  }
+
+  .phase-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+  }
+
+  .phase-card.active {
+    border-color: #f5a623;
+    background: #fffbf0;
+  }
+
+  .phase-card .phase-num {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #9ca3af;
+    margin-bottom: 6px;
+  }
+
+  .phase-card.active .phase-num {
+    color: #f5a623;
+  }
+
+  .phase-card h4 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+  }
+
+  .phase-card .phase-time {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .phase-card ul {
+    padding-left: 18px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.7;
+  }
+
+  .phase-card .gate {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+
+  .phase-card.active .gate {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .phase-card .gate strong {
+    color: #1a1a2e;
+  }
+
+  /* ── KPI TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+
+  thead th {
+    background: #0f3460;
+    color: #fff;
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tbody tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+  }
+
+  tbody tr:hover {
+    background: #f0f7ff;
+  }
+
+  tbody td:first-child {
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+
+  /* ── NORTH STAR BLOCK ── */
+  .north-star {
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin: 32px 0;
+    color: #fff;
+  }
+
+  .north-star .star {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .north-star h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #a8c7fa;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
+
+  .north-star .metric {
+    font-size: 32px;
+    font-weight: 900;
+    color: #f5a623;
+    font-family: 'Arial Black', sans-serif;
+    margin-bottom: 8px;
+  }
+
+  .north-star p {
+    font-size: 15px;
+    color: #cbd5e1;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── CONTENT MIX ── */
+  .mix-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .mix-item {
+    text-align: center;
+    padding: 24px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+  }
+
+  .mix-item .count {
+    font-size: 40px;
+    font-weight: 900;
+    font-family: 'Arial Black', sans-serif;
+    color: #0f3460;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .mix-item .label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+
+  .mix-item .sub {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  /* ── WHY IT WORKS LIST ── */
+  .why-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+
+  .why-list li {
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #1a1a2e;
+    border-left: 4px solid #0f3460;
+    position: relative;
+    padding-left: 46px;
+  }
+
+  .why-list li::before {
+    content: attr(data-num);
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 22px;
+    height: 22px;
+    background: #0f3460;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 22px;
+  }
+
+  /* ── MOTIVATION SECTION ── */
+  .motivation {
+    background: linear-gradient(135deg, #16213e, #0f3460);
+    border-radius: 16px;
+    padding: 40px;
+    margin: 32px 0;
+  }
+
+  .motivation h2 {
+    color: #f5a623;
+    border-bottom-color: rgba(245, 166, 35, 0.3);
+    margin-top: 0;
+  }
+
+  .motivation p, .motivation li {
+    color: #cbd5e1;
+  }
+
+  .motivation ul {
+    padding-left: 20px;
+    line-height: 1.9;
+  }
+
+  .motivation .quote {
+    font-size: 20px;
+    font-style: italic;
+    color: #fff;
+    border-left: 4px solid #f5a623;
+    padding-left: 20px;
+    margin: 24px 0;
+    line-height: 1.5;
+  }
+
+  /* ── PLATFORM BLOCK ── */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .platform-card {
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+  }
+
+  .platform-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .platform-card p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { font-size: 13px; }
+    .cover { min-height: auto; padding: 80px 40px; }
+    .phase-grid { grid-template-columns: 1fr 1fr; }
+    .mix-grid { grid-template-columns: repeat(3, 1fr); }
+    h2 { page-break-before: auto; }
+    .north-star, .motivation { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── COVER ── -->
+<div class="cover">
+  <div class="logo-area">
+    <div class="brand">Joy<span>Maze</span></div>
+    <div class="tagline">Kids Activity App &amp; KDP Books</div>
+  </div>
+
+  <h1>Organic Growth Roadmap</h1>
+  <p class="subtitle">
+    A clear, honest plan for building an audience from zero —
+    through content, consistency, and compounding.
+  </p>
+
+  <div class="reminder">
+    <p>
+      "If you're reading this because you feel stuck or overwhelmed —
+      that's normal. You're building something real.
+      The only thing that matters today is posting. Just post."
+    </p>
+  </div>
+
+  <p class="date">JoyMaze · April 2026 · Confidential</p>
+</div>
+
+<!-- ── CONTENT ── -->
+<div class="page">
+
+  <!-- THE BIG PICTURE -->
+  <h2>The Big Picture</h2>
+
+  <p>
+    JoyMaze is a kids activity app and KDP activity book brand competing for the attention of
+    parents aged 25–40 who care about their children's development. The organic growth strategy
+    is built on one simple truth:
+  </p>
+
+  <div class="callout orange">
+    <strong>The core insight</strong>
+    <p>Parents who discover JoyMaze through saved content become loyal users.
+    A coloring page saved on Pinterest in January can still drive app installs in August.
+    Every post is a seed. The goal is to plant as many seeds as possible, as consistently as possible.</p>
+  </div>
+
+  <p>
+    This is not a sprint. It's a compounding machine. The first 90 days feel slow.
+    Months 4–8 feel like they're working. After Month 8, you'll look back and see
+    the compounding effect clearly. The only way to fail is to stop posting.
+  </p>
+
+  <!-- DAILY CONTENT TARGET -->
+  <h2>Daily Content Target</h2>
+
+  <p>The goal is to reach and maintain this output level every day before investing in new tools or platforms:</p>
+
+  <div class="mix-grid">
+    <div class="mix-item">
+      <div class="count">10</div>
+      <div class="label">Image Posts</div>
+      <div class="sub">5 story + 5 activity puzzles</div>
+    </div>
+    <div class="mix-item">
+      <div class="count">10</div>
+      <div class="label">Story Videos</div>
+      <div class="sub">Joyo's Story Corner episodes</div>
+    </div>
+    <div class="mix-item">
+      <div class="count">10</div>
+      <div class="label">ASMR Videos</div>
+      <div class="sub">Satisfying activity reveals</div>
+    </div>
+  </div>
+
+  <div class="callout green">
+    <strong>Why this number</strong>
+    <p>High-volume posting is not about spamming. It's about giving the algorithm enough data to find your audience.
+    At 30 pieces of content per day across 5 platforms, you'll know within 60 days exactly which content type
+    your audience responds to — and you'll have the production system to double down on it.</p>
+  </div>
+
+  <!-- NORTH STAR -->
+  <div class="north-star">
+    <div class="star">⭐</div>
+    <h3>North Star Metric</h3>
+    <div class="metric">Pinterest Monthly Saves</div>
+    <p>
+      Pinterest saves are the single best leading indicator in this business.
+      A save means a parent found your content valuable enough to return to.
+      Saves compound into impressions, which compound into follows, which compound into app installs.
+      Track this number weekly. When it grows, everything grows behind it.
+    </p>
+  </div>
+
+  <!-- PLATFORM STRATEGY -->
+  <h2>Platform Strategy</h2>
+
+  <p>Each platform plays a different role. Don't chase all of them equally — lead with Pinterest and TikTok.</p>
+
+  <div class="platform-grid">
+    <div class="platform-card">
+      <h4>📌 Pinterest — Primary Discovery Engine</h4>
+      <p>Parents search here for printable activities, quiet time ideas, and kids crafts.
+      Activity posts (mazes, coloring pages) drive saves. Saves drive impressions.
+      One viral activity pin can drive traffic for 12+ months.</p>
+    </div>
+    <div class="platform-card">
+      <h4>🎵 TikTok / Reels — Reach Engine</h4>
+      <p>ASMR videos and story videos perform here with zero followers if the hook lands.
+      Algorithm-first platform — great content gets pushed regardless of follower count.
+      Focus: ASMR satisfying videos and Joyo story episodes.</p>
+    </div>
+    <div class="platform-card">
+      <h4>📸 Instagram — Trust Builder</h4>
+      <p>Slower growth but higher intent. Parents who follow on Instagram are closer to installing.
+      Story posts and archetype content perform best here.
+      Reels (ASMR + story) drive new reach.</p>
+    </div>
+    <div class="platform-card">
+      <h4>🐦 X / Twitter — Live Now</h4>
+      <p>Already posting. Lower conversion intent for this audience, but costs almost nothing to maintain.
+      Good for testing hooks and copy before committing to Pinterest/Instagram creative.</p>
+    </div>
+    <div class="platform-card">
+      <h4>▶️ YouTube Shorts — Long-term SEO</h4>
+      <p>Shorts are indexed by Google. "Maze for kids," "coloring for kids" search traffic is real.
+      Slower to build but durable — a Shorts upload from Month 2 can rank in Month 8.</p>
+    </div>
+    <div class="platform-card">
+      <h4>📚 Amazon KDP — Revenue Flywheel</h4>
+      <p>Activity books reinforce the brand and create a second revenue stream.
+      Pinterest traffic converts to KDP purchases. App users become book buyers.
+      Each book review compounds discoverability on Amazon.</p>
+    </div>
+  </div>
+
+  <!-- PHASE ROADMAP -->
+  <h2>Growth Phases</h2>
+
+  <p>Each phase has a clear gate. Do not move to the next phase until the gate is cleared.</p>
+
+  <div class="phase-grid">
+    <div class="phase-card active">
+      <div class="phase-num">Phase 0 · Active Now</div>
+      <h4>Stabilize</h4>
+      <div class="phase-time">Now → 6 weeks</div>
+      <ul>
+        <li>Consistent daily output</li>
+        <li>All 5 platforms receiving content</li>
+        <li>ASMR + story videos daily</li>
+        <li>No skipped days</li>
+        <li>Video steps not skipped</li>
+      </ul>
+      <div class="gate">
+        <strong>Gate:</strong> 30 consecutive days of ≥10 total posts/day
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">Phase 1</div>
+      <h4>Grow</h4>
+      <div class="phase-time">6 weeks → 4 months</div>
+      <ul>
+        <li>Pinterest saves trending up weekly</li>
+        <li>TikTok/Reels reach growing</li>
+        <li>Identify top 2 content types</li>
+        <li>Double down on what works</li>
+        <li>First real app installs from content</li>
+      </ul>
+      <div class="gate">
+        <strong>Gate:</strong> Pinterest 75K impressions/mo AND installs ≥100/mo or KDP ≥20 units/mo
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">Phase 2</div>
+      <h4>Optimize</h4>
+      <div class="phase-time">Month 4 → Month 8</div>
+      <ul>
+        <li>Analytics-driven content decisions</li>
+        <li>More of top 2 performers</li>
+        <li>KDP book #2 planning</li>
+        <li>Community building</li>
+        <li>First revenue-funded experiments</li>
+      </ul>
+      <div class="gate">
+        <strong>Gate:</strong> Installs ≥1,000/mo OR KDP ≥150 units/mo for 2 months
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">Phase 3</div>
+      <h4>Scale</h4>
+      <div class="phase-time">Month 8+</div>
+      <ul>
+        <li>AI video generation integration</li>
+        <li>Pinterest Promoted Pins pilot</li>
+        <li>Influencer outreach (micro)</li>
+        <li>KDP series expansion</li>
+        <li>Email list + newsletter</li>
+      </ul>
+      <div class="gate">
+        <strong>Gate:</strong> Phase 2 gate cleared + sustainable revenue to fund ads
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI TARGETS -->
+  <h2>KPI Targets — Month by Month</h2>
+
+  <p>These are <strong>conservative</strong> targets assuming no viral posts. One ASMR video or activity post
+  that reaches 50K+ views jumps you 2–3 months ahead instantly.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Pinterest Impressions</th>
+        <th>Pinterest Saves</th>
+        <th>TikTok Followers</th>
+        <th>App Installs</th>
+        <th>KDP Units</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Month 1</td><td>5,000</td><td>50</td><td>100</td><td>10</td><td>2</td></tr>
+      <tr><td>Month 2</td><td>25,000</td><td>300</td><td>500</td><td>40</td><td>8</td></tr>
+      <tr><td>Month 3</td><td>75,000</td><td>1,000</td><td>1,500</td><td>120</td><td>20</td></tr>
+      <tr><td>Month 4</td><td>200,000</td><td>3,000</td><td>4,000</td><td>300</td><td>50</td></tr>
+      <tr><td>Month 5</td><td>350,000</td><td>6,000</td><td>7,000</td><td>500</td><td>80</td></tr>
+      <tr><td>Month 6</td><td>500,000</td><td>8,000</td><td>10,000</td><td>700</td><td>100</td></tr>
+      <tr><td>Month 8</td><td>1,000,000+</td><td>18,000</td><td>25,000</td><td>1,500</td><td>220</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Revenue estimate at Month 8</strong>
+    <p>1,500 installs/month × ~$0.10 avg LTV + 220 KDP units × ~$2.50 royalty = ~$700/month
+    recurring and growing. Phase 3 ads + influencer can 3-5x this quickly once the organic base is solid.</p>
+  </div>
+
+  <!-- WHY ORGANIC FIRST -->
+  <h2>Why Organic First — The Real Reason</h2>
+
+  <ul class="why-list">
+    <li data-num="1">
+      <strong>Organic traffic tells you the truth.</strong> Paid ads can make anything look like it's working.
+      Organic saves, shares, and follows are the only signal that your content actually resonates.
+      You need that signal before you spend money amplifying it.
+    </li>
+    <li data-num="2">
+      <strong>Pinterest pins compound for 12+ months.</strong> A Pinterest pin from Month 1 is still
+      driving traffic in Month 8. Every day you post is an investment that keeps paying.
+      Every day you don't post is a day of compounding you'll never get back.
+    </li>
+    <li data-num="3">
+      <strong>Building the pipeline IS the product.</strong> A reliable content pipeline that runs daily
+      is a business asset. It's the thing that makes everything else work — ads, influencer deals,
+      partnerships. Without the pipeline, those channels don't scale.
+    </li>
+    <li data-num="4">
+      <strong>Your competition is inconsistency, not competitors.</strong> Most kids content accounts
+      post 2-3 times per week and stop after 2 months. Showing up every day for 6 months wins by default.
+    </li>
+    <li data-num="5">
+      <strong>Low cost, real data.</strong> At current pipeline costs (~$15-30/month), you're running
+      a real marketing campaign for the price of a dinner. When the data tells you what to scale,
+      you'll scale with confidence instead of guessing.
+    </li>
+  </ul>
+
+  <!-- CONTENT THAT WORKS -->
+  <h2>Content Types That Drive Results</h2>
+
+  <p>Ranked by expected save/share rate for this audience (parents of kids 4-8):</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Content Type</th>
+        <th>Platform</th>
+        <th>Why It Works</th>
+        <th>Expected Save Rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Activity puzzles (mazes, coloring)</td>
+        <td>Pinterest</td>
+        <td>Parents save to print for their kids — pure utility</td>
+        <td>High (3-8%)</td>
+      </tr>
+      <tr>
+        <td>ASMR activity reveals</td>
+        <td>TikTok / Reels</td>
+        <td>Satisfying = watch time = algorithm push</td>
+        <td>High shares</td>
+      </tr>
+      <tr>
+        <td>Archetype 7 (subtle marketing)</td>
+        <td>Instagram / Pinterest</td>
+        <td>Real parent moments — identity resonance</td>
+        <td>Medium (1-3%)</td>
+      </tr>
+      <tr>
+        <td>Pattern Interrupt (myth-bust, did-you-know)</td>
+        <td>All platforms</td>
+        <td>Educational hooks drive comments and shares</td>
+        <td>Medium-high (comments)</td>
+      </tr>
+      <tr>
+        <td>Story videos (Joyo's Story Corner)</td>
+        <td>TikTok / YouTube Shorts</td>
+        <td>Kids watch → parents follow → installs</td>
+        <td>High watch time</td>
+      </tr>
+      <tr>
+        <td>Pure story archetypes (1-6)</td>
+        <td>Instagram / Pinterest</td>
+        <td>Emotional mirror — parents feel seen</td>
+        <td>Medium saves, high follows</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- THE VIRAL MOMENT -->
+  <h2>When a Post Goes Viral</h2>
+
+  <p>It will happen. One ASMR video or activity post will hit 50K-500K views. Here's what to do:</p>
+
+  <div class="callout green">
+    <strong>What to do immediately</strong>
+    <p><strong>Don't change your strategy.</strong> Study why it worked (hook, visual style, topic, format).
+    Update the content archetype notes. Let the rotation absorb it naturally. Post normally the next day.</p>
+  </div>
+
+  <div class="callout red">
+    <strong>What NOT to do</strong>
+    <p>Don't make 10 versions of the same post. Don't pivot everything to chase the format.
+    Don't buy ads on the viral post. The algorithm already knows — let it run.
+    One viral post that you chase becomes a distraction from the pipeline that generated it.</p>
+  </div>
+
+  <!-- MOTIVATION -->
+  <div class="motivation">
+    <h2>When You Feel Like Stopping</h2>
+
+    <p>If you're reading this because you feel stuck, unmotivated, or like nothing is working — here's the truth:</p>
+
+    <div class="quote">
+      "The content you post today will be discovered by parents you've never met,
+      in places you'll never see, at 2am when they're looking for something to do with their kid tomorrow.
+      That's why you post today."
+    </div>
+
+    <p>The numbers at Month 1 will feel invisible. That's not failure — that's how compound growth works.
+    The seeds you planted in Month 1 are what produce the Month 4 results.
+    You don't feel them growing. Then one day you do.</p>
+
+    <ul>
+      <li>You don't need to feel motivated. You just need to open the cheatsheet and follow Step 1.</li>
+      <li>A bad post that gets posted beats a perfect post that doesn't.</li>
+      <li>Every day you post is a day your competitors didn't.</li>
+      <li>The pipeline is built. The strategy is clear. Your only job is to run it.</li>
+      <li>JoyMaze is already real. The audience just hasn't found it yet.</li>
+    </ul>
+
+    <div class="quote">
+      "Every expert was once a beginner who refused to quit on a day they felt like quitting."
+    </div>
+
+    <p style="color: #f5d67a; font-weight: 700; font-size: 16px; margin-top: 24px;">
+      Open the cheatsheet. Run Step 1. The rest follows.
+    </p>
+  </div>
+
+  <!-- THE DECISION THAT'S LOCKED -->
+  <h2>Decisions That Are Locked — Don't Revisit</h2>
+
+  <p>These decisions are made. They don't need to be reconsidered until the Phase gates are cleared:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Decision</th>
+        <th>Why It's Locked</th>
+        <th>When to Revisit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>No new video generation tools (Seedance, Sora, etc.)</td>
+        <td>Optimize existing pipeline first</td>
+        <td>Phase 3 (Month 8+)</td>
+      </tr>
+      <tr>
+        <td>No paid ads yet</td>
+        <td>Need organic data to know what to amplify</td>
+        <td>Phase 2 gate cleared</td>
+      </tr>
+      <tr>
+        <td>No new platforms beyond current 5</td>
+        <td>Depth beats breadth at this stage</td>
+        <td>Phase 2 gate cleared</td>
+      </tr>
+      <tr>
+        <td>Existing pipeline is sufficient</td>
+        <td>30+10+10 is achievable with what's built</td>
+        <td>Only if technically broken</td>
+      </tr>
+      <tr>
+        <td>Pinterest saves = north star</td>
+        <td>Best leading indicator for this audience and business model</td>
+        <td>Phase 2 — may add secondary metric</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- CLOSING -->
+  <div class="callout orange">
+    <strong>The one-sentence version</strong>
+    <p>Post every day, watch Pinterest saves, don't add new tools until Phase 1 is cleared,
+    and trust that compounding works — because it always does.</p>
+  </div>
+
+  <p style="text-align: center; color: #9ca3af; font-size: 13px; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+    JoyMaze Organic Growth Roadmap · Created April 2026 · Review monthly and update KPI actuals in the table above.
+  </p>
+
+</div>
+</body>
+</html>

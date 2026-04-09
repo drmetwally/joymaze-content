@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "last_updated": "2026-04-07",
+    "managed_by": "scripts/apply-intelligence.mjs",
+    "max_entries": 30,
+    "description": "Dynamic extension of THEME_POOL in generate-prompts.mjs. Never mutate the hardcoded pool — add here only."
+  },
+  "themes": [
+    {
+      "name": "Spring Gardening",
+      "added_week": "2026-04-07",
+      "source": "trend_analysis",
+      "confidence": 0.82,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Rising search"
+    }
+  ]
+}

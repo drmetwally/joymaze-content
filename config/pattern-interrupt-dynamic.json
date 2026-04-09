@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "last_updated": "2026-04-07",
+    "managed_by": "scripts/apply-intelligence.mjs",
+    "max_entries": 20,
+    "description": "Dynamic extension of PATTERN_INTERRUPT_POOL in generate-prompts.mjs. Entry shape matches hardcoded pool exactly — only lifecycle fields added."
+  },
+  "interrupts": [
+    {
+      "subtype": "did-you-know",
+      "topic": "Kids who do mazes 3x/week show 40% improvement in spatial navigation tasks",
+      "visual": "Brain map with two highlighted regions connected by a glowing line",
+      "added_week": "2026-04-07",
+      "source": "trend_analysis",
+      "confidence": 0.79,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Not in current pool"
+    }
+  ]
+}

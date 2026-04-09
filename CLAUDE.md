@@ -8,7 +8,7 @@ Joymaze-Content is the content automation engine for the JoyMaze kids activity a
 
 **Goal:** Drive app installs and Amazon KDP book sales through high-volume, branded social media content.
 
-**Daily targets:** 1-2 short-form videos + 10+ image posts
+**Daily targets:** 10 image posts + 10 story videos + 10 ASMR videos (threshold goal — see docs/TASKS.md)
 
 ## Tech Stack
 
@@ -72,19 +72,46 @@ npm run calendar              # Manage content calendar
 | TikTok | 1080x1920 (9:16) | Video only |
 | YouTube | 1080x1920 (9:16) | Shorts < 60s |
 
-## Agent Startup Protocol
+## Token Efficiency Rules (CRITICAL — read first)
 
-**On every task, before writing any code:**
+Every tool call and every line of conversation context costs quota. Follow these rules strictly:
 
-1. Read these files in order:
-   - `AGENTS.md` — hard rules (never skip)
-   - `MEMORY.md` — project invariants
-   - `docs/ACTIVE_SPRINT.md` — current priorities
-   - `docs/BUG_BOARD.md` — known bugs and status
-2. Ask: **"What is the single task? What are the exact files?"**
-3. If the task is ambiguous or touches more than the listed files, stop and clarify.
+### Startup (do this ONCE per session, not per task)
+1. Read `docs/TASKS.md` — current work and locked decisions
+2. Read `memory/MEMORY.md` — cross-session decisions Ahmed trusted you with; read any relevant memory files it points to before acting
+3. Read `docs/CONTENT_ARCHETYPES.md` lines 1–50 + 530–583 — daily mix, slot rules, CTA rules, archetype cheat sheet (MANDATORY for any content task)
+4. Read the **last entry only** of `docs/SESSION_LOG.md` (last ~20 lines) — for recent context
+5. **Stop. Do NOT read** `AGENTS.md`, `docs/ACTIVE_SPRINT.md`, or `docs/BUG_BOARD.md` unless the task explicitly requires one of them
+6. Ask: **"What is the single task? What are the exact files?"** — then go straight to those files
 
-**On task completion:**
-- Append one short entry to `docs/SESSION_LOG.md`.
-- Append a summary entry to `docs/CHAT_LOG.md`.
-- If any architecture decision was made, append to `docs/DECISIONS.md`.
+### During work
+- **Never re-read the conversation** for context — the structured files ARE the context
+- **Never search for files** unless you know you need a specific one — ask Ahmed if unsure
+- **Never re-read a file** you already read in this session — trust what you read
+- Read only the lines you need (use `offset` + `limit`) — never read an entire large file when only a section is needed
+- Run multiple independent tool calls in parallel (one message, multiple calls)
+- Do not do exploratory reads "to understand the codebase" — read only what the task requires
+- **Use a subagent for any task requiring 3+ file reads** — intermediate noise stays in subagent context; only summary returns
+
+### After every task
+- **Compact the conversation immediately** — type `/compact` after logging
+- Append one short entry to `docs/SESSION_LOG.md`
+- Append a summary entry to `docs/CHAT_LOG.md`
+- If any architecture decision was made, append to `docs/DECISIONS.md`
+- Mark tasks done in `docs/TASKS.md`
+
+### Multi-agent routing (read docs/AGENTS.md when quota feels tight)
+- New isolated script or single-file rewrite with a clear spec → **Codex** (no Claude quota)
+- Keep Claude for: architecture, multi-file logic, judgment calls, debugging
+
+### What NOT to do
+- Do not read 5 files at session start — 2 files maximum (TASKS.md + last SESSION_LOG entry)
+- Do not read ACTIVE_SPRINT.md — it is stale; TASKS.md is the live anchor
+- Do not wander with Grep/Glob to understand the repo — you know this codebase
+- Do not re-read files to verify edits — trust that Edit/Write succeeded
+- Do not add exploratory tool calls before you know what you need
+
+### Ahmed: session hygiene reminders
+- Run `/mcp` at session start — disable Gmail/Calendar MCP servers if not needed that session (each costs ~7K tokens/turn)
+- Run `/context` if quota feels tight — it shows a breakdown of where tokens are going
+- Phrase tasks specifically: "in `scripts/X.mjs`, do Y" — not "fix the pipeline" (vague = broad file scanning)

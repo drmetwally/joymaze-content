@@ -668,3 +668,129 @@ Never shout. Never lecture. Never sell. Just make them feel.
 
 The brand sounds like: a quiet certainty. A warm knowing. A gentle invitation.
 Not a pitch. Not an ad. A moment.
+
+---
+
+## STORY-FIRST CONTENT ARCHITECTURE
+# See docs/CONTENT_ARCHETYPES.md for full archetype definitions and example executions.
+
+### The Core Rule
+80% of all content is pure story — no product pitch, no CTA in the post body.
+20% weaves in marketing. It works *because* the 80% earned the trust.
+
+### The 8 Story Archetypes (quick reference)
+
+| # | Archetype | Emotional Arc | Marketing |
+|---|-----------|---------------|-----------|
+| 1 | The Restless Afternoon | Overwhelm → Calm | None |
+| 2 | The Discovery | Skepticism → Surprise | None |
+| 3 | Childhood Nostalgia | Longing → Warmth | None |
+| 4 | The Quiet Room | Guilt → Relief | None |
+| 5 | The Curious Child | Wonder → Pride | None |
+| 6 | Before I Knew This | Frustration → Clarity | None |
+| 7 | The Parent Who Chose | Identity → Confidence | Subtle (1 product mention max) |
+| 8 | Kids Story Video | Wonder → Delight | None — zero product mention |
+
+### The 3-Beat Story Structure (apply to every archetype)
+```
+BEAT 1 — SCENE DROP: One vivid, specific moment. Sensory and concrete. No setup.
+BEAT 2 — EMOTIONAL TENSION: The friction every parent recognizes. Name it, don't explain it.
+BEAT 3 — THE SHIFT: Something changes. Room goes quiet. Child leans in. Parent exhales.
+          Pure story posts: shift is the end. No product.
+          Subtle marketing posts: JoyMaze is present in the shift as setting, not hero.
+```
+
+### Daily Mix (10 image posts + 1 video)
+- 6 pure story posts: archetypes 1–6 (rotate: odd days = 1,3,5 / even days = 2,4,6)
+- 2 subtle marketing posts: archetype 7 (JoyMaze appears naturally, not pitched)
+- 1 pattern interrupt / myth-bust: edutainment hook, no product
+- 1 marketing anchor: story-wrapped copy, soft in-post CTA
+- 1 video: archetype 8 — pure kids story, Joyo narrates, zero CTA
+
+### CTA Placement Rules
+- Profile bio: "Free on iOS & Android → joymaze.com"
+- First pinned comment: on Archetype 7 and marketing anchor posts only
+- In-post CTA: only on the 1 daily marketing anchor post — soft invitation, never command
+- Archetypes 1–6 and Archetype 8: no CTA anywhere
+
+### When Writing for Archetype 8 (Kids Story Video)
+- Characters: animals, vehicles, fantastical creatures — not JoyMaze characters
+- Joyo bookends the video only (intro + outro) as narrator/guide
+- Zero brand language inside the story itself
+- Story themes: small creature solves big problem, lost creature finds home, unexpected friendship,
+  ordinary moment becomes magical, the overlooked one finds their gift
+- Format: ACT 1 (introduce character + wish) → ACT 2 (challenge + almost-fails) → ACT 3 (resolution + emotional payoff)
+- The lesson lives in the feeling, not a moral speech at the end
+
+---
+
+## ACTIVITY POST COPYWRITING (Archetypes A1–A5)
+
+Activity posts are fundamentally different from story posts. Story posts sell an emotion.
+Activity posts sell a challenge. The reader should feel compelled to try it — or hand
+the phone to their kid immediately.
+
+### Voice Shift
+- **Story posts:** Warm, intimate, reflective, like a parenting blog you trust
+- **Activity posts:** Playful, competitive, encouraging — like a fun teacher daring you to try
+
+### Activity Hook Formulas
+
+**Challenge hooks** (most effective — creates urgency):
+- "Can your [age]-year-old solve this in under 2 minutes?"
+- "This maze stumped 3 out of 4 kids. Yours?"
+- "Only the sharpest eyes catch all 5 differences."
+- "How many words can they find before the timer runs out?"
+
+**Curiosity hooks** (creates the itch):
+- "There's one hidden word most kids miss."
+- "The answer isn't what you think."
+- "Look closer. Something doesn't belong."
+- "Most parents can't solve this faster than their 6-year-old."
+
+**Dare hooks** (triggers action):
+- "Bet they can't trace this without lifting the pencil."
+- "Think they can find the path? Hand them this."
+- "Try this with your kid. See who finishes first."
+
+**Skill hooks** (appeals to the parent's desire for development):
+- "This builds focus you'll notice at homework time."
+- "Fine motor practice that doesn't feel like practice."
+- "The kind of screen time that makes their teacher smile."
+- "Problem-solving starts here — one maze at a time."
+
+### Activity Caption Structure (All Platforms)
+
+1. **CHALLENGE HOOK** (1 line) — Open with a question, dare, or claim. No intro. Jump straight in.
+2. **SKILL PAYOFF** (1-2 lines) — Name the benefit without being preachy. Use sensory language.
+   "Their fingers move. Their brain lights up. That's the moment."
+3. **ENGAGEMENT PROMPT** (1 line) — Ask for interaction.
+   "Drop a [emoji] if they solved it!" / "Tag a parent who needs this."
+4. **BRAND + CTA** (1 line) — Soft.
+   "More puzzles like this in JoyMaze — free on iOS & Android."
+
+### What NOT to Write for Activity Posts
+- Don't call it "educational" — say "builds," "develops," "sharpens"
+- Don't describe the puzzle ("This is a word search with...") — the image speaks
+- Don't use "worksheet" or "homework" language
+- Don't give the answer or hint at the solution
+- Don't write long emotional narratives — save that for story posts
+- Don't use weak words: very, really, great, amazing, awesome
+- Don't oversell — the activity IS the value, the caption is the hook
+
+### Platform-Specific Activity Rules
+
+**Pinterest:** Challenge hook + 1-2 keyword phrases ("maze puzzle for kids", "printable word search") + brand CTA. No hashtags. 200-350 chars.
+
+**Instagram:** Challenge hook + skill payoff + engagement question + brand mention. Hashtags added separately. 400-700 chars.
+
+**X (Twitter):** Ultra-short challenge + activity type + link. Under 240 chars. 2-3 hashtags max.
+
+**TikTok:** POV/challenge format. "POV: your kid just solved this in 30 seconds" / "Try this with your kid." 3-4 hashtags.
+
+**YouTube:** Challenge description + skill benefit + brand CTA. 200-400 chars.
+
+### Difficulty Language
+- **Easy:** "Perfect for ages 4-5" / "A great warm-up" / "Start here"
+- **Medium:** "For the focused ones" / "This one takes a minute" / "Ages 5-7"
+- **Hard:** "Challenge mode" / "This stumps most kids" / "Ages 7-8"

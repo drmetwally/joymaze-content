@@ -29,10 +29,52 @@
       "#MatchingGame", "#MemoryGame", "#KidsMemoryGame", "#MatchingPuzzle",
       "#BrainTraining", "#ConcentrationGame"
     ],
+    "tracing": [
+      "#TracingActivities", "#FineMotorSkills", "#PrewritingSkills",
+      "#HandwritingPractice", "#TracingForKids", "#LineTracing",
+      "#KidsHandwriting", "#MotorSkillsDevelopment"
+    ],
+    "quiz": [
+      "#KidsQuiz", "#BrainTeaser", "#KidsChallenge", "#VisualPuzzle",
+      "#SpotTheDifference", "#OddOneOut", "#KidsBrainGames", "#ThinkingSkills"
+    ],
+    "dotToDotActivity": [
+      "#DotToDotForKids", "#ConnectTheDots", "#DotToDot", "#NumberLearning",
+      "#CountingActivity", "#KidsDotToDot", "#LearnNumbers", "#FineMotorFun"
+    ],
+    "sudoku": [
+      "#KidsSudoku", "#SudokuForKids", "#NumberPuzzle", "#MathForKids",
+      "#LogicGames", "#NumberFun", "#KidsMath", "#MathActivities"
+    ],
+    "coloringActivity": [
+      "#ColoringPage", "#KidsColoring", "#ColoringForKids", "#FreeColoringPage",
+      "#PrintableColoring", "#ColoringSheet", "#ArtForKids", "#KidsArt"
+    ],
     "parenting": [
       "#ParentingTips", "#MomLife", "#DadLife", "#ParentingHacks",
       "#KidsEducation", "#ScreenTimeThatMatters", "#MomHacks",
       "#ParentingWin", "#FamilyFun", "#KidsAndParents"
+    ],
+    "screenfree": [
+      "#ScreenFreeActivities", "#ScreenFreeKids", "#ScreenFreeFun",
+      "#NoScreenTime", "#UnpluggedPlay", "#OfflineActivities",
+      "#ScreenFreeParenting", "#DigitalDetoxKids", "#AnalogPlay"
+    ],
+    "printables": [
+      "#FreePrintables", "#PrintableActivities", "#PrintableForKids",
+      "#FreeWorksheets", "#PrintAndPlay", "#KidsPrintables",
+      "#PrintableMaze", "#PrintableWordSearch", "#FreeActivitySheets"
+    ],
+    "developmental": [
+      "#FineMotorSkills", "#GrossMotorSkills", "#SpatialReasoning",
+      "#ProblemSolvingSkills", "#HandEyeCoordination", "#FocusBuilding",
+      "#CriticalThinking", "#BrainDevelopment", "#ChildDevelopment",
+      "#KidsBrainGames", "#CognitiveSkills", "#LearningMilestones"
+    ],
+    "quiettime": [
+      "#QuietTimeActivities", "#CalmKids", "#IndependentPlay",
+      "#BusyKids", "#KidsEntertainment", "#RainyDayActivities",
+      "#TravelActivities", "#WaitingRoomActivities", "#CarRideActivities"
     ],
     "education": [
       "#EarlyLearning", "#PreschoolActivities", "#KindergartenReady",
@@ -43,6 +85,12 @@
       "#ActivityBook", "#KidsActivityBook", "#ColoringBook", "#MazeBook",
       "#AmazonKDP", "#ChildrensBook", "#PrintableActivities",
       "#BusyBook", "#QuietTimeActivities"
+    ],
+    "asmr": [
+      "#ASMR", "#ASMRColoring", "#SatisfyingArt", "#OddlySatisfying",
+      "#ASMRForKids", "#CalmingContent", "#RelaxingVideo", "#SatisfyingVideo",
+      "#ColoringASMR", "#ProcessVideo", "#SlowArt", "#MindfulColoring",
+      "#QuietTime", "#CalmScreenTime", "#SatisfyingToWatch"
     ],
     "engagement": [
       "#WouldYouRather", "#ThisOrThat", "#KidsChallenge", "#FunFacts",
@@ -58,18 +106,18 @@
   "platformDefaults": {
     "pinterest": {
       "count": 15,
-      "pools": ["core", "parenting", "education"],
-      "alwaysInclude": ["#JoyMaze", "#KidsActivities"]
+      "pools": ["core", "screenfree", "printables", "developmental", "parenting", "education"],
+      "alwaysInclude": ["#JoyMaze", "#KidsActivities", "#ScreenFreeActivities"]
     },
     "instagram": {
       "count": 25,
-      "pools": ["core", "parenting", "education", "engagement"],
-      "alwaysInclude": ["#JoyMaze", "#KidsActivities", "#LearningThroughPlay"]
+      "pools": ["core", "screenfree", "developmental", "quiettime", "parenting", "education", "engagement"],
+      "alwaysInclude": ["#JoyMaze", "#KidsActivities", "#LearningThroughPlay", "#ScreenFreeActivities"]
     },
     "x": {
-      "count": 3,
-      "pools": ["core"],
-      "alwaysInclude": ["#JoyMaze"]
+      "count": 0,
+      "pools": [],
+      "alwaysInclude": []
     },
     "tiktok": {
       "count": 4,

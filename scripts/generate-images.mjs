@@ -222,7 +222,7 @@ async function generateWithDallE(prompt) {
  */
 async function generateWithGemini(prompt) {
   const { GoogleGenerativeAI } = await import('@google/generative-ai');
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+  const genAI = new GoogleGenerativeAI(process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
   const result = await model.generateContent({

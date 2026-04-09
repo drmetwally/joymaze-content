@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "last_updated": "2026-04-07",
+    "managed_by": "scripts/apply-intelligence.mjs",
+    "max_entries_per_type": 12,
+    "description": "Winning hook patterns with real performance scores. Injected into generate-prompts.mjs system prompt and generate-captions.mjs as additional examples."
+  },
+  "hooks": [
+    {
+      "id": "hook_20260407_000",
+      "hook_type": "sensory_hook",
+      "text": "Hear the pencil on paper. That sound means they found it.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-07",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_20260407_001",
+      "hook_type": "relief_hook",
+      "text": "Ten quiet minutes you did not have to manufacture.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-07",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    }
+  ],
+  "hook_type_index": {
+    "pattern_interrupt": [],
+    "curiosity_gap": [],
+    "emotional_mirror": [],
+    "identity_hook": [],
+    "transformation_hint": [],
+    "relief_hook": [
+      "hook_20260407_001"
+    ],
+    "sensory_hook": [
+      "hook_20260407_000"
+    ],
+    "secret_insider": []
+  }
+}
