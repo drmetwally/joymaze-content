@@ -1,0 +1,39 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "I found my 5-year-old silently coloring an Easter egg at 6am.",
+    "reply1": "The house was still. No TV, no tablets. Just crayons and morning light.",
+    "replies": [
+      "The house was still. No TV, no tablets. Just crayons and morning light.",
+      "In that moment, I felt like I'd finally gotten something right as a parent."
+    ],
+    "scheduledHour": 13
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "What has keys but can't open locks?",
+    "reply1": "A piano. drop your answer below 👇",
+    "replies": [
+      "A piano. drop your answer below 👇"
+    ],
+    "scheduledHour": 17
+  },
+  {
+    "type": "insight",
+    "tweet1": "Did you know kids who color regularly have better fine motor skills?",
+    "reply1": "Try incorporating printable coloring pages into your child's quiet time.",
+    "replies": [
+      "Try incorporating printable coloring pages into your child's quiet time."
+    ],
+    "scheduledHour": 21
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're the kind of parent who turns screen time into a learning moment.",
+    "reply1": "You're one decision away from making that happen today. Save this for when you need it.",
+    "replies": [
+      "You're one decision away from making that happen today. Save this for when you need it."
+    ],
+    "scheduledHour": 23
+  }
+]
