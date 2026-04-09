@@ -236,14 +236,17 @@ npm run post:scheduled:dry
 ## Cooldown Management
 
 ```bash
-npm run cooldown:status     # Check if posting is paused
-npm run cooldown:clear      # Resume posting immediately
+npm run cooldown:status                          # Check if posting is paused
+npm run cooldown:clear                           # Resume posting + push to GitHub
 ```
 
-To pause posting manually:
+To pause posting (stops BOTH local and GitHub Actions):
 ```bash
-echo '{"until":"2026-04-12","reason":"shadowban recovery"}' > output/posting-cooldown.json
+npm run cooldown:set 2026-04-12 "shadowban recovery"
+git add output/posting-cooldown.json && git commit -m "cooldown: active" && git push
 ```
+
+**Important:** Always push after setting a cooldown — GitHub Actions ignores a local-only cooldown file.
 
 ---
 

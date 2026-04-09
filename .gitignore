@@ -4,6 +4,7 @@ output/
 !output/queue/
 output/queue/*
 !output/queue/*.json
+!output/posting-cooldown.json
 *.log
 .DS_Store
 Thumbs.db
