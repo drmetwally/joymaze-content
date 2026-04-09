@@ -29,15 +29,16 @@ async function checkCooldown() {
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 
-function formatDateLocal(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+// Always use UTC so behaviour is identical on local PC and GitHub Actions runners.
+function formatDateUTC(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function getQueuePath(date = new Date()) {
-  return path.join(QUEUE_DIR, `x-text-${formatDateLocal(date)}.json`);
+  return path.join(QUEUE_DIR, `x-text-${formatDateUTC(date)}.json`);
 }
 
 function getReplies(entry) {
@@ -131,7 +132,7 @@ async function main() {
   }
 
   const now = new Date();
-  const currentHour = now.getHours();
+  const currentHour = now.getUTCHours(); // UTC — consistent on PC and GitHub Actions
   const queuePath = getQueuePath(now);
 
   console.log('=== JoyMaze Scheduled X Poster ===');

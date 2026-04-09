@@ -19,26 +19,23 @@ const POST_TYPES = ['story-hook', 'puzzle', 'insight', 'identity'];
 const PUZZLE_CLOSE = 'drop your answer below \uD83D\uDC47';
 const TWEET_MAX = 280;
 
-function formatDateLocal(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+function formatDateUTC(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
+// UTC hours optimised for North American parents (EST audience):
+//   13 UTC = 8 AM EST  — post-drop-off morning scroll
+//   17 UTC = 12 PM EST — lunch peak
+//   21 UTC = 4 PM EST  — after-work / commute scroll
+//   23 UTC = 6 PM EST  — pre-bedtime routine (safe UTC ceiling before midnight)
+// scheduledHour is always UTC — consistent on local PC and GitHub Actions.
+const SCHEDULED_HOURS_UTC = [13, 17, 21, 23];
+
 function scheduledHours(count) {
-  if (count <= 1) return [7];
-  const start = 7;
-  const end = 21;
-  const hours = [];
-
-  for (let i = 0; i < count; i++) {
-    const raw = Math.round(start + (i * (end - start)) / (count - 1));
-    const minHour = i === 0 ? start : hours[i - 1] + 1;
-    hours.push(Math.min(end, Math.max(minHour, raw)));
-  }
-
-  return hours;
+  return SCHEDULED_HOURS_UTC.slice(0, count);
 }
 
 async function readTextIfExists(filePath) {
@@ -295,7 +292,7 @@ function buildFallbackPosts() {
 }
 
 async function main() {
-  const date = formatDateLocal();
+  const date = formatDateUTC();
   const outputPath = path.join(OUTPUT_DIR, `x-text-${date}.json`);
 
   console.log('=== JoyMaze X Text Post Generator ===');
