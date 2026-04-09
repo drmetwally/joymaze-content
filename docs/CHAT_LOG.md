@@ -4,6 +4,23 @@
 
 ---
 
+### 2026-04-09 — GitHub Actions cloud posting pipeline + X profile recovery
+
+- **Topics:** X shadowban diagnosis, X Professional account setup, GitHub Actions pipeline, Cloudinary integration, UTC scheduling fix, cooldown architecture
+- **X status:** Soft shadowban (temporary label, April 2). Search bans clear per shadowban.eu. Cooldown until April 12. Actions: converted to Professional account, added bio/category, mobile interaction advised daily.
+- **GitHub repo:** drmetwally/joymaze-content (public) pushed. 17 secrets configured via `gh secret set`. Baseline commit + Actions pipeline commit.
+- **Cloudinary:** dm9eqz4ex live. `scripts/upload-cloud.mjs` built (no npm dep). All 5 generation scripts upload on completion → `cloudUrls`/`cloudUrl` in queue JSON.
+- **post-content.mjs:** `resolveMedia()` added — downloads from Cloudinary when local file missing (GitHub Actions environment).
+- **3 workflows live:** `x-posts.yml` (hourly), `post-media.yml` (2:00 UTC / 4AM Cairo), `weekly.yml` (Monday 5:00 UTC)
+- **UTC scheduling fix:** `scheduledHour` was local Cairo time = broke in GitHub Actions. Fixed to UTC in both generate-x-posts.mjs and post-x-scheduled.mjs.
+- **X post times:** Research-based UTC hours [13,17,21,23] = 8AM/12PM/4PM/6PM EST for North American parents.
+- **Race condition fixed:** Deleted local "JoyMaze X Posts" Task Scheduler job — GitHub Actions is sole X text post owner.
+- **Cooldown fix:** `output/posting-cooldown.json` now tracked in git (gitignore restructured to `output/*`). Must push after setting for Actions to respect it.
+- **New daily rule:** `git push` after `generate:captions` replaces `npm run post` as end-of-day action.
+- **Cheatsheet:** Fully rewritten for cloud architecture — architecture table, file location table, Step 8 push, cooldown protocol, GitHub Actions manual trigger guide.
+
+---
+
 ### 2026-04-09 — output/raw/ folder restructure + strategic cooldown plan
 - **Topics:** Pruning old raw folders, confirming new slot structure, X shadowban recovery strategy
 - **Folder changes:** Deleted `pattern/`, `story/`, `story-marketing/`. Created `fact-card/`, `challenge/`, `quiet/`, `printable/`, `identity/`. Kept `coloring/`, `dottodot/`, `sudoku/` — all confirmed JoyMaze core activities

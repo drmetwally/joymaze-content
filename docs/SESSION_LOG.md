@@ -730,6 +730,24 @@
 
 ---
 
+## 2026-04-09 — [Claude] — GitHub Actions cloud posting pipeline
+
+**Files changed:** `scripts/upload-cloud.mjs` (new), `scripts/generate-images.mjs`, `scripts/import-raw.mjs`, `scripts/generate-asmr-video.mjs`, `scripts/generate-story-video.mjs`, `scripts/generate-activity-video.mjs`, `scripts/post-content.mjs`, `scripts/generate-x-posts.mjs`, `scripts/post-x-scheduled.mjs`, `.github/workflows/x-posts.yml` (new), `.github/workflows/post-media.yml` (new), `.github/workflows/weekly.yml` (new), `.gitignore`, `package.json`, `docs/DAILY_CHEATSHEET.md`
+
+- GitHub repo created and pushed (drmetwally/joymaze-content, public). 17 GitHub Secrets configured via gh CLI.
+- Built `scripts/upload-cloud.mjs`: shared Cloudinary upload utility, pure fetch multipart, no npm dep. Cloudinary account: dm9eqz4ex.
+- Hooked upload into all 5 generation scripts: generate-images, import-raw, generate-asmr-video, generate-story-video, generate-activity-video. Each uploads after render and stores `cloudUrls`/`cloudUrl` in queue JSON.
+- Updated `post-content.mjs`: added `resolveMedia()` — downloads from Cloudinary when local file missing. Enables GitHub Actions posting.
+- Built 3 GitHub Actions workflows: x-posts.yml (hourly X text drip), post-media.yml (2:00 UTC / 4AM Cairo media posting), weekly.yml (Monday maintenance).
+- Fixed UTC scheduling bug: `scheduledHour` was local Cairo time — broke in GitHub Actions. Both X scripts now use `getUTCHours()` and UTC date.
+- Optimised X post times: research-based UTC [13,17,21,23] = 8AM/12PM/4PM/6PM EST for North American parents.
+- Race condition fix: deleted local "JoyMaze X Posts" Task Scheduler job. GitHub Actions is sole X text post owner.
+- Cooldown fix: `output/posting-cooldown.json` now tracked in git (restructured .gitignore from `output/` to `output/*`). Pushed cooldown active until 2026-04-12.
+- Rewrote DAILY_CHEATSHEET.md for cloud architecture: architecture table, file location table, Step 8 git push, updated cooldown section, Actions manual trigger guide.
+- New daily rule: `git push` after `generate:captions` = new "post" button. PC can be off after push.
+
+---
+
 ## 2026-04-09 — [Claude] — Activity videos, Pinterest demo, story narration fix
 
 **Files changed:** `scripts/generate-activity-video.mjs` (new), `scripts/get-pinterest-token.mjs` (new), `docs/PINTEREST_DEMO_GUIDE.md` (new), `scripts/generate-story-ideas.mjs`, `docs/DAILY_CHEATSHEET.md`, `package.json`
