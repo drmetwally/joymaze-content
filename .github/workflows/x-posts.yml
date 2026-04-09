@@ -1,0 +1,56 @@
+name: X Text Posts — Hourly Drip
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # every hour UTC (= every hour Cairo +2/+3)
+  workflow_dispatch:        # manual trigger from GitHub UI
+
+jobs:
+  post-x:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # needed to commit queue updates back
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate X posts for today (if not yet generated)
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          if [ ! -f "output/queue/x-text-${TODAY}.json" ]; then
+            echo "No X posts file for today — generating..."
+            mkdir -p output/queue
+            node scripts/generate-x-posts.mjs
+          else
+            echo "X posts already generated for ${TODAY} — skipping generation."
+          fi
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+      - name: Post due X text entries
+        run: node scripts/post-x-scheduled.mjs
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+
+      - name: Commit updated queue (posted flags)
+        run: |
+          git config user.name "JoyMaze Bot"
+          git config user.email "bot@joymaze.com"
+          git add output/queue/x-text-*.json
+          git diff --staged --quiet || git commit -m "chore: x-posts queue update $(date +%Y-%m-%d\ %H:%M) [skip ci]"
+          git push

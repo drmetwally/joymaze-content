@@ -28,6 +28,7 @@ import { tmpdir } from 'os';
 import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
+import { createWriteStream, existsSync } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -46,6 +47,23 @@ const idIdx = args.indexOf('--id');
 const FILTER_ID = idIdx !== -1 ? args[idIdx + 1] : null;
 const limitIdx = args.indexOf('--limit');
 const POST_LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : Infinity;
+
+// ── Cloud media fallback ────────────────────────────────────────────────────
+// If the local file doesn't exist (e.g. running in GitHub Actions), download
+// from Cloudinary to a temp file and return that path instead.
+async function resolveMedia(localPath, cloudUrl) {
+  if (existsSync(localPath)) return localPath;
+  if (!cloudUrl) throw new Error(`Local file missing and no cloudUrl: ${localPath}`);
+
+  const ext = path.extname(localPath) || '.bin';
+  const tempPath = path.join(tmpdir(), `joymaze-${Date.now()}${ext}`);
+  const res = await fetch(cloudUrl);
+  if (!res.ok) throw new Error(`Failed to download from Cloudinary (${res.status}): ${cloudUrl}`);
+
+  const buffer = Buffer.from(await res.arrayBuffer());
+  await fs.writeFile(tempPath, buffer);
+  return tempPath;
+}
 
 // ── Cooldown guard ──────────────────────────────────────────────────────────
 async function checkCooldown() {
@@ -591,7 +609,8 @@ async function postContent(metadata) {
         console.log(`    ${platform}: no video file for this platform, skipping`);
         continue;
       }
-      mediaPath = path.join(VIDEOS_DIR, videoFile);
+      const localVideo = path.join(VIDEOS_DIR, videoFile);
+      mediaPath = await resolveMedia(localVideo, metadata.cloudUrl);
       mediaLabel = videoFile;
     } else {
       const imageFilename = metadata.outputs?.[config.imageKey];
@@ -599,7 +618,9 @@ async function postContent(metadata) {
         console.log(`    ${platform}: no image for this platform, skipping`);
         continue;
       }
-      mediaPath = path.join(IMAGES_DIR, imageFilename);
+      const localImage = path.join(IMAGES_DIR, imageFilename);
+      const cloudFallback = metadata.cloudUrls?.[config.imageKey];
+      mediaPath = await resolveMedia(localImage, cloudFallback);
       mediaLabel = imageFilename;
     }
 

@@ -18,6 +18,7 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { uploadToCloud } from './upload-cloud.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -385,6 +386,22 @@ async function generateContentPiece(category, index) {
 
   const metadataPath = path.join(QUEUE_DIR, `${contentId}.json`);
   await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+  // Upload platform variants to Cloudinary for GitHub Actions posting
+  if (!DRY_RUN) {
+    try {
+      const cloudUrls = {};
+      for (const [key, filename] of Object.entries(outputs)) {
+        const localPath = path.join(OUTPUT_DIR, filename);
+        cloudUrls[key] = await uploadToCloud(localPath, 'joymaze/images');
+      }
+      metadata.cloudUrls = cloudUrls;
+      await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+      console.log(`    Cloudinary: uploaded ${Object.keys(cloudUrls).length} variants`);
+    } catch (err) {
+      console.warn(`    Cloudinary upload failed (local posting still works): ${err.message}`);
+    }
+  }
 
   return metadata;
 }

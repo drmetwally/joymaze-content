@@ -27,6 +27,7 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { uploadToCloud } from './upload-cloud.mjs';
 import { execSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -264,6 +265,15 @@ async function writeQueueJson(sourceId, sourceMeta, videoFilename, hookText) {
 
   if (!DRY_RUN) {
     await fs.writeFile(queuePath, JSON.stringify(entry, null, 2));
+    // Upload to Cloudinary for GitHub Actions posting
+    try {
+      const videoPath = path.join(ROOT, 'output', 'videos', videoFilename);
+      entry.cloudUrl = await uploadToCloud(videoPath, 'joymaze/videos');
+      await fs.writeFile(queuePath, JSON.stringify(entry, null, 2));
+      console.log(`  Cloudinary: ${entry.cloudUrl}`);
+    } catch (err) {
+      console.warn(`  Cloudinary upload failed (local posting still works): ${err.message}`);
+    }
   }
   return entry;
 }

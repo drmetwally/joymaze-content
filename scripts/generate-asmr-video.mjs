@@ -27,6 +27,7 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { uploadToCloud } from './upload-cloud.mjs';
 import { execSync, exec } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1334,11 +1335,18 @@ async function main() {
       captions: null,
     };
 
-    await fs.writeFile(
-      path.join(QUEUE_DIR, `${videoId}.json`),
-      JSON.stringify(metadata, null, 2),
-    );
+    const queuePath = path.join(QUEUE_DIR, `${videoId}.json`);
+    await fs.writeFile(queuePath, JSON.stringify(metadata, null, 2));
     console.log(`Queue metadata: ${videoId}.json`);
+
+    // Upload to Cloudinary for GitHub Actions posting
+    try {
+      metadata.cloudUrl = await uploadToCloud(outputPath, 'joymaze/videos');
+      await fs.writeFile(queuePath, JSON.stringify(metadata, null, 2));
+      console.log(`Cloudinary: ${metadata.cloudUrl}`);
+    } catch (err) {
+      console.warn(`Cloudinary upload failed (local posting still works): ${err.message}`);
+    }
 
     // Cleanup temp frames
     await cleanupDir(tempDir);
