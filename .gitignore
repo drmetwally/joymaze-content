@@ -1,10 +1,10 @@
 node_modules/
 .env
-output/
+output/*
 !output/queue/
+!output/posting-cooldown.json
 output/queue/*
 !output/queue/*.json
-!output/posting-cooldown.json
 *.log
 .DS_Store
 Thumbs.db
