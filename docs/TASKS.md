@@ -29,6 +29,16 @@ No new pipelines until this threshold is hit consistently for 30 days.
 
 ---
 
+## NEXT SESSION — FIRST THING (2026-04-11 morning)
+
+- [ ] **Carousel Format 2 — Educational Facts carousel:** "5 brain benefits of mazes" — each slide = one fact/stat/did-you-know image. Needs: `generate-prompts.mjs` to plan a "facts-carousel day" (picks 5 pattern-interrupt/fact-card slots with a shared hook theme), `import-raw.mjs` to detect `facts-carousel-*` folder prefix, group + slideIndex assigned automatically same as activity carousel.
+
+- [ ] **Carousel Format 3 — Age Progression carousel:** Same activity at Easy/Medium/Hard across age groups (4-5 / 6-7 / 8+). Needs: `generate-prompts.mjs` to plan an "age-carousel day" (generates 3 difficulty variants of the same activity type + theme), `import-raw.mjs` to detect `age-carousel-*` folder prefix.
+
+Both formats should follow the same zero-friction pattern as Format 1 (Activity Collection): prompt generator writes the folder name + drop instructions into the prompts .md file. Ahmed creates folder, drops images with 01-/02-/03- prefixes. `import:raw` does the rest.
+
+---
+
 ## PHASE 0 — PIPELINE STABILIZATION
 
 ### Pipeline Improvement Plan (logged 2026-04-08) — work through in order
