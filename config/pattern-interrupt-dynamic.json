@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-07",
+    "last_updated": "2026-04-10",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries": 20,
     "description": "Dynamic extension of PATTERN_INTERRUPT_POOL in generate-prompts.mjs. Entry shape matches hardcoded pool exactly — only lifecycle fields added."
@@ -17,9 +17,51 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Not in current pool"
+    },
+    {
+      "subtype": "surprising-stat",
+      "topic": "Did you know? Solving puzzles regularly can boost a child's problem-solving skills by up to 30% in just a few weeks.",
+      "visual": "A child deeply focused on a puzzle, with subtle graphical elements suggesting cognitive growth or 'lightbulb' moments.",
+      "added_week": "2026-04-10",
+      "source": "intelligence_refresh",
+      "confidence": 0.85,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Provides a specific, surprising statistic that validates the educational value of puzzles, addressing parental desire for learning outcomes."
+    },
+    {
+      "subtype": "myth-bust",
+      "topic": "Myth: All screen time is equal. Fact: Interactive learning apps engage different brain regions than passive viewing, fostering active learning.",
+      "visual": "A split image: one side showing a child passively watching a screen, the other showing a child actively interacting with a tablet, with brain activity highlighted metaphorically.",
+      "added_week": "2026-04-10",
+      "source": "intelligence_refresh",
+      "confidence": 0.9,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Directly confronts parental screen time guilt by distinguishing between types of screen engagement, offering permission and understanding."
+    },
+    {
+      "subtype": "did-you-know",
+      "topic": "Did you know? Strong fine motor skills developed through activities like tracing and coloring are directly linked to early reading and writing readiness.",
+      "visual": "A child's hand tracing lines or coloring, with subtle visual cues like letters or words emerging from the activity.",
+      "added_week": "2026-04-10",
+      "source": "intelligence_refresh",
+      "confidence": 0.88,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Highlights a lesser-known but crucial benefit of JoyMaze activities, connecting physical engagement to academic success, appealing to parents' desire for their child's development."
     }
   ]
 }

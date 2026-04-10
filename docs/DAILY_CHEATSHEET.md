@@ -150,15 +150,47 @@ npm run import:raw
 ```
 
 Takes everything in `output/raw/` and:
-- Adds JoyMaze logo watermark
-- Adds **"FREE Printable" badge** on activity posts
-- Adds Halbert-style hook text overlay
-- Resizes for each platform
+- Adds **JoyMaze logo only** (no text overlays — hook text goes in the caption, not burned on the image)
+- Resizes cleanly for each platform (no blur, no cropping of printables):
+  - Pinterest: 1000×1500 portrait
+  - Instagram: 1080×1350 portrait (4:5)
+  - X: 1080×1350 portrait (4:5)
+  - TikTok: 1080×1920 portrait (9:16, white-padded so printable is never cropped)
 - Assigns `scheduledHour` (spread 6 AM–9 PM)
 - Uploads all variants to Cloudinary (for 4 AM cloud posting)
 - Creates queue metadata in `output/queue/`
+- **If any images have carousel sidecar JSONs → also creates a carousel queue file** (see Carousel section below)
 
 **Check:** 10 items processed, ~40 platform-sized images in `output/images/`
+
+### Carousel Posts (Instagram + TikTok)
+
+A carousel is a swipeable multi-image post. To group images into a carousel, place a small `.json` file next to each image in `output/raw/` with the **same filename** as the image:
+
+```
+output/raw/spring1.png   ← image
+output/raw/spring1.json  ← sidecar (metadata file)
+output/raw/spring2.png
+output/raw/spring2.json
+output/raw/spring3.png
+output/raw/spring3.json
+```
+
+Each sidecar JSON needs two fields:
+
+```json
+{
+  "carouselGroup": "spring-week",
+  "slideIndex": 1
+}
+```
+
+- `carouselGroup` — any name you choose; images sharing the same name are grouped into one carousel
+- `slideIndex` — the order they appear (1 = first slide, 2 = second, etc.)
+
+After `npm run import:raw`, a carousel file is automatically created at `output/queue/carousel-spring-week-YYYY-MM-DD.json`. When you run `post-content.mjs`, it posts the carousel to Instagram (swipeable album) and TikTok (photo slideshow) automatically.
+
+**Minimum:** 2 slides per carousel. Instagram supports up to 10; TikTok up to 35.
 
 ---
 

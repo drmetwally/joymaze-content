@@ -571,11 +571,188 @@ async function postToYouTube(mediaPath, caption, metadata) {
   };
 }
 
+// ========== Carousel posting ==========
+
+async function postCarouselToInstagram(metadata) {
+  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
+  const accountId = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
+  if (!token || !accountId) throw new Error('Instagram credentials not configured');
+
+  const slides = metadata.slides || [];
+  if (slides.length < 2) throw new Error('Instagram carousel requires at least 2 slides');
+
+  const baseUrl = `https://graph.facebook.com/v19.0/${accountId}`;
+
+  // Step 1: Create an item container for each slide
+  const itemIds = [];
+  for (const slide of slides) {
+    const imageUrl = slide.cloudUrls?.instagram_portrait;
+    if (!imageUrl) throw new Error(`Slide ${slide.slideIndex} missing instagram_portrait cloudUrl`);
+
+    const resp = await fetch(`${baseUrl}/media`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_url: imageUrl,
+        is_carousel_item: true,
+        access_token: token,
+      }),
+    });
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`Instagram carousel item ${slide.slideIndex} failed ${resp.status}: ${err}`);
+    }
+    const data = await resp.json();
+    itemIds.push(data.id);
+  }
+
+  // Step 2: Create the carousel container
+  const caption = metadata.captions?.instagram;
+  const captionText = caption
+    ? `${caption.text}\n\n${(caption.hashtags || []).map(h => `#${h.replace(/^#/, '')}`).join(' ')}`.trim()
+    : '';
+
+  const carouselResp = await fetch(`${baseUrl}/media`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      media_type: 'CAROUSEL',
+      children: itemIds.join(','),
+      caption: captionText,
+      access_token: token,
+    }),
+  });
+  if (!carouselResp.ok) {
+    const err = await carouselResp.text();
+    throw new Error(`Instagram carousel container failed ${carouselResp.status}: ${err}`);
+  }
+  const carouselContainer = await carouselResp.json();
+
+  // Step 3: Publish
+  const publishResp = await fetch(`${baseUrl}/media_publish`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      creation_id: carouselContainer.id,
+      access_token: token,
+    }),
+  });
+  if (!publishResp.ok) {
+    const err = await publishResp.text();
+    throw new Error(`Instagram carousel publish failed ${publishResp.status}: ${err}`);
+  }
+  const published = await publishResp.json();
+  return { platform: 'instagram', postId: published.id };
+}
+
+async function postCarouselToTikTok(metadata) {
+  const accessToken = process.env.TIKTOK_ACCESS_TOKEN;
+  if (!accessToken) throw new Error('TikTok credentials not configured (TIKTOK_ACCESS_TOKEN)');
+
+  const slides = metadata.slides || [];
+  if (slides.length < 2) throw new Error('TikTok carousel requires at least 2 slides');
+
+  const photoImages = slides
+    .map(s => s.cloudUrls?.tiktok)
+    .filter(Boolean);
+
+  if (photoImages.length !== slides.length) {
+    throw new Error(`${slides.length - photoImages.length} slide(s) missing TikTok cloudUrl`);
+  }
+
+  const caption = metadata.captions?.tiktok;
+  const captionText = caption
+    ? `${caption.text}\n\n${(caption.hashtags || []).map(h => `#${h.replace(/^#/, '')}`).join(' ')}`.trim()
+    : '';
+
+  const resp = await fetch('https://open.tiktokapis.com/v2/post/publish/content/init/', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify({
+      post_info: {
+        title: captionText.slice(0, 150),
+        privacy_level: 'PUBLIC_TO_EVERYONE',
+        disable_comment: false,
+      },
+      source_info: {
+        source: 'PULL_FROM_URL',
+        photo_images: photoImages,
+        photo_cover_index: 0,
+      },
+      post_mode: 'DIRECT_POST',
+      media_type: 'PHOTO',
+    }),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`TikTok carousel post ${resp.status}: ${err}`);
+  }
+  const data = await resp.json();
+  if (data.error?.code !== 'ok') {
+    throw new Error(`TikTok carousel error: ${data.error?.message || JSON.stringify(data)}`);
+  }
+  return { platform: 'tiktok', postId: data.data?.publish_id };
+}
+
+async function postCarousel(metadata) {
+  const results = [];
+  const platforms = [
+    { name: 'instagram', fn: postCarouselToInstagram },
+    { name: 'tiktok',    fn: postCarouselToTikTok    },
+  ];
+
+  for (const { name, fn } of platforms) {
+    if (FILTER_PLATFORM && name !== FILTER_PLATFORM) continue;
+
+    const status = metadata.platforms?.[name]?.status;
+    if (status === 'posted') {
+      console.log(`    ${name}: already posted, skipping`);
+      continue;
+    }
+
+    const slideCount = metadata.slides?.length || 0;
+    if (DRY_RUN) {
+      const urls = (metadata.slides || []).map(s => s.cloudUrls?.[name === 'instagram' ? 'instagram_portrait' : 'tiktok'] || '(missing)');
+      console.log(`    ${name}: [DRY RUN] Would post ${slideCount}-slide carousel`);
+      console.log(`      Caption: ${metadata.captions?.[name]?.text?.slice(0, 80)}...`);
+      console.log(`      Slides: ${urls.join(', ').slice(0, 120)}`);
+      results.push({ platform: name, status: 'dry-run' });
+      continue;
+    }
+
+    try {
+      const result = await fn(metadata);
+      console.log(`    ${name}: POSTED carousel (${result.postId || 'ok'})`);
+      metadata.platforms[name] = {
+        ...metadata.platforms[name],
+        status: 'posted',
+        postId: result.postId,
+        postedAt: new Date().toISOString(),
+      };
+      results.push({ platform: name, status: 'posted', ...result });
+    } catch (err) {
+      console.log(`    ${name}: FAILED — ${err.message}`);
+      metadata.platforms[name] = {
+        ...metadata.platforms[name],
+        status: 'failed',
+        error: err.message,
+        failedAt: new Date().toISOString(),
+      };
+      results.push({ platform: name, status: 'failed', error: err.message });
+    }
+  }
+  return results;
+}
+
 // ========== Posting orchestrator ==========
 
 const POSTERS = {
   pinterest: { fn: postToPinterest, imageKey: 'pinterest' },
-  instagram: { fn: postToInstagram, imageKey: 'instagram_square' },
+  instagram: { fn: postToInstagram, imageKey: 'instagram_portrait' },
   x:         { fn: postToX,         imageKey: 'x'               },
   tiktok:    { fn: postToTikTok,    imageKey: 'tiktok'           },
   youtube:   { fn: postToYouTube,   imageKey: null               }, // video-only
@@ -718,6 +895,19 @@ async function main() {
     // Skip x-text queue files — those are handled by post-x-scheduled.mjs
     if (filename.startsWith('x-text-')) {
       skipped++;
+      continue;
+    }
+
+    // Carousel files — route to carousel poster
+    if (metadata.type === 'carousel') {
+      console.log(`  ${metadata.id} (carousel — ${metadata.totalSlides} slides, theme: "${metadata.theme}")`);
+      const results = await postCarousel(metadata);
+      await fs.writeFile(filePath, JSON.stringify(metadata, null, 2));
+      const anyPosted = results.some(r => r.status === 'posted' || r.status === 'dry-run');
+      const anyFailed = results.some(r => r.status === 'failed');
+      if (anyPosted) posted++;
+      if (anyFailed) failed++;
+      console.log('');
       continue;
     }
 

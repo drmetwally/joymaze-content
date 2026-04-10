@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-07",
+    "last_updated": "2026-04-10",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_type": 12,
     "description": "Winning hook patterns with real performance scores. Injected into generate-prompts.mjs system prompt and generate-captions.mjs as additional examples."
@@ -16,7 +16,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-07",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -29,7 +29,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-07",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     }

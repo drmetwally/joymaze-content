@@ -61,6 +61,18 @@ function getDueEntries(entries, currentHour) {
   );
 }
 
+// Puzzle entries whose delayed answer is now due to post as a reply to the original tweet.
+function getDueAnswers(entries, currentHour) {
+  return entries.filter(entry =>
+    entry.type === 'puzzle' &&
+    entry.answer_tweet &&
+    Number.isFinite(entry?.answer_scheduledHour) &&
+    entry.answer_scheduledHour <= currentHour &&
+    entry.tweetId &&                    // main tweet was already posted
+    entry.answer_posted !== true
+  );
+}
+
 async function loadQueue(filePath) {
   return JSON.parse(await fs.readFile(filePath, 'utf-8'));
 }
@@ -137,7 +149,7 @@ async function main() {
 
   console.log('=== JoyMaze Scheduled X Poster ===');
   console.log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}`);
-  console.log(`Date: ${formatDateLocal(now)}`);
+  console.log(`Date: ${formatDateUTC(now)}`);
   console.log(`Current hour: ${currentHour}`);
 
   let entries;
@@ -153,20 +165,32 @@ async function main() {
   }
 
   const dueEntries = getDueEntries(entries, currentHour);
-  if (dueEntries.length === 0) {
+  const dueAnswers  = getDueAnswers(entries, currentHour);
+
+  if (dueEntries.length === 0 && dueAnswers.length === 0) {
     console.log('No scheduled X text posts are due right now.');
     return;
   }
 
   if (DRY_RUN) {
-    console.log(JSON.stringify(dueEntries.map(entry => ({
-      type: entry.type,
-      scheduledHour: entry.scheduledHour,
-      tweet1: entry.tweet1,
-      replies: getReplies(entry),
-      alreadyStarted: Boolean(entry.tweetId),
-      posted: entry.posted === true,
-    })), null, 2));
+    console.log(JSON.stringify([
+      ...dueEntries.map(entry => ({
+        kind: 'post',
+        type: entry.type,
+        scheduledHour: entry.scheduledHour,
+        tweet1: entry.tweet1,
+        replies: getReplies(entry),
+        alreadyStarted: Boolean(entry.tweetId),
+        posted: entry.posted === true,
+      })),
+      ...dueAnswers.map(entry => ({
+        kind: 'puzzle-answer',
+        type: entry.type,
+        answer_scheduledHour: entry.answer_scheduledHour,
+        answer_tweet: entry.answer_tweet,
+        in_reply_to: entry.tweetId,
+      })),
+    ], null, 2));
     return;
   }
 
@@ -174,6 +198,7 @@ async function main() {
   let postedCount = 0;
   let failedCount = 0;
 
+  // ── Post due main entries ──
   for (const entry of dueEntries) {
     try {
       await postEntry(client, entry, () => saveQueue(queuePath, entries));
@@ -185,6 +210,28 @@ async function main() {
       await saveQueue(queuePath, entries);
       failedCount++;
       console.log(`Failed ${entry.type} scheduled for ${entry.scheduledHour}:00 - ${err.message}`);
+    }
+  }
+
+  // ── Post delayed puzzle answers as replies to original tweet ──
+  for (const entry of dueAnswers) {
+    try {
+      const answerTweet = await client.v2.tweet({
+        text: entry.answer_tweet,
+        reply: { in_reply_to_tweet_id: entry.tweetId },
+      });
+      entry.answer_tweetId  = answerTweet.data.id;
+      entry.answer_posted   = true;
+      entry.answer_postedAt = new Date().toISOString();
+      await saveQueue(queuePath, entries);
+      postedCount++;
+      console.log(`Posted puzzle answer for ${entry.scheduledHour}:00 puzzle as reply (${entry.answer_tweetId})`);
+    } catch (err) {
+      entry.answer_error    = err.message;
+      entry.answer_failedAt = new Date().toISOString();
+      await saveQueue(queuePath, entries);
+      failedCount++;
+      console.log(`Failed puzzle answer for ${entry.scheduledHour}:00 - ${err.message}`);
     }
   }
 

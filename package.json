@@ -61,7 +61,8 @@
     "x:generate": "node scripts/generate-x-posts.mjs",
     "x:generate:dry": "node scripts/generate-x-posts.mjs --dry-run",
     "x:text:post": "node scripts/post-x-scheduled.mjs",
-    "x:text:post:dry": "node scripts/post-x-scheduled.mjs --dry-run"
+    "x:text:post:dry": "node scripts/post-x-scheduled.mjs --dry-run",
+    "status": "node scripts/status.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

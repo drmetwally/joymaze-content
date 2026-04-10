@@ -559,3 +559,11 @@
 - [Claude 2026-04-09] Story narration fix: enforced 15-word max per slide in generate-story-ideas.mjs. First story had 7–10s TTS per slide (target: 3–4s) — root cause was no word count ceiling. 15 words × 8 slides ≈ 23–30s total audio. Testing for a few days.
 
 - [Claude 2026-04-09] Daily cheatsheet updated: 4am auto-post scheduler documented, STEP 4B added for activity videos, YouTube marked live in Step 8, 6 new troubleshooting rows.
+
+- [Claude 2026-04-10] Pipeline status command: built scripts/status.mjs + npm run status. Shows UTC time, cooldown state, today's X text queue with per-post status (posted/pending/due/failed), tweet IDs, and past-day failures. Confirmed: 4 queued X text posts for today, all pending due to active cooldown until 2026-04-12.
+
+- [Claude 2026-04-10] Status command expanded: scripts/status.mjs now covers full pipeline — generation state (prompts/images/stories/ASMR/videos), recent archive with per-platform post counts, X text queue. Revealed: Pinterest had 12 failures on 04-08, Instagram 0 posts across all days (token issue). Single npm run status = full pipeline health check.
+
+- [Claude 2026-04-10] X post generator full rewrite (generate-x-posts.mjs): fixed 7 root causes — style guide was context-flooding model (796 lines dumped raw), user prompt hardcoded bad CTAs, puzzle type generated image-hunt posts. Rewrite: extractStyleSections() for focused system prompt, rule-based post scorer (5 dimensions), retry logic, dedup against 7 days, themes/CTAs/perf-weights all injected. Dry-run confirmed: all 4 posts pass, puzzle is self-contained riddle, no banned phrases.
+
+- [Claude 2026-04-10] Carousel pipeline complete: import-raw.mjs now calls buildCarousels() at end of main() to write carousel-*.json queue files; post-content.mjs has full carousel routing — postCarouselToInstagram (3-step Graph API: item containers → carousel container → publish), postCarouselToTikTok (PULL_FROM_URL photo_images array), postCarousel orchestrator, and carousel routing in main() before the captions guard. Also fixed POSTERS imageKey instagram_square → instagram_portrait. Carousel triggered via sidecar JSON with carouselGroup + slideIndex fields.

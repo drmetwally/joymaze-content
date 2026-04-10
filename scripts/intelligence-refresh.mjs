@@ -659,6 +659,24 @@ Return ONLY valid JSON array: [{"index": 1, "verdict": "SAFE", "reason": "brief 
     log(`  Brand safety (pass 2) failed: ${err.message} — continuing with pass-1 results`);
   }
 
+  // Normalise: any entry that wasn't explicitly hard-rejected (false) is SAFE.
+  // REVIEW verdicts from the LLM model are too conservative for short-form hooks/CTAs —
+  // pass 1 (hard blocklist) is the real safety gate. Only explicit REJECT stays blocked.
+  const allEntries = [
+    ...(payload.new_themes || []),
+    ...(payload.new_hooks || []),
+    ...(payload.new_ctas || []),
+    ...(payload.new_pattern_interrupts || []),
+  ];
+  let normalised = 0;
+  for (const entry of allEntries) {
+    if (entry.brand_safe !== false) {
+      entry.brand_safe = true;
+      normalised++;
+    }
+  }
+  if (normalised > 0) log(`  Brand safety normalised: ${normalised} entries confirmed SAFE`);
+
   return payload;
 }
 

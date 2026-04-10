@@ -1,16 +1,197 @@
 {
   "_meta": {
     "schema_version": 1,
-    "generated_at": null,
-    "week_of": null,
-    "status": "none",
-    "applied_at": null,
-    "entropy_score": null,
-    "inputs_summary": {}
+    "generated_at": "2026-04-10T20:01:16.859Z",
+    "week_of": "2026-04-10",
+    "status": "applied",
+    "applied_at": "2026-04-10T20:01:55.509Z",
+    "entropy_score": 2,
+    "inputs_summary": {
+      "analytics_posts_analyzed": 166,
+      "posts_with_analytics": 0,
+      "competitor_searches_performed": 0,
+      "trends_boost_themes": [
+        "Easter",
+        "Garden/Flowers",
+        "Spring Animals",
+        "Spring",
+        "Ocean/Underwater"
+      ],
+      "rising_searches_count": 8
+    }
   },
-  "new_themes": [],
-  "new_hooks": [],
-  "new_ctas": [],
-  "new_pattern_interrupts": [],
-  "intelligence_summary": {}
+  "new_themes": [
+    {
+      "name": "Earth Day Conservation",
+      "confidence": 0.9,
+      "brand_safe": true,
+      "source": "trend_analysis",
+      "rationale": "Earth Day is upcoming, and a specific focus on conservation offers a novel angle beyond general 'Spring' or 'Garden' themes."
+    },
+    {
+      "name": "Community Helpers",
+      "confidence": 0.85,
+      "brand_safe": true,
+      "source": "competitor_analysis",
+      "rationale": "This theme has broad appeal for 4-8 year olds, fostering gratitude and understanding of the world, and is not covered in recent content."
+    },
+    {
+      "name": "Fantasy Creatures (Unicorns & Dragons)",
+      "confidence": 0.88,
+      "brand_safe": true,
+      "source": "competitor_analysis",
+      "rationale": "While mermaids were used, other fantasy creatures like unicorns and dragons are highly engaging for this age group and offer fresh visual opportunities."
+    },
+    {
+      "name": "Inventors & Inventions",
+      "confidence": 0.82,
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "rationale": "This theme encourages curiosity, problem-solving, and creativity, distinct from 'Construction' or 'Vehicles', aligning with the learning aspect of the app."
+    }
+  ],
+  "new_hooks": [
+    {
+      "hook_type": "emotional_mirror",
+      "text": "The silence isn't empty. It's full of focus.",
+      "brand_safe": null,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "arch1",
+        "arch2",
+        "arch3"
+      ],
+      "rationale": "Mirrors the parent's desire for quiet, but reframes it as productive, addressing the '20 minutes where I know they're okay' need."
+    },
+    {
+      "hook_type": "identity_hook",
+      "text": "This is what 'good screen time' actually looks like.",
+      "brand_safe": null,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "arch1",
+        "arch5",
+        "arch6"
+      ],
+      "rationale": "Directly addresses parental guilt and offers permission, aligning with the identity shift to being a parent who makes good choices."
+    },
+    {
+      "hook_type": "curiosity_gap",
+      "text": "What if their next screen moment built more than just a high score?",
+      "brand_safe": null,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "arch3",
+        "arch4",
+        "arch6"
+      ],
+      "rationale": "Creates a curiosity gap while hinting at the transformative potential of JoyMaze, speaking to the desire for meaningful engagement."
+    },
+    {
+      "hook_type": "sensory_hook",
+      "text": "That deep breath of concentration? It's the sound of learning.",
+      "brand_safe": null,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "arch2",
+        "arch3",
+        "arch4"
+      ],
+      "rationale": "Uses sensory detail to paint a picture of engaged learning, making the abstract concept of 'learning' tangible and emotional."
+    },
+    {
+      "hook_type": "identity_hook",
+      "text": "You're not just finding an activity. You're finding their next 'aha!' moment.",
+      "brand_safe": null,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "arch1",
+        "arch5",
+        "arch6"
+      ],
+      "rationale": "Elevates the parent's role from providing distraction to facilitating discovery, reinforcing the desired identity shift."
+    },
+    {
+      "hook_type": "relief_hook",
+      "text": "Imagine: a moment of calm, created by them.",
+      "brand_safe": null,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "arch2",
+        "arch3"
+      ],
+      "rationale": "Offers the parent a vision of relief and autonomy for their child, addressing the need for independent, engaged time."
+    }
+  ],
+  "new_ctas": [
+    {
+      "platform": "instagram",
+      "type": "app",
+      "text": "Tap the link in bio to explore activities that spark their best thinking.",
+      "brand_safe": false,
+      "source": "intelligence_refresh",
+      "rationale": "Value-driven CTA that focuses on the benefit to the child, aligning with the parent's desire for learning and engagement.",
+      "_reject_reason": "competitor mentions"
+    },
+    {
+      "platform": "pinterest",
+      "type": "both",
+      "text": "Pin this for later: your child's next quiet moment is waiting.",
+      "brand_safe": false,
+      "source": "intelligence_refresh",
+      "rationale": "Leverages Pinterest's save functionality, framing the app as a solution for future moments of calm and engagement.",
+      "_reject_reason": "competitor mentions"
+    },
+    {
+      "platform": "instagram",
+      "type": "app",
+      "text": "Ready to transform screen time? Find the link in our bio.",
+      "brand_safe": false,
+      "source": "intelligence_refresh",
+      "rationale": "Soft-commanding CTA that speaks directly to the parent's desire for transformation and positive screen choices.",
+      "_reject_reason": "competitor mentions"
+    }
+  ],
+  "new_pattern_interrupts": [
+    {
+      "subtype": "surprising-stat",
+      "topic": "Did you know? Solving puzzles regularly can boost a child's problem-solving skills by up to 30% in just a few weeks.",
+      "visual": "A child deeply focused on a puzzle, with subtle graphical elements suggesting cognitive growth or 'lightbulb' moments.",
+      "confidence": 0.85,
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "rationale": "Provides a specific, surprising statistic that validates the educational value of puzzles, addressing parental desire for learning outcomes."
+    },
+    {
+      "subtype": "myth-bust",
+      "topic": "Myth: All screen time is equal. Fact: Interactive learning apps engage different brain regions than passive viewing, fostering active learning.",
+      "visual": "A split image: one side showing a child passively watching a screen, the other showing a child actively interacting with a tablet, with brain activity highlighted metaphorically.",
+      "confidence": 0.9,
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "rationale": "Directly confronts parental screen time guilt by distinguishing between types of screen engagement, offering permission and understanding."
+    },
+    {
+      "subtype": "did-you-know",
+      "topic": "Did you know? Strong fine motor skills developed through activities like tracing and coloring are directly linked to early reading and writing readiness.",
+      "visual": "A child's hand tracing lines or coloring, with subtle visual cues like letters or words emerging from the activity.",
+      "confidence": 0.88,
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "rationale": "Highlights a lesser-known but crucial benefit of JoyMaze activities, connecting physical engagement to academic success, appealing to parents' desire for their child's development."
+    }
+  ],
+  "intelligence_summary": {
+    "top_performing_archetype_this_week": "No data",
+    "weakest_archetype_this_week": "No data",
+    "recommended_focus_shift": "Prioritize content that directly addresses parental guilt about screen time by showcasing the tangible benefits of engaged learning and reinforcing the parent's identity as a good decision-maker.",
+    "competitor_patterns_detected": [
+      "Building trust through authentic, value-first content (Busy Toddler).",
+      "Leveraging SEO and broad seasonal/holiday content (Kids Activities Blog).",
+      "Focus on low-prep/sensory play for younger kids (Busy Toddler).",
+      "Extensive use of printables for diverse topics (Kids Activities Blog)."
+    ],
+    "hook_gap_identified": "Hooks that explicitly frame screen time as a positive, intentional choice for parents, reinforcing their identity as 'good decision-makers' and offering permission.",
+    "cta_fatigue_detected": false
+  }
 }

@@ -196,14 +196,19 @@ const CATEGORIES = {
 };
 
 // Platform export sizes
-// Source images should be generated at 2:3 portrait (1000×1500) — optimizes for Pinterest + Instagram.
-// X (16:9) and TikTok (9:16) are auto-adapted via smartResize; portrait source letterboxes acceptably on X.
+// fitMode controls how a mismatched-aspect source is adapted to the target canvas:
+//   'auto'          — cover-crop if aspects are close (< 0.15 diff), else blurred-bg letterbox
+//   'cover'         — always cover-crop (may clip edges)
+//   'contain-white' — always contain-fit centred on a white background (no cropping, no blur)
+//
+// Source images should be generated at 2:3 portrait (1000×1500) — optimizes for Pinterest.
+// All platforms use contain-white or close-aspect cover so printable content is never clipped.
 const PLATFORM_SIZES = {
-  pinterest:          { width: 1000, height: 1500, suffix: 'pin' },   // 2:3 — primary platform
-  instagram_portrait: { width: 1080, height: 1350, suffix: 'ig-pt' }, // 4:5 — feed + Stories
-  instagram_square:   { width: 1080, height: 1080, suffix: 'ig-sq' }, // 1:1 — grid fallback
-  tiktok:             { width: 1080, height: 1920, suffix: 'tt'    }, // 9:16 — image carousels
-  x:                  { width: 1200, height: 675,  suffix: 'x'    }, // 16:9 — text-first, portrait letterboxed
+  pinterest:          { width: 1000, height: 1500, suffix: 'pin',   fitMode: 'auto'          }, // 2:3 — exact match, primary platform
+  instagram_portrait: { width: 1080, height: 1350, suffix: 'ig-pt', fitMode: 'auto'          }, // 4:5 — 0.13 diff, minor height trim only
+  instagram_square:   { width: 1080, height: 1080, suffix: 'ig-sq', fitMode: 'contain-white' }, // 1:1 — contain-white: full printable in white square
+  tiktok:             { width: 1080, height: 1920, suffix: 'tt',    fitMode: 'contain-white' }, // 9:16 — contain-white: no side-clipping of activity edges
+  x:                  { width: 1080, height: 1350, suffix: 'x',     fitMode: 'auto'          }, // 4:5 — same as ig-pt, printable-friendly
 };
 
 function escapeXml(str) {
@@ -277,27 +282,43 @@ async function readSidecar(imagePath) {
 }
 
 /**
- * Smart resize: landscape images into portrait/square canvases get a blurred background
- * letterbox instead of a harsh center-crop. Same-orientation images use cover.
+ * Smart resize — adapts source to target canvas according to fitMode:
+ *   'auto'          Default. Cover-crop if aspect ratio difference < 0.15 (or both landscape).
+ *                   Blurred-background letterbox otherwise (legacy fallback — rarely triggered now).
+ *   'cover'         Always cover-crop (may clip edges).
+ *   'contain-white' Always contain-fit centred on a white background. No cropping, no blur.
+ *                   Use for TikTok (9:16) and Instagram square (1:1) with portrait printables.
  */
-async function smartResize(inputBuffer, targetWidth, targetHeight) {
+async function smartResize(inputBuffer, targetWidth, targetHeight, fitMode = 'auto') {
+  // contain-white: full image visible, white padding fills the remaining canvas
+  if (fitMode === 'contain-white') {
+    return sharp(inputBuffer)
+      .resize(targetWidth, targetHeight, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+      .png()
+      .toBuffer();
+  }
+
+  if (fitMode === 'cover') {
+    return sharp(inputBuffer).resize(targetWidth, targetHeight, { fit: 'cover' }).png().toBuffer();
+  }
+
+  // 'auto' — original logic
   const meta = await sharp(inputBuffer).metadata();
   const inputAspect = meta.width / meta.height;
   const targetAspect = targetWidth / targetHeight;
 
-  // If aspects are close enough or both landscape, just cover-crop
+  // Close-enough aspects or both landscape → cover-crop (clean, no padding needed)
   if (Math.abs(inputAspect - targetAspect) < 0.15 || (inputAspect > 1 && targetAspect > 1)) {
     return sharp(inputBuffer).resize(targetWidth, targetHeight, { fit: 'cover' }).png().toBuffer();
   }
 
-  // Blur background: scale to fill (cover) + gaussian blur
+  // Very different aspects → blurred-background letterbox (legacy path, now rarely reached)
   const bgBuffer = await sharp(inputBuffer)
     .resize(targetWidth, targetHeight, { fit: 'cover' })
     .blur(28)
     .png()
     .toBuffer();
 
-  // Foreground: fit entirely within canvas (contain), transparent padding
   const fgBuffer = await sharp(inputBuffer)
     .resize(targetWidth, targetHeight, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .png()
@@ -312,8 +333,8 @@ async function smartResize(inputBuffer, targetWidth, targetHeight) {
 /**
  * Composite brand elements onto an image (replicates generate-images.mjs logic)
  */
-async function compositeBrandElements(imageBuffer, { width, height, textOverlay, addWatermark = true, addPrintableBadge = false, hookText = null }) {
-  const resizedBuffer = await smartResize(imageBuffer, width, height);
+async function compositeBrandElements(imageBuffer, { width, height, textOverlay, addWatermark = true, addPrintableBadge = false, hookText = null, fitMode = 'auto' }) {
+  const resizedBuffer = await smartResize(imageBuffer, width, height, fitMode);
   let image = sharp(resizedBuffer);
 
   const layers = [];
@@ -509,18 +530,22 @@ async function importImage(filePath, index, scheduledHour = null) {
   const rawBuffer = await fs.readFile(filePath);
 
   // Export for each platform
+  // Brand elements: logo only on all platforms.
+  // Overlays (hook text, "FREE Printable" badge, joymaze.com URL) belong in the caption — not on the image.
+  // Rationale: overlays obscure printable content and read as promotional. Logo is the only silent brand signal.
   const outputs = {};
   for (const [platformKey, size] of Object.entries(PLATFORM_SIZES)) {
     const outFilename = `${contentId}-${size.suffix}.png`;
     const outputPath = path.join(OUTPUT_DIR, outFilename);
 
     const branded = await compositeBrandElements(rawBuffer, {
-      width: size.width,
-      height: size.height,
-      textOverlay,
-      addWatermark,
-      addPrintableBadge: category.startsWith('activity-'),
-      hookText,
+      width:            size.width,
+      height:           size.height,
+      fitMode:          size.fitMode || 'auto',
+      textOverlay:      null,   // in caption
+      addWatermark:     false,  // in caption / bio
+      addPrintableBadge: false, // in caption
+      hookText:         null,   // in caption
     });
 
     await fs.writeFile(outputPath, branded);
@@ -541,11 +566,14 @@ async function importImage(filePath, index, scheduledHour = null) {
     generatedAt: new Date().toISOString(),
     scheduledHour: scheduledHour !== null ? scheduledHour : undefined, // hourly drip scheduler
     dryRun: false,
+    // Carousel grouping — set via sidecar JSON: { "carouselGroup": "spring-week", "slideIndex": 1 }
+    carouselGroup: sidecar?.carouselGroup || null,
+    slideIndex: sidecar?.slideIndex ?? null,
     outputs,
     platforms: {
-      pinterest: { image: outputs.pinterest, status: 'pending' },
-      instagram: { image: outputs.instagram_square, status: 'pending' },
-      x: { image: outputs.x, status: 'pending' },
+      pinterest: { image: outputs.pinterest,          status: 'pending' },
+      instagram: { image: outputs.instagram_portrait, status: 'pending' }, // 4:5 portrait — primary feed format
+      x:         { image: outputs.x,                  status: 'pending' },
     },
     captions: null, // Filled by generate-captions.mjs
   };
@@ -568,6 +596,107 @@ async function importImage(filePath, index, scheduledHour = null) {
   }
 
   return metadata;
+}
+
+// ── Carousel helpers ────────────────────────────────────────────────────────
+
+/**
+ * Generate a template-based carousel caption for Instagram or TikTok.
+ * AI-generated captions can override these later via generate-captions.mjs.
+ */
+function buildCarouselCaption(platform, theme, subjects, totalSlides) {
+  const count = totalSlides;
+  const themeLabel = theme || 'activities';
+
+  if (platform === 'instagram') {
+    return {
+      text: `${count} free ${themeLabel} printables your kids will love 🎨\n\nSwipe through to pick your favorite →\n\nSave this for your next quiet afternoon — print, play, and let them focus.\n\n#freeprintable #kidsactivities #printablesforkids #screenfree #kidslearning`,
+      hashtags: ['#freeprintable', '#kidsactivities', '#printablesforkids', '#screenfree', '#kidslearning'],
+    };
+  }
+
+  if (platform === 'tiktok') {
+    return {
+      text: `${count} free ${themeLabel} activities for kids 🖍️ Save your favorite and try it today #kidsactivities #freeprintable #screenfree #kidslearning`,
+      hashtags: ['#kidsactivities', '#freeprintable', '#screenfree', '#kidslearning'],
+    };
+  }
+
+  return { text: `${count} ${themeLabel} activities for kids 🎨`, hashtags: [] };
+}
+
+/**
+ * After all images are imported, group any that share a carouselGroup sidecar field
+ * into carousel metadata files. One JSON per group, saved to output/queue/.
+ *
+ * Sidecar format: { "carouselGroup": "spring-week", "slideIndex": 1, ... }
+ * slideIndex is 1-based; slides are sorted by it before writing.
+ */
+async function buildCarousels(importedMetadata) {
+  const groups = {};
+  for (const m of importedMetadata) {
+    if (!m?.carouselGroup) continue;
+    if (!groups[m.carouselGroup]) groups[m.carouselGroup] = [];
+    groups[m.carouselGroup].push(m);
+  }
+
+  const groupKeys = Object.keys(groups);
+  if (groupKeys.length === 0) return;
+
+  console.log(`\nBuilding ${groupKeys.length} carousel(s)...`);
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  for (const [groupId, slides] of Object.entries(groups)) {
+    // Sort by slideIndex (1-based); fallback to insertion order
+    slides.sort((a, b) => (a.slideIndex ?? 0) - (b.slideIndex ?? 0));
+
+    const theme = groupId.replace(/-/g, ' '); // "spring-week" → "spring week"
+    const carouselId = `carousel-${groupId}-${date}`;
+    const subjects = slides.map(s => s.subject).filter(Boolean);
+
+    const carouselSlides = slides.map(m => ({
+      id:          m.id,
+      subject:     m.subject || '',
+      category:    m.category || 'general',
+      slideIndex:  m.slideIndex ?? 0,
+      cloudUrls: {
+        instagram_portrait: m.cloudUrls?.instagram_portrait || null,
+        tiktok:             m.cloudUrls?.tiktok             || null,
+      },
+    }));
+
+    // Warn if Cloudinary URLs are missing (carousel posting will fail without them)
+    const missingIg = carouselSlides.filter(s => !s.cloudUrls.instagram_portrait).length;
+    const missingTt = carouselSlides.filter(s => !s.cloudUrls.tiktok).length;
+
+    const carouselMetadata = {
+      id:            carouselId,
+      type:          'carousel',
+      carouselGroup: groupId,
+      theme,
+      source:        'manual-import',
+      generatedAt:   new Date().toISOString(),
+      totalSlides:   slides.length,
+      slides:        carouselSlides,
+      platforms: {
+        instagram: { status: 'pending' },
+        tiktok:    { status: 'pending' },
+      },
+      captions: {
+        instagram: buildCarouselCaption('instagram', theme, subjects, slides.length),
+        tiktok:    buildCarouselCaption('tiktok',    theme, subjects, slides.length),
+      },
+    };
+
+    const carouselPath = path.join(QUEUE_DIR, `${carouselId}.json`);
+    await fs.writeFile(carouselPath, JSON.stringify(carouselMetadata, null, 2));
+
+    console.log(`  ✓ ${carouselId} (${slides.length} slides)`);
+    console.log(`    Theme: "${theme}"`);
+    if (missingIg) console.log(`    ⚠ ${missingIg} slide(s) missing Instagram Cloudinary URL`);
+    if (missingTt) console.log(`    ⚠ ${missingTt} slide(s) missing TikTok Cloudinary URL`);
+  }
 }
 
 /**
@@ -702,6 +831,11 @@ async function main() {
   console.log('Next steps:');
   console.log('  1. Run `node scripts/generate-captions.mjs` to add captions');
   console.log('  2. Run `node scripts/post-content.mjs` to publish');
+
+  // Build carousel metadata files for any images tagged with carouselGroup in their sidecar
+  if (!DRY_RUN) {
+    await buildCarousels(results);
+  }
 
   return results;
 }
