@@ -891,3 +891,31 @@
 - `node scripts/import-raw.mjs --dry-run` confirms no carousel files written in dry-run
 - `node scripts/post-content.mjs --dry-run` will show carousel dry-run output for any carousel-*.json in queue
 - Carousel triggered by adding `"carouselGroup": "my-group"` + `"slideIndex": 1` to image sidecar JSONs
+
+---
+
+## 2026-04-10 — [Claude] — Zero-friction carousel automation
+
+**Files changed:** `scripts/generate-prompts.mjs`, `scripts/import-raw.mjs`, `docs/DAILY_CHEATSHEET.md`
+
+**Problem solved:** Carousel group naming was manual — Ahmed had to invent a name, write sidecar JSONs per image, and track slideIndex himself. Friction = never gets used.
+
+**Solution:**
+- `generate-prompts.mjs`: every 3rd content day (`doy % CAROUSEL_PERIOD === 0`, CAROUSEL_PERIOD=3), automatically plans a carousel from today's 5 activity slots. Group name derived from dominant theme + date (e.g. `carousel-spring-flowers-2026-04-10`). Writes `carousel-plan-YYYY-MM-DD.json` + appends full drop instructions (folder path, filename examples) to the prompts `.md` file.
+- `import-raw.mjs`: auto-detects any subfolder starting with `carousel-` in output/raw/. Files sorted alphabetically = slide order. No sidecar JSONs needed. `importImage()` accepts `carouselOverride` param (folder-based assignment takes priority over any sidecar).
+
+**Ahmed's workflow on carousel day:**
+1. Open prompts file — carousel instructions at the bottom
+2. Create the folder it tells you (e.g. `output/raw/carousel-spring-flowers-2026-04-10/`)
+3. Drop the 5 activity images in, name them `01-xxx.png`, `02-xxx.png`, etc.
+4. `npm run import:raw` — carousel queue file built automatically
+
+---
+
+## 2026-04-10 — [Claude] — Carousel formats gap identified
+
+**Finding:** Only Activity Collection carousel format is implemented (Format 1). Two formats discussed but not built:
+- Format 2: Educational Facts carousel ("5 brain benefits of mazes" — one stat/fact per slide)
+- Format 3: Age Progression carousel (same activity at Easy/Medium/Hard across age groups)
+
+Both require changes to generate-prompts.mjs (new plan types) and import-raw.mjs (new folder prefix detection, e.g. `facts-carousel-*`). Logged in project_unimplemented_upgrades.md.
