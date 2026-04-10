@@ -490,7 +490,7 @@ function detectCategoryFromFolder(filePath) {
 /**
  * Import a single raw image
  */
-async function importImage(filePath, index, scheduledHour = null) {
+async function importImage(filePath, index, scheduledHour = null, carouselOverride = null) {
   const filename = path.basename(filePath);
   const ext = path.extname(filename);
   const baseName = path.basename(filename, ext);
@@ -520,6 +520,7 @@ async function importImage(filePath, index, scheduledHour = null) {
   if (textOverlay) console.log(`    Text overlay: ${textOverlay}`);
   if (hookText) console.log(`    Hook: "${hookText}"`);
   if (sidecar) console.log(`    Sidecar metadata: found`);
+  if (carouselOverride) console.log(`    Carousel: group="${carouselOverride.carouselGroup}" slide=${carouselOverride.slideIndex}`);
 
   if (DRY_RUN) {
     console.log(`    [DRY RUN] Would export to ${Object.keys(PLATFORM_SIZES).length} platform sizes`);
@@ -566,9 +567,9 @@ async function importImage(filePath, index, scheduledHour = null) {
     generatedAt: new Date().toISOString(),
     scheduledHour: scheduledHour !== null ? scheduledHour : undefined, // hourly drip scheduler
     dryRun: false,
-    // Carousel grouping — set via sidecar JSON: { "carouselGroup": "spring-week", "slideIndex": 1 }
-    carouselGroup: sidecar?.carouselGroup || null,
-    slideIndex: sidecar?.slideIndex ?? null,
+    // Carousel grouping — folder-based (carousel-* subfolder) takes priority over sidecar JSON
+    carouselGroup: carouselOverride?.carouselGroup ?? sidecar?.carouselGroup ?? null,
+    slideIndex:    carouselOverride?.slideIndex    ?? sidecar?.slideIndex    ?? null,
     outputs,
     platforms: {
       pinterest: { image: outputs.pinterest,          status: 'pending' },
@@ -803,6 +804,28 @@ async function main() {
   console.log(`Found ${filePaths.length} image(s) to import.`);
   console.log('');
 
+  // Auto-detect carousel subfolders: any subfolder named carousel-* groups its images.
+  // Files are sorted alphabetically → that is the slide order. No sidecar JSONs needed.
+  const carouselAssignments = new Map();
+  const byFolder = {};
+  for (const fp of filePaths) {
+    const folderName = path.basename(path.dirname(fp));
+    if (!byFolder[folderName]) byFolder[folderName] = [];
+    byFolder[folderName].push(fp);
+  }
+  for (const [folderName, paths] of Object.entries(byFolder)) {
+    if (!folderName.startsWith('carousel-')) continue;
+    const sorted = [...paths].sort(); // alphabetical = slide order within the group
+    sorted.forEach((fp, i) => {
+      carouselAssignments.set(fp, { carouselGroup: folderName, slideIndex: i + 1 });
+    });
+  }
+  if (carouselAssignments.size > 0) {
+    const groups = [...new Set([...carouselAssignments.values()].map(a => a.carouselGroup))];
+    console.log(`Carousel groups detected: ${groups.join(', ')} (${carouselAssignments.size} slides total)`);
+    console.log('');
+  }
+
   // Pre-compute scheduled hours: spread evenly across 6 AM–9 PM
   const hours = scheduledHours(filePaths.length, 6, 21);
   console.log(`Scheduled hours: ${hours.join(', ')}`);
@@ -812,7 +835,7 @@ async function main() {
   const results = [];
   for (let i = 0; i < filePaths.length; i++) {
     try {
-      const result = await importImage(filePaths[i], i, hours[i]);
+      const result = await importImage(filePaths[i], i, hours[i], carouselAssignments.get(filePaths[i]) || null);
       results.push(result);
     } catch (err) {
       console.error(`  Error importing ${path.basename(filePaths[i])}: ${err.message}`);

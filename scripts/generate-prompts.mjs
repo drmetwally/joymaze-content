@@ -420,6 +420,31 @@ function pickArch7Scene(date) {
   return ARCH7_SCENES[dayOfYear(date) % ARCH7_SCENES.length];
 }
 
+// ── Carousel planning ──────────────────────────────────────────────────────
+// Every CAROUSEL_PERIOD content days, tag today's 5 activity prompts as a carousel batch.
+// Ahmed drops those images into a single subfolder; import-raw auto-detects it.
+const CAROUSEL_PERIOD = 3; // carousel day every 3rd content day
+
+function shouldPlanCarousel(date) {
+  return dayOfYear(date) % CAROUSEL_PERIOD === 0;
+}
+
+function buildCarouselPlan(assignedThemes, date) {
+  const dateStr = date.toISOString().slice(0, 10);
+  const dominant = (assignedThemes[0] || 'activities')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const carouselGroup = `carousel-${dominant}-${dateStr}`;
+  return {
+    carouselGroup,
+    suggestedFolder: `output/raw/${carouselGroup}`,
+    date: dateStr,
+    totalSlides: assignedThemes.length,
+    slides: assignedThemes.map((theme, i) => ({ slideIndex: i + 1, theme })),
+  };
+}
+
 function pickPatternInterrupt(date, dynamicInterrupts = []) {
   const merged = [...PATTERN_INTERRUPT_POOL, ...dynamicInterrupts];
   return merged[dayOfYear(date) % merged.length];
@@ -1468,6 +1493,12 @@ async function main() {
   const assignedThemes = pickActivityThemes(activitySlotCount, usedThemeSet, 7, boostThemes);
   console.log(`  Assigned themes (code-enforced): ${assignedThemes.join(', ')}`);
 
+  // Carousel planning — every CAROUSEL_PERIOD days, group activity slots into a carousel batch
+  const carouselPlan = shouldPlanCarousel(today) ? buildCarouselPlan(assignedThemes, today) : null;
+  if (carouselPlan) {
+    console.log(`\n  CAROUSEL DAY — activity images should go into: ${carouselPlan.suggestedFolder}`);
+  }
+
   // Pre-assign story settings to prevent scene repetition
   const pureStoryCount = mix.slots.filter(s => typeof s.archetype === 'number').length;
   const assignedStorySettings = pickStorySettings(pureStoryCount, usedSceneSet, today);
@@ -1602,12 +1633,42 @@ async function main() {
       scoreSummary = `\n# Quality Gate: avg ${avg}/10 · ${pass} pass · ${flag} flagged · ${fail} rejected`;
     }
 
-    const header = `# Image Prompts — ${dateStr}\n# Rotation: ${mix.label}\n# Generated: ${today.toISOString()}${scoreSummary}\n\n`;
-    await fs.writeFile(filepath, header + finalResult, 'utf-8');
+    let carouselNotice = '';
+    if (carouselPlan) {
+      carouselNotice = `\n# CAROUSEL DAY — Drop the 5 activity images into: ${carouselPlan.suggestedFolder}/\n`;
+    }
+    const header = `# Image Prompts — ${dateStr}\n# Rotation: ${mix.label}\n# Generated: ${today.toISOString()}${scoreSummary}${carouselNotice}\n\n`;
+
+    let footer = '';
+    if (carouselPlan) {
+      footer = `\n\n---\n## CAROUSEL DAY — Image Drop Instructions\n\n` +
+        `Today's 5 activity images form a carousel (swipeable album on Instagram + TikTok).\n\n` +
+        `**Create this folder and drop all 5 activity images into it:**\n\n` +
+        `\`\`\`\n${carouselPlan.suggestedFolder}/\n\`\`\`\n\n` +
+        `Name the files so they sort alphabetically in the right order:\n` +
+        `\`\`\`\n` +
+        carouselPlan.slides.map(s => `01-${s.theme.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png  ← slide ${s.slideIndex} (${s.theme})`).join('\n') +
+        `\n\`\`\`\n\n` +
+        `import:raw auto-detects the \`carousel-*\` folder name and builds the carousel queue file. **No sidecar JSONs needed.**\n\n` +
+        `The inspiration slot images (slots 1-5) go into their normal category subfolders as usual.\n`;
+    }
+
+    await fs.writeFile(filepath, header + finalResult + footer, 'utf-8');
     console.log(`\nSaved to: ${filepath}`);
+
+    // Write carousel plan JSON for reference
+    if (carouselPlan) {
+      const planPath = path.join(OUTPUT_DIR, `carousel-plan-${dateStr}.json`);
+      await fs.writeFile(planPath, JSON.stringify(carouselPlan, null, 2));
+      console.log(`Carousel plan saved to: ${planPath}`);
+    }
   }
 
   console.log('\n✅ Copy the prompts above into ChatGPT or Gemini image generation.');
+  if (carouselPlan) {
+    console.log(`CAROUSEL DAY: Drop the 5 activity images into ${carouselPlan.suggestedFolder}/`);
+    console.log('Name files 01-xxx.png, 02-xxx.png etc. for correct slide order.');
+  }
   console.log('Save generated images to output/raw/ then run: npm run import:raw\n');
 }
 

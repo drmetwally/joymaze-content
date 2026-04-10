@@ -165,32 +165,28 @@ Takes everything in `output/raw/` and:
 
 ### Carousel Posts (Instagram + TikTok)
 
-A carousel is a swipeable multi-image post. To group images into a carousel, place a small `.json` file next to each image in `output/raw/` with the **same filename** as the image:
+**Fully automatic — no manual steps.** Every 3rd content day, the prompt generator plans a carousel. At the bottom of the prompts file you'll see a block like:
 
 ```
-output/raw/spring1.png   ← image
-output/raw/spring1.json  ← sidecar (metadata file)
-output/raw/spring2.png
-output/raw/spring2.json
-output/raw/spring3.png
-output/raw/spring3.json
+## CAROUSEL DAY — Image Drop Instructions
+
+Create this folder and drop all 5 activity images into it:
+  output/raw/carousel-spring-flowers-2026-04-10/
+
+Name files so they sort alphabetically:
+  01-coloring.png     ← slide 1
+  02-maze.png         ← slide 2
+  03-word-search.png  ← slide 3
+  ...
 ```
 
-Each sidecar JSON needs two fields:
+That's it. No JSON files, no extra steps:
+- `import-raw.mjs` auto-detects any `carousel-*` subfolder
+- Files sorted alphabetically = slide order
+- Carousel queue file written to `output/queue/` automatically
+- `post-content.mjs` posts it as a swipeable album on Instagram + TikTok photo slideshow
 
-```json
-{
-  "carouselGroup": "spring-week",
-  "slideIndex": 1
-}
-```
-
-- `carouselGroup` — any name you choose; images sharing the same name are grouped into one carousel
-- `slideIndex` — the order they appear (1 = first slide, 2 = second, etc.)
-
-After `npm run import:raw`, a carousel file is automatically created at `output/queue/carousel-spring-week-YYYY-MM-DD.json`. When you run `post-content.mjs`, it posts the carousel to Instagram (swipeable album) and TikTok (photo slideshow) automatically.
-
-**Minimum:** 2 slides per carousel. Instagram supports up to 10; TikTok up to 35.
+**The 5 inspiration slot images** (lifestyle/story) go in their normal category subfolders as usual — only the activity images go in the carousel folder.
 
 ---
 
