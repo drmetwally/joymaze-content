@@ -1,0 +1,41 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "The room fell silent when she began to draw the tree, its branches twisting like her favorite book's illustrations.",
+    "scheduledHour": 13,
+    "reply1": "For 17 minutes, nothing else mattered. The markers scattered across the table, a rainbow of colors she hadn't used in weeks.",
+    "replies": [
+      "For 17 minutes, nothing else mattered. The markers scattered across the table, a rainbow of colors she hadn't used in weeks.",
+      "As I watched, the branches grew leaves, and a bird appeared, singing a song she hummed along to, wordless but full of joy."
+    ]
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "I have a face but no eyes, a tongue but no taste, and I'm always coming but never actually arrive. What am I?",
+    "scheduledHour": 17,
+    "reply1": "Think carefully... drop your guess below 👇 — answer drops in a few hours",
+    "replies": [
+      "Think carefully... drop your guess below 👇 — answer drops in a few hours"
+    ],
+    "answer_tweet": "The answer is: a clock! Hands but no arms, a face but no eyes. Did you get it?",
+    "answer_scheduledHour": 21
+  },
+  {
+    "type": "insight",
+    "tweet1": "Most kids can't resist finishing a maze, even when it's hard, because the journey is more intriguing than the end.",
+    "scheduledHour": 21,
+    "reply1": "Try giving them a maze with no clear start or finish. Watch how they adapt and find their own path, teaching themselves persistence.",
+    "replies": [
+      "Try giving them a maze with no clear start or finish. Watch how they adapt and find their own path, teaching themselves persistence."
+    ]
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're sitting in the car after dropping them off, the silence a sudden, palpable thing, like a held breath.",
+    "scheduledHour": 23,
+    "reply1": "In this quiet, you realize the afternoon stretches out before you, a canvas waiting for the brushstrokes of choice, of chance, of memory.",
+    "replies": [
+      "In this quiet, you realize the afternoon stretches out before you, a canvas waiting for the brushstrokes of choice, of chance, of memory."
+    ]
+  }
+]
