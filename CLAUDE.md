@@ -92,6 +92,7 @@ Every tool call and every line of conversation context costs quota. Follow these
 - Run multiple independent tool calls in parallel (one message, multiple calls)
 - Do not do exploratory reads "to understand the codebase" — read only what the task requires
 - **Use a subagent for any task requiring 3+ file reads** — intermediate noise stays in subagent context; only summary returns
+- **When building a new script or debugging pipeline connectivity**: read `docs/SYSTEM_INDEX.md` first — it maps every script's inputs/outputs, config ownership, and the full data-flow chain. Replaces ad-hoc Grep/Glob for "what reads this file?" questions.
 
 ### After every task
 - **Compact the conversation immediately** — type `/compact` after logging
@@ -107,7 +108,7 @@ Every tool call and every line of conversation context costs quota. Follow these
 ### What NOT to do
 - Do not read 5 files at session start — 2 files maximum (TASKS.md + last SESSION_LOG entry)
 - Do not read ACTIVE_SPRINT.md — it is stale; TASKS.md is the live anchor
-- Do not wander with Grep/Glob to understand the repo — you know this codebase
+- Do not wander with Grep/Glob to understand the repo — read `docs/SYSTEM_INDEX.md` instead
 - Do not re-read files to verify edits — trust that Edit/Write succeeded
 - Do not add exploratory tool calls before you know what you need
 

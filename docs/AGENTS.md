@@ -32,6 +32,8 @@ Both agents write to the same files. Follow this protocol exactly so neither bre
 
 Do NOT read `docs/ACTIVE_SPRINT.md` — stale. `docs/TASKS.md` is the live anchor.
 
+**Codex only:** Read `docs/SYSTEM_INDEX.md` before starting any new script — it maps every existing script's inputs/outputs and config ownership so you don't duplicate or conflict with live pipelines.
+
 ### What to write at session end (both agents)
 
 After completing any task, in this order:
@@ -119,6 +121,7 @@ Key files:
   config/writing-style.md            — brand voice + Halbert copywriting rules
   docs/TASKS.md                      — current work board (read this first)
   docs/AGENTS.md                     — this protocol file
+  docs/SYSTEM_INDEX.md               — full pipeline map: every script's inputs/outputs, config ownership, data-flow chain (read before building any new script)
 ```
 
 **Good prompt pattern:**
