@@ -1030,3 +1030,24 @@ Both require changes to generate-prompts.mjs (new plan types) and import-raw.mjs
 - 41 ok · 3 warnings (all expected: Pinterest sandbox, X cooldown tomorrow, Phase 2 analytics not yet active)
 - Checks: env vars per script, config file existence, pool entry counts, pool/intelligence freshness (days), GitHub Actions workflows, pipeline chain connectivity
 - X cooldown detected from output/posting-cooldown.json (any active cooldown → warn, not just "suspended")
+
+---
+
+## Session 2026-04-11 — Account migration (retroactive log, missed in context compression)
+
+**X account repurposed:**
+- Old suspended account scrapped (automation/spam flag — not appealed)
+- Repurposed clean 3-year-old fit-clinic account → @playjoymaze
+- Handle: @playjoymaze | Account age: ~3 years (no violation history)
+- New X Developer App created, API keys obtained, `.env` updated with new credentials
+- GitHub Secrets NOT yet updated (pending — must update before re-enabling x-posts.yml)
+- Status: 2-week manual warmup in progress. x-posts.yml should remain DISABLED.
+
+**New platform accounts created (Ahmed confirmed — no new API keys yet):**
+- Pinterest: new account under joymaze.pp@gmail.com — old API keys still in .env. Need new Developer App.
+- Instagram: new account under joymaze.pp@gmail.com — no live API credentials
+- TikTok: new account under joymaze.pp@gmail.com — no live API credentials
+- YouTube: already set up under joymaze.pp@gmail.com — OAuth live, unchanged
+
+**Memory updated:** project_warmup_pipeline.md + project_pipeline_status.md now have the full platform account/API status table.
+**Feedback added:** feedback_log_account_changes.md — any future account/credential mention must be logged immediately.
