@@ -1,0 +1,78 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "I'll never forget the afternoon my kid colored outside the lines and found a new world.",
+    "reply1": "The scribbles were everywhere. I wanted to intervene.",
+    "replies": [
+      "The scribbles were everywhere. I wanted to intervene.",
+      "But then I saw her face. Pure joy.",
+      "In that moment, I learned to let go."
+    ],
+    "scheduledHour": 7
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "Can your kid find all 5 hidden eggs in this picture?",
+    "reply1": "Look closely at the flowers and trees. drop your answer below 👇",
+    "replies": [
+      "Look closely at the flowers and trees. drop your answer below 👇"
+    ],
+    "scheduledHour": 9
+  },
+  {
+    "type": "insight",
+    "tweet1": "Did you know that kids who color regularly have better fine motor skills?",
+    "reply1": "Try incorporating coloring into your daily quiet time for improved focus and hand-eye coordination.",
+    "replies": [
+      "Try incorporating coloring into your daily quiet time for improved focus and hand-eye coordination."
+    ],
+    "scheduledHour": 11
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're the kind of parent who wants screen-free activities that spark imagination.",
+    "reply1": "You value the quiet moments and the creations that come from them. save this for when you need it",
+    "replies": [
+      "You value the quiet moments and the creations that come from them. save this for when you need it"
+    ],
+    "scheduledHour": 13
+  },
+  {
+    "type": "story-hook",
+    "tweet1": "The sound of a pencil on paper is music to my ears.",
+    "reply1": "It means my kid is focused, creating, and learning.",
+    "replies": [
+      "It means my kid is focused, creating, and learning.",
+      "Those are the moments I cherish, the ones that make parenting worthwhile.",
+      "And it all starts with a simple piece of paper and a pencil."
+    ],
+    "scheduledHour": 15
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "How many words can your kid find in this spring-themed word search?",
+    "reply1": "Get your timer ready and see how many they can find. drop your answer below 👇",
+    "replies": [
+      "Get your timer ready and see how many they can find. drop your answer below 👇"
+    ],
+    "scheduledHour": 17
+  },
+  {
+    "type": "insight",
+    "tweet1": "Research shows that kids who engage in puzzle activities have improved problem-solving skills.",
+    "reply1": "Incorporate puzzle-solving into your kid's daily routine for a fun and challenging way to learn.",
+    "replies": [
+      "Incorporate puzzle-solving into your kid's daily routine for a fun and challenging way to learn."
+    ],
+    "scheduledHour": 19
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're a parent who believes in the power of play and creativity.",
+    "reply1": "You know that with the right tools and support, your kid can achieve anything they set their mind to. save this for when you need it",
+    "replies": [
+      "You know that with the right tools and support, your kid can achieve anything they set their mind to. save this for when you need it"
+    ],
+    "scheduledHour": 21
+  }
+]

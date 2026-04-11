@@ -165,28 +165,36 @@ Takes everything in `output/raw/` and:
 
 ### Carousel Posts (Instagram + TikTok)
 
-**Fully automatic — no manual steps.** Every 3rd content day, the prompt generator plans a carousel. At the bottom of the prompts file you'll see a block like:
+**Fully automatic — no manual steps.** Carousels rotate on a 9-day cycle — one format every ~3 days. Check the bottom of today's prompts file for instructions.
 
-```
-## CAROUSEL DAY — Image Drop Instructions
+**3 formats, all zero-friction:**
 
-Create this folder and drop all 5 activity images into it:
-  output/raw/carousel-spring-flowers-2026-04-10/
+| Format | Trigger | Slides | Folder prefix |
+|--------|---------|--------|---------------|
+| **1 — Activity Collection** | `doy%9===0` | 5 activity images | `carousel-{theme}-{date}/` |
+| **2 — Educational Facts** | `doy%9===3` | 5 (hook + 4 brain-benefit facts) | `facts-carousel-{activity}-{date}/` |
+| **3 — Activity Progression** | `doy%9===6` | 3 (blank → half → done) | `progress-carousel-{activity}-{date}/` |
 
-Name files so they sort alphabetically:
-  01-coloring.png     ← slide 1
-  02-maze.png         ← slide 2
-  03-word-search.png  ← slide 3
-  ...
-```
+**Your only action on carousel day:**
+1. Check the `## CAROUSEL DAY` block at the bottom of the prompts file
+2. Create the folder it specifies inside `output/raw/`
+3. Drop your images in, named `01-xxx.png`, `02-xxx.png`, etc.
+4. Run `npm run import:raw` — carousel queue file built automatically
 
-That's it. No JSON files, no extra steps:
-- `import-raw.mjs` auto-detects any `carousel-*` subfolder
+Notes:
+- `import-raw.mjs` detects `carousel-*`, `facts-carousel-*`, and `progress-carousel-*` subfolders
 - Files sorted alphabetically = slide order
-- Carousel queue file written to `output/queue/` automatically
-- `post-content.mjs` posts it as a swipeable album on Instagram + TikTok photo slideshow
+- **Format 2** (Facts): prompts file includes the exact fact copy for each slide — just make Gemini render it as an infographic card
+- **Format 3** (Progression): generate all 3 slides in the **same Gemini chat** for visual consistency
+- **The 5 inspiration slot images** always go in their normal category subfolders, not the carousel folder
 
-**The 5 inspiration slot images** (lifestyle/story) go in their normal category subfolders as usual — only the activity images go in the carousel folder.
+**Self-learning (automatic — no action needed):**
+- Activity type is picked by analytics (Pinterest save-rate winner among 5 activity types)
+- Falls back to day-of-year rotation until 5+ posts have impressions
+- Format 2: dynamic `did-you-know` facts from the intelligence pool replace the last 1-2 slides when keyword-matched
+- Format 3: trend `boost_themes` override analytics ranking when a trending topic overlaps an activity type
+- The `intelligenceSignal` field in `carousel-plan-{date}.json` shows what drove the pick: `analytics-ranked` / `trend-boost` / `doy-rotation`
+- Slide descriptions scored by Groq at generation time — score table logged to console (PASS/WEAK/FLAG)
 
 ---
 

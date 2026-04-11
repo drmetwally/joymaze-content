@@ -32,13 +32,123 @@
       "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_000",
+      "hook_type": "problem_solution",
+      "text": "Struggling with your…? You're going to want to save this.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_001",
+      "hook_type": "identity_hook",
+      "text": "Ever ask yourself, how…?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_002",
+      "hook_type": "curiosity_gap",
+      "text": "Want to know something crazy?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_003",
+      "hook_type": "insight",
+      "text": "You'll never believe this.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_004",
+      "hook_type": "engagement_question",
+      "text": "Can I be honest with you for a bit?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_000",
+      "hook_type": "problem_solution",
+      "text": "Struggling with [pain point]? Save this.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_001",
+      "hook_type": "curiosity_gap",
+      "text": "The surprising truth behind [topic]",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260411_002",
+      "hook_type": "identity_hook",
+      "text": "Does this sound like you?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-11",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
     }
   ],
   "hook_type_index": {
     "pattern_interrupt": [],
-    "curiosity_gap": [],
+    "curiosity_gap": [
+      "hook_comp_20260411_002",
+      "hook_comp_20260411_001"
+    ],
     "emotional_mirror": [],
-    "identity_hook": [],
+    "identity_hook": [
+      "hook_comp_20260411_001",
+      "hook_comp_20260411_002"
+    ],
     "transformation_hint": [],
     "relief_hook": [
       "hook_20260407_001"
@@ -46,6 +156,16 @@
     "sensory_hook": [
       "hook_20260407_000"
     ],
-    "secret_insider": []
+    "secret_insider": [],
+    "problem_solution": [
+      "hook_comp_20260411_000",
+      "hook_comp_20260411_000"
+    ],
+    "insight": [
+      "hook_comp_20260411_003"
+    ],
+    "engagement_question": [
+      "hook_comp_20260411_004"
+    ]
   }
 }

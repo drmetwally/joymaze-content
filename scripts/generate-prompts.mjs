@@ -93,6 +93,33 @@ const THEME_POOL = [
 let MERGED_THEME_POOL = [...THEME_POOL];
 
 /**
+ * Load competitor intelligence from config/competitor-intelligence.json.
+ * Returns structured data or null if file doesn't exist yet.
+ */
+async function loadCompetitorIntelligence() {
+  try {
+    const data = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'competitor-intelligence.json'), 'utf-8'));
+    // Only use if generated within the last 14 days
+    const age = Date.now() - new Date(data.generated_at || 0).getTime();
+    if (age > 14 * 24 * 60 * 60 * 1000) return null;
+    return data;
+  } catch { return null; }
+}
+
+/**
+ * Load audit learnings from config/audit-learnings.json.
+ * Returns critical + high severity lessons. Silent fallback if file missing.
+ */
+async function loadAuditLearnings() {
+  try {
+    const data = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'audit-learnings.json'), 'utf-8'));
+    return (data.lessons || []).filter(l => l.severity === 'critical' || l.severity === 'high');
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Load dynamic pools from config files (silent fallback if files don't exist yet).
  */
 async function loadDynamicPools() {
@@ -262,10 +289,10 @@ const PATTERN_INTERRUPT_POOL = [
   { subtype: 'myth-bust', topic: 'Boredom is not the enemy — bored kids invent, create, and problem-solve', visual: 'Child\'s hands building something out of random household items — tape, boxes, string' },
   { subtype: 'myth-bust', topic: 'Puzzle difficulty should NOT match age exactly — slight frustration builds grit', visual: 'Close-up of a pencil eraser with eraser marks on a maze — evidence of trying, failing, trying again' },
   { subtype: 'did-you-know', topic: 'Mazes activate the same brain region as chess — spatial reasoning and planning', visual: 'Side-by-side: a maze puzzle and a chess board, connected by glowing neural pathways' },
-  { subtype: 'did-you-know', topic: 'Kids who do puzzles 3x/week score 30% higher on spatial reasoning tests', visual: 'Infographic-style: puzzle pieces forming an upward graph arrow' },
+  { subtype: 'did-you-know', topic: 'Kids who practice puzzles regularly show measurable improvements in spatial reasoning — the same skill needed for math and reading', visual: 'Infographic-style: puzzle pieces forming an upward graph arrow' },
   { subtype: 'did-you-know', topic: 'Coloring reduces cortisol (stress hormone) in children just like meditation does', visual: 'Calm watercolor wash with a half-colored mandala and a small heart-rate line going smooth' },
   { subtype: 'did-you-know', topic: 'Word searches build the same scanning skills kids need for reading fluency', visual: 'A word search grid morphing into an open book — letters becoming words becoming sentences' },
-  { subtype: 'surprising-stat', topic: '73% of parents say their child asks for activity books MORE than tablet games', visual: 'Bold typography "73%" with tiny pencil and paper icons surrounding it' },
+  { subtype: 'surprising-stat', topic: 'Parents consistently report their kids reach for activity books over tablets when both are available', visual: 'Bold "vs" graphic: a pencil and activity book on one side, a tablet face-down on the other' },
   { subtype: 'surprising-stat', topic: 'The average 5-year-old can solve a maze faster than most adults think', visual: 'Stopwatch showing 2:30 next to a completed maze — "Your kid is faster than you think"' },
   { subtype: 'counterintuitive', topic: 'The WORST time to give a kid a puzzle is when they\'re calm — give it when they\'re restless', visual: 'Before/after: restless scattered toys → focused hands on a maze, same room' },
   { subtype: 'counterintuitive', topic: 'Printing a coloring page is more engaging than a coloring app — the paper matters', visual: 'Hands holding a printed coloring page with real crayons vs a tablet coloring app — the paper version is more lived-in' },
@@ -286,9 +313,9 @@ const PATTERN_INTERRUPT_POOL = [
   { subtype: 'did-you-know', topic: 'Dot-to-dot counting prepares kids for multiplication more than flash cards do', visual: 'Dot-to-dot 1-to-50 page on left, multiplication grid on right — same neural pathway highlighted' },
   { subtype: 'did-you-know', topic: 'Left-handed kids who use activity books develop better bilateral coordination than those who only type', visual: 'Left hand gripping a pencil, completing a maze, brain hemisphere diagram in corner' },
   { subtype: 'did-you-know', topic: 'A child who colors for 20 minutes shows the same calm EEG pattern as an adult after yoga', visual: 'EEG wave going from jagged to smooth, child with crayons at the center' },
-  { subtype: 'surprising-stat', topic: 'Kids complete 40% more of an activity when a parent sits nearby — even if the parent isn\'t helping', visual: 'Two pie charts: completion rate alone vs. with parent in the room' },
-  { subtype: 'surprising-stat', topic: 'Printable activities get used 3× more when stored in a visible folder vs. a drawer', visual: 'Open folder of colorful activity pages on a counter vs. closed drawer — same pages' },
-  { subtype: 'surprising-stat', topic: 'The average age a child masters a maze jumps by 18 months when they practice 3× per week', visual: 'Age milestone timeline: 4yo → 5.5yo (no practice) vs. 4yo → 4yo (with practice)' },
+  { subtype: 'surprising-stat', topic: 'Kids complete significantly more of an activity when a parent sits nearby — even when the parent isn\'t helping at all', visual: 'Two pie charts: completion rate alone vs. with parent in the room' },
+  { subtype: 'surprising-stat', topic: 'Printable activities get used far more often when stored in a visible spot — out of sight really is out of mind', visual: 'Open folder of colorful activity pages on a counter vs. closed drawer — same pages' },
+  { subtype: 'surprising-stat', topic: 'Children who practice mazes regularly tend to hit mastery milestones months ahead of peers who don\'t', visual: 'Two paths diverging on a timeline: one reaching the finish line earlier from consistent practice' },
   { subtype: 'counterintuitive', topic: 'The messier the coloring, the more confident the child — perfectionists color less freely', visual: 'Two coloring pages: one perfectly inside lines, one bold and expressive — same drawing, different child' },
   { subtype: 'counterintuitive', topic: 'Giving a child the WRONG answer first actually teaches them to think harder', visual: 'Parent pointing to wrong path in a maze — child\'s expression: skeptical, then determined' },
   { subtype: 'counterintuitive', topic: 'Screen-free activities don\'t need to compete with screens — they win by being tactile, not by banning tech', visual: 'Tablet face-down on table. Child\'s hands with pencil on a printed maze. Both visible.' },
@@ -421,14 +448,20 @@ function pickArch7Scene(date) {
 }
 
 // ── Carousel planning ──────────────────────────────────────────────────────
-// Every CAROUSEL_PERIOD content days, tag today's 5 activity prompts as a carousel batch.
-// Ahmed drops those images into a single subfolder; import-raw auto-detects it.
-const CAROUSEL_PERIOD = 3; // carousel day every 3rd content day
+// Three formats on a 9-day rotation (by day-of-year):
+//   doy % 9 === 0 → Format 1: Activity Collection  (5 activity images as a swipeable album)
+//   doy % 9 === 3 → Format 2: Educational Facts    (5 brain-benefit fact cards for one activity)
+//   doy % 9 === 6 → Format 3: Activity Progression (blank → half-done → complete, 3 slides)
 
-function shouldPlanCarousel(date) {
-  return dayOfYear(date) % CAROUSEL_PERIOD === 0;
+function getCarouselFormat(date) {
+  const d = dayOfYear(date);
+  if (d % 9 === 0) return 'activity-collection';
+  if (d % 9 === 3) return 'facts';
+  if (d % 9 === 6) return 'progression';
+  return null;
 }
 
+// ── Format 1: Activity Collection ──
 function buildCarouselPlan(assignedThemes, date) {
   const dateStr = date.toISOString().slice(0, 10);
   const dominant = (assignedThemes[0] || 'activities')
@@ -437,12 +470,203 @@ function buildCarouselPlan(assignedThemes, date) {
     .replace(/^-+|-+$/g, '');
   const carouselGroup = `carousel-${dominant}-${dateStr}`;
   return {
+    format: 'activity-collection',
     carouselGroup,
     suggestedFolder: `output/raw/${carouselGroup}`,
     date: dateStr,
     totalSlides: assignedThemes.length,
     slides: assignedThemes.map((theme, i) => ({ slideIndex: i + 1, theme })),
   };
+}
+
+// ── Format 2: Educational Facts ──
+const FACTS_CAROUSEL_ACTIVITIES = [
+  { key: 'mazes', label: 'Mazes', skill: 'problem-solving & spatial reasoning',
+    facts: [
+      'Mazes teach kids to plan ahead — every wrong path is a choice they learn from, not a failure',
+      'Spatial reasoning grows with every maze solved — the same mental skill behind math, engineering, and reading maps',
+      'Every dead end teaches resilience — "try again" builds grit that no worksheet can replicate',
+      'A maze has a visible finish line — that keeps kids focused longer than open-ended activities because the goal is always clear',
+    ],
+  },
+  { key: 'coloring', label: 'Coloring', skill: 'creativity & fine motor control',
+    facts: [
+      'Coloring demands two things at once: discipline to stay in lines + freedom to choose colors — that tension is exactly what grows the brain',
+      'The grip, pressure, and precision of coloring build the same fine motor strength needed for confident handwriting',
+      'Choosing colors is a real decision — kids as young as 2 are practicing self-expression and preference every time they pick up a crayon',
+      'Coloring is one of the few screen-free activities that genuinely calms an overstimulated child — focused hands = quieter mind',
+    ],
+  },
+  { key: 'word-search', label: 'Word Search', skill: 'vocabulary & visual focus',
+    facts: [
+      'Word searches train kids to find signal in noise — a skill that transfers directly to reading, math, and focus in a busy classroom',
+      'Kids encounter words they\'ve never read before in every grid — recognition before definition is how reading vocabulary actually expands',
+      'The left-to-right, top-to-bottom scan pattern of word searches is the same eye movement that builds reading fluency',
+      'Ten minutes of word search builds the visual "spot the difference" skill that makes reading faster and more automatic',
+    ],
+  },
+  { key: 'dot-to-dot', label: 'Dot-to-Dot', skill: 'number sequencing & fine motor',
+    facts: [
+      'Dot-to-dot teaches number sequencing while kids think they\'re just drawing — the best learning happens when it doesn\'t feel like learning',
+      'The hidden picture is a built-in finish line — kids stay focused because they genuinely want to see what it becomes',
+      'The fine motor precision of connecting dots builds the same pencil control needed for confident, legible handwriting',
+      'The reveal at the end associates counting and number order with reward — kids want to do it again',
+    ],
+  },
+  { key: 'sudoku', label: 'Kids Sudoku', skill: 'logic & pattern recognition',
+    facts: [
+      'Kids Sudoku introduces logical deduction years before formal algebra — "if this, then not that" is a real math skill at age 5',
+      'Completing a grid builds working memory — the ability to hold multiple possibilities in mind at once, the same skill as mental math',
+      'Sudoku rewards the brain for noticing patterns — that habit of looking for patterns is what makes kids better readers and better problem-solvers',
+      'Even a 4×4 kids grid teaches elimination — the most powerful reasoning tool in logic, science, and everyday decisions',
+    ],
+  },
+];
+
+// Alternate search terms for matching dynamic facts to activity types
+const ACTIVITY_SEARCH_TERMS = {
+  mazes:        ['maze', 'mazes'],
+  coloring:     ['color', 'coloring'],
+  'word-search':['word search', 'word-search', 'wordsearch'],
+  'dot-to-dot': ['dot to dot', 'dot-to-dot', 'connect the dots'],
+  sudoku:       ['sudoku'],
+};
+
+function buildFactsCarouselPlan(date, intelligence = {}) {
+  const { activityRanking = [], dynamicInterrupts = [], topHook = null } = intelligence;
+  const dateStr = date.toISOString().slice(0, 10);
+
+  // Activity selection: analytics ranking → doy rotation fallback
+  let activity;
+  let signal = 'doy-rotation';
+  if (activityRanking.length > 0) {
+    const idx = FACTS_CAROUSEL_ACTIVITIES.findIndex(a => a.key === activityRanking[0]);
+    if (idx >= 0) { activity = FACTS_CAROUSEL_ACTIVITIES[idx]; signal = 'analytics-ranked'; }
+  }
+  if (!activity) {
+    activity = FACTS_CAROUSEL_ACTIVITIES[dayOfYear(date) % FACTS_CAROUSEL_ACTIVITIES.length];
+  }
+
+  // Dynamic fact injection: pull did-you-know entries from pattern-interrupt-dynamic.json
+  // that mention this activity type — replace the last 1-2 hardcoded facts
+  const terms = ACTIVITY_SEARCH_TERMS[activity.key] || [activity.key];
+  const matchingFacts = dynamicInterrupts.filter(f => {
+    const t = (f.topic || '').toLowerCase();
+    return (f.subtype === 'did-you-know' || f.subtype === 'surprising-stat') &&
+           terms.some(term => t.includes(term));
+  });
+  const baseFacts = [...activity.facts];
+  const injectedCount = Math.min(matchingFacts.length, 2);
+  for (let i = 0; i < injectedCount; i++) {
+    baseFacts[baseFacts.length - 1 - i] = matchingFacts[i].topic;
+  }
+
+  // Hook slide: use top performing hook pattern if available
+  const hookDesc = topHook
+    ? `Title card in style of: "${topHook.text}" — reframed as "5 Brain Benefits of ${activity.label}"`
+    : `Title card: "5 Brain Benefits of ${activity.label}" — hook image showing a child happily doing ${activity.label.toLowerCase()}`;
+
+  const folderName = `facts-carousel-${activity.key}-${dateStr}`;
+  return {
+    format: 'facts',
+    carouselGroup: folderName,
+    suggestedFolder: `output/raw/${folderName}`,
+    date: dateStr,
+    activity: activity.label,
+    skill: activity.skill,
+    intelligenceSignal: signal,
+    dynamicFactsInjected: injectedCount,
+    totalSlides: 5,
+    slides: [
+      { slideIndex: 1, role: 'hook', description: hookDesc },
+      ...baseFacts.map((fact, i) => ({ slideIndex: i + 2, role: 'fact', description: fact })),
+    ],
+  };
+}
+
+// ── Format 3: Activity Progression ──
+const PROGRESSION_CAROUSEL_ACTIVITIES = [
+  { key: 'maze',       label: 'Maze',             description: 'a simple forest maze with a start arrow and a finish flag' },
+  { key: 'coloring',   label: 'Coloring Page',    description: 'a cute coloring page of a cartoon dinosaur outline in a jungle' },
+  { key: 'dot-to-dot', label: 'Dot-to-Dot',       description: 'a dot-to-dot puzzle of a smiling sun, numbered 1–20' },
+  { key: 'word-search', label: 'Word Search',     description: 'a word search grid of jungle animals on a white page' },
+  { key: 'sudoku',     label: 'Kids Sudoku',       description: 'a 4×4 kids sudoku grid with animal icon symbols' },
+];
+
+// Map facts pool keys → progression pool keys (different naming convention)
+const FACTS_TO_PROG_KEY = {
+  mazes: 'maze', coloring: 'coloring', 'word-search': 'word-search',
+  'dot-to-dot': 'dot-to-dot', sudoku: 'sudoku',
+};
+
+function buildProgressCarouselPlan(date, intelligence = {}) {
+  const { activityRanking = [], boostThemes = [] } = intelligence;
+  const dateStr = date.toISOString().slice(0, 10);
+
+  // Activity selection priority:
+  // 1. Trending boost_themes that overlap an activity type (e.g. "Earth Day" → maze with nature theme)
+  // 2. Analytics ranking
+  // 3. doy rotation
+  let activity;
+  let signal = 'doy-rotation';
+
+  const trendMatch = PROGRESSION_CAROUSEL_ACTIVITIES.find(a =>
+    boostThemes.some(t => t.toLowerCase().includes(a.key.replace(/-/g, ' ')))
+  );
+  if (trendMatch) {
+    activity = trendMatch;
+    signal = 'trend-boost';
+  } else if (activityRanking.length > 0) {
+    const progKey = FACTS_TO_PROG_KEY[activityRanking[0]];
+    const idx = PROGRESSION_CAROUSEL_ACTIVITIES.findIndex(a => a.key === progKey);
+    if (idx >= 0) { activity = PROGRESSION_CAROUSEL_ACTIVITIES[idx]; signal = 'analytics-ranked'; }
+  }
+  if (!activity) {
+    activity = PROGRESSION_CAROUSEL_ACTIVITIES[dayOfYear(date) % PROGRESSION_CAROUSEL_ACTIVITIES.length];
+  }
+
+  const folderName = `progress-carousel-${activity.key}-${dateStr}`;
+  return {
+    format: 'progression',
+    carouselGroup: folderName,
+    suggestedFolder: `output/raw/${folderName}`,
+    date: dateStr,
+    activity: activity.label,
+    description: activity.description,
+    intelligenceSignal: signal,
+    totalSlides: 3,
+    slides: [
+      { slideIndex: 1, role: 'blank',    filename: '01-blank.png',  description: `${activity.description} — completely blank, no marks, fresh and untouched` },
+      { slideIndex: 2, role: 'progress', filename: '02-half.png',   description: `Same ${activity.label.toLowerCase()} — 50% complete, pencil marks visible, clearly in progress` },
+      { slideIndex: 3, role: 'done',     filename: '03-done.png',   description: `Same ${activity.label.toLowerCase()} — fully completed, satisfying finish state, all sections filled` },
+    ],
+  };
+}
+
+// ── Carousel footer builders ──
+function buildFactsCarouselFooter(plan) {
+  const slideLines = plan.slides.map(s =>
+    `${String(s.slideIndex).padStart(2, '0')}-${s.role}.png  ← Slide ${s.slideIndex}: ${s.description}`
+  ).join('\n');
+  return `\n\n---\n## FACTS CAROUSEL DAY — Image Drop Instructions\n\n` +
+    `Today's carousel: **5 brain-benefit fact cards** for **${plan.activity}** (${plan.skill})\n\n` +
+    `**Create this folder:**\n\`\`\`\n${plan.suggestedFolder}/\n\`\`\`\n\n` +
+    `Generate each slide in Gemini as an infographic-style fact card. Name files so they sort in order:\n\`\`\`\n` +
+    slideLines + `\n\`\`\`\n\n` +
+    `import:raw auto-detects the \`facts-carousel-*\` folder and builds the carousel queue file. **No sidecar JSONs needed.**\n`;
+}
+
+function buildProgressCarouselFooter(plan) {
+  const slideLines = plan.slides.map(s =>
+    `${s.filename}  ← Slide ${s.slideIndex} (${s.role}): ${s.description}`
+  ).join('\n');
+  return `\n\n---\n## PROGRESSION CAROUSEL DAY — Image Drop Instructions\n\n` +
+    `Today's carousel shows the **satisfying journey** of completing a **${plan.activity}**.\n\n` +
+    `**Create this folder:**\n\`\`\`\n${plan.suggestedFolder}/\n\`\`\`\n\n` +
+    `Generate all 3 slides in Gemini — **same scene, 3 stages**. Keep the same chat window for visual consistency:\n\`\`\`\n` +
+    slideLines + `\n\`\`\`\n\n` +
+    `**Gemini tip:** Generate slide 1 first, then say "now show 50% complete" and "now show fully done" — same scene throughout.\n\n` +
+    `import:raw auto-detects the \`progress-carousel-*\` folder and builds the carousel queue file. **No sidecar JSONs needed.**\n`;
 }
 
 function pickPatternInterrupt(date, dynamicInterrupts = []) {
@@ -566,7 +790,7 @@ function extractEssentials(styleGuide) {
   return extracted.join('\n');
 }
 
-function buildSystemPrompt(styleGuide, archetypes, hookExamples = []) {
+function buildSystemPrompt(styleGuide, archetypes, hookExamples = [], auditLessons = [], compIntel = null) {
   const essentials = extractEssentials(styleGuide);
 
   return `You are JoyMaze's creative director and image prompt engineer.
@@ -593,7 +817,7 @@ You generate TWO types of image prompts:
 
 The 5 inspiration slots replace story archetypes. Each has a distinct visual brief:
 
-**FACT-CARD**: Bold educational poster. Surprising statistic or counterintuitive child-development fact. Could be a crisp infographic-style card, or an activity scene with a bold text overlay. NOT a generic brain/lightbulb image. Think: viral Pinterest educational post.
+**FACT-CARD**: Bold educational poster. Counterintuitive child-development insight or relatable observation — expressed through VISUAL METAPHOR, not text-in-image. Could be a crisp infographic-style layout with strong imagery, or an activity scene with bold visual design. NEVER ask the image generator to render text, stats, or numbers inside the image — those are added post-generation by our pipeline via sharp. NOT a generic brain/lightbulb image. Think: viral Pinterest educational post where the VISUAL does the storytelling.
 
 **ACTIVITY-CHALLENGE**: Child at peak engagement with a printable activity — maze, coloring page, puzzle. The activity printable must be clearly visible and beautiful. Child's expression = focused, curious, slightly competitive. No blank pages, no finished pages — frozen at the moment of WORKING. Discarded screen (tablet face-down, TV remote pushed aside) is a bonus conversion signal.
 
@@ -921,7 +1145,9 @@ Current month determines seasonal hooks. Weave seasonal context into 2-3 prompts
 - PINTEREST OPTIMIZATION: Caption hooks should include language parents search for: "screen-free activities", "printable for kids", "quiet time activities", "ages 4-8", "fine motor skills", "brain games for kids"
 - ACTIVITY CAPTIONS: Always include "SAVE this" + skill framing + age range. Parents save educational content 3x more than generic entertainment content.
 - ACTIVITY CTA VARIETY IS MANDATORY: NEVER repeat the same CTA structure across activity prompts in the same day's batch. Rotate between: "Can your kid find the path?", "Find all [N] hidden words!", "How fast can they spot them all?", "Can you spot all the differences?", "Only 1 in 5 kids solve this!", "Time your little one — drop the result below!", "Which path leads to the treasure?", "Can they find the matching pair?". Each activity prompt MUST use a structurally different CTA.
-- THEME COHERENCE: The activity shown in a story prompt must match the setting's mood and environment. A snowy/winter/indoor scene cannot show a desert or tropical activity. A sunny outdoor scene cannot show an arctic activity. Setting and activity must feel like they belong in the same world.${
+- THEME COHERENCE: The activity shown in a story prompt must match the setting's mood and environment. A snowy/winter/indoor scene cannot show a desert or tropical activity. A sunny outdoor scene cannot show an arctic activity. Setting and activity must feel like they belong in the same world.
+- SCROLL STOPPER (MANDATORY ON EVERY PROMPT): Name the specific element that makes a parent's thumb stop. Not the art style — the compositional moment. For story/lifestyle: the detail nobody expects (eraser debris, a crayon rolled to the edge, a scrunched brow, a half-eaten snack). For activity: the puzzle front-and-center, partially solved, inviting and slightly daunting. For fact-card: the visual metaphor that makes the insight click without words. If you cannot point to what stops the scroll, the prompt is incomplete.
+- FUN OR VALUE (MANDATORY ON EVERY PROMPT): Every prompt must deliver one or both. VALUE = the viewer receives something they can use — a printable they want, an insight they can act on, an activity their kid can do today. FUN = the viewer feels something specific — recognition, surprise, warmth, the urge to share. A beautiful image of a child holding an activity delivers NEITHER unless the activity itself is the visual hero and the viewer's brain registers "I want that for my child." Generic lifestyle scene with activity as background prop = failure.${
   hookExamples.length > 0 ? (() => {
     const byType = {};
     for (const h of hookExamples) {
@@ -934,6 +1160,24 @@ Current month determines seasonal hooks. Weave seasonal context into 2-3 prompts
       .join('\n');
     return `\n\n## HIGH-PERFORMING HOOK EXAMPLES (empirically validated — use as inspiration, not verbatim):\n${lines}`;
   })() : ''
+}${
+  auditLessons.length > 0 ? `
+
+## AUDIT LEARNINGS — MANDATORY RULES (learned from real failures, enforced by quality gate):
+${auditLessons.map(l =>
+  `- [${l.id.toUpperCase()}] ${l.generationRule}\n  ✗ BAD: "${l.examples?.bad || ''}"\n  ✓ GOOD: "${l.examples?.good || ''}"`
+).join('\n')}` : ''
+}${
+  compIntel ? `
+
+## COMPETITOR INTELLIGENCE — WHAT IS WORKING RIGHT NOW (${compIntel.date}):
+Use these findings to inform visual direction, hook structure, and theme selection. Do NOT copy competitors — use these as signals for what parents in this niche respond to.
+
+FORMATS GETTING MOST SAVES: ${(compIntel.top_formats || []).join(' | ')}
+WINNING HOOK STRUCTURES: ${(compIntel.winning_hooks || []).map(h => `"${h}"`).join(' | ')}
+VIRAL THEMES RIGHT NOW: ${(compIntel.viral_themes || []).join(' | ')}
+CONTENT GAPS (opportunities): ${(compIntel.content_gaps || []).join(' | ')}
+SCROLL STOPPER FORMULAS: ${(compIntel.scroll_stopper_formulas || []).join(' | ')}` : ''
 }`;
 }
 
@@ -999,6 +1243,163 @@ PERFORMANCE DATA (from ${scored.length} analyzed posts):
 - Weakest categories: ${weakCats}
 - Best-performing hooks: ${hookPatterns}
 Generate MORE content similar to top performers. Lean into the emotional tones and visual styles that performed best.`;
+}
+
+/**
+ * Load activity-level performance ranking from queue + archive analytics.
+ * Returns an array of activity keys (e.g. ['mazes','maze','coloring',...]) sorted best-first.
+ * Returns [] if fewer than 5 posts with analytics data exist — triggers doy fallback.
+ *
+ * Key mapping: category 'activity-maze' → facts key 'mazes' / progression key 'maze'.
+ * Both carousel pools use this same ranking (facts pool uses 'mazes', progression uses 'maze').
+ */
+async function loadActivityRanking() {
+  const QUEUE   = path.join(ROOT, 'output', 'queue');
+  const ARCHIVE = path.join(ROOT, 'output', 'archive');
+  const items   = [];
+
+  async function scan(dir) {
+    try {
+      for (const f of (await fs.readdir(dir)).filter(f => f.endsWith('.json'))) {
+        try { items.push(JSON.parse(await fs.readFile(path.join(dir, f), 'utf-8'))); } catch {}
+      }
+    } catch {}
+  }
+
+  await scan(QUEUE);
+  try {
+    for (const d of await fs.readdir(ARCHIVE)) {
+      const dp = path.join(ARCHIVE, d);
+      try { if ((await fs.stat(dp)).isDirectory()) await scan(dp); } catch {}
+    }
+  } catch {}
+
+  const withData = items.filter(i => (i.analytics?.pinterest?.lifetime?.impressions ?? 0) > 0);
+  if (withData.length < 5) return [];
+
+  // category → facts pool key (facts uses 'mazes', progression uses 'maze' — covered via FACTS_TO_PROG map)
+  const CAT_KEY = {
+    'activity-maze':        'mazes',
+    'activity-coloring':    'coloring',
+    'activity-word-search': 'word-search',
+    'activity-dot-to-dot':  'dot-to-dot',
+    'activity-sudoku':      'sudoku',
+  };
+
+  const byKey = {};
+  for (const item of withData) {
+    const key = CAT_KEY[item.category];
+    if (!key) continue;
+    if (!byKey[key]) byKey[key] = { saves: 0, impressions: 0 };
+    byKey[key].saves       += item.analytics.pinterest.lifetime.saves;
+    byKey[key].impressions += item.analytics.pinterest.lifetime.impressions;
+  }
+
+  return Object.entries(byKey)
+    .map(([key, d]) => ({ key, saveRate: d.saves / d.impressions }))
+    .sort((a, b) => b.saveRate - a.saveRate)
+    .map(x => x.key);
+}
+
+/**
+ * Score carousel slide descriptions for visual specificity and distinctiveness.
+ * Uses llama-3.1-8b-instant (cheap/fast). Silent no-op if GROQ_API_KEY not set.
+ * Returns array of { n, score, note } or null on failure.
+ */
+
+/**
+ * Post-generation deterministic strip.
+ * Removes text-in-image instructions and fabricated stats the LLM emits
+ * despite system prompt rules. Runs before scoring and saving.
+ */
+function stripRuleViolations(result) {
+  // Strip text-in-image instructions: "The text reads: '...'", "overlay reads: ...", etc.
+  result = result.replace(
+    /(?:The (?:text|statistic|stat|overlay|font|label|caption|banner|heading) (?:reads|says|should (?:read|say))|text overlay should read)[:\s]+[""]?[^.!?\n"]{0,300}[""]?[.!]?\s*/gi,
+    ''
+  );
+  // Strip fabricated improvement percentages
+  result = result.replace(
+    /(?:improve[sd]?|increase[sd]?|boost[s]?|raise[sd]?|develop[sd]?)\s+[\w\s]+?\s+by\s+\d{1,3}%[,.]?/gi,
+    ''
+  );
+  result = result.replace(
+    /\b\d{1,3}%\s+(?:of (?:children|kids|parents|students)|improvement|higher|more|better|faster|increase)/gi,
+    ''
+  );
+  return result;
+}
+
+/**
+ * Pre-check all prompts for hard rule violations before LLM scoring.
+ * Returns Map<promptNumber, violations[]> — each violation: {rule, penalty}.
+ * These penalties are applied deterministically, regardless of LLM score.
+ */
+function preCheckViolations(result) {
+  const violations = new Map();
+  const sections = result.split(/(?=### Prompt \d)/);
+  const month = new Date().getMonth() + 1; // 1-12
+
+  for (const section of sections) {
+    const match = section.match(/### Prompt (\d+)/);
+    if (!match) continue;
+    const n = parseInt(match[1], 10);
+    const v = [];
+
+    // Text-in-image instruction
+    if (/(?:the (?:text|statistic|overlay|label) (?:reads|says)|text overlay should read|reads:\s*[""])/i.test(section)) {
+      v.push({ rule: 'text-in-image', penalty: -4 });
+    }
+    // Fabricated stat (specific percentage claim)
+    if (/\d{1,3}%\s+(?:of (?:children|kids|parents)|improvement|higher|more|better)|(?:improve|increase|boost)\s+\w+\s+by\s+\d{1,3}%/i.test(section)) {
+      v.push({ rule: 'fabricated-stat', penalty: -4 });
+    }
+    // Wrong season: Christmas/Halloween mentioned in spring/summer (Mar–Aug)
+    if (month >= 3 && month <= 8) {
+      if (/christmas tree|halloween pumpkin|thanksgiving turkey|winter holiday/i.test(section)) {
+        v.push({ rule: 'wrong-season', penalty: -3 });
+      }
+    }
+    // System instruction meta-leak: internal rules copied into output
+    if (/(?:consumer delivery:|MANDATORY:|SCROLL STOPPER \(MANDATORY|the system prompt|SEASONAL NOTE:)/i.test(section)) {
+      v.push({ rule: 'system-instruction-leak', penalty: -3 });
+    }
+
+    if (v.length > 0) violations.set(n, v);
+  }
+  return violations;
+}
+
+async function scoreCarouselSlides(plan) {
+  if (!process.env.GROQ_API_KEY || !plan?.slides?.length) return null;
+
+  const slideList = plan.slides.map(s =>
+    `Slide ${s.slideIndex} (${s.role}): ${s.description || s.filename || ''}`
+  ).join('\n');
+
+  const prompt = `Score these image generation instructions for a ${plan.format} social media carousel about ${plan.activity}.
+Rate each 1–10 on visual specificity (enough detail for Gemini to generate a distinct image) and note any that are too vague.
+Reply ONLY with a JSON array: [{"n":1,"score":8,"note":"..."},...]
+
+${slideList}`;
+
+  try {
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.1,
+        max_tokens: 400,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const raw = (data.choices?.[0]?.message?.content || '').trim();
+    const m = raw.match(/\[[\s\S]*\]/);
+    return m ? JSON.parse(m[0]) : null;
+  } catch { return null; }
 }
 
 /**
@@ -1147,7 +1548,7 @@ function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], as
     if (s.type === 'fact-card') {
       return `Slot ${i + 1}: FACT-CARD — educational poster
   Topic: ${s.topic}
-  Visual: Bold, eye-catching design. Could be a striking statistic overlaid on an activity scene, OR a bold text card with soft background.
+  Visual: Bold, eye-catching design — strong visual metaphor, infographic-style layout, or activity scene. NO text, statistics, or numbers in the image (our pipeline adds those post-generation via sharp).
   Energy: Confident, surprising, educational. Like a viral infographic.
   ${s.hint}${styleLine}`;
     }
@@ -1155,9 +1556,10 @@ function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], as
     if (s.type === 'activity-challenge') {
       return `Slot ${i + 1}: ACTIVITY-CHALLENGE — challenge-framed lifestyle scene
   Theme: ${s.theme}
-  Visual: A child ABOUT TO solve or actively solving an activity (maze / coloring / puzzle). Peak engagement moment — not blank page, not finished.
-  Energy: Competitive curiosity. "Can YOUR kid solve this?" vibe.
-  Include: the activity printable clearly visible, child's hand on it or reaching for it, focused expression
+  Visual: The ACTIVITY PRINTABLE is the visual hero — clear, beautiful, inviting, front-and-center and legible. The viewer must look at this image and think "I want that for my child." Activity shown 30-60% solved — never blank (no tension), never finished (tension resolved). Child's hands or face may be in frame but must NOT obscure the activity. The activity earns the challenge hook, not the child's expression.
+  Energy: Competitive curiosity. "Can YOUR kid solve this?" — but the ACTIVITY earns that question.
+  Consumer delivery: The viewer receives a desirable, usable activity. The image is the preview. If the activity isn't clearly visible and beautiful, the post delivers nothing.
+  Include: printable clearly lit and legible, child's hand engaged as supporting detail — not primary subject
   ${s.hint}${styleLine}${childLine}`;
     }
 
@@ -1188,6 +1590,7 @@ function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], as
     - Simple lifestyle scene: printable on table, morning light, calm atmosphere
     - OR a bold text design: the identity statement as large text over a soft background
   Energy: Aspirational but NOT aspirational-lifestyle-Instagram — real, warm, specific
+  Consumer delivery: The IMAGE sets the scene. The CAPTION HOOK must deliver the payoff — a specific felt truth, not an atmosphere. The viewer must receive either recognition ("that's me") or a clear emotional landing ("that's what I need to hear"). Vibes without a payoff = scroll past. The caption hook idea you write must land on a feeling, not a vibe.
   ${s.hint}${styleLine}${childLine}`;
     }
 
@@ -1199,7 +1602,38 @@ function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], as
     const idx = storySlots.length + i + 1;
     const sourceLabel = s.source === 'books' ? 'KDP Books' : s.source === 'both' ? 'App + Books' : 'App';
     const theme = assignedThemes[i] ? ` — THEME: ${assignedThemes[i]} (mandatory, do not change)` : '';
-    return `${idx}. [ACTIVITY] ${s.label}${theme} — ${s.difficulty} difficulty (Skill: ${s.skill}) [${sourceLabel}]`;
+
+    // Seasonal context: prevent LLM from defaulting to off-season holidays
+    const m = new Date().getMonth() + 1;
+    const seasonalNote = m >= 3 && m <= 5 ? 'SPRING (Easter, Earth Day, spring nature — NOT Christmas/Halloween)' :
+                         m >= 6 && m <= 8 ? 'SUMMER (summer break, outdoors, 4th of July — NOT Christmas)' :
+                         m >= 9 && m <= 10 ? 'FALL (Halloween, harvest, back-to-school)' :
+                                             'WINTER/HOLIDAY (Christmas, Hanukkah, New Year)';
+
+    // Per-activity-type scroll stopper + visual specificity guide
+    const label = s.label.toLowerCase();
+    const guide = label.includes('maze')
+      ? 'SCROLL STOPPER: themed character at start, clearly marked finish, decorative elements in corners. VISUAL: maze path fills 70% of frame, solvable-looking, fun themed illustration.'
+      : label.includes('word search')
+      ? 'SCROLL STOPPER: themed illustrated header + large legible letter grid. VISUAL: grid must be large enough to read individual letters clearly. Theme art above grid.'
+      : label.includes('color')
+      ? 'SCROLL STOPPER: intricate but not intimidating design, clearly defined sections. VISUAL: BLACK OUTLINE ONLY — zero color fill, zero shading, pure line art on white paper.'
+      : label.includes('dot')
+      ? 'SCROLL STOPPER: enough dots that the final shape is intriguing but not obvious. VISUAL: numbered dots ONLY — NO pre-drawn outline, NO connected lines anywhere in the image.'
+      : label.includes('match') || label.includes('spot')
+      ? 'SCROLL STOPPER: paired images side by side, clearly laid out. VISUAL: clean pairs layout, 4-6 differences or pairs, fun illustrated subjects.'
+      : label.includes('sudoku')
+      ? 'SCROLL STOPPER: child-friendly icons (animals, shapes) instead of numbers for ages 4-6. VISUAL: 4x4 or 6x6 grid, some cells filled, some blank — clearly a puzzle in progress.'
+      : label.includes('quiz') || label.includes('visual puzzle')
+      ? 'SCROLL STOPPER: bold visual question with 3-4 illustrated answer choices. VISUAL: clear question + answer options, fun themed illustrations, no walls of text.'
+      : label.includes('trac')
+      ? 'SCROLL STOPPER: large clear dotted guide path with visible start arrow. VISUAL: thick dotted lines, generous white space, child-accessible letter or shape.'
+      : 'SCROLL STOPPER: clear themed activity hero with defined sections. VISUAL: activity fills 80% of frame.';
+
+    return `${idx}. [ACTIVITY] ${s.label}${theme} — ${s.difficulty} difficulty (Skill: ${s.skill}) [${sourceLabel}]
+  ${guide}
+  SEASON: ${seasonalNote} — apply to the theme if it could be misread as off-season.
+  CAPTION: structurally different from other activity captions in this batch. Rotate formula: "Can your kid find...?" / "How fast can they...?" / "Only 1 in 5 kids can..." / "Find all X hidden..." / "Time your little one — drop the result below!"`;
   });
 
   const allDescriptions = [...storyDescriptions, ...activityDescriptions];
@@ -1299,15 +1733,25 @@ async function generateWithOllama(systemPrompt, userPrompt) {
  * Returns { scores: [{n, score, fail}, ...] } or null on failure.
  * Uses llama-3.1-8b-instant (cheap/fast) so scoring doesn't inflate cost.
  */
-async function scorePrompts(result) {
+async function scorePrompts(result, auditLessons = []) {
   const client = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: 'https://api.groq.com/openai/v1',
   });
 
-  const scoringPrompt = `You are a quality gate for AI image generation prompts targeting parents on Pinterest/Instagram.
+  const auditCriteria = auditLessons.length > 0
+    ? `\nAUDIT RULES (violations override other scoring — deduct as specified):\n${auditLessons.map(l =>
+        `- [${l.id}] Check: ${l.scoreCheck}. If found: flag="${l.scoreFlag}", apply ${l.scorePenalty} points.`
+      ).join('\n')}\n`
+    : '';
+
+  const scoringPrompt = `You are a quality gate for AI image generation prompts targeting parents on Pinterest/Instagram.${auditCriteria}
 
 Score each numbered prompt from 0–10. Start at 10 and subtract for each missing criterion.
+
+FOR ALL PROMPTS (applies to every prompt type without exception):
+- SCROLL STOPPER NAMED: Prompt identifies a specific compositional element that stops the scroll — an unexpected detail, a bold visual anchor, or an inviting activity. Generic description without a stopping moment = −2.
+- FUN OR VALUE DELIVERED: Prompt ensures the viewer receives something. For activity-challenge: is the printable clearly the visual hero, legible and inviting? Activity as background prop = −3. For fact-card: is the insight specific enough that a parent takes something away? Vague inspiration = −2. For identity: does the caption hook idea land on a specific felt truth, not just an atmosphere? No payoff = −2.
 
 FOR STORY PROMPTS (not puzzle/activity prompts):
 - SENSORY ANCHOR: One unexpected real-world detail (half-eaten apple, steam from mug, sock falling off). Missing = −2.
@@ -1414,9 +1858,11 @@ async function main() {
 
   // Load strategy + dynamic pools in parallel
   console.log('Loading strategy context + dynamic pools...');
-  const [{ styleGuide, archetypes }, dynamicPools] = await Promise.all([
+  const [{ styleGuide, archetypes }, dynamicPools, auditLessons, compIntel] = await Promise.all([
     loadStrategyContext(),
     loadDynamicPools(),
+    loadAuditLearnings(),
+    loadCompetitorIntelligence(),
   ]);
   console.log(`  Style guide: ${styleGuide.length} chars`);
   console.log(`  Archetypes: ${archetypes.length} chars`);
@@ -1429,6 +1875,12 @@ async function main() {
   }
   if (dynamicPools.hookExamples.length) {
     console.log(`  Hook examples: ${dynamicPools.hookExamples.length} for system prompt injection`);
+  }
+  if (auditLessons.length) {
+    console.log(`  Audit learnings: ${auditLessons.length} rules loaded (injected into generation + scorer)`);
+  }
+  if (compIntel) {
+    console.log(`  Competitor intelligence: loaded (${compIntel.date}) — formats, hooks, gaps injected`);
   }
 
   // Make dynamic pools available to getTodaysMix via simple attachment
@@ -1493,10 +1945,58 @@ async function main() {
   const assignedThemes = pickActivityThemes(activitySlotCount, usedThemeSet, 7, boostThemes);
   console.log(`  Assigned themes (code-enforced): ${assignedThemes.join(', ')}`);
 
-  // Carousel planning — every CAROUSEL_PERIOD days, group activity slots into a carousel batch
-  const carouselPlan = shouldPlanCarousel(today) ? buildCarouselPlan(assignedThemes, today) : null;
+  // Carousel planning — 9-day rotation across 3 formats
+  const carouselFormat = getCarouselFormat(today);
+  let carouselPlan = null;
+  if (carouselFormat === 'activity-collection') {
+    carouselPlan = buildCarouselPlan(assignedThemes, today);
+  } else if (carouselFormat === 'facts' || carouselFormat === 'progression') {
+    // Load analytics ranking + pass dynamic pools already in memory
+    const activityRanking = await loadActivityRanking();
+    const dynamicInterrupts = dynamicPools.patternInterrupts || [];
+    // Best unscored hook from hooks-library (performance_score = null means untested but brand_safe)
+    const topHook = (dynamicPools.hookExamples || []).find(h => h.brand_safe) || null;
+    const intelligence = { activityRanking, dynamicInterrupts, topHook, boostThemes };
+
+    if (activityRanking.length > 0) {
+      console.log(`\n  [Carousel] Analytics ranking: ${activityRanking.join(' > ')}`);
+    } else {
+      console.log('\n  [Carousel] No analytics data yet — using doy rotation (will self-correct once posts have impressions).');
+    }
+    if (dynamicInterrupts.length > 0) {
+      console.log(`  [Carousel] ${dynamicInterrupts.length} dynamic fact(s) available for injection.`);
+    }
+
+    if (carouselFormat === 'facts') {
+      carouselPlan = buildFactsCarouselPlan(today, intelligence);
+    } else {
+      carouselPlan = buildProgressCarouselPlan(today, intelligence);
+    }
+
+    // Score carousel slide descriptions via Groq (same model as quality gate: llama-3.1-8b-instant)
+    if (process.env.GROQ_API_KEY) {
+      console.log('  Scoring carousel slide descriptions...');
+      const slideScores = await scoreCarouselSlides(carouselPlan);
+      if (slideScores?.length) {
+        carouselPlan._slideScores = slideScores;
+        const low = slideScores.filter(s => s.score < 6);
+        console.log('  ┌─ Carousel Slide Scores ─────────────────────────────────┐');
+        for (const s of slideScores) {
+          const tag = s.score >= 7 ? 'PASS' : s.score >= 6 ? 'WEAK' : 'FLAG';
+          console.log(`  │ Slide ${String(s.n).padEnd(2)}  ${tag.padEnd(4)}  ${String(s.score).padEnd(4)}${s.note ? `  ${s.note}` : ''}`);
+        }
+        console.log(`  └─ avg ${(slideScores.reduce((a,s)=>a+s.score,0)/slideScores.length).toFixed(1)}/10${low.length ? ` · ⚠ ${low.length} below threshold` : ' · all good'} ───────────────────────────┘`);
+      } else {
+        console.log('  Carousel slide scoring skipped (Groq unavailable).');
+      }
+    }
+  }
   if (carouselPlan) {
-    console.log(`\n  CAROUSEL DAY — activity images should go into: ${carouselPlan.suggestedFolder}`);
+    const fmtLabel = { 'activity-collection': 'ACTIVITY COLLECTION', facts: 'FACTS', progression: 'PROGRESSION' }[carouselPlan.format];
+    console.log(`\n  CAROUSEL DAY (${fmtLabel}) — images folder: ${carouselPlan.suggestedFolder}`);
+    if (carouselPlan.intelligenceSignal && carouselPlan.intelligenceSignal !== 'doy-rotation') {
+      console.log(`  Signal: ${carouselPlan.intelligenceSignal}${carouselPlan.dynamicFactsInjected ? ` · ${carouselPlan.dynamicFactsInjected} dynamic fact(s) injected` : ''}`);
+    }
   }
 
   // Pre-assign story settings to prevent scene repetition
@@ -1505,7 +2005,7 @@ async function main() {
   console.log(`  Story settings: ${assignedStorySettings.map(s => s.location.split(',')[0]).join(' | ')}`);
 
   // Build prompts
-  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, dynamicPools.hookExamples);
+  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, dynamicPools.hookExamples, auditLessons, compIntel);
   const userPrompt = buildUserPrompt(mix, count, (performanceContext || '') + trendSignals + recentThemesData, assignedThemes, assignedStorySettings);
 
   if (DRY_RUN) {
@@ -1541,11 +2041,36 @@ async function main() {
   console.log(result);
   console.log('='.repeat(80));
 
+  // Post-generation deterministic strip — removes violations LLM emitted despite rules
+  result = stripRuleViolations(result);
+
+  // Pre-check for hard rule violations (deterministic, before LLM scoring)
+  const preChecks = preCheckViolations(result);
+  if (preChecks.size > 0) {
+    for (const [n, v] of preChecks) {
+      const desc = v.map(x => `${x.rule}(${x.penalty})`).join(', ');
+      console.log(`  ⚠ Pre-check Prompt ${n}: ${desc}`);
+    }
+  }
+
   // Quality gate scoring + auto-regeneration loop
   let scoreData = null;
   if (process.env.GROQ_API_KEY) {
     console.log('\nRunning quality gate scoring...');
-    scoreData = await scorePrompts(result);
+    scoreData = await scorePrompts(result, auditLessons);
+
+    // Apply pre-check penalties on top of LLM scores (deterministic overrides)
+    if (preChecks.size > 0 && scoreData?.scores?.length) {
+      for (const [n, v] of preChecks) {
+        const entry = scoreData.scores.find(s => s.n === n);
+        if (entry) {
+          const totalPenalty = v.reduce((sum, x) => sum + x.penalty, 0);
+          entry.score = Math.max(0, parseFloat((entry.score + totalPenalty).toFixed(1)));
+          const ruleNames = v.map(x => x.rule).join(', ');
+          entry.fail = [entry.fail, `rule-violations: ${ruleNames}`].filter(Boolean).join('; ');
+        }
+      }
+    }
 
     if (!scoreData?.scores?.length) {
       console.log('  Quality gate scoring failed or returned no scores — prompts saved unscored.');
@@ -1635,22 +2160,31 @@ async function main() {
 
     let carouselNotice = '';
     if (carouselPlan) {
-      carouselNotice = `\n# CAROUSEL DAY — Drop the 5 activity images into: ${carouselPlan.suggestedFolder}/\n`;
+      const fmtLabels = { 'activity-collection': 'CAROUSEL DAY', facts: 'FACTS CAROUSEL DAY', progression: 'PROGRESSION CAROUSEL DAY' };
+      const label = fmtLabels[carouselPlan.format] || 'CAROUSEL DAY';
+      carouselNotice = `\n# ${label} — Drop images into: ${carouselPlan.suggestedFolder}/\n`;
     }
     const header = `# Image Prompts — ${dateStr}\n# Rotation: ${mix.label}\n# Generated: ${today.toISOString()}${scoreSummary}${carouselNotice}\n\n`;
 
     let footer = '';
     if (carouselPlan) {
-      footer = `\n\n---\n## CAROUSEL DAY — Image Drop Instructions\n\n` +
-        `Today's 5 activity images form a carousel (swipeable album on Instagram + TikTok).\n\n` +
-        `**Create this folder and drop all 5 activity images into it:**\n\n` +
-        `\`\`\`\n${carouselPlan.suggestedFolder}/\n\`\`\`\n\n` +
-        `Name the files so they sort alphabetically in the right order:\n` +
-        `\`\`\`\n` +
-        carouselPlan.slides.map(s => `01-${s.theme.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png  ← slide ${s.slideIndex} (${s.theme})`).join('\n') +
-        `\n\`\`\`\n\n` +
-        `import:raw auto-detects the \`carousel-*\` folder name and builds the carousel queue file. **No sidecar JSONs needed.**\n\n` +
-        `The inspiration slot images (slots 1-5) go into their normal category subfolders as usual.\n`;
+      if (carouselPlan.format === 'facts') {
+        footer = buildFactsCarouselFooter(carouselPlan);
+      } else if (carouselPlan.format === 'progression') {
+        footer = buildProgressCarouselFooter(carouselPlan);
+      } else {
+        // Format 1: activity-collection
+        footer = `\n\n---\n## CAROUSEL DAY — Image Drop Instructions\n\n` +
+          `Today's 5 activity images form a carousel (swipeable album on Instagram + TikTok).\n\n` +
+          `**Create this folder and drop all 5 activity images into it:**\n\n` +
+          `\`\`\`\n${carouselPlan.suggestedFolder}/\n\`\`\`\n\n` +
+          `Name the files so they sort alphabetically in the right order:\n` +
+          `\`\`\`\n` +
+          carouselPlan.slides.map(s => `01-${s.theme.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png  ← slide ${s.slideIndex} (${s.theme})`).join('\n') +
+          `\n\`\`\`\n\n` +
+          `import:raw auto-detects the \`carousel-*\` folder name and builds the carousel queue file. **No sidecar JSONs needed.**\n\n` +
+          `The inspiration slot images (slots 1-5) go into their normal category subfolders as usual.\n`;
+      }
     }
 
     await fs.writeFile(filepath, header + finalResult + footer, 'utf-8');
@@ -1666,7 +2200,8 @@ async function main() {
 
   console.log('\n✅ Copy the prompts above into ChatGPT or Gemini image generation.');
   if (carouselPlan) {
-    console.log(`CAROUSEL DAY: Drop the 5 activity images into ${carouselPlan.suggestedFolder}/`);
+    const fmtLabels = { 'activity-collection': 'CAROUSEL DAY', facts: 'FACTS CAROUSEL DAY', progression: 'PROGRESSION CAROUSEL DAY' };
+    console.log(`${fmtLabels[carouselPlan.format] || 'CAROUSEL DAY'}: Drop images into ${carouselPlan.suggestedFolder}/`);
     console.log('Name files 01-xxx.png, 02-xxx.png etc. for correct slide order.');
   }
   console.log('Save generated images to output/raw/ then run: npm run import:raw\n');

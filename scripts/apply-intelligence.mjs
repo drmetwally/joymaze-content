@@ -595,6 +595,16 @@ async function main() {
   console.log(`\n=== JoyMaze Intelligence Applier ===`);
   console.log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}`);
 
+  // Monday-only gate
+  if (process.argv.includes('--monday-only')) {
+    const day = new Date().getDay();
+    const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][day];
+    if (day !== 1) {
+      console.log(`apply-intelligence: skipped (--monday-only, today is ${dayName}).`);
+      return;
+    }
+  }
+
   // 1. Load intelligence file
   const intelligence = await loadJson(INTELLIGENCE_FILE);
   if (!intelligence || intelligence._meta?.status === 'none') {

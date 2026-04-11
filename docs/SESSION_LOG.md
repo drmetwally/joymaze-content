@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-04-11 — [Agent: Claude] — X suspension recovery + platform reset + daily brief built
+
+**Files changed:** `scripts/generate-brief.mjs` (new), `package.json`, `.env`, memory files, `docs/TASKS.md`
+
+- **X account suspended** (reason: spam + bulk posting + Premium subscription on day 1). Decision: no appeal. Repurposed clean 3-year-old fit-clinic account → `@playjoymaze`. New X Developer app created, API keys rotated in `.env` and GitHub Secrets.
+- **Pinterest:** Old account abandoned. New account created via joymaze.pp@gmail.com. Business account (WY, USA). Instagram linked but auto-sync disabled — pipeline posts natively.
+- **Task Scheduler cleanup:** All 4 local posting tasks disabled except `JoyMaze Daily` (generation only). GitHub Actions is sole posting owner.
+- **ToS confirmed:** Automation via official APIs is explicitly allowed on all platforms. Violation was behavioral (bulk + spam patterns), not architectural.
+- **Warmup protocol:** 2-week manual posting period for new accounts before re-enabling GitHub Actions.
+- **`generate-brief.mjs` built:** `npm run brief` → `output/daily-brief-YYYY-MM-DD.html`. Reads all queue JSONs for today, renders each post as a click-to-copy card (caption, hashtags, media thumbnail, platform-per-section). Handles X text posts and media posts. Falls back to most recent date if today has no files.
+- **Next:** Facebook Page → link Instagram → Meta Developer App → TikTok account → TikTok API → Pinterest OAuth refresh → full API credential update
+
+---
+
 ## 2026-04-09 — [Agent: Claude] — output/raw/ folder structure pruned + rebuilt
 
 **Files changed:** `output/raw/` (filesystem only)
@@ -919,3 +933,100 @@
 - Format 3: Age Progression carousel (same activity at Easy/Medium/Hard across age groups)
 
 Both require changes to generate-prompts.mjs (new plan types) and import-raw.mjs (new folder prefix detection, e.g. `facts-carousel-*`). Logged in project_unimplemented_upgrades.md.
+
+---
+
+## 2026-04-11 — [Claude] — Carousel Formats 2 & 3 implemented
+
+**Files changed:** `scripts/generate-prompts.mjs`, `scripts/import-raw.mjs`, `docs/TASKS.md`
+
+**What was built:**
+- **Format 2 (Educational Facts):** Triggers `doy%9===3` (next: 2026-04-12). Picks one activity from a 5-pool rotation (mazes/coloring/word-search/dot-to-dot/sudoku). Plans 5 slides: hook title card + 4 brain-benefit fact cards. Folder prefix: `facts-carousel-{activity}-{date}/`. Instructions appended to prompts .md file.
+- **Format 3 (Activity Progression):** Triggers `doy%9===6` (next: 2026-04-15). Picks one activity from a 5-pool rotation. Plans 3 slides showing the satisfying completion journey: blank → 50% done → fully complete. Folder prefix: `progress-carousel-{activity}-{date}/`. Ahmed generates all 3 in same Gemini chat for visual consistency.
+
+**Rotation schedule (9-day cycle):**
+- `doy%9===0` → Format 1: Activity Collection
+- `doy%9===3` → Format 2: Educational Facts
+- `doy%9===6` → Format 3: Progression
+
+**import-raw.mjs:** Extended folder detection to accept `carousel-*`, `facts-carousel-*`, and `progress-carousel-*` prefixes — all use the same zero-friction drop workflow.
+
+---
+
+## 2026-04-11 — [Claude] — Carousel intelligence + analytics self-learning
+
+**Files changed:** `scripts/generate-prompts.mjs`
+
+**What was added:**
+
+1. **`loadActivityRanking()`** — scans queue + archive for Pinterest analytics, ranks activity types (mazes/coloring/word-search/dot-to-dot/sudoku) by save rate. Returns sorted key array. Falls back to empty array (doy rotation) if < 5 posts have analytics data.
+
+2. **`scoreCarouselSlides(plan)`** — Groq `llama-3.1-8b-instant` scorer for carousel slide descriptions. Scores each slide 1–10 for visual specificity and distinctiveness. Logs a quality gate table to console (PASS/WEAK/FLAG). Same gating pattern as the existing 10-prompt quality gate.
+
+3. **Intelligence wiring for Formats 2 & 3:**
+   - Activity selection: analytics ranking → doy rotation fallback (self-corrects once posts accumulate impressions)
+   - Format 2 (Facts): dynamic `did-you-know` / `surprising-stat` entries from `pattern-interrupt-dynamic.json` replace last 1–2 hardcoded facts when a keyword match to the chosen activity is found
+   - Format 2 (Facts): top hook from `hooks-library.json` (already loaded by `loadDynamicPools`) informs the hook title slide style
+   - Format 3 (Progression): `boost_themes` from `trends-this-week.json` trigger trend-aware activity selection before falling back to analytics ranking
+
+4. **`intelligenceSignal` field** added to plan JSON (`analytics-ranked` / `trend-boost` / `doy-rotation`) — logged to console and stored in the plan file for traceability.
+
+**Self-learning progression:**
+- Week 1-4: `doy-rotation` (no data yet)
+- Week 4+: `analytics-ranked` (save-rate winner gets more carousel exposure)
+- Any time: `trend-boost` if a trending topic overlaps an activity type
+
+---
+
+## 2026-04-11 — [Claude] — Content quality system overhaul + competitor intelligence
+
+**Session type:** Manual audit → system hardening
+
+**What was audited:**
+- `output/prompts/prompts-2026-04-11.md` — 10 image prompts
+- `output/queue/x-text-2026-04-11.json` — 4 X text posts
+
+**Critical failures found and fixed:**
+1. Prompt 1 (FACT-CARD): fabricated 25% stat + text-in-image instruction → rewritten
+2. Prompt 10 (Coloring): Christmas/Halloween theme in April → replaced with Easter/spring
+3. X Post 2 (puzzle): clock riddle had 0.3 relevancy — system rule gap exposed
+
+**Universal rule added (Fun OR Value):**
+- Every post must deliver: FUN (makes them participate/feel/laugh) or VALUE (something to use/act on)
+- Hardcoded into generate-prompts.mjs RULES + slot descriptions + scorePrompts()
+- Hardcoded into generate-x-posts.mjs Universal Rules + type rules + scorePost()
+
+**Scroll Stopper rule hardcoded** — same locations, mandatory on every prompt
+
+**Audit learning system built:**
+- `config/audit-learnings.json` — 5 lessons, machine-readable, auto-injected at generation + scoring
+- Future audits: append an entry → next run picks it up automatically. Zero code changes needed.
+
+**Competitor intelligence system built:**
+- `intelligence-refresh.mjs --competitor-only` → `config/competitor-intelligence.json`
+- 6 targeted Gemini web searches → structured into formats/hooks/themes/gaps/scroll-stoppers
+- `npm run intelligence:competitor` | `npm run intelligence:competitor:dry`
+- Injected into generate-prompts.mjs system prompt as COMPETITOR INTELLIGENCE block
+- First live run: 2026-04-11. Top finding: "actual activity as visual hero" + "analog meets AI aesthetic"
+
+**PATTERN_INTERRUPT_POOL cleaned:** 5 fabricated stats softened to observational language
+
+**Files changed:** `scripts/generate-prompts.mjs`, `scripts/generate-x-posts.mjs`, `scripts/intelligence-refresh.mjs`, `config/audit-learnings.json` (new), `config/competitor-intelligence.json` (new), `package.json`, `output/prompts/prompts-2026-04-11.md`
+
+**Next:** Build `scripts/health-check.mjs` — system index + connectivity validator
+
+---
+
+## Session 2026-04-11 (continued — context resumed)
+
+**npm run daily audit:**
+- Competitor intelligence auto-ran, propagated 3 hooks + 3 themes + 1 interrupt to dynamic pools
+- 9/10 prompts PASS at 9.5 | Prompt 10 correctly FLAG at 6.5 (wrong-season: "Christmas trees" in April)
+- stripRuleViolations() confirmed working: "boost fine motor skills by 30%" → stripped from saved file
+- preCheckViolations() correctly fires only on Prompt 10 wrong-season; fabricated stat stripped before pre-check runs (correct flow)
+
+**health-check.mjs built:**
+- `npm run health-check` → terminal report across 5 sections: Environment, Platform Credentials, Config Files, Dynamic Pools, Pipeline Links, Output Dirs
+- 41 ok · 3 warnings (all expected: Pinterest sandbox, X cooldown tomorrow, Phase 2 analytics not yet active)
+- Checks: env vars per script, config file existence, pool entry counts, pool/intelligence freshness (days), GitHub Actions workflows, pipeline chain connectivity
+- X cooldown detected from output/posting-cooldown.json (any active cooldown → warn, not just "suspended")

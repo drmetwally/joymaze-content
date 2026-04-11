@@ -29,13 +29,27 @@ No new pipelines until this threshold is hit consistently for 30 days.
 
 ---
 
-## NEXT SESSION — FIRST THING (2026-04-11 morning)
+## ACCOUNT RESET — X SUSPENSION (2026-04-11)
 
-- [ ] **Carousel Format 2 — Educational Facts carousel:** "5 brain benefits of mazes" — each slide = one fact/stat/did-you-know image. Needs: `generate-prompts.mjs` to plan a "facts-carousel day" (picks 5 pattern-interrupt/fact-card slots with a shared hook theme), `import-raw.mjs` to detect `facts-carousel-*` folder prefix, group + slideIndex assigned automatically same as activity carousel.
+X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
-- [ ] **Carousel Format 3 — Activity Progression carousel:** Same activity shown at 3 completion stages: blank (untouched) → half-complete (in progress) → fully complete. Shows the satisfying journey. Needs: `generate-prompts.mjs` to plan a "progress-carousel day" (generates 3 variants of the same activity: blank/fresh, 50% done, completed), `import-raw.mjs` to detect `progress-carousel-*` folder prefix. Ahmed generates 3 variants in Gemini, names them 01-blank.png / 02-half.png / 03-done.png.
+- [ ] **Create new X account** — use joymaze.pp@gmail.com, sign up on mobile data (not home WiFi)
+- [ ] **Apply for X Developer access** on new account — needed before automation can resume
+- [ ] **2-week manual warmup** — post 2-3 times/day manually using warmup pipeline output; no automation
+- [ ] **Create new Pinterest account** — use joymaze.pp@gmail.com
+- [ ] **Disable `x-posts.yml` GitHub Actions workflow** — comment out or set `if: false` until new credentials are ready
+- [ ] **Update GitHub Secrets** — replace X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET with new account credentials after developer access approved
+- [ ] **Build warmup pipeline** — read-only display layer over `output/queue/`; shows caption + hook + CTA + image URL per post, copy-paste ready; includes warmup timer flag (same pattern as posting-cooldown.json); activates automation when timer expires
 
-Both formats should follow the same zero-friction pattern as Format 1 (Activity Collection): prompt generator writes the folder name + drop instructions into the prompts .md file. Ahmed creates folder, drops images with 01-/02-/03- prefixes. `import:raw` does the rest.
+> **ToS note (confirmed):** Automation via official APIs is explicitly allowed on all platforms. Our pipeline is within ToS. The violation was behavioral (bulk + spam patterns). Do not let this incident make us over-correct away from automation — just enforce warmup period + rate limits on new accounts.
+
+---
+
+## NEXT SESSION — FIRST THING (2026-04-12+)
+
+- [x] **Carousel Format 2 — Educational Facts carousel** — DONE (2026-04-11). `facts-carousel-*` folder prefix auto-detected by import-raw.mjs. generate-prompts.mjs triggers on doy%9===3 (next: 2026-04-12). 5 slides: hook + 4 facts. 5 activity pools (mazes, coloring, word-search, dot-to-dot, sudoku) rotate by doy.
+
+- [x] **Carousel Format 3 — Activity Progression carousel** — DONE (2026-04-11). `progress-carousel-*` folder prefix auto-detected by import-raw.mjs. generate-prompts.mjs triggers on doy%9===6 (next: 2026-04-15). 3 slides: 01-blank.png → 02-half.png → 03-done.png. Ahmed generates all 3 in same Gemini chat for visual consistency.
 
 ---
 

@@ -8,34 +8,6 @@
   },
   "interrupts": [
     {
-      "subtype": "did-you-know",
-      "topic": "Kids who do mazes 3x/week show 40% improvement in spatial navigation tasks",
-      "visual": "Brain map with two highlighted regions connected by a glowing line",
-      "added_week": "2026-04-07",
-      "source": "trend_analysis",
-      "confidence": 0.79,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 1,
-      "brand_safe": true,
-      "rationale": "Not in current pool"
-    },
-    {
-      "subtype": "surprising-stat",
-      "topic": "Did you know? Solving puzzles regularly can boost a child's problem-solving skills by up to 30% in just a few weeks.",
-      "visual": "A child deeply focused on a puzzle, with subtle graphical elements suggesting cognitive growth or 'lightbulb' moments.",
-      "added_week": "2026-04-10",
-      "source": "intelligence_refresh",
-      "confidence": 0.85,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 0,
-      "brand_safe": true,
-      "rationale": "Provides a specific, surprising statistic that validates the educational value of puzzles, addressing parental desire for learning outcomes."
-    },
-    {
       "subtype": "myth-bust",
       "topic": "Myth: All screen time is equal. Fact: Interactive learning apps engage different brain regions than passive viewing, fostering active learning.",
       "visual": "A split image: one side showing a child passively watching a screen, the other showing a child actively interacting with a tablet, with brain activity highlighted metaphorically.",
@@ -62,6 +34,62 @@
       "decay_weeks": 0,
       "brand_safe": true,
       "rationale": "Highlights a lesser-known but crucial benefit of JoyMaze activities, connecting physical engagement to academic success, appealing to parents' desire for their child's development."
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "interactive digital printables beyond static PDFs",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "printables for specific learning disabilities/neurodivergence",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "day in the life or how we use this lifestyle content for printables",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "behind-the-scenes of printable creation",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
     }
   ]
 }

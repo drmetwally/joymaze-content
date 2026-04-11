@@ -233,7 +233,22 @@ async function loadRecentFingerprints(daysBack = DEDUP_DAYS) {
     const data = await readJsonIfExists(path.join(OUTPUT_DIR, `x-text-${formatDateUTC(d)}.json`));
     if (Array.isArray(data)) {
       data.forEach(p => {
+        // Standard opening-line fingerprint
         if (p.tweet1) seen.add(p.tweet1.toLowerCase().slice(0, 60));
+        // Puzzle-specific: fingerprint by ANSWER so rephrased versions of same riddle are caught
+        if (p.type === 'puzzle' && p.answer_tweet) {
+          // Extract the answer word(s): "The answer is: a clock!" → "clock"
+          const ansMatch = p.answer_tweet.match(/(?:answer is:?\s*(?:a\s+|an\s+)?)([\w\s]{2,25}?)(?:[!.,\s]|$)/i);
+          if (ansMatch) seen.add(`puzzle-answer:${ansMatch[1].trim().toLowerCase()}`);
+          // Also fingerprint key nouns from tweet1 for semantic dedup
+          const nouns = (p.tweet1 || '').toLowerCase()
+            .replace(/[^a-z\s]/g, '')
+            .split(/\s+/)
+            .filter(w => w.length > 3 && !['have','what','with','that','this','from','they','when','your','does','their'].includes(w))
+            .sort()
+            .join(',');
+          if (nouns) seen.add(`puzzle-nouns:${nouns}`);
+        }
       });
     }
   }
@@ -253,9 +268,21 @@ function buildUserPrompt({ trendNotes, hookNotes, themeNotes, ctaNotes, perfNote
     `${i + 1}. ${type} at ${scheduledHours(POST_TYPES.length)[i]}:00 UTC`
   ).join('\n');
 
-  const dedupBlock = recentFingerprints?.size > 0
-    ? `\nDO NOT reuse or closely echo these recent opening lines:\n${[...recentFingerprints].slice(0, 20).map(f => `- "${f}..."`).join('\n')}`
-    : '';
+  const recentLines = recentFingerprints
+    ? [...recentFingerprints].filter(f => !f.startsWith('puzzle-answer:') && !f.startsWith('puzzle-nouns:'))
+    : [];
+  const recentPuzzleAnswers = recentFingerprints
+    ? [...recentFingerprints].filter(f => f.startsWith('puzzle-answer:')).map(f => f.replace('puzzle-answer:', ''))
+    : [];
+
+  const dedupBlock = [
+    recentLines.length > 0
+      ? `DO NOT reuse or closely echo these recent opening lines:\n${recentLines.slice(0, 20).map(f => `- "${f}..."`).join('\n')}`
+      : '',
+    recentPuzzleAnswers.length > 0
+      ? `PUZZLE ANSWERS already used recently (do NOT use riddles with these answers):\n${recentPuzzleAnswers.map(a => `- ${a}`).join('\n')}`
+      : '',
+  ].filter(Boolean).join('\n\n');
 
   const perfBlock  = perfNotes  ? `\n${perfNotes}\n`  : '';
   const trendBlock = trendNotes ? `\nWeekly trend notes:\n${trendNotes}\n` : '';
@@ -279,6 +306,8 @@ ${slotLines}
 - Every individual tweet: 280 characters max
 - Each post must feel DISTINCTLY different in hook type, rhythm, and angle
 - Do not mention scheduledHour in the output
+- FUN OR VALUE (NON-NEGOTIABLE): Every post must deliver one or both. FUN = makes the reader laugh, feel seen, or want to participate (they do something: guess, reply, share). VALUE = teaches something they can act on, or gives them a felt truth they needed to hear. Before writing the reply, ask: "what did the reader receive from this complete post?" If the answer is "nothing" — rewrite.
+- SCROLL STOPPER (NON-NEGOTIABLE): tweet1 must create a reason to stop before the first line ends. The reader decides in one second. One sharp detail, one surprising turn, one question that hooks — not a warm-up sentence.
 ${dedupBlock}
 
 ═══ TYPE-BY-TYPE RULES ═══
@@ -296,7 +325,8 @@ STORY-HOOK:
 PUZZLE:
 - tweet1 is a SELF-CONTAINED TEXT RIDDLE — completely standalone
 - Types that work: "I have X but no Y" riddles, "what am I?" riddles, lateral thinking puzzles, play-on-words challenges
-- Themes: nature, animals, seasons, things kids interact with (pencils, books, clocks, shadows, keys)
+- Themes: nature, animals, seasons, things kids interact with daily (pencils, books, clocks, shadows, keys, doors, mirrors, rain). Stay in the world of childhood and parenting.
+- DIFFICULTY: must be solvable in under 10 seconds for most parents — the fun IS the "aha" moment, not the struggle. If it requires trivia knowledge, obscure reasoning, or wordplay most adults would miss, it fails. Test it: can a tired parent solve this on a school run? If no — simpler.
 - NEVER reference a picture, image, or visual
 - replies: exactly 1 item — a HINT or engagement prompt. Do NOT include the answer here.
   Good examples: "Think carefully... drop your guess below 👇 — answer drops in a few hours"
@@ -307,7 +337,7 @@ PUZZLE:
   Example: "The answer is: a clock ⏰ Hands but no arms — gets everyone! Did you get it?"
 - The JSON shape for puzzle posts MUST include answer_tweet:
   {"type":"puzzle","tweet1":"...","replies":["hint or engagement line"],"answer_tweet":"The answer is: X! ..."}
-- Keep the riddle thematic, age-appropriate, and genuinely fun to solve aloud
+- Fun test: the reader's kid should be able to try this at the dinner table tonight. If it doesn't pass that test, rewrite it.
 
 INSIGHT:
 - tweet1 shares one specific, surprising parenting or child development observation
@@ -321,7 +351,11 @@ IDENTITY:
 - tweet1 speaks to who the parent is in a SPECIFIC MOMENT — not a trait list
 - NEVER open with "You're the kind of parent who" — find a scene, a feeling, a moment
 - Think: the parent in the car after drop-off. The parent who picked up the crayons. The parent at 10pm who noticed something.
-- replies: exactly 1 item — a deeper story beat, an emotional anchor, or a felt truth
+- replies: exactly 1 item — must EARN the setup with a SPECIFIC FELT TRUTH or a surprising story beat. Not a motivational statement. Not a reflection on what the moment meant.
+  BAD reply: "you're still teaching them, still guiding them" — poster language, zero delivery
+  BAD reply: "that's what good parenting looks like" — tells the reader what to feel
+  GOOD reply: a specific detail, an unexpected turn, or a truth so precise it stings. "She stopped asking you to watch. You stopped noticing she'd stopped." "The permission slip was already in his bag."
+- Value test: after reading tweet1 + reply, the parent received something — a recognition, a laugh, a truth they needed. If they received nothing, rewrite the reply.
 - If using a CTA, use "save this for when you need it" AT MOST ONCE across the entire daily batch — only if the post genuinely earns it
 ${perfBlock}${trendBlock}${themeBlock}${hookBlock}
 ═══ QUALITY BAR ═══
@@ -332,6 +366,12 @@ ${perfBlock}${trendBlock}${themeBlock}${hookBlock}
 - No weak filler: very, really, great, amazing, truly, awesome
 - No emojis except the 👇 in the puzzle reply closing
 - No repetition of hook structure, rhythm, or theme across the 4 posts
+- FUN/VALUE DELIVERY TEST — run this before finalising each post:
+  Story-hook: does the final reply pay off the setup with a specific detail or turn — not a summary of what it meant?
+  Puzzle: can a tired parent solve this in under 10 seconds? Can their kid try it at dinner?
+  Insight: does the reply give ONE actionable tip — not vague advice?
+  Identity: does the reply land on a specific felt truth — not a motivational poster?
+  If any post fails its test — rewrite the reply, not the tweet.
 `;
 }
 
@@ -519,6 +559,29 @@ function scorePost(post, batchIdentityCTACount = 0) {
     scrollStop = 0.10;
     engagement = 0.10;
     reasons.push('puzzle references non-existent image');
+  }
+
+  // ── fun/value delivery checks (per type) ──
+  if (post.type === 'identity') {
+    const reply = (post.replies || [])[0] || '';
+    if (/still teaching them|still guiding them|good parent(ing)?|right thing to do|what good parenting|you should be proud|that'?s what parenting|you'?re doing (great|well|the right)/i.test(reply)) {
+      engagement = Math.min(engagement, 0.40);
+      reasons.push('identity reply: motivational poster language — no specific payoff delivered');
+    }
+  }
+  if (post.type === 'puzzle') {
+    // Long tweet1 = likely too complex to solve quickly
+    if (t1.split(/\s+/).length > 22) {
+      engagement = Math.min(engagement, 0.55);
+      reasons.push('puzzle: tweet1 too long — likely too complex for quick solve (fun test fail)');
+    }
+  }
+  if (post.type === 'story-hook') {
+    const finalReply = (post.replies || []).slice(-1)[0] || '';
+    if (/i realized|it reminded me|that'?s when i knew|i understood|and i (finally )?saw|it made me (realize|think|remember)|and that'?s (when|how|why)/i.test(finalReply)) {
+      engagement = Math.min(engagement, 0.45);
+      reasons.push('story-hook: final reply explains meaning — show the moment, don\'t summarise it');
+    }
   }
 
   // ── clarity ──

@@ -66,6 +66,102 @@
       "decay_weeks": 0,
       "brand_safe": true,
       "rationale": "This theme encourages curiosity, problem-solving, and creativity, distinct from 'Construction' or 'Vehicles', aligning with the learning aspect of the app."
+    },
+    {
+      "name": "seasonal holiday printables (current month/season)",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "screen-free alternatives to tablet time",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "skill-building & educational focus",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "nostalgia (throwback kid)",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "no phone summer",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "skill-building and educational play",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "family connection and traditions",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
+    },
+    {
+      "name": "outdoor games and arts & crafts",
+      "added_week": "2026-04-11",
+      "source": "competitor_analysis",
+      "confidence": 0.75,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Viral theme from competitor intelligence"
     }
   ]
 }

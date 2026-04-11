@@ -25,8 +25,14 @@ const ROOT = path.resolve(__dirname, '..');
 
 const DRY_RUN          = process.argv.includes('--dry-run');
 const SKIP_COMPETITOR  = process.argv.includes('--skip-competitor');
+const COMPETITOR_ONLY  = process.argv.includes('--competitor-only');
+const MONDAY_ONLY_INTEL = process.argv.includes('--monday-only');
 
-const INTELLIGENCE_FILE   = path.join(ROOT, 'config', 'content-intelligence.json');
+const INTELLIGENCE_FILE       = path.join(ROOT, 'config', 'content-intelligence.json');
+const COMPETITOR_INTEL_JSON   = path.join(ROOT, 'config', 'competitor-intelligence.json');
+const HOOKS_FILE              = path.join(ROOT, 'config', 'hooks-library.json');
+const THEMES_DYNAMIC_FILE     = path.join(ROOT, 'config', 'theme-pool-dynamic.json');
+const INTERRUPTS_DYNAMIC_FILE = path.join(ROOT, 'config', 'pattern-interrupt-dynamic.json');
 const TRENDS_FILE         = path.join(ROOT, 'config', 'trends-this-week.json');
 const PERF_WEIGHTS_FILE   = path.join(ROOT, 'config', 'performance-weights.json');
 const ANALYTICS_FILE      = path.join(ROOT, 'output', 'analytics.jsonl');
@@ -356,6 +362,248 @@ Return as plain text in sections. Be concise — 3-5 bullet points per section.`
     log(`  Competitor search failed: ${err.message} — using static baseline only`);
     return null;
   }
+}
+
+// ── Step 2b: Competitor top-post analysis ─────────────────────────────────────
+// Dedicated pass: targeted queries focused on WHAT IS PERFORMING, not generic trends.
+// Writes config/competitor-intelligence.json — loaded by generate-prompts.mjs at runtime.
+
+async function runCompetitorTopPostAnalysis() {
+  const apiKey = process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY;
+  if (!apiKey) { log('  Skipping: no VERTEX_API_KEY'); return null; }
+
+  const month = new Date().toLocaleDateString('en-US', { month: 'long' });
+  const year  = new Date().getFullYear();
+
+  const queries = [
+    `Pinterest most saved kids printable activities ${month} ${year} top performing pins`,
+    `viral kids screen-free printable activity social media hooks captions ${year}`,
+    `kids coloring page maze "word search" printable top Instagram TikTok posts ${year}`,
+    `site:${COMPETITOR_SITES[0]} OR site:${COMPETITOR_SITES[1]} most shared kids activity ${year}`,
+    `kids printable activity caption formula hook "can your kid" OR "save this" viral ${year}`,
+    `best performing kids activity content Pinterest Instagram format visual style ${year}`,
+  ];
+
+  const systemInstruction = `You are a social media competitive intelligence analyst for the kids printable activity niche (Pinterest, Instagram, TikTok). Your goal: identify exactly what content formats, hook structures, and themes drive the most saves and engagement. Be specific — name patterns, quote structures, describe visuals. Skip generic advice.`;
+
+  const userPrompt = `Search the web for these queries to find what's performing best RIGHT NOW in kids printable/activity social media content:
+
+${queries.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+From all results, extract SPECIFIC, EVIDENCE-BASED intelligence in these 6 categories:
+
+1. TOP FORMATS — which visual layouts get the most saves? (flat-lay, lifestyle scene, actual puzzle as hero, bold infographic, etc.) Name what you observe.
+2. WINNING HOOKS — exact hook structures appearing in top posts. Quote real patterns ("Can your kid...", "Save this for...", specific opening lines).
+3. VIRAL THEMES — specific topics/activities generating engagement right now. Be season and trend specific.
+4. CAPTION PATTERNS — how do top captions open, what CTAs appear, approximate length?
+5. CONTENT GAPS — topics or formats clearly missing from what competitors are doing.
+6. SCROLL STOPPER FORMULAS — the specific visual or copy element that stops parents from scrolling in this niche.
+
+3–5 bullet points per category. Only include what you found evidence for — skip speculation.`;
+
+  try {
+    log(`  Running ${queries.length} targeted competitor top-post queries via Gemini...`);
+    const raw = await callGemini(systemInstruction, userPrompt, true, 0.2);
+    log(`  Raw competitor top-post analysis: ${raw.length} chars`);
+    return raw;
+  } catch (err) {
+    log(`  Competitor top-post analysis failed: ${err.message}`);
+    return null;
+  }
+}
+
+async function structureCompetitorIntelligence(rawAnalysis) {
+  const groq = groqClient();
+  if (!groq) { log('  No Groq client — skipping structure pass'); return null; }
+
+  const prompt = `Extract SPECIFIC, VERBATIM patterns from this competitive intelligence report. Do NOT use category labels — use actual quotes, specific visual descriptions, and concrete examples a content creator can act on immediately.
+
+RAW ANALYSIS:
+${rawAnalysis.slice(0, 5000)}
+
+Return ONLY this JSON. Each entry must be a specific, usable instruction or verbatim quote — NOT a category name. Max 5 per array. Include only what has evidence in the report.
+
+{
+  "top_formats": [
+    "vertical 2:3 pins with benefit-driven text overlay (1000x1500px) — highest Pinterest save rate",
+    "actual puzzle/activity sheet as visual hero — activity fills the frame, not lifestyle scene"
+  ],
+  "winning_hooks": [
+    "Struggling with [pain point]? Save this.",
+    "The surprising truth behind [topic]"
+  ],
+  "viral_themes": [
+    "seasonal holiday printables (current month/season)",
+    "screen-free alternatives to tablet time"
+  ],
+  "caption_patterns": [
+    "open like a parent talking to a parent — conversational, not instructional",
+    "end with Save this for later or Tag a parent who needs this"
+  ],
+  "content_gaps": [
+    "specific gap description with what's missing"
+  ],
+  "scroll_stopper_formulas": [
+    "analog meets AI aesthetic — hand-drawn elements + clean digital layouts",
+    "activity 30-60% complete shown front and center — tension of the unfinished state"
+  ]
+}
+
+Return ONLY valid JSON. No markdown fences. No explanation.`;
+
+  try {
+    const groqInst = groqClient();
+    const resp = await groqInst.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.1,
+      max_tokens: 800,
+    });
+    const raw = resp.choices[0].message.content.trim()
+      .replace(/^```json?\s*/i, '').replace(/```\s*$/, '').trim();
+    return JSON.parse(raw);
+  } catch (err) {
+    log(`  Structure pass failed: ${err.message}`);
+    return null;
+  }
+}
+
+// ── Step 2c: Propagate competitor findings into dynamic pools ─────────────────
+// Winning hooks → hooks-library.json
+// Viral themes  → theme-pool-dynamic.json
+// Content gaps  → pattern-interrupt-dynamic.json (as edutainment opportunities)
+
+function inferHookType(text) {
+  const t = text.toLowerCase();
+  if (/struggling|having trouble|problem.*solve|solution/i.test(t))   return 'problem_solution';
+  if (/surprising|truth|crazy|actually|secret|didn.t know/i.test(t)) return 'curiosity_gap';
+  if (/save this|you.ll need this/i.test(t))                         return 'save_hook';
+  if (/happened|moment|when.*kid|story/i.test(t))                    return 'story_hook';
+  if (/does this|ever ask|sound like you/i.test(t))                  return 'identity_hook';
+  if (/\?/.test(t))                                                  return 'engagement_question';
+  return 'insight';
+}
+
+function isRelevantToNiche(text) {
+  // Reject entries that are clearly off-brand (sports, food, etc.) or contain banned terms
+  const offBrand = /coach|sports|recipe|makeup|fashion|workout|fitness|diet|dating/i;
+  if (offBrand.test(text)) return false;
+  // Must relate to kids, parents, activities, or be generic enough to adapt
+  const relevant = /kid|child|parent|activ|print|maze|color|puzzle|screen|learn|craft|draw|focus|quiet/i;
+  return relevant.test(text) || text.length < 60; // short generic hooks can be adapted
+}
+
+function normalizeText(s) {
+  return s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function isSimilarEntry(a, b, threshold = 0.75) {
+  const na = normalizeText(a), nb = normalizeText(b);
+  if (na === nb) return true;
+  const setA = new Set(na.split(' ')), setB = new Set(nb.split(' '));
+  const intersection = [...setA].filter(w => setB.has(w)).length;
+  const union = new Set([...setA, ...setB]).size;
+  return union > 0 && (intersection / union) >= threshold;
+}
+
+async function applyCompetitorFindings(structured, date) {
+  if (!structured) return;
+  const today = date || new Date().toISOString().slice(0, 10);
+  const weekOf = today;
+  let hooksAdded = 0, themesAdded = 0, interruptsAdded = 0;
+
+  // ── 1. Winning hooks → hooks-library.json ──
+  try {
+    const lib = JSON.parse(await fs.readFile(HOOKS_FILE, 'utf-8'));
+    const existingTexts = (lib.hooks || []).map(h => h.text);
+    const toAdd = (structured.winning_hooks || []).filter(h =>
+      isRelevantToNiche(h) &&
+      !BRAND_BLOCKLIST.some(b => h.toLowerCase().includes(b)) &&
+      !existingTexts.some(e => isSimilarEntry(h, e))
+    );
+    for (const hookText of toAdd) {
+      const hookType = inferHookType(hookText);
+      const id = `hook_comp_${today.replace(/-/g,'')}_${hooksAdded.toString().padStart(3,'0')}`;
+      lib.hooks.push({
+        id, hook_type: hookType, text: hookText,
+        performance_score: null, save_rate_pct: null,
+        source: 'competitor_analysis', added_week: weekOf,
+        times_used: 0, decay_weeks: 0, brand_safe: true, archetype_fit: [],
+      });
+      if (!lib.hook_type_index) lib.hook_type_index = {};
+      if (!lib.hook_type_index[hookType]) lib.hook_type_index[hookType] = [];
+      lib.hook_type_index[hookType].push(id);
+      hooksAdded++;
+    }
+    if (hooksAdded > 0 && !DRY_RUN) {
+      await fs.writeFile(HOOKS_FILE, JSON.stringify(lib, null, 2) + '\n', 'utf-8');
+    }
+    log(`  Hooks: +${hooksAdded} competitor hooks added (${toAdd.length} passed brand filter)`);
+  } catch (err) { log(`  Hooks apply failed: ${err.message}`); }
+
+  // ── 2. Viral themes → theme-pool-dynamic.json ──
+  try {
+    const pool = JSON.parse(await fs.readFile(THEMES_DYNAMIC_FILE, 'utf-8'));
+    const existingNames = (pool.themes || []).map(t => t.name);
+    const toAdd = (structured.viral_themes || []).filter(t =>
+      isRelevantToNiche(t) &&
+      !BRAND_BLOCKLIST.some(b => t.toLowerCase().includes(b)) &&
+      !existingNames.some(e => isSimilarEntry(t, e))
+    );
+    for (const themeName of toAdd) {
+      pool.themes.push({
+        name: themeName, added_week: weekOf, source: 'competitor_analysis',
+        confidence: 0.75, performance_score: null,
+        times_used: 0, last_used: null, decay_weeks: 0, brand_safe: true,
+        rationale: 'Viral theme from competitor intelligence',
+      });
+      themesAdded++;
+    }
+    if (themesAdded > 0 && !DRY_RUN) {
+      await fs.writeFile(THEMES_DYNAMIC_FILE, JSON.stringify(pool, null, 2) + '\n', 'utf-8');
+    }
+    log(`  Themes: +${themesAdded} competitor themes added`);
+  } catch (err) { log(`  Themes apply failed: ${err.message}`); }
+
+  // ── 3. Content gaps → pattern-interrupt-dynamic.json ──
+  try {
+    const pool = JSON.parse(await fs.readFile(INTERRUPTS_DYNAMIC_FILE, 'utf-8'));
+    // Also clean fabricated stats from existing entries
+    const before = pool.interrupts.length;
+    pool.interrupts = pool.interrupts.filter(i => {
+      const hasFabStat = /\d+%|\d+x improvement|\d+ times more|\d+ months/i.test(i.topic);
+      if (hasFabStat) { log(`  Cleaned fabricated stat from interrupts: "${i.topic.slice(0,60)}"`); }
+      return !hasFabStat;
+    });
+    const cleaned = before - pool.interrupts.length;
+    if (cleaned > 0) log(`  Interrupt pool: removed ${cleaned} fabricated stat entries`);
+
+    const existingTopics = pool.interrupts.map(i => normalizeText(i.topic));
+    const gaps = (structured.content_gaps || []).filter(g =>
+      g.length > 10 &&
+      isRelevantToNiche(g) &&
+      !BRAND_BLOCKLIST.some(b => g.toLowerCase().includes(b)) &&
+      !existingTopics.some(e => isSimilarEntry(g, e))
+    );
+    for (const gap of gaps) {
+      pool.interrupts.push({
+        subtype: 'edutainment',
+        topic: gap,
+        visual: 'Bold educational layout showing the contrast between what competitors offer and what parents actually need',
+        added_week: weekOf, source: 'competitor_analysis',
+        confidence: 0.70, performance_score: null,
+        times_used: 0, last_used: null, decay_weeks: 0, brand_safe: true,
+        rationale: 'Content gap from competitor analysis',
+      });
+      interruptsAdded++;
+    }
+    if ((interruptsAdded > 0 || cleaned > 0) && !DRY_RUN) {
+      await fs.writeFile(INTERRUPTS_DYNAMIC_FILE, JSON.stringify(pool, null, 2) + '\n', 'utf-8');
+    }
+    log(`  Interrupts: +${interruptsAdded} gap opportunities added`);
+  } catch (err) { log(`  Interrupts apply failed: ${err.message}`); }
+
+  if (DRY_RUN) log('  [DRY RUN] Pool files not written');
 }
 
 // ── Step 3: Synthesize intelligence via Gemini ────────────────────────────────
@@ -731,6 +979,53 @@ async function main() {
   log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}`);
   log(`Date: ${new Date().toISOString().slice(0, 10)}\n`);
 
+  // Monday-only gate
+  if (MONDAY_ONLY_INTEL && !COMPETITOR_ONLY) {
+    const day = new Date().getDay(); // 0=Sun, 1=Mon
+    const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][day];
+    if (day !== 1) {
+      log(`Intelligence refresh skipped (--monday-only, today is ${dayName}).`);
+      return;
+    }
+  }
+
+  // ── Competitor-only mode: skip full intelligence refresh ──
+  if (COMPETITOR_ONLY) {
+    log('Mode: COMPETITOR ONLY (skipping full intelligence refresh)\n');
+    log('--- Competitor top-post analysis ---');
+    const raw = await runCompetitorTopPostAnalysis();
+    if (!raw) { log('No results — check VERTEX_API_KEY'); return; }
+
+    log('\n--- Structuring findings ---');
+    const structured = await structureCompetitorIntelligence(raw);
+    if (!structured) { log('Structure pass failed — raw analysis not saved'); return; }
+
+    const output = {
+      generated_at: new Date().toISOString(),
+      date: new Date().toISOString().slice(0, 10),
+      ...structured,
+      raw_analysis: raw,
+    };
+
+    if (DRY_RUN) {
+      log('\n[DRY RUN] Would write config/competitor-intelligence.json:');
+    } else {
+      await fs.writeFile(COMPETITOR_INTEL_JSON, JSON.stringify(output, null, 2) + '\n', 'utf-8');
+      log('✓ Written to config/competitor-intelligence.json');
+    }
+
+    log('\n--- Propagating to dynamic pools ---');
+    await applyCompetitorFindings(structured, output.date);
+
+    log('\n--- Results ---');
+    log('Top formats:');      (structured.top_formats       || []).forEach(f => log(`  • ${f}`));
+    log('Winning hooks:');    (structured.winning_hooks     || []).forEach(h => log(`  • "${h}"`));
+    log('Viral themes:');     (structured.viral_themes      || []).forEach(t => log(`  • ${t}`));
+    log('Content gaps:');     (structured.content_gaps      || []).forEach(g => log(`  • ${g}`));
+    log('Scroll stoppers:');  (structured.scroll_stopper_formulas || []).forEach(s => log(`  • ${s}`));
+    return;
+  }
+
   // Check if already ran this week
   const existing = await loadJson(INTELLIGENCE_FILE);
   if (existing?._meta?.week_of === new Date().toISOString().slice(0, 10) && !DRY_RUN) {
@@ -754,6 +1049,35 @@ async function main() {
   // 2. Competitor web searches
   log('\n--- Step 2: Competitor web searches ---');
   const competitorResults = await runCompetitorSearches(inputContext.trendsData);
+
+  // 2b. Competitor top-post analysis (dedicated structured pass)
+  log('\n--- Step 2b: Competitor top-post analysis ---');
+  if (!SKIP_COMPETITOR && (process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY)) {
+    const compRaw = await runCompetitorTopPostAnalysis();
+    if (compRaw) {
+      const compStructured = await structureCompetitorIntelligence(compRaw);
+      if (compStructured) {
+        const compOutput = {
+          generated_at: new Date().toISOString(),
+          date: new Date().toISOString().slice(0, 10),
+          ...compStructured,
+          raw_analysis: compRaw,
+        };
+        if (!DRY_RUN) {
+          await fs.writeFile(COMPETITOR_INTEL_JSON, JSON.stringify(compOutput, null, 2) + '\n', 'utf-8');
+          log('  ✓ Written to config/competitor-intelligence.json');
+        } else {
+          log('  [DRY RUN] Would write config/competitor-intelligence.json');
+          log(`  Top formats: ${compStructured.top_formats?.slice(0, 2).join(' | ') || 'none'}`);
+          log(`  Winning hooks: ${compStructured.winning_hooks?.slice(0, 2).join(' | ') || 'none'}`);
+        }
+        log('  Propagating to dynamic pools...');
+        await applyCompetitorFindings(compStructured, compOutput.date);
+      }
+    }
+  } else {
+    log('  Skipped (--skip-competitor flag or no API key)');
+  }
 
   // 3. Synthesize intelligence
   log('\n--- Step 3: Synthesizing intelligence ---');

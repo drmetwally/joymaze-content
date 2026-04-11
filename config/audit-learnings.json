@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "description": "Machine-readable lessons from manual content audits. Append new entries after each audit session. The generator reads this file and injects critical/high lessons into the system prompt and scorer automatically.",
+  "lastUpdated": "2026-04-11",
+  "lessons": [
+    {
+      "id": "no-fabricated-stats",
+      "date": "2026-04-11",
+      "source": "manual-audit",
+      "severity": "critical",
+      "appliesTo": ["fact-card", "pattern-interrupt", "all"],
+      "generationRule": "NEVER generate specific statistics, percentages, or numbers presented as established facts (e.g., '25% improvement', '73% of parents', '30% higher'). Use observational language instead: 'research suggests', 'occupational therapists recommend', 'parents consistently report', 'studies show'. If a stat is needed, frame it as a reference to expertise, not a fabricated number. Fabricated precision destroys parent trust when searched.",
+      "scoreCheck": "Prompt contains a specific percentage or numerical stat presented as fact (e.g., 'X% of children', 'score X% higher', 'X% more') without source framing",
+      "scoreFlag": "fabricated-stat",
+      "scorePenalty": -4,
+      "examples": {
+        "bad": "coloring Easter eggs can improve fine motor skills by 25% in children under 6",
+        "good": "Occupational therapists call coloring one of the best pre-writing fine motor activities for kids"
+      }
+    },
+    {
+      "id": "no-text-in-image",
+      "date": "2026-04-11",
+      "source": "manual-audit",
+      "severity": "critical",
+      "appliesTo": ["fact-card", "pattern-interrupt", "all"],
+      "generationRule": "NEVER instruct the image generator to render text, statistics, labels, captions, or quotes inside the image. AI image generators produce garbled, misspelled, or clipped text — it looks like a defect. All text overlays (stats, hooks, branding) are composited by our pipeline post-generation via sharp. Generate the VISUAL LAYER ONLY — no embedded words.",
+      "scoreCheck": "Prompt contains instructions for the AI to render text inside the image (e.g., 'the text reads:', 'the statistic reads:', 'with text overlay saying', 'labeled with', 'font should say', 'reads:')",
+      "scoreFlag": "text-in-image",
+      "scorePenalty": -4,
+      "examples": {
+        "bad": "The statistic reads: 'Did you know that coloring improves fine motor skills by 25%?'",
+        "good": "Bold educational poster visual — infographic-style layout, strong activity imagery. NO text or numbers in the image."
+      }
+    },
+    {
+      "id": "seasonal-consistency-all-slots",
+      "date": "2026-04-11",
+      "source": "manual-audit",
+      "severity": "high",
+      "appliesTo": ["coloring", "activity", "all"],
+      "generationRule": "ALL prompts — including activity slots (coloring, word search, maze, dot-to-dot, matching) — must use themes consistent with the current month. March-April = spring/Easter/flowers. May-June = end of school/summer. July-August = summer/beach. September-October = back to school/fall/Halloween. November-December = winter/Christmas. NEVER default to Christmas or Halloween themes in spring months. Check the seasonal context and apply it to the coloring page theme, maze setting, word search topic, etc.",
+      "scoreCheck": "Activity prompt (coloring, word search, maze, etc.) uses a holiday or seasonal theme incompatible with the current month (e.g., Christmas tree or Halloween pumpkin in March-June)",
+      "scoreFlag": "wrong-season",
+      "scorePenalty": -3,
+      "examples": {
+        "bad": "Generate a coloring page featuring a Christmas tree or Halloween pumpkin (in April)",
+        "good": "Generate a coloring page featuring an Easter basket with spring flowers, chicks, and decorated eggs"
+      }
+    }
+    ,
+    {
+      "id": "scroll-stopper-mandatory",
+      "date": "2026-04-11",
+      "source": "manual-audit",
+      "severity": "critical",
+      "appliesTo": ["all"],
+      "generationRule": "Every prompt must name a SPECIFIC element that makes a parent's thumb stop. Not the art style — the compositional moment. For lifestyle: the unexpected detail (eraser debris, crayon rolled to the edge, scrunched brow, half-eaten snack). For activity: the puzzle front-and-center, partially solved, inviting and slightly daunting. For fact-card: the visual metaphor that makes the insight click without words. If you cannot point to what stops the scroll, the prompt is incomplete.",
+      "scoreCheck": "Prompt lacks a specific scroll-stopping compositional element — describes generic scene without naming what makes the viewer pause",
+      "scoreFlag": "no-scroll-stopper",
+      "scorePenalty": -2,
+      "examples": {
+        "bad": "A child sitting at a table doing a coloring page, smiling happily",
+        "good": "A child's hand frozen mid-stroke over a half-filled Easter egg coloring page — one section left untouched, crayon resting at the edge, small eraser marks visible from an earlier attempt"
+      }
+    },
+    {
+      "id": "fun-or-value-mandatory",
+      "date": "2026-04-11",
+      "source": "manual-audit",
+      "severity": "critical",
+      "appliesTo": ["all"],
+      "generationRule": "Every piece of content must deliver Fun OR Value (or both) to the consumer. Fun = makes them laugh, feel seen, or want to participate. Value = gives them something to use, act on, or share with their kid. A lifestyle image of a child holding an activity delivers NEITHER unless the activity is the visual hero and the viewer's brain registers 'I want that for my child.' Generic atmosphere without consumer delivery = content that fails on every platform.",
+      "scoreCheck": "Prompt generates decorative content where the activity/product is a background prop rather than the visual hero, OR caption hook delivers atmosphere without a specific payoff",
+      "scoreFlag": "no-fun-or-value",
+      "scorePenalty": -3,
+      "examples": {
+        "bad": "A child intensely focused on solving an Easter maze. The maze is partially completed. Background is warm sunny yellow.",
+        "good": "An Easter maze printable front-and-center — clearly legible, partially solved with a pencil trail visible halfway through. A child's focused hand in the corner, secondary to the maze itself. The viewer's first instinct: 'I need to print this.'"
+      }
+    }
+  ]
+}

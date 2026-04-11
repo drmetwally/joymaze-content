@@ -652,7 +652,16 @@ async function buildCarousels(importedMetadata) {
     // Sort by slideIndex (1-based); fallback to insertion order
     slides.sort((a, b) => (a.slideIndex ?? 0) - (b.slideIndex ?? 0));
 
-    const theme = groupId.replace(/-/g, ' '); // "spring-week" → "spring week"
+    // Derive a clean theme label from the groupId — strip date suffix and format prefix
+    const noDate = groupId.replace(/-\d{4}-\d{2}-\d{2}$/, '');
+    let theme;
+    if (noDate.startsWith('facts-carousel-')) {
+      theme = noDate.replace('facts-carousel-', '').replace(/-/g, ' ') + ' brain benefits';
+    } else if (noDate.startsWith('progress-carousel-')) {
+      theme = noDate.replace('progress-carousel-', '').replace(/-/g, ' ') + ' progression';
+    } else {
+      theme = noDate.replace(/^carousel-/, '').replace(/-/g, ' '); // "carousel-spring-flowers" → "spring flowers"
+    }
     const carouselId = `carousel-${groupId}-${date}`;
     const subjects = slides.map(s => s.subject).filter(Boolean);
 
@@ -814,7 +823,7 @@ async function main() {
     byFolder[folderName].push(fp);
   }
   for (const [folderName, paths] of Object.entries(byFolder)) {
-    if (!folderName.startsWith('carousel-')) continue;
+    if (!folderName.startsWith('carousel-') && !folderName.startsWith('facts-carousel-') && !folderName.startsWith('progress-carousel-')) continue;
     const sorted = [...paths].sort(); // alphabetical = slide order within the group
     sorted.forEach((fp, i) => {
       carouselAssignments.set(fp, { carouselGroup: folderName, slideIndex: i + 1 });

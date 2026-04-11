@@ -4,6 +4,18 @@
 
 ---
 
+### 2026-04-11 — X suspension recovery + platform reset + daily brief
+
+- **X suspended** for spam (bulk posting + Blue Premium on new account day 1). No appeal — repurposed clean 3-year-old fit-clinic account → `@playjoymaze`. New Developer app, all API keys rotated.
+- **ToS research:** Automation via official APIs is explicitly allowed everywhere. Violation was behavioral. Pipeline architecture is sound — just enforce warmup + rate limits on new accounts.
+- **Pinterest:** New account (joymaze.pp@gmail.com), Business/WY. Instagram auto-sync disabled — native posting only.
+- **Task Scheduler:** All local posting tasks disabled. `JoyMaze Daily` (generation) kept. GitHub Actions is sole posting owner.
+- **`npm run brief`:** New daily HTML brief built. Reads today's queue JSONs, renders copy-paste cards per post per platform. Feeds manual warmup posting.
+- **Warmup protocol:** 2 weeks manual posting on all new accounts before automation resumes.
+- **Pending next session:** Facebook Page + Meta Developer App → TikTok account + API → Pinterest OAuth refresh for new account → full credential update in .env + GitHub Secrets
+
+---
+
 ### 2026-04-09 — GitHub Actions cloud posting pipeline + X profile recovery
 
 - **Topics:** X shadowban diagnosis, X Professional account setup, GitHub Actions pipeline, Cloudinary integration, UTC scheduling fix, cooldown architecture
@@ -571,3 +583,9 @@
 - [Claude 2026-04-10] Zero-friction carousel automation: generate-prompts.mjs now plans carousel batches every 3rd content day — derives group name from dominant theme+date, appends folder drop instructions to prompts .md, writes carousel-plan JSON. import-raw.mjs auto-detects carousel-* subfolders, sorts files alphabetically for slide order, no sidecar JSONs ever needed. Ahmed's only action on carousel day: create the folder the prompt file specifies and name images 01-xx.png etc.
 
 - [Claude 2026-04-10] Carousel gap identified: only Activity Collection format (Format 1) was implemented. Educational Facts carousel (one stat/fact per slide, e.g. "5 brain benefits of mazes") and Age Progression carousel (same activity at Easy/Medium/Hard by age) are NOT built. Logged in unimplemented_upgrades memory.
+
+- [Claude 2026-04-11] Carousel Formats 2 & 3 built: generate-prompts.mjs now rotates 3 carousel formats on a 9-day doy cycle (0=Activity Collection, 3=Facts, 6=Progression). Facts format: 5 slides (hook + 4 brain-benefit facts), 5-activity pool rotating by doy, folder prefix facts-carousel-*. Progression format: 3 slides (01-blank/02-half/03-done), same Gemini chat for visual consistency, folder prefix progress-carousel-*. import-raw.mjs extended to detect all 3 prefixes. Memory + cheatsheet + TASKS updated.
+
+- [Claude 2026-04-11] Carousel intelligence self-learning: added loadActivityRanking() (analytics-ranked activity selection for Formats 2+3), dynamic fact injection from pattern-interrupt-dynamic.json (replaces last 1-2 hardcoded facts when keyword match found), hooks-library top hook informs Format 2 title slide style, boost_themes from trends-this-week.json bias Format 3 activity selection. Added scoreCarouselSlides() Groq scorer (llama-3.1-8b-instant) with PASS/WEAK/FLAG gate table. intelligenceSignal field logged + saved in plan JSON.
+
+- [Claude 2026-04-11] System hardening session (continued): 7 subagent changes verified via npm run daily. Fabricated stat strip confirmed working (saved file clean). Pre-check catches wrong-season → Prompt 10 flagged at 6.5. Built scripts/health-check.mjs (npm run health-check) — 5 sections, 41 ok · 3 expected warnings. X cooldown, Pinterest sandbox, Phase 2 analytics all correctly detected as known gaps. intelligence:competitor propagation live (3 hooks + 3 themes + 1 interrupt added to dynamic pools on today's run).
