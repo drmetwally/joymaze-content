@@ -1,0 +1,41 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "She colored outside the lines today. On purpose.",
+    "scheduledHour": 13,
+    "reply1": "It was a flower, meant to spill over the edge of the page.",
+    "replies": [
+      "It was a flower, meant to spill over the edge of the page.",
+      "And in that one gesture, she found her own rules."
+    ]
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "I have a face and two hands but no arms or legs. What am I?",
+    "scheduledHour": 17,
+    "reply1": "Think carefully... drop your guess below 👇 — answer drops in a few hours",
+    "replies": [
+      "Think carefully... drop your guess below 👇 — answer drops in a few hours"
+    ],
+    "answer_tweet": "The answer is: a clock! It has a face and two hands. Did you get it?",
+    "answer_scheduledHour": 21
+  },
+  {
+    "type": "insight",
+    "tweet1": "Most kids stop a maze at the first dead end. Then they try again when no one is watching.",
+    "scheduledHour": 21,
+    "reply1": "Let them work through it quietly. That's where the learning happens.",
+    "replies": [
+      "Let them work through it quietly. That's where the learning happens."
+    ]
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're the one who finds the crayon on the floor at 10pm.",
+    "scheduledHour": 23,
+    "reply1": "The permission slip was already in his bag. You just had to trust him to remember.",
+    "replies": [
+      "The permission slip was already in his bag. You just had to trust him to remember."
+    ]
+  }
+]
