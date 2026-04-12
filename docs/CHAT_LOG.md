@@ -603,3 +603,11 @@
 - [Claude 2026-04-11] System hardening session (continued): 7 subagent changes verified via npm run daily. Fabricated stat strip confirmed working (saved file clean). Pre-check catches wrong-season → Prompt 10 flagged at 6.5. Built scripts/health-check.mjs (npm run health-check) — 5 sections, 41 ok · 3 expected warnings. X cooldown, Pinterest sandbox, Phase 2 analytics all correctly detected as known gaps. intelligence:competitor propagation live (3 hooks + 3 themes + 1 interrupt added to dynamic pools on today's run).
 
 - [Claude 2026-04-11] Account migration logged (retroactive): @playjoymaze (repurposed fit-clinic, API keys updated in .env). New accounts created for Pinterest/Instagram/TikTok under joymaze.pp@gmail.com — NO new API keys yet for those platforms. GitHub Secrets not yet updated for X. x-posts.yml should stay disabled during warmup. Memory files corrected: project_warmup_pipeline.md + project_pipeline_status.md now have full platform status table. feedback_log_account_changes.md added to prevent future context-compression loss of credential changes.
+
+- [Claude 2026-04-12 s2] Daily output tracker: built scripts/track-output.mjs — counts images/story/ASMR per day, appends to output/daily-output-log.json with Phase 0 gate status and 30-day streak. Wired into npm run daily.
+
+- [Claude 2026-04-12 s2] Series naming live: SERIES_NAMES constant in generate-prompts.mjs injects "Maze Monday" (Mon) / "Puzzle Power Wednesday" (Wed) / "Fine Motor Friday" (Fri) as seriesTag into LLM prompt. Non-destructive — empty string on off days. Builds series anticipation in caption hooks.
+
+- [Claude 2026-04-12 s2] AsmrReveal Remotion wiring: --remotion flag on generate-asmr-video.mjs now bypasses FFmpeg frame pipeline entirely → calls renderWithRemotion() → builds AsmrReveal props from activity.json → delegates to render-video.mjs. Handles coloring (blank.png+colored.png) and maze (maze.png+solved.png) file naming correctly. npm run animate:asmr:remotion -- --asmr [folder].
+
+- [Claude 2026-04-12 s2] Memory + cheatsheet + feedback loop all updated. Intelligence loop diagram added to DAILY_CHEATSHEET.md. project_remotion_engine.md and project_daily_output_tracking.md created in memory. FREE Printable badge decision documented: overlay on activity content is wrong — correct approach is corner badge in brand frame margin only (deferred).
