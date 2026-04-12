@@ -1191,3 +1191,19 @@ Chrome Headless Shell auto-downloaded on first render (107.6MB, cached).
 **Note on "FREE Printable" overlay:** Decision to not add text directly over activity content (obscures the printable). Better approach deferred: small corner badge/ribbon on brand frame margin only. Revisit after Phase 0.
 
 **Next:** Live AsmrReveal test — drop blank.png + colored.png into output/asmr/coloring-spring-flowers/ then run animate:asmr:remotion
+
+---
+**2026-04-12 s3 — Caption CTA audit + generate-prompts.mjs overhaul**
+
+Trigger: Ahmed audited prompt2 (Easter maze Challenge Hook) — identified 3 compounding problems: (1) joymaze.com URL in every caption = bot fingerprint + intent mismatch; (2) pipe ( | ) separator = AI content tell; (3) scoring rubric was rewarding the wrong things (9.5 scores with fundamental issues).
+
+Root cause: project_caption_cta_strategy.md had a "always include joymaze.com" rule that conflicted with the newer anti-spam rules (post-shadowban) and the agreed "let value drive people to link in bio" philosophy.
+
+Changes made to generate-prompts.mjs:
+- Story caption template: removed pipe + URL, hook stands alone
+- Activity caption template: challenge hook + "Save this for later", no URL
+- Gold Standard example A caption: stripped to the bare hook line
+- Output rules (lines ~1691/1696): explicit prohibition on pipe and URL
+- Scoring rubric (story + activity): pipe present = −2, URL present = −2/−3; rewrites what "good caption" means
+
+Memory updated: project_caption_cta_strategy.md — full reversal of old rule with reasoning documented.

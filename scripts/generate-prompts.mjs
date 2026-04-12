@@ -905,7 +905,7 @@ For STORY prompts:
 **Image prompt:**
 [3-5 sentences. Show the full scene — parents, children, expressions, body language. Rich sensory details. End with: "Portrait orientation, 2:3 aspect ratio (1000×1500 px)."]
 
-**Caption hook idea:** [Emotional hook line] | [Skill framing: "Builds [skill]. Screen-free printable at joymaze.com"]
+**Caption hook idea:** [1-2 sentence emotional hook — standalone. No pipe ( | ) separator. No URL. No "screen-free printable at joymaze.com". The image does the work; the caption triggers the save.]
 ---
 
 For ACTIVITY prompts:
@@ -921,7 +921,7 @@ For ACTIVITY prompts:
 **Image prompt:**
 [3-5 sentences describing the exact puzzle. End with: "Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark)."]
 
-**Caption hook idea:** [Challenge hook] | SAVE this for quiet time! Builds [specific skill]. Free printable activities for ages 4-8.
+**Caption hook idea:** [Punchy challenge hook — 1-2 sentences. End with "Save this for later." No pipe ( | ) separator. No URL.]
 ---
 
 ## GOLD STANDARD EXAMPLES
@@ -940,7 +940,7 @@ Study these. This is the quality bar. Match or exceed it every time.
 **Image prompt:**
 A girl around 5 years old sits cross-legged on sun-warmed wooden porch steps, a yellow pencil gripped in her hand, eyes locked on a printed tracing sheet — a dotted path shaped like a winding river leading to a cartoon fox den. Three abandoned toys — a rubber ball, a plastic dinosaur, a half-eaten apple — lie forgotten beside her. Late afternoon light cuts through the porch railing, striping shadows across her lap. Her mother stands just inside the screen door, coffee mug in hand, watching without interrupting. Style: soft-focus photorealistic, warm golden tones, shallow depth of field. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
 
-**Caption hook idea:** "Three toys abandoned. One tracing sheet. The house went quiet. | Builds fine motor skills and hand-eye coordination. Screen-free printable at joymaze.com"
+**Caption hook idea:** "Three toys abandoned. One tracing sheet. The house went quiet."
 ---
 
 Why this works:
@@ -951,7 +951,7 @@ Why this works:
 - PARENT IN SCENE (watching from doorway — completes the emotional story)
 - EMOTIONAL beat is SHOWN not told — the stillness IS the story
 - ART STYLE is specific (soft-focus photorealistic, warm golden tones, shallow DOF)
-- CAPTION includes: emotional hook + skill framing + screen-free positioning
+- CAPTION includes: emotional hook only — the image does the skill framing. No URL, no pipe.
 
 ### EXAMPLE B — Perfect Activity Prompt
 ---
@@ -1688,12 +1688,12 @@ INSPIRATION prompts (slots 1-5):
 - Use the exact age and gender specified in each slot. Do not deviate.
 - Each slot uses a DIFFERENT hook type — rotate: Curiosity Gap, Emotional Mirror, Identity Hook, Relief Hook, Sensory Hook, Transformation Hint, Challenge Hook, Insider Hook
 - Each slot uses a DIFFERENT setting — no two prompts in the same room or visual style
-- Caption hook: specific emotional line | skill framing + "screen-free printable"
+- Caption hook: specific emotional line — NO pipe ( | ) separator, NO URL, NO "screen-free printable at joymaze.com" phrase. Hook stands alone. Max 2 sentences.
 - EVERY inspiration prompt MUST end with: "Portrait orientation, 2:3 aspect ratio (1000×1500 px)."
 
 ACTIVITY prompts:
 - Each activity uses a DIFFERENT theme from the expanded pool
-- Caption hook: challenge + "SAVE this" + skill framing + "ages 4-8"
+- Caption hook: punchy challenge hook, end with "Save this for later." No URL, no pipe ( | ) separator.
 - MAZE: use the EXACT fill-in-the-blank template from Example C. No narrative style.
 - DOT-TO-DOT: use the EXACT fill-in-the-blank template from Example D.
 - EVERY activity image prompt MUST name a visual illustration style (e.g., 'warm watercolor illustration', '3D Pixar-style render', 'vintage storybook illustration', 'ink-and-wash bold lines'). No named style = generic output that won't stop the scroll.
@@ -1779,13 +1779,13 @@ FOR STORY PROMPTS (not puzzle/activity prompts):
 - EXPRESSION SPECIFIC: Child expression is a specific feeling ("brow furrowed"), not "smiling happily". Generic = −1.
 - ART STYLE NAMED: Explicit style stated (soft-focus photorealistic, warm watercolor, etc.). Missing = −1.
 - DIMENSIONS LINE: Ends with "Portrait orientation, 2:3 aspect ratio (1000×1500 px)". Missing = −1.
-- CAPTION HOOK: Includes "screen-free" or "printable". Missing = −0.5.
+- CAPTION HOOK: Emotionally specific, reads like a human wrote it. Pipe ( | ) separator present = −2. "joymaze.com" URL present = −2. "screen-free printable at joymaze.com" template phrase present = −3. Generic/template feel = −1.
 
 FOR ACTIVITY PROMPTS (maze, word search, dot-to-dot, coloring, tracing, matching, quiz, sudoku):
 - PUZZLE SPECCED: Character, theme, difficulty clearly stated. Vague = −3.
 - DIMENSIONS LINE: Ends with "Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% empty". Missing = −2.
 - TEMPLATE STYLE: Uses direct instruction style for maze/dot-to-dot. Narrative description style = −2.
-- CAPTION HOOK: Includes "SAVE this" and skill framing. Missing = −1.
+- CAPTION HOOK: Punchy challenge hook, ends with save-bait ("Save this for later" or equivalent). No pipe ( | ) separator, no URL. Pipe present = −2. URL present = −2.
 - COLORING PAGE CORRECTNESS (only for coloring type): The prompt must NOT say the image is colored, filled with color, painted, or use words like "bright pastel colors", "colored with", "vibrant colors applied". A coloring page is UNCOLORED black-outline-only line art. Any color fill instruction = −5 (instant fail).
 - DOT-TO-DOT CORRECTNESS (only for dot-to-dot type): The prompt must NOT say to draw "thick outlines", "crisp outlines", "bold strokes", or any pre-drawn character outline. The character shape must ONLY be revealed by connecting the numbered dots — no outline should exist before connecting. Any pre-drawn outline instruction = −5 (instant fail).
 - ART STYLE NAMED: Image prompt explicitly states a visual style (watercolor, Pixar render, ink-and-wash, linocut, storybook illustration, etc.). Missing = −1.
