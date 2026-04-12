@@ -43,6 +43,7 @@ const TEMP_DIR = path.join(ROOT, 'output', '.asmr-temp');
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const NO_MUSIC = args.includes('--no-music');
+const USE_REMOTION = args.includes('--remotion');
 const INIT_MODE = args.includes('--init');
 const asmrIdx = args.indexOf('--asmr');
 const ASMR_FOLDER = asmrIdx !== -1 ? args[asmrIdx + 1] : null;
@@ -1083,6 +1084,116 @@ async function findMusic(asmrDir, activityType) {
   return null;
 }
 
+// ========== REMOTION PATH ==========
+
+/**
+ * Render an ASMR reveal video using the Remotion AsmrReveal composition
+ * instead of the frame-by-frame FFmpeg pipeline.
+ *
+ * Called when --remotion flag is set and revealType is 'coloring' or 'maze'.
+ * Produces identical queue metadata to the FFmpeg path.
+ */
+async function renderWithRemotion(asmrDir, activityMeta, revealType) {
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const slug = path.basename(asmrDir);
+  const videoId = `${dateStr}-asmr-${slug}-remotion`;
+  const outputPath = path.join(VIDEOS_DIR, `${videoId}.mp4`);
+
+  // File naming: coloring uses blank.png + colored.png; maze uses maze.png + solved.png
+  const [srcFile, dstFile] = revealType === 'coloring'
+    ? ['blank.png', 'colored.png']
+    : ['maze.png', 'solved.png'];
+
+  const blankImagePath  = path.relative(ROOT, path.join(asmrDir, srcFile)).replace(/\\/g, '/');
+  const solvedImagePath = path.relative(ROOT, path.join(asmrDir, dstFile)).replace(/\\/g, '/');
+
+  // Music
+  const musicPath = await findMusic(asmrDir, activityMeta.type);
+  const audioPath = musicPath
+    ? path.relative(ROOT, musicPath).replace(/\\/g, '/')
+    : 'assets/audio/crayon.mp3';
+
+  const inputProps = {
+    blankImagePath,
+    solvedImagePath,
+    revealType:        revealType === 'coloring' ? 'ttb' : 'ltr',
+    hookText:          activityMeta.hookText || '',
+    hookDurationSec:   activityMeta.hookDurationSec ?? 3,
+    revealDurationSec: activityMeta.revealDurationSec ?? REVEAL_SECONDS,
+    holdDurationSec:   activityMeta.holdDurationSec ?? HOLD_SECONDS,
+    audioPath,
+    audioVolume:       activityMeta.audioVolume ?? 0.85,
+    showJoyo:          activityMeta.showJoyo ?? true,
+    showParticles:     activityMeta.showParticles ?? true,
+    particleEmoji:     activityMeta.particleEmoji ?? '✨',
+  };
+
+  const totalDuration = inputProps.hookDurationSec + inputProps.revealDurationSec + inputProps.holdDurationSec;
+  console.log(`\n[Remotion] AsmrReveal — ${revealType} — ${totalDuration}s`);
+  console.log(`  blank:  ${blankImagePath}`);
+  console.log(`  solved: ${solvedImagePath}`);
+  console.log(`  audio:  ${audioPath}`);
+
+  if (DRY_RUN) {
+    console.log('[DRY RUN] Skipping Remotion render.\n');
+    return;
+  }
+
+  await fs.mkdir(VIDEOS_DIR, { recursive: true });
+
+  const renderScript = path.join(ROOT, 'scripts', 'render-video.mjs');
+  // Pass props as JSON string — render-video.mjs parses --props directly
+  const propsJson = JSON.stringify(inputProps);
+  const cmd = `node "${renderScript}" --comp AsmrReveal --props ${JSON.stringify(propsJson)} --out "${outputPath}"`;
+  execSync(cmd, { stdio: 'inherit', cwd: ROOT });
+
+  // Queue metadata — identical shape to FFmpeg path
+  const metadata = {
+    id: videoId,
+    type: 'video',
+    format: 'asmr',
+    category: `asmr-${activityMeta.type}`,
+    categoryName: 'ASMR Activity',
+    archetype: 9,
+    renderer: 'remotion',
+    title: activityMeta.title,
+    activityType: activityMeta.type,
+    theme: activityMeta.theme,
+    hookText: activityMeta.hookText || '',
+    asmrFolder: slug,
+    duration: totalDuration,
+    slideCount: null,
+    hasMusic: !!musicPath,
+    resolution: `${VIDEO_WIDTH}x${VIDEO_HEIGHT}`,
+    outputFile: `${videoId}.mp4`,
+    generatedAt: new Date().toISOString(),
+    platforms: {
+      tiktok:    { video: `${videoId}.mp4`, status: 'pending' },
+      youtube:   { video: `${videoId}.mp4`, status: 'pending' },
+      instagram: { video: `${videoId}.mp4`, status: 'pending', type: 'reel' },
+      pinterest: { video: `${videoId}.mp4`, status: 'pending', type: 'video' },
+      x:         { video: `${videoId}.mp4`, status: 'pending', type: 'video' },
+    },
+    captions: null,
+  };
+
+  const queuePath = path.join(QUEUE_DIR, `${videoId}.json`);
+  await fs.writeFile(queuePath, JSON.stringify(metadata, null, 2));
+  console.log(`Queue metadata: ${videoId}.json`);
+
+  // Cloudinary upload
+  try {
+    const { uploadToCloud } = await import('./upload-cloud.mjs');
+    metadata.cloudUrl = await uploadToCloud(outputPath, 'joymaze/videos');
+    await fs.writeFile(queuePath, JSON.stringify(metadata, null, 2));
+    console.log(`Cloudinary: ${metadata.cloudUrl}`);
+  } catch (err) {
+    console.warn(`Cloudinary upload skipped: ${err.message}`);
+  }
+
+  console.log('\nDone! Run `npm run generate:captions` to add captions.\n');
+}
+
 // ========== MAIN ==========
 
 async function main() {
@@ -1177,6 +1288,12 @@ async function main() {
         process.exit(1);
       }
     }
+  }
+
+  // Remotion path: intercept reveal-type renders before FFmpeg pipeline
+  if (USE_REMOTION && (revealType === 'coloring' || revealType === 'maze')) {
+    await renderWithRemotion(asmrDir, activityMeta, revealType);
+    return;
   }
 
   // Find ambient music

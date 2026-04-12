@@ -61,12 +61,12 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [x] **1. Refresh Pinterest OAuth** — `scripts/refresh-pinterest-token.mjs` built. Runs every Monday in scheduler (before intelligence refresh). npm scripts: `pinterest:refresh`, `pinterest:refresh:dry`. Writes new access + refresh tokens back to .env automatically.
 - [x] **2. Set up Windows Task Scheduler for `post-x-scheduled.mjs`** — Task "JoyMaze X Posts" created, runs hourly from 07:00. Drips x-text-YYYY-MM-DD.json posts throughout the day.
 - [~] **3. Configure Instagram, TikTok, YouTube credentials** — YouTube OAuth done (2026-04-08): YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, YOUTUBE_REFRESH_TOKEN all set in .env via get-youtube-token.mjs. Instagram + TikTok credentials still pending.
-- [ ] **4. Build daily output log** — simple append-only log: date → image count, story video count, ASMR count. Without it, can't track 30-day gate progress.
+- [x] **4. Build daily output log** — DONE 2026-04-12. `scripts/track-output.mjs` → `output/daily-output-log.json`. npm: `output:track`, `output:report`. Auto-runs in `npm run daily` (after archive). Shows Phase 0 gate status + 30-day streak.
 
 **Quick wins — low effort, real impact:**
 - [ ] **5. Run Level 1 caption audit** — open 5 random queue JSONs, score captions against the 5-question protocol in CAPTION AUDIT PROTOCOL section. 10 minutes, catches weak templates before they ship at scale.
 - [ ] **6. Trigger first live Monday intelligence run** — built + dry-run verified. Has never run live. Dynamic pools are empty until it does.
-- [ ] **7. Series naming in prompt rotation** — "Maze Monday," "Fine Motor Friday," "Puzzle Power Wednesday." Day-of-week label added to `generate-prompts.mjs` slot assignment. Zero API cost.
+- [x] **7. Series naming in prompt rotation** — DONE 2026-04-12. `SERIES_NAMES` constant + `seriesTag` in `getTodaysMix()` + `seriesNote` injected into `buildUserPrompt`. Mon=Maze Monday, Wed=Puzzle Power Wednesday, Fri=Fine Motor Friday. Zero API cost.
 - [ ] **8. Age-specific caption variants** — same image, two captions: ages 4-5 and ages 6-8. Caption template change only. Doubles Pinterest reach per post.
 - [~] **9. "Did You Know?" educational post type** — **Video version DONE 2026-04-12** (`AnimatedFactCard` Remotion composition, tested 12.5s render). Sharp static infographic version still pending — text + layout + icon, no AI image needed. High save rate.
 
@@ -159,6 +159,8 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
 ### ASMR Pipeline
 
+- [x] **Wire AsmrReveal Remotion renderer into generate-asmr-video.mjs** — DONE 2026-04-12. `--remotion` flag skips FFmpeg frame pipeline, calls render-video.mjs `--comp AsmrReveal` with inputProps built from activity.json. npm: `animate:asmr:remotion`, `animate:asmr:remotion:dry`. Requires blank.png + colored.png (coloring) or maze.png + solved.png (maze) in the ASMR folder.
+- [ ] **Live AsmrReveal test** — drop blank.png + colored.png into `output/asmr/coloring-spring-flowers/` → `npm run animate:asmr:remotion -- --asmr coloring-spring-flowers`
 - [ ] Run ASMR pipeline for all 6 activity types (coloring, maze, dot-to-dot, tracing, matching, word-search)
 - [ ] Confirm audio chain is lossless end-to-end (flagged fixed in prior session — verify)
 - [ ] Schedule ASMR generation as part of daily-scheduler.mjs

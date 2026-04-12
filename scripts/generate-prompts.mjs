@@ -47,6 +47,11 @@ async function loadStrategyContext() {
 // Difficulty rotation: Easy on Mon/Thu, Medium on Tue/Fri, Hard on Wed/Sat
 const DIFFICULTY_BY_DAY = ['easy', 'easy', 'medium', 'hard', 'easy', 'medium', 'hard'];
 
+// Series naming — day-specific labels that build recurring audience anticipation.
+// Empty string = no series that day. Caption generator should weave the series name naturally
+// into maze/activity slots (not forced into every slot — just where it fits).
+const SERIES_NAMES = ['', 'Maze Monday', '', 'Puzzle Power Wednesday', '', 'Fine Motor Friday', ''];
+
 // Full activity pool — 8 types covering JoyMaze app + KDP activity books
 // App: maze, word-search, matching, dot-to-dot, sudoku, coloring
 // Books: tracing, quiz (+ above)
@@ -702,8 +707,11 @@ function getTodaysMix(date, trendTopic = null) {
     || (getTodaysMix._boostThemes || [])[1]
     || challengeTheme;
 
+  const seriesTag = SERIES_NAMES[day] || '';
+
   return {
     label: `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][day]} — Intelligence Mix + Activities (${difficulty})`,
+    seriesTag,
     slots: [
       // ── 5 Inspiration slots ──
       {
@@ -1653,9 +1661,13 @@ function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], as
     ? '\nToday is SUNDAY — best-of repost day. Lean into the most emotionally resonant versions of each slot. Quiet-moment and identity slots especially strong today.'
     : '';
 
+  const seriesNote = mix.seriesTag
+    ? `\nToday's Series: ${mix.seriesTag} — weave "${mix.seriesTag}" naturally into 1-2 caption hooks (activity or challenge slots). Not forced into every slot — just where the theme fits organically.`
+    : '';
+
   return `Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}.
 Season: ${season} (${month}).
-Rotation: ${mix.label}${sundayNote}
+Rotation: ${mix.label}${sundayNote}${seriesNote}
 
 ━━━ INPUT INSTRUCTIONS — do NOT copy these into your output ━━━
 The slot specs below are creative briefs. Use them to inform what you generate.

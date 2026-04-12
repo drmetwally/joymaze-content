@@ -1162,3 +1162,32 @@ Chrome Headless Shell auto-downloaded on first render (107.6MB, cached).
 - Wire animate:story into story generation pipeline (replace FFmpeg slideshow)
 - Remotion Studio: npm run remotion:studio for visual preview
 - Future: AnimatedFactCard composition for carousel-style educational posts
+
+---
+
+## 2026-04-12 (session 2) — Daily output log + series naming + AsmrReveal wiring
+
+**Files changed:** `scripts/track-output.mjs` (new), `scripts/generate-prompts.mjs`, `scripts/generate-asmr-video.mjs`, `package.json`, `docs/TASKS.md`
+
+**Task 1 — Daily output log (Phase 0 gate dependency — DONE):**
+- `scripts/track-output.mjs` → `output/daily-output-log.json` (append-only, 90-day window)
+- Counts: image JSONs in archive/YYYY-MM-DD/, story-*.mp4 and asmr-*.mp4 in output/videos/
+- Shows Phase 0 gate status per day + running 30-day streak count
+- `npm run output:track` (write) + `npm run output:report` (read-only table view)
+- Wired into `npm run daily` after archive step
+
+**Task 2 — Series naming in generate-prompts.mjs (DONE):**
+- `SERIES_NAMES = ['', 'Maze Monday', '', 'Puzzle Power Wednesday', '', 'Fine Motor Friday', '']`
+- `seriesTag` added to `getTodaysMix()` return object
+- `seriesNote` injected into `buildUserPrompt()` — tells LLM to weave the series name naturally into 1-2 caption hooks. Non-destructive (empty string = no-op on non-series days)
+
+**Task 3 — AsmrReveal Remotion wiring (DONE):**
+- `--remotion` flag added to `generate-asmr-video.mjs`
+- When set for coloring/maze reveal types: calls `renderWithRemotion()` instead of FFmpeg pipeline
+- `renderWithRemotion()` builds AsmrReveal inputProps from activity.json, calls render-video.mjs --comp AsmrReveal --props <json>, writes identical queue metadata JSON
+- File naming handled: coloring → blank.png+colored.png, maze → maze.png+solved.png (passed as blankImagePath/solvedImagePath in props, bypassing render-video.mjs defaults)
+- `npm run animate:asmr:remotion -- --asmr coloring-spring-flowers` for live render (needs images first)
+
+**Note on "FREE Printable" overlay:** Decision to not add text directly over activity content (obscures the printable). Better approach deferred: small corner badge/ribbon on brand frame margin only. Revisit after Phase 0.
+
+**Next:** Live AsmrReveal test — drop blank.png + colored.png into output/asmr/coloring-spring-flowers/ then run animate:asmr:remotion

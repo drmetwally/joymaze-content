@@ -25,7 +25,7 @@
     "import:raw": "node scripts/import-raw.mjs",
     "generate:prompts": "node scripts/generate-prompts.mjs --save",
     "archive": "node scripts/archive-queue.mjs",
-    "daily": "node scripts/archive-queue.mjs && node scripts/collect-analytics.mjs && node scripts/collect-trends.mjs --monday-only && node scripts/weekly-scorecard.mjs --monday-only --save && node scripts/intelligence-refresh.mjs --monday-only && node scripts/apply-intelligence.mjs --monday-only && node scripts/intelligence-refresh.mjs --competitor-only --monday-only && node scripts/generate-prompts.mjs --save && node scripts/generate-story-ideas.mjs --save && node scripts/generate-asmr-brief.mjs --save && node scripts/generate-x-posts.mjs",
+    "daily": "node scripts/archive-queue.mjs && node scripts/collect-analytics.mjs && node scripts/track-output.mjs && node scripts/collect-trends.mjs --monday-only && node scripts/weekly-scorecard.mjs --monday-only --save && node scripts/intelligence-refresh.mjs --monday-only && node scripts/apply-intelligence.mjs --monday-only && node scripts/intelligence-refresh.mjs --competitor-only --monday-only && node scripts/generate-prompts.mjs --save && node scripts/generate-story-ideas.mjs --save && node scripts/generate-asmr-brief.mjs --save && node scripts/generate-x-posts.mjs",
     "weekly": "node scripts/collect-trends.mjs && node scripts/intelligence-refresh.mjs && node scripts/apply-intelligence.mjs && node scripts/intelligence-refresh.mjs --competitor-only",
     "generate:story:ideas": "node scripts/generate-story-ideas.mjs",
     "generate:story:idea": "node scripts/generate-story-ideas.mjs --save",
@@ -78,6 +78,10 @@
     "animate:hook:dry": "node scripts/render-video.mjs --comp HookIntro --dry-run",
     "animate:factcard": "node scripts/render-video.mjs --comp AnimatedFactCard",
     "animate:factcard:dry": "node scripts/render-video.mjs --comp AnimatedFactCard --dry-run",
+    "animate:asmr:remotion": "node scripts/generate-asmr-video.mjs --remotion",
+    "animate:asmr:remotion:dry": "node scripts/generate-asmr-video.mjs --remotion --dry-run",
+    "output:track": "node scripts/track-output.mjs",
+    "output:report": "node scripts/track-output.mjs --report",
     "remotion:studio": "npx remotion studio remotion/index.jsx"
   },
   "dependencies": {
