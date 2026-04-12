@@ -35,6 +35,7 @@
     "scheduler:post-now": "node scripts/daily-scheduler.mjs --post-now",
     "generate:video": "node scripts/generate-videos.mjs",
     "generate:story": "node scripts/generate-story-video.mjs",
+    "generate:story:remotion": "node scripts/generate-story-video.mjs --remotion",
     "generate:story:openai": "node scripts/generate-story-video.mjs --tts openai",
     "generate:story:openai:ws": "node scripts/generate-story-video.mjs --tts openai --word-sync",
     "generate:story:edge": "node scripts/generate-story-video.mjs --tts edge",
@@ -75,6 +76,8 @@
     "animate:asmr:dry": "node scripts/render-video.mjs --comp AsmrReveal --dry-run",
     "animate:hook": "node scripts/render-video.mjs --comp HookIntro",
     "animate:hook:dry": "node scripts/render-video.mjs --comp HookIntro --dry-run",
+    "animate:factcard": "node scripts/render-video.mjs --comp AnimatedFactCard",
+    "animate:factcard:dry": "node scripts/render-video.mjs --comp AnimatedFactCard --dry-run",
     "remotion:studio": "npx remotion studio remotion/index.jsx"
   },
   "dependencies": {

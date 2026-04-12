@@ -42,8 +42,10 @@ const verbose       = hasFlag('--verbose');
 function storyJsonToProps(story, storyDir) {
   const fps = 30;
   const slides = (story.slides ?? []).map((slide) => {
-    const imagePath = slide.imagePath
-      ? path.relative(ROOT, path.resolve(storyDir, slide.imagePath)).replace(/\\/g, '/')
+    // story.json uses `image`; render-video.mjs native format uses `imagePath` — accept both
+    const rawImageRef = slide.imagePath ?? slide.image ?? '';
+    const imagePath = rawImageRef
+      ? path.relative(ROOT, path.resolve(storyDir, rawImageRef)).replace(/\\/g, '/')
       : '';
     const durationSec = slide.durationSec ?? slide.duration ?? 4;
     return {
@@ -120,6 +122,11 @@ function computeDuration(inputProps, compId) {
   }
   if (compId === 'HookIntro') {
     return Math.round((inputProps.durationSec ?? 4) * fps);
+  }
+  if (compId === 'AnimatedFactCard') {
+    const cardSec = inputProps.cardDurationSec ?? 3.5;
+    const count   = inputProps.facts?.length ?? 3;
+    return Math.round((2 + cardSec * count) * fps); // 2s title intro + cards
   }
   return fps * 30;
 }

@@ -1,7 +1,8 @@
 import { registerRoot, Composition } from 'remotion';
-import { StoryEpisode, storyEpisodeSchema }  from './compositions/StoryEpisode.jsx';
-import { AsmrReveal,   asmrRevealSchema }    from './compositions/AsmrReveal.jsx';
-import { HookIntro,    hookIntroSchema }     from './compositions/HookIntro.jsx';
+import { StoryEpisode,      storyEpisodeSchema }      from './compositions/StoryEpisode.jsx';
+import { AsmrReveal,        asmrRevealSchema }        from './compositions/AsmrReveal.jsx';
+import { HookIntro,         hookIntroSchema }         from './compositions/HookIntro.jsx';
+import { AnimatedFactCard,  animatedFactCardSchema }  from './compositions/AnimatedFactCard.jsx';
 
 // ─── Composition Registry ────────────────────────────────────────────────────
 // durationInFrames here is the default shown in Remotion Studio.
@@ -40,6 +41,17 @@ const Root = () => (
       width={1080}
       height={1920}
       defaultProps={hookIntroSchema}
+    />
+
+    {/* ── Animated fact card: "Did You Know?" educational carousel ──── */}
+    <Composition
+      id="AnimatedFactCard"
+      component={AnimatedFactCard}
+      durationInFrames={375}    // 2s intro + 3 cards × 3.5s @ 30fps
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={animatedFactCardSchema}
     />
   </>
 );

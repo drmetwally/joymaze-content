@@ -63,6 +63,7 @@ const TTS_SPEED = speedIdx !== -1 ? parseFloat(args[speedIdx + 1]) : 0.75; // 0.
 const WORD_SYNC = args.includes('--word-sync'); // karaoke-style word-by-word text reveal
 const voiceIdx = args.indexOf('--voice');
 const TTS_VOICE_OVERRIDE = voiceIdx !== -1 ? args[voiceIdx + 1] : null; // explicit override; otherwise cycles
+const USE_REMOTION = args.includes('--remotion'); // use Remotion renderer instead of FFmpeg frame pipeline
 // OpenAI voices — cycled per episode so each story has a distinct narrator
 const OPENAI_VOICE_POOL = ['nova', 'shimmer', 'fable', 'alloy', 'echo', 'onyx'];
 // nova=warm female, shimmer=bright female, fable=British expressive, alloy=neutral, echo=male smooth, onyx=male deep
@@ -950,6 +951,83 @@ async function cleanupDir(dir) {
   } catch { /* ignore */ }
 }
 
+// ========== REMOTION RENDERER PATH ==========
+
+/**
+ * Render a story via Remotion (StoryEpisode composition) instead of the
+ * frame-by-frame FFmpeg pipeline. The story.json is already on disk — we
+ * just spawn render-video.mjs with the --story flag.
+ *
+ * Usage: add --remotion to any generate:story command.
+ * e.g.  node scripts/generate-story-video.mjs --story ep01-fox --remotion
+ */
+async function renderWithRemotion(storyMeta, storyJsonPath) {
+  const dateStr  = new Date().toISOString().slice(0, 10);
+  const videoId  = `${dateStr}-story-ep${String(storyMeta.episode).padStart(2, '0')}-remotion`;
+  const outputPath = path.join(VIDEOS_DIR, `${videoId}.mp4`);
+
+  const relStory  = path.relative(ROOT, storyJsonPath).replace(/\\/g, '/');
+  const renderScript = path.join(ROOT, 'scripts', 'render-video.mjs');
+
+  console.log('\nRenderer: Remotion (StoryEpisode)');
+  console.log(`  Story : ${relStory}`);
+  console.log(`  Output: ${outputPath}`);
+
+  if (DRY_RUN) {
+    console.log('[DRY RUN] Remotion render skipped.');
+    return;
+  }
+
+  await fs.mkdir(VIDEOS_DIR, { recursive: true });
+
+  const cmd = `node "${renderScript}" --comp StoryEpisode --story "${relStory}" --out "${outputPath}"`;
+  try {
+    execSync(cmd, { stdio: 'inherit', cwd: ROOT });
+  } catch (err) {
+    console.error(`\nRemotion render failed: ${err.message}`);
+    process.exit(1);
+  }
+
+  // Queue metadata (same shape as FFmpeg path)
+  const metadata = {
+    id:           videoId,
+    type:         'video',
+    format:       'story',
+    category:     'kids-story-video',
+    categoryName: "Joyo's Story Corner",
+    archetype:    8,
+    title:        storyMeta.title,
+    episode:      storyMeta.episode,
+    theme:        storyMeta.theme,
+    slideCount:   storyMeta.slides.length,
+    renderer:     'remotion',
+    resolution:   `${VIDEO_WIDTH}x${VIDEO_HEIGHT}`,
+    outputFile:   `${videoId}.mp4`,
+    generatedAt:  new Date().toISOString(),
+    platforms: {
+      tiktok:    { video: `${videoId}.mp4`, status: 'pending' },
+      youtube:   { video: `${videoId}.mp4`, status: 'pending' },
+      instagram: { video: `${videoId}.mp4`, status: 'pending', type: 'reel' },
+    },
+    captions: null,
+  };
+
+  await fs.mkdir(QUEUE_DIR, { recursive: true });
+  const queuePath = path.join(QUEUE_DIR, `${videoId}.json`);
+  await fs.writeFile(queuePath, JSON.stringify(metadata, null, 2));
+  console.log(`Queue metadata: ${videoId}.json`);
+
+  try {
+    metadata.cloudUrl = await uploadToCloud(outputPath, 'joymaze/videos');
+    await fs.writeFile(queuePath, JSON.stringify(metadata, null, 2));
+    console.log(`Cloudinary: ${metadata.cloudUrl}`);
+  } catch (err) {
+    console.warn(`Cloudinary upload skipped: ${err.message}`);
+  }
+
+  console.log('\nDone! Run `npm run generate:captions` to add captions.\n');
+}
+
 // ========== MAIN ==========
 
 async function main() {
@@ -1027,6 +1105,12 @@ async function main() {
       console.error(`Expected at: ${imgPath}`);
       process.exit(1);
     }
+  }
+
+  // ── Remotion fast path ──────────────────────────────────────────────────────
+  if (USE_REMOTION) {
+    await renderWithRemotion(storyMeta, storyJsonPath);
+    return;
   }
 
   // Find music file
