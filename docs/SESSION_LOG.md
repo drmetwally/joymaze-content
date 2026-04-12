@@ -1051,3 +1051,19 @@ Both require changes to generate-prompts.mjs (new plan types) and import-raw.mjs
 
 **Memory updated:** project_warmup_pipeline.md + project_pipeline_status.md now have the full platform account/API status table.
 **Feedback added:** feedback_log_account_changes.md — any future account/credential mention must be logged immediately.
+
+---
+
+## Session 2026-04-12 — Morning audit + engine hardening
+
+**Audit of today's generation:**
+- X posts: 4 posts reviewed. story-hook (13:00) PASS. identity (23:00) PASS. insight (21:00) BORDERLINE (passive hook, acceptable). puzzle (17:00) FAIL — "head/tail/no body = coin" is a cliché riddle every parent has seen.
+- Prompts: 10 reviewed. Prompts 1-5 (story) PASS. Prompts 6-9 (activity) PASS on content but missing art style directives — generic output risk. Prompt 10 FAIL — "Autumn Leaves" coloring page in April = wrong season; quality gate missed it.
+
+**Surgical fixes applied today:**
+- `output/queue/x-text-2026-04-12.json`: Replaced coin riddle with crayon riddle ("I get shorter every time I'm used..."). No schedule change.
+- `output/prompts/prompts-2026-04-12.md`: Added style directive to Prompts 6-9 (watercolor, Pixar, storybook, ink-and-wash). Replaced Prompt 10 Autumn Leaves → Spring Garden coloring page.
+
+**Engine fixes applied:**
+- `generate-x-posts.mjs`: Added BANNED STALE RIDDLES blocklist to PUZZLE section (coin, footsteps, echo, clock, piano, shadow, river, map). LLM now has explicit "treat as banned" instruction.
+- `generate-prompts.mjs`: (1) Expanded wrong-season preCheckViolations to catch autumn/fall themes in spring months 3-5 (regex: autumn leaves|fall leaves|harvest moon|etc., penalty -3). (2) Added mandatory style directive to ACTIVITY prompts instruction block. (3) Added ART STYLE NAMED penalty (-1) to activity prompt quality gate scoring rubric.

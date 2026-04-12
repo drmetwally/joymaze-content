@@ -1,0 +1,41 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "The moment I realized my kid was using crayons to color the walls, not the paper.",
+    "scheduledHour": 13,
+    "reply1": "I was about to scold, but then I saw the look on her face - pure joy.",
+    "replies": [
+      "I was about to scold, but then I saw the look on her face - pure joy.",
+      "She wasn't making a mess, she was creating a masterpiece."
+    ]
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "I get shorter every time I'm used, but I leave a little of myself behind everywhere I go. Kids use me every single day. What am I?",
+    "scheduledHour": 17,
+    "reply1": "Think carefully... drop your guess below 👇 — answer coming in a few hours",
+    "replies": [
+      "Think carefully... drop your guess below 👇 — answer coming in a few hours"
+    ],
+    "answer_tweet": "The answer is: a crayon! Gets shorter with every drawing — but leaves color everywhere it goes. Did you get it?",
+    "answer_scheduledHour": 21
+  },
+  {
+    "type": "insight",
+    "tweet1": "Most kids can't resist finishing a puzzle, even when it's hard, because it's not about the puzzle - it's about being in control.",
+    "scheduledHour": 21,
+    "reply1": "Try giving them a puzzle with no instructions and see what happens - they might just surprise you.",
+    "replies": [
+      "Try giving them a puzzle with no instructions and see what happens - they might just surprise you."
+    ]
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're sitting in the car after drop-off, the silence is deafening, and you're wondering if you're doing enough.",
+    "scheduledHour": 23,
+    "reply1": "The permission slip was already in his bag, but the question still lingers - am I giving him the right tools to succeed?",
+    "replies": [
+      "The permission slip was already in his bag, but the question still lingers - am I giving him the right tools to succeed?"
+    ]
+  }
+]

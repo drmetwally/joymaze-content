@@ -1360,6 +1360,12 @@ function preCheckViolations(result) {
         v.push({ rule: 'wrong-season', penalty: -3 });
       }
     }
+    // Wrong season: Autumn/fall themes in spring (Mar–May)
+    if (month >= 3 && month <= 5) {
+      if (/autumn leaves|fall leaves|autumn theme|harvest moon|harvest time|falling leaves|autumn.{0,20}color/i.test(section)) {
+        v.push({ rule: 'wrong-season', penalty: -3 });
+      }
+    }
     // System instruction meta-leak: internal rules copied into output
     if (/(?:consumer delivery:|MANDATORY:|SCROLL STOPPER \(MANDATORY|the system prompt|SEASONAL NOTE:)/i.test(section)) {
       v.push({ rule: 'system-instruction-leak', penalty: -3 });
@@ -1678,6 +1684,7 @@ ACTIVITY prompts:
 - Caption hook: challenge + "SAVE this" + skill framing + "ages 4-8"
 - MAZE: use the EXACT fill-in-the-blank template from Example C. No narrative style.
 - DOT-TO-DOT: use the EXACT fill-in-the-blank template from Example D.
+- EVERY activity image prompt MUST name a visual illustration style (e.g., 'warm watercolor illustration', '3D Pixar-style render', 'vintage storybook illustration', 'ink-and-wash bold lines'). No named style = generic output that won't stop the scroll.
 - EVERY activity image prompt MUST end with: "Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark)."
 
 ALL prompts:
@@ -1769,6 +1776,7 @@ FOR ACTIVITY PROMPTS (maze, word search, dot-to-dot, coloring, tracing, matching
 - CAPTION HOOK: Includes "SAVE this" and skill framing. Missing = −1.
 - COLORING PAGE CORRECTNESS (only for coloring type): The prompt must NOT say the image is colored, filled with color, painted, or use words like "bright pastel colors", "colored with", "vibrant colors applied". A coloring page is UNCOLORED black-outline-only line art. Any color fill instruction = −5 (instant fail).
 - DOT-TO-DOT CORRECTNESS (only for dot-to-dot type): The prompt must NOT say to draw "thick outlines", "crisp outlines", "bold strokes", or any pre-drawn character outline. The character shape must ONLY be revealed by connecting the numbered dots — no outline should exist before connecting. Any pre-drawn outline instruction = −5 (instant fail).
+- ART STYLE NAMED: Image prompt explicitly states a visual style (watercolor, Pixar render, ink-and-wash, linocut, storybook illustration, etc.). Missing = −1.
 
 Return ONLY valid JSON — no markdown, no explanation:
 {"scores":[{"n":1,"score":8.5,"fail":""},{"n":2,"score":5.5,"fail":"missing sensory anchor, generic expression"}]}

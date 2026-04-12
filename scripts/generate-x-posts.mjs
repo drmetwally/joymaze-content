@@ -326,6 +326,7 @@ PUZZLE:
 - tweet1 is a SELF-CONTAINED TEXT RIDDLE — completely standalone
 - Types that work: "I have X but no Y" riddles, "what am I?" riddles, lateral thinking puzzles, play-on-words challenges
 - Themes: nature, animals, seasons, things kids interact with daily (pencils, books, clocks, shadows, keys, doors, mirrors, rain). Stay in the world of childhood and parenting.
+- BANNED STALE RIDDLES — every parent has seen these, do NOT use them: 'I have a head and a tail but no body' (coin), 'the more you take, the more you leave behind' (footsteps), 'I speak without a mouth and hear without ears' (echo), 'I have hands but no arms' (clock), 'what has keys but no locks' (piano), 'I follow you everywhere but never speak' (shadow), 'what can run but never walks' (river), 'I have cities but no houses' (map). These are the first riddles any LLM generates — treat them as banned phrases and write something original.
 - DIFFICULTY: must be solvable in under 10 seconds for most parents — the fun IS the "aha" moment, not the struggle. If it requires trivia knowledge, obscure reasoning, or wordplay most adults would miss, it fails. Test it: can a tired parent solve this on a school run? If no — simpler.
 - NEVER reference a picture, image, or visual
 - replies: exactly 1 item — a HINT or engagement prompt. Do NOT include the answer here.
