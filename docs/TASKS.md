@@ -68,7 +68,7 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [ ] **6. Trigger first live Monday intelligence run** — built + dry-run verified. Has never run live. Dynamic pools are empty until it does.
 - [ ] **7. Series naming in prompt rotation** — "Maze Monday," "Fine Motor Friday," "Puzzle Power Wednesday." Day-of-week label added to `generate-prompts.mjs` slot assignment. Zero API cost.
 - [ ] **8. Age-specific caption variants** — same image, two captions: ages 4-5 and ages 6-8. Caption template change only. Doubles Pinterest reach per post.
-- [ ] **9. "Did You Know?" educational post type** — infographic-style, sharp-rendered (text + layout + icon). No AI image gen needed. High save + share rate. All competitors have it; we don't.
+- [~] **9. "Did You Know?" educational post type** — **Video version DONE 2026-04-12** (`AnimatedFactCard` Remotion composition, tested 12.5s render). Sharp static infographic version still pending — text + layout + icon, no AI image needed. High save rate.
 
 ### Pipeline Throughput
 

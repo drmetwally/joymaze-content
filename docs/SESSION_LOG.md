@@ -18,6 +18,41 @@
 
 ---
 
+## 2026-04-12 — [Agent: Claude] — Content audit + engine fixes + full Remotion engine build
+
+**Files changed:** `scripts/generate-prompts.mjs`, `scripts/generate-x-posts.mjs`, `scripts/render-video.mjs`, `scripts/generate-story-video.mjs`, `remotion/index.jsx`, `remotion/compositions/{StoryEpisode,AsmrReveal,HookIntro,AnimatedFactCard}.jsx`, `remotion/components/{WipeReveal,FloatingParticles,HookText,JoyoWatermark,CaptionBar,BrandWatermark}.jsx`, `output/queue/x-text-2026-04-12.json`, `output/prompts/prompts-2026-04-12.md`, `.github/workflows/x-posts.yml`, `output/posting-cooldown.json`, `package.json`, memory files
+
+**Morning audit + engine fixes:**
+- Audited today's 10 prompts + X posts against scroll-stopper / fun-value criteria
+- Fixed P6–P9: added named visual style directives (watercolor, Pixar 3D, storybook, ink-wash)
+- Replaced P10 Autumn Leaves (wrong-season) with Spring Garden coloring page
+- Fixed X puzzle post: replaced stale coin riddle with original crayon riddle; answer post scheduled 4h later
+- Engine fix 1: `preCheckViolations()` in `generate-prompts.mjs` — autumn-in-spring check (months 3-5)
+- Engine fix 2: activity prompt system + quality gate now enforces named art style (−1 penalty if missing)
+- Engine fix 3: BANNED STALE RIDDLES blocklist added to `generate-x-posts.mjs` system prompt (coin, echo, shadow, clock, etc.)
+
+**Warmup hold (confirmed + hardened):**
+- `posting-cooldown.json` extended to 2026-04-26 (was expired/missing)
+- `.github/workflows/x-posts.yml` — added `if: false` belt-and-suspenders stop
+- Confirmed X API keys in GitHub Secrets (gh secret list showed update 2026-04-11 14:10 UTC)
+
+**Full Remotion animation engine built (commit 86c0573):**
+- `remotion/index.jsx` — registers StoryEpisode, AsmrReveal, HookIntro
+- `StoryEpisode.jsx` — cross-fade slides, Ken Burns, music fade, Joyo, brand. TESTED: 6s, 11.4s render ✓
+- `AsmrReveal.jsx` — LTR/TTB clip-path wipe, hook text, sparkle particles, ASMR audio. Dry-run ✓
+- `HookIntro.jsx` — spring headline + delayed subline, gradient bg. TESTED: 4s, 6.7s render ✓
+- Components: `WipeReveal`, `FloatingParticles` (golden angle deterministic), `HookText`, `JoyoWatermark`, `CaptionBar`, `BrandWatermark`
+- `scripts/render-video.mjs` — `--comp`, `--story`, `--asmr`, `--props`, `--out`, `--dry-run`; bundle cache singleton; storyJsonToProps + activityJsonToProps
+
+**AnimatedFactCard composition + story Remotion wiring (commit e97b8fb):**
+- `AnimatedFactCard.jsx` — "Did You Know?" educational carousel; cards spring in from right sequentially; dot indicators; configurable facts/colors/duration. TESTED: 12.5s, 13.6s render ✓
+- `render-video.mjs`: `storyJsonToProps` now accepts `slide.image` (current story.json schema) as fallback
+- `generate-story-video.mjs`: `--remotion` flag → `renderWithRemotion()` bypasses frame-gen + FFmpeg, calls StoryEpisode via render-video.mjs; same queue metadata + Cloudinary upload
+- npm scripts: `animate:factcard`, `animate:factcard:dry`, `generate:story:remotion`
+- Next for Remotion: drop blank.png + solved.png → live AsmrReveal render; wire animate:asmr into ASMR pipeline
+
+---
+
 ## 2026-04-09 — [Agent: Claude] — output/raw/ folder structure pruned + rebuilt
 
 **Files changed:** `output/raw/` (filesystem only)
@@ -1067,3 +1102,63 @@ Both require changes to generate-prompts.mjs (new plan types) and import-raw.mjs
 **Engine fixes applied:**
 - `generate-x-posts.mjs`: Added BANNED STALE RIDDLES blocklist to PUZZLE section (coin, footsteps, echo, clock, piano, shadow, river, map). LLM now has explicit "treat as banned" instruction.
 - `generate-prompts.mjs`: (1) Expanded wrong-season preCheckViolations to catch autumn/fall themes in spring months 3-5 (regex: autumn leaves|fall leaves|harvest moon|etc., penalty -3). (2) Added mandatory style directive to ACTIVITY prompts instruction block. (3) Added ART STYLE NAMED penalty (-1) to activity prompt quality gate scoring rubric.
+
+---
+
+## Session 2026-04-12 — Remotion animation engine
+
+**Installed:** `remotion`, `@remotion/renderer`, `@remotion/bundler`, `react`, `react-dom`
+Chrome Headless Shell auto-downloaded on first render (107.6MB, cached).
+
+**Built:**
+- `remotion/index.jsx` — composition registry, `registerRoot`
+- `remotion/compositions/StoryEpisode.jsx` — multi-slide story video: cross-fade transitions, Ken Burns zoom, hook text, Joyo watermark, music with fade in/out
+- `remotion/components/HookText.jsx` — spring-animated yellow banner (scale + opacity)
+- `remotion/components/JoyoWatermark.jsx` — bounce-in + continuous float sine wave
+- `remotion/components/CaptionBar.jsx` — slide-up caption bar per scene
+- `scripts/render-video.mjs` — Node.js render API: --comp, --story (story.json), --props, --out, --dry-run, --verbose
+
+**Test render:** 1080×1920 h264, 6s, 2.2MB, 11.4s render time. Confirmed working.
+
+**npm scripts:** animate:story, animate:story:dry, animate:story:verbose, remotion:studio
+
+**Architecture:** publicDir = project root → all assets/output files served via staticFile(). story.json → props auto-conversion built in. Duration computed from slide durationFrames sum.
+
+**Next for Remotion:**
+- Wire `--story` flag to a real story.json once slides have imagePaths
+- Add `AsmrReveal` composition (wipe reveal in React instead of FFmpeg)
+- Add `FloatingStars` / confetti component for ASMR overlay
+- Remotion Studio: `npm run remotion:studio` for visual preview during development
+
+---
+
+## Session 2026-04-12 — Full Remotion engine structure
+
+**New compositions:**
+- `remotion/compositions/AsmrReveal.jsx` — ASMR wipe reveal: hook → wipe (ltr/ttb) → hold + sparkles + brand. Reads from activity.json via --asmr flag. 34.5s default (3+30+1.5).
+- `remotion/compositions/HookIntro.jsx` — 4s punchy hook clip: spring headline + subline + Joyo + brand. For Reels/Shorts hooks or prepended to longer videos.
+
+**New components:**
+- `remotion/components/FloatingParticles.jsx` — deterministic sparkles (golden-angle distribution, no random()). count, emoji, startFrame props.
+- `remotion/components/BrandWatermark.jsx` — "joymaze.com" text overlay, fades in after 0.8s. position: bottom-center/bottom-right/top-right.
+- `remotion/components/WipeReveal.jsx` — reusable wipe core: blank + solved images, clip-path ltr/ttb, luminous edge glow line. Used by AsmrReveal.
+
+**render-video.mjs upgraded:**
+- `--asmr activity.json` flag: reads activity.json → AsmrReveal props auto-built
+- `--story story.json` flag: existing, reads story.json → StoryEpisode props
+- Bundle caching: `_cachedServeUrl` module singleton — bundle once, reuse in same process
+- Duration auto-computed per composition type
+
+**npm scripts added:** animate:asmr, animate:asmr:dry, animate:hook, animate:hook:dry
+
+**Test renders confirmed:**
+- StoryEpisode: 6s, 1080×1920, 11.4s render ✓
+- HookIntro: 4s, 1080×1920, 6.7s render ✓
+- AsmrReveal: dry-run ✓ (needs blank.png + solved.png images to do live render)
+
+**Next for Remotion:**
+- Drop blank.png + solved.png into output/asmr/coloring-spring-flowers/ → run live AsmrReveal render
+- Wire animate:asmr into daily pipeline (replace generate-asmr-video.mjs or run in parallel)
+- Wire animate:story into story generation pipeline (replace FFmpeg slideshow)
+- Remotion Studio: npm run remotion:studio for visual preview
+- Future: AnimatedFactCard composition for carousel-style educational posts

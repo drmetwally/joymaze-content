@@ -16,6 +16,18 @@
 
 ---
 
+### 2026-04-12 — Content audit + engine fixes + full Remotion engine
+
+- **Morning audit:** 10 prompts + X posts scored. P6-P9 missing visual style directives → added (watercolor, Pixar 3D, storybook, ink-wash). P10 Autumn Leaves in April → replaced with Spring Garden. X puzzle = stale coin riddle → replaced with original crayon riddle.
+- **Engine fixes:** (1) wrong-season penalty for autumn-in-spring in preCheckViolations; (2) named art style required in activity prompts + quality gate penalty; (3) BANNED STALE RIDDLES blocklist in X post system prompt.
+- **Warmup hold hardened:** posting-cooldown.json extended to 2026-04-26 + `if: false` in x-posts.yml. X keys confirmed live in GitHub Secrets.
+- **Remotion engine fully built:** StoryEpisode (tested), AsmrReveal (dry-run), HookIntro (tested), 6 components. render-video.mjs as single CLI. 3 npm script pairs.
+- **AnimatedFactCard:** "Did You Know?" carousel — facts slide in from right, dot indicators, accent underline. Tested live: 12.5s, 13.6s render.
+- **Story Remotion path:** `--remotion` flag on generate-story-video.mjs bypasses FFmpeg frame pipeline, calls Remotion StoryEpisode. storyJsonToProps accepts slide.image (schema fix).
+- **Pending:** daily output log (Phase 0 gate dep), series naming, live AsmrReveal render (needs images from Ahmed), wire animate:asmr into ASMR pipeline
+
+---
+
 ### 2026-04-09 — GitHub Actions cloud posting pipeline + X profile recovery
 
 - **Topics:** X shadowban diagnosis, X Professional account setup, GitHub Actions pipeline, Cloudinary integration, UTC scheduling fix, cooldown architecture
