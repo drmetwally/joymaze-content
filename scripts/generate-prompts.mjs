@@ -1403,7 +1403,7 @@ function preCheckViolations(result) {
     const isColoringPage = /\*\*Activity type:\*\*\s*Coloring Page/i.test(section);
     if (isColoringPage) {
       const imageBlock = section.match(/\*\*Image prompt:\*\*([\s\S]*?)(?=\n\n\*\*Caption|\nLeave|\n---)/)?.[1] || '';
-      if (/\b(?:watercolor|pastel color|vibrant color|colored with|painted|soft color|blended color|warm color|muted color)\b/i.test(imageBlock)) {
+      if (/\b(?:watercolor|ink.?and.?wash|pastel color|vibrant color|colored with|painted|soft color|blended color|warm color|muted color)\b/i.test(imageBlock)) {
         v.push({ rule: 'coloring-style-conflict', penalty: -4 });
       }
     }
@@ -1727,7 +1727,7 @@ INSPIRATION prompts (slots 1-5):
 
 ACTIVITY prompts:
 - Each activity uses a DIFFERENT theme from the expanded pool
-- Caption hook: punchy challenge hook, end with "Save this for later." No URL, no pipe ( | ) separator.
+- Caption hook: punchy challenge hook. End with ONE save-bait phrase — rotate through these, never repeat the same one twice in a batch: "Save this for later." / "Save this one." / "Bookmark this for the weekend." / "Send this to another parent." / "Which one stumped them?" (use as a follow-up angle) / "Time them — drop the result below." / "Tag a parent who needs this." Do NOT default to "Save this for later" every time. No URL, no pipe ( | ) separator.
 - MAZE: use the EXACT fill-in-the-blank template from Example C. No narrative style.
 - DOT-TO-DOT: use the EXACT fill-in-the-blank template from Example D.
 - EVERY activity image prompt MUST name a visual illustration style (e.g., 'warm watercolor illustration', '3D Pixar-style render', 'vintage storybook illustration', 'ink-and-wash bold lines'). No named style = generic output that won't stop the scroll.
@@ -1888,7 +1888,7 @@ async function regeneratePrompt(sectionText, failReason, systemPrompt) {
     'identity': 'IDENTITY: PHOTOREALISTIC or realistic photography style ONLY. Authentic parent-child moment — scene must feel real, not illustrated. NEVER use editorial illustration, watercolor, collage, anime, or any non-photorealistic style.',
     'activity-challenge': 'ACTIVITY-CHALLENGE: PHOTOREALISTIC photography style ONLY. Child at peak engagement, printable clearly visible and partially complete. NEVER use illustration styles.',
     'fact-card': 'FACT-CARD: Bold educational poster — visual metaphor only, NO text/numbers/stats in the image (pipeline adds those). Can use graphic/collage styles. NOT a generic brain/lightbulb.',
-    'coloring page': 'COLORING PAGE: Black outlines ONLY — zero color fill, zero shading, zero watercolor on the page. Every interior shape must be white and empty. Do NOT use "watercolor", "pastel", "blended colors", or any color-fill style descriptor for the page artwork. The art style you name should describe the LINE STYLE only (e.g., "bold ink outlines on white", "crisp cartoon line art").',
+    'coloring page': 'COLORING PAGE: Black outlines ONLY — zero color fill, zero shading, zero watercolor, zero ink-and-wash on the page. Every interior shape must be white and empty. Do NOT use "watercolor", "ink-and-wash", "pastel", "blended colors", or any style that implies liquid or color fill. The art style you name must describe the LINE STYLE only (e.g., "bold black ink outlines on white", "crisp cartoon line art", "clean vector line art").',
   };
   const headerLower = sectionText.toLowerCase();
   const slotTypeRule = Object.entries(SLOT_TYPE_RULES).find(([k]) => headerLower.includes(k))?.[1] || '';
