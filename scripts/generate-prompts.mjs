@@ -1358,8 +1358,8 @@ function preCheckViolations(result) {
     if (/(?:the (?:text|statistic|overlay|label) (?:reads|says)|text overlay should read|reads:\s*[""])/i.test(section)) {
       v.push({ rule: 'text-in-image', penalty: -4 });
     }
-    // Fabricated stat (specific percentage claim)
-    if (/\d{1,3}%\s+(?:of (?:children|kids|parents)|improvement|higher|more|better)|(?:improve|increase|boost)\s+\w+\s+by\s+\d{1,3}%/i.test(section)) {
+    // Fabricated stat (specific percentage claim — in image prompt OR caption hook idea)
+    if (/\d{1,3}%\s+(?:of (?:children|kids|parents)|improvement|higher|more|better)|(?:improve|increase|boost)\b.{0,50}\bby\s+\d{1,3}%|\*\*Caption hook idea:\*\*[^\n]*\d+%/i.test(section)) {
       v.push({ rule: 'fabricated-stat', penalty: -4 });
     }
     // Wrong season: Christmas/Halloween mentioned in spring/summer (Mar–Aug)
@@ -1544,7 +1544,7 @@ ${parts.join('\n\n')}
 
 IMPORTANT: Choose COMPLETELY DIFFERENT themes, scenes, settings, and art styles.
 For activities: explore new subjects (dinosaurs, jungle, weather, vehicles, insects, castles, underwater caves, desert, arctic, music, sports, etc.)
-For stories: vary the child's age/gender, the setting (kitchen, backyard, car ride, park, bedroom, grandparent's house), the activity (mazes, tracing, dot-to-dot, word search — not just coloring/puzzles), and the art style (watercolor, 3D render, anime, oil painting, collage, paper cutout, crayon drawing, etc.)`;
+For stories: vary the child's age/gender, the setting (kitchen, backyard, car ride, park, bedroom, grandparent's house), and the activity (mazes, tracing, dot-to-dot, word search — not just coloring/puzzles). Story/lifestyle art style is ALWAYS photorealistic or photography-based — NEVER illustration styles (watercolor, woodblock, anime, oil painting, collage, 3D render, editorial illustration).`;
 }
 
 function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], assignedStorySettings = []) {
@@ -1689,6 +1689,7 @@ INSPIRATION prompts (slots 1-5):
 - Each slot uses a DIFFERENT hook type — rotate: Curiosity Gap, Emotional Mirror, Identity Hook, Relief Hook, Sensory Hook, Transformation Hint, Challenge Hook, Insider Hook
 - Each slot uses a DIFFERENT setting — no two prompts in the same room or visual style
 - Caption hook: specific emotional line — NO pipe ( | ) separator, NO URL, NO "screen-free printable at joymaze.com" phrase. Hook stands alone. Max 2 sentences.
+- Art style MUST be photorealistic or photography-based (e.g., "soft-focus photorealistic, warm golden tones, shallow depth of field", "golden-hour photography, lens flare, bokeh"). NEVER use illustration styles (watercolor, woodblock, anime, oil painting, collage, 3D render, editorial illustration) on story/lifestyle prompts — those are for activity slots only.
 - EVERY inspiration prompt MUST end with: "Portrait orientation, 2:3 aspect ratio (1000×1500 px)."
 
 ACTIVITY prompts:
@@ -1777,7 +1778,7 @@ FOR STORY PROMPTS (not puzzle/activity prompts):
 - PEAK ENGAGEMENT: Activity shown 30–60% complete. Blank OR finished page = −2.
 - ABANDONED ALTERNATIVE: Discarded screen/device or ignored toy visible. Missing = −1.5.
 - EXPRESSION SPECIFIC: Child expression is a specific feeling ("brow furrowed"), not "smiling happily". Generic = −1.
-- ART STYLE NAMED: Explicit style stated (soft-focus photorealistic, warm watercolor, etc.). Missing = −1.
+- ART STYLE NAMED AND CORRECT: Must be photorealistic or photography-based (soft-focus photorealistic, golden-hour photography, shallow depth of field, etc.). Missing style = −1. Illustration style used (watercolor, woodblock, anime, editorial illustration, collage, 3D render) on a story prompt = −3.
 - DIMENSIONS LINE: Ends with "Portrait orientation, 2:3 aspect ratio (1000×1500 px)". Missing = −1.
 - CAPTION HOOK: Emotionally specific, reads like a human wrote it. Pipe ( | ) separator present = −2. "joymaze.com" URL present = −2. "screen-free printable at joymaze.com" template phrase present = −3. Generic/template feel = −1.
 
@@ -2095,6 +2096,29 @@ async function main() {
     if (!scoreData?.scores?.length) {
       console.log('  Quality gate scoring failed or returned no scores — prompts saved unscored.');
       console.log('  (Check GROQ_API_KEY and Groq API status if this persists.)');
+      // Even without scorer: regen prompts with hard pre-check violations (wrong-season, fabricated-stat, etc.)
+      if (preChecks.size > 0) {
+        const hardViolators = [...preChecks.entries()]
+          .filter(([, v]) => v.some(x => x.penalty <= -3))
+          .map(([n, v]) => ({ n, fail: v.map(x => x.rule).join(', ') }));
+        if (hardViolators.length > 0) {
+          console.log(`\n  Auto-regenerating ${hardViolators.length} hard-violation prompt(s) (scorer unavailable)...`);
+          const sections = result.split(/(?=### Prompt \d)/);
+          for (const s of hardViolators) {
+            const sectionIdx = sections.findIndex(sec => sec.match(new RegExp(`^### Prompt ${s.n}\\b`)));
+            if (sectionIdx === -1) continue;
+            console.log(`    Prompt ${s.n}: ${s.fail}`);
+            const rewritten = await regeneratePrompt(sections[sectionIdx], s.fail, systemPrompt);
+            if (rewritten) {
+              sections[sectionIdx] = rewritten.endsWith('\n') ? rewritten : rewritten + '\n\n';
+              console.log(`    → Rewritten.`);
+            } else {
+              console.log(`    → Regen failed. Prompt ${s.n} marked REJECTED.`);
+            }
+          }
+          result = sections.join('');
+        }
+      }
     } else {
       // Auto-regeneration: attempt to fix rejected prompts (score < 5) up to 2 times
       const MAX_REGEN_ATTEMPTS = 2;
