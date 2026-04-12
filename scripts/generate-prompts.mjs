@@ -1399,6 +1399,14 @@ function preCheckViolations(result) {
         v.push({ rule: 'illustration-on-story', penalty: -3 });
       }
     }
+    // Coloring page style conflict: style implies color fill which makes the page pre-colored
+    const isColoringPage = /\*\*Activity type:\*\*\s*Coloring Page/i.test(section);
+    if (isColoringPage) {
+      const imageBlock = section.match(/\*\*Image prompt:\*\*([\s\S]*?)(?=\n\n\*\*Caption|\nLeave|\n---)/)?.[1] || '';
+      if (/\b(?:watercolor|pastel color|vibrant color|colored with|painted|soft color|blended color|warm color|muted color)\b/i.test(imageBlock)) {
+        v.push({ rule: 'coloring-style-conflict', penalty: -4 });
+      }
+    }
     // System instruction meta-leak: internal rules copied into output
     if (/(?:consumer delivery:|MANDATORY:|SCROLL STOPPER \(MANDATORY|the system prompt|SEASONAL NOTE:)/i.test(section)) {
       v.push({ rule: 'system-instruction-leak', penalty: -3 });
@@ -1873,10 +1881,23 @@ async function regeneratePrompt(sectionText, failReason, systemPrompt) {
     baseURL: 'https://api.groq.com/openai/v1',
   });
 
+  // Inject slot-type-specific rules so the regen model knows exactly what the slot requires
+  const SLOT_TYPE_RULES = {
+    'printable-tease': 'PRINTABLE-TEASE: Beautiful flat-lay PHOTOGRAPHY style ONLY. Printed activity sheet on a real wooden table or soft surface. Warm side-lighting makes paper glow. Small hand reaching in OR pencil resting on page. Slightly worn paper feel — NOT pristine. Photorealistic, NOT an illustration. No text overlays.',
+    'quiet-moment': 'QUIET-MOMENT: PHOTOREALISTIC photography style ONLY (e.g., "soft-focus photorealistic, warm golden tones, shallow depth of field"). Child absorbed in activity, no screens visible. Warm directional lighting. Scene feels real and unposed. NEVER use watercolor, woodblock, anime, illustration, or any non-photorealistic style.',
+    'identity': 'IDENTITY: PHOTOREALISTIC or realistic photography style ONLY. Authentic parent-child moment — scene must feel real, not illustrated. NEVER use editorial illustration, watercolor, collage, anime, or any non-photorealistic style.',
+    'activity-challenge': 'ACTIVITY-CHALLENGE: PHOTOREALISTIC photography style ONLY. Child at peak engagement, printable clearly visible and partially complete. NEVER use illustration styles.',
+    'fact-card': 'FACT-CARD: Bold educational poster — visual metaphor only, NO text/numbers/stats in the image (pipeline adds those). Can use graphic/collage styles. NOT a generic brain/lightbulb.',
+    'coloring page': 'COLORING PAGE: Black outlines ONLY — zero color fill, zero shading, zero watercolor on the page. Every interior shape must be white and empty. Do NOT use "watercolor", "pastel", "blended colors", or any color-fill style descriptor for the page artwork. The art style you name should describe the LINE STYLE only (e.g., "bold ink outlines on white", "crisp cartoon line art").',
+  };
+  const headerLower = sectionText.toLowerCase();
+  const slotTypeRule = Object.entries(SLOT_TYPE_RULES).find(([k]) => headerLower.includes(k))?.[1] || '';
+  const slotRuleBlock = slotTypeRule ? `\nSLOT TYPE RULES (must follow exactly):\n${slotTypeRule}\n` : '';
+
   const fixPrompt = `The following image generation prompt was rejected by the quality gate.
 
 REJECTION REASON: ${failReason}
-
+${slotRuleBlock}
 REJECTED PROMPT:
 ${sectionText}
 
