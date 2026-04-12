@@ -7,6 +7,7 @@ on:
 
 jobs:
   post-x:
+    if: false   # WARMUP HOLD — re-enable after 2026-04-26 when manual warmup period ends
     runs-on: ubuntu-latest
     permissions:
       contents: write       # needed to commit queue updates back
