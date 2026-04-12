@@ -170,7 +170,19 @@ function pickActivityThemes(count, usedThemes, daysBack = 7, boostThemes = []) {
   const usedNorm = new Set([...usedThemes].map(normalize));
   const boostNorm = new Set(boostThemes.map(normalize));
 
-  const available = MERGED_THEME_POOL.filter(t => !usedNorm.has(normalize(t)));
+  // Seasonal exclusions — filter themes that don't fit the current month
+  const month = new Date().getMonth() + 1; // 1-12
+  const SPRING_EXCLUDE = /autumn leaves|fall leaves|harvest moon|harvest time|falling leaves|snowy winter|christmas|halloween|thanksgiving/i;
+  const SUMMER_EXCLUDE = /snowy winter|christmas|halloween|thanksgiving|autumn leaves|fall leaves/i;
+  const WINTER_EXCLUDE = /summer beach|beach.*summer/i;
+  const seasonExclude = (month >= 3 && month <= 5) ? SPRING_EXCLUDE
+    : (month >= 6 && month <= 8) ? SUMMER_EXCLUDE
+    : (month >= 12 || month <= 2) ? WINTER_EXCLUDE
+    : null;
+
+  const available = MERGED_THEME_POOL.filter(t =>
+    !usedNorm.has(normalize(t)) && (!seasonExclude || !seasonExclude.test(t))
+  );
 
   // Partition: trending themes that are available get priority slots
   const trending = available.filter(t => boostNorm.has(normalize(t)));
@@ -1374,6 +1386,19 @@ function preCheckViolations(result) {
         v.push({ rule: 'wrong-season', penalty: -3 });
       }
     }
+    // Pipe separator in Caption hook idea line (AI content tell)
+    if (/\*\*Caption hook idea:\*\*[^\n]*\|/.test(section)) {
+      v.push({ rule: 'pipe-in-caption', penalty: -3 });
+    }
+    // Illustration style on a story/lifestyle prompt (not FACT-CARD — that can use poster/graphic styles)
+    const isStoryPrompt = /\*\*Type:\*\*\s*Story/i.test(section);
+    const isFactCard = /### Prompt \d+[^\n]*FACT-CARD/i.test(section);
+    if (isStoryPrompt && !isFactCard) {
+      const imageBlock = section.match(/\*\*Image prompt:\*\*([\s\S]*?)(?=\n\n\*\*Caption|\n---)/)?.[1] || '';
+      if (/\b(?:watercolor|woodblock|anime|editorial illustration|collage|oil painting|paper cutout|claymation|felt.craft|mixed.media|storybook illustration)\b/i.test(imageBlock)) {
+        v.push({ rule: 'illustration-on-story', penalty: -3 });
+      }
+    }
     // System instruction meta-leak: internal rules copied into output
     if (/(?:consumer delivery:|MANDATORY:|SCROLL STOPPER \(MANDATORY|the system prompt|SEASONAL NOTE:)/i.test(section)) {
       v.push({ rule: 'system-instruction-leak', penalty: -3 });
@@ -2120,10 +2145,11 @@ async function main() {
         }
       }
     } else {
-      // Auto-regeneration: attempt to fix rejected prompts (score < 5) up to 2 times
+      // Auto-regeneration: attempt to fix rejected prompts (score < 5) OR any prompt with a pre-check violation
       const MAX_REGEN_ATTEMPTS = 2;
       let regenRound = 0;
-      let rejected = scoreData.scores.filter(s => s.score < 5);
+      const preCheckViolatorNs = new Set(preChecks.keys());
+      let rejected = scoreData.scores.filter(s => s.score < 5 || preCheckViolatorNs.has(s.n));
 
       while (rejected.length > 0 && regenRound < MAX_REGEN_ATTEMPTS) {
         regenRound++;
