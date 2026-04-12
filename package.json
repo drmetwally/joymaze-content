@@ -68,17 +68,26 @@
     "status": "node scripts/status.mjs",
     "brief": "node scripts/generate-brief.mjs",
     "brief:date": "node scripts/generate-brief.mjs",
-    "health-check": "node scripts/health-check.mjs"
+    "health-check": "node scripts/health-check.mjs",
+    "animate:story": "node scripts/render-video.mjs --comp StoryEpisode",
+    "animate:story:dry": "node scripts/render-video.mjs --comp StoryEpisode --dry-run",
+    "animate:story:verbose": "node scripts/render-video.mjs --comp StoryEpisode --dry-run --verbose",
+    "remotion:studio": "npx remotion studio remotion/index.jsx"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/generative-ai": "^0.24.0",
+    "@remotion/bundler": "^4.0.448",
+    "@remotion/renderer": "^4.0.448",
     "dotenv": "^16.4.7",
     "fluent-ffmpeg": "^2.1.3",
     "google-trends-api": "^4.9.2",
     "msedge-tts": "^2.0.4",
     "node-cron": "^3.0.3",
     "openai": "^4.85.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "remotion": "^4.0.448",
     "sharp": "^0.33.5",
     "twitter-api-v2": "^1.29.0"
   },
