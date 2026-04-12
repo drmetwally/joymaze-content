@@ -613,3 +613,5 @@
 - [Claude 2026-04-12 s2] Memory + cheatsheet + feedback loop all updated. Intelligence loop diagram added to DAILY_CHEATSHEET.md. project_remotion_engine.md and project_daily_output_tracking.md created in memory. FREE Printable badge decision documented: overlay on activity content is wrong — correct approach is corner badge in brand frame margin only (deferred).
 
 - [Claude 2026-04-12 s3] Caption CTA overhaul: removed "screen-free printable at joymaze.com" mandate and pipe ( | ) separators from ALL caption templates and scoring rubric in generate-prompts.mjs. Story captions now standalone emotional hooks; activity captions end with "Save this for later." Scoring now penalizes URL (−2/−3) and pipe (−2) instead of rewarding them. Memory updated: project_caption_cta_strategy.md reflects full philosophy reversal.
+
+- [Claude 2026-04-12 s4] Weekly intelligence engine ran: 4 themes + 7 hooks added, Garden/Flowers + Snack Time boosted. Final prompts: 10/10 pass, avg 8.9/10. Best caption: "Can your kid solve this flower maze before the petals fall?" — seasonal intelligence working.

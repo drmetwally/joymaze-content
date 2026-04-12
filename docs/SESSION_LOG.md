@@ -1207,3 +1207,16 @@ Changes made to generate-prompts.mjs:
 - Scoring rubric (story + activity): pipe present = −2, URL present = −2/−3; rewrites what "good caption" means
 
 Memory updated: project_caption_cta_strategy.md — full reversal of old rule with reasoning documented.
+
+---
+**2026-04-12 s4 — Intelligence engine run + final prompt audit**
+
+Ran `npm run weekly` (full intelligence loop): trends collected (Spring Break today, Earth Day +10d, Mother's Day +29d), 4 new themes added (Snack Time, Acts of Kindness, Library Adventures, Summer Bucket List), 7 new hooks added, competitor-only second pass failed (VERTEX_API_KEY issue).
+
+Generated prompts post-intelligence. Key wins:
+- Garden/Flowers trend boost produced best caption of session: "Can your kid solve this flower maze before the petals fall?"
+- Snack Time theme appeared for first time (P6 coloring page)
+- Zero pipes, zero URLs, zero fake stats across all 10 prompts post-regen
+- Gate: 10 pass, 0 flagged, 0 rejected, avg 8.9/10
+
+Residual minor gap: coloring-style-conflict regex misses "Activity type: Coloring" (catches "Coloring Page" only). One-word gap, non-urgent.
