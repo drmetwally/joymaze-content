@@ -71,7 +71,10 @@
     "health-check": "node scripts/health-check.mjs",
     "animate:story": "node scripts/render-video.mjs --comp StoryEpisode",
     "animate:story:dry": "node scripts/render-video.mjs --comp StoryEpisode --dry-run",
-    "animate:story:verbose": "node scripts/render-video.mjs --comp StoryEpisode --dry-run --verbose",
+    "animate:asmr": "node scripts/render-video.mjs --comp AsmrReveal",
+    "animate:asmr:dry": "node scripts/render-video.mjs --comp AsmrReveal --dry-run",
+    "animate:hook": "node scripts/render-video.mjs --comp HookIntro",
+    "animate:hook:dry": "node scripts/render-video.mjs --comp HookIntro --dry-run",
     "remotion:studio": "npx remotion studio remotion/index.jsx"
   },
   "dependencies": {
