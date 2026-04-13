@@ -615,3 +615,7 @@
 - [Claude 2026-04-12 s3] Caption CTA overhaul: removed "screen-free printable at joymaze.com" mandate and pipe ( | ) separators from ALL caption templates and scoring rubric in generate-prompts.mjs. Story captions now standalone emotional hooks; activity captions end with "Save this for later." Scoring now penalizes URL (−2/−3) and pipe (−2) instead of rewarding them. Memory updated: project_caption_cta_strategy.md reflects full philosophy reversal.
 
 - [Claude 2026-04-12 s4] Weekly intelligence engine ran: 4 themes + 7 hooks added, Garden/Flowers + Snack Time boosted. Final prompts: 10/10 pass, avg 8.9/10. Best caption: "Can your kid solve this flower maze before the petals fall?" — seasonal intelligence working.
+
+- [Claude 2026-04-13 s1] Universal MEMORY.md created at project root — consolidates all 30+ scattered memory files into one canonical source for all agents. Phase 0 gate updated: images≥10 + ASMR≥1 + story≥1 + X text≥4 (was images/stories/ASMR all ≥10). track-output.mjs now counts X text queue entries. CLAUDE.md startup updated to read local MEMORY.md first.
+2026-04-13 s2 — Remotion L2–4: ActivityChallenge comp, TypewriterCaption, AsmrReveal progress bar, batch renderer (render-batch.mjs), hook prepend (prepend-hook.mjs). 39 stale memory files redirected to MEMORY.md.
+2026-04-13 s3 — render-video.mjs: --preview flag (3s @ 0.5×), auto-thumbnail (renderStill → *-thumb.jpg), audio auto-selection (AUDIO_MAP). All 9 Remotion tasks done.

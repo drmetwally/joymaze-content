@@ -8,9 +8,10 @@ import {
   interpolate,
   staticFile,
 } from 'remotion';
-import { HookText }      from '../components/HookText.jsx';
-import { JoyoWatermark } from '../components/JoyoWatermark.jsx';
-import { CaptionBar }    from '../components/CaptionBar.jsx';
+import { HookText }            from '../components/HookText.jsx';
+import { JoyoWatermark }       from '../components/JoyoWatermark.jsx';
+import { CaptionBar }          from '../components/CaptionBar.jsx';
+import { TypewriterCaption }   from '../components/TypewriterCaption.jsx';
 
 // ─── Default props / schema ──────────────────────────────────────────────────
 // Used as defaultProps in index.jsx and as a reference for callers.
@@ -25,6 +26,7 @@ export const storyEpisodeSchema = {
   musicVolume: 0.28,      // 0–1
   showJoyo: true,         // Show floating Joyo watermark
   transitionFrames: 15,   // Cross-fade duration in frames (15 = 0.5s @ 30fps)
+  typewriterCaptions: false,  // If true, use animated word-by-word TypewriterCaption instead of static CaptionBar
 };
 
 // ─── StoryEpisode ─────────────────────────────────────────────────────────────
@@ -43,6 +45,7 @@ export const StoryEpisode = ({
   musicVolume = 0.28,
   showJoyo = true,
   transitionFrames = 15,
+  typewriterCaptions = false,
 }) => {
   const { fps } = useVideoConfig();
 
@@ -66,7 +69,11 @@ export const StoryEpisode = ({
           from={slide.startFrame}
           durationInFrames={slide.durationFrames ?? Math.round(fps * 4)}
         >
-          <SlideScene slide={slide} transitionFrames={transitionFrames} />
+          <SlideScene
+            slide={slide}
+            transitionFrames={transitionFrames}
+            typewriterCaptions={typewriterCaptions}
+          />
         </Sequence>
       ))}
 
@@ -104,7 +111,7 @@ export const StoryEpisode = ({
 // ─── SlideScene ───────────────────────────────────────────────────────────────
 // Individual slide: image + caption, with cross-fade in/out.
 
-const SlideScene = ({ slide, transitionFrames }) => {
+const SlideScene = ({ slide, transitionFrames, typewriterCaptions = false }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
@@ -143,8 +150,12 @@ const SlideScene = ({ slide, transitionFrames }) => {
         />
       </AbsoluteFill>
 
-      {/* Caption bar */}
-      {slide.captionText && <CaptionBar text={slide.captionText} />}
+      {/* Caption bar — static or typewriter */}
+      {slide.captionText && (
+        typewriterCaptions
+          ? <TypewriterCaption text={slide.captionText} />
+          : <CaptionBar text={slide.captionText} />
+      )}
     </AbsoluteFill>
   );
 };

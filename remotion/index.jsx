@@ -1,8 +1,9 @@
 import { registerRoot, Composition } from 'remotion';
-import { StoryEpisode,      storyEpisodeSchema }      from './compositions/StoryEpisode.jsx';
-import { AsmrReveal,        asmrRevealSchema }        from './compositions/AsmrReveal.jsx';
-import { HookIntro,         hookIntroSchema }         from './compositions/HookIntro.jsx';
-import { AnimatedFactCard,  animatedFactCardSchema }  from './compositions/AnimatedFactCard.jsx';
+import { StoryEpisode,        storyEpisodeSchema }        from './compositions/StoryEpisode.jsx';
+import { AsmrReveal,          asmrRevealSchema }          from './compositions/AsmrReveal.jsx';
+import { HookIntro,           hookIntroSchema }           from './compositions/HookIntro.jsx';
+import { AnimatedFactCard,    animatedFactCardSchema }    from './compositions/AnimatedFactCard.jsx';
+import { ActivityChallenge,   activityChallengeSchema }   from './compositions/ActivityChallenge.jsx';
 
 // ─── Composition Registry ────────────────────────────────────────────────────
 // durationInFrames here is the default shown in Remotion Studio.
@@ -52,6 +53,17 @@ const Root = () => (
       width={1080}
       height={1920}
       defaultProps={animatedFactCardSchema}
+    />
+
+    {/* ── Activity challenge: hook → puzzle + timer → CTA ──────────── */}
+    <Composition
+      id="ActivityChallenge"
+      component={ActivityChallenge}
+      durationInFrames={1950}   // 2.5s hook + 60s timer + 2.5s CTA @ 30fps
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={activityChallengeSchema}
     />
   </>
 );

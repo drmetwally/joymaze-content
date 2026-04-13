@@ -1220,3 +1220,78 @@ Generated prompts post-intelligence. Key wins:
 - Gate: 10 pass, 0 flagged, 0 rejected, avg 8.9/10
 
 Residual minor gap: coloring-style-conflict regex misses "Activity type: Coloring" (catches "Coloring Page" only). One-word gap, non-urgent.
+
+---
+**2026-04-13 s1 — Universal memory consolidation + Phase 0 gate update**
+
+Files changed: `MEMORY.md` (full rewrite — canonical project memory), `scripts/track-output.mjs`, `CLAUDE.md`
+
+**Task 1 — Universal MEMORY.md:**
+Created `D:\Joymaze-Content\MEMORY.md` as single source of truth for all project state. Consolidates all 30+ memory files from `C:\Users\BESOO\.claude\projects\D--Joymaze-Content\memory\` into one local file. Covers: Ahmed profile, growth strategy, platform account status, anti-spam rules, caption strategy, content strategy, posting architecture, key scripts, intelligence/quality systems, video pipelines, API keys, geo strategy, pending items, multi-agent protocol, session hygiene. Mandatory read instruction at top for all agents.
+
+**Task 2 — Phase 0 gate updated (track-output.mjs):**
+Old gate: images≥10 AND storyVideos≥10 AND asmrVideos≥10
+New gate: images≥10 AND asmrVideos≥1 AND storyVideos≥1 AND xTextPosts≥4
+Added `countXTextPosts()` — reads `output/queue/x-text-YYYY-MM-DD.json`, counts total entries (covers manual warmup + automation). Report table now shows X Posts column. Gate description printed in report. Tested: today shows 4/4 X posts OK.
+
+**Task 3 — CLAUDE.md startup updated:**
+Step 1 now reads `MEMORY.md` (local) instead of `memory/MEMORY.md` (non-existent path). Daily targets updated to reflect new Phase 0 gate numbers.
+
+**Root cause of memory drift:** CLAUDE.md was pointing to `memory/MEMORY.md` (project-local, does not exist) at startup. Auto-memory system writes to `C:\Users\BESOO\.claude\...`. Different sessions resolved the path differently. Fix: one canonical local file, all agents read it first.
+
+**Note:** Yesterday's session not found in SESSION_LOG or CHAT_LOG — the end-of-session ritual was not completed. Context about new X account and manual posting start was lost. Memory file now has explicit warnings about skipping the ritual.
+
+---
+**2026-04-13 s2 — Remotion animation engine: Layer 2–4 build**
+
+Files changed:
+- `remotion/compositions/AsmrReveal.jsx` — progress bar added (fills with wipe, JoyMaze orange)
+- `remotion/compositions/ActivityChallenge.jsx` — NEW composition: hook screen → puzzle + MM:SS timer → CTA screen
+- `remotion/components/TypewriterCaption.jsx` — NEW component: word-by-word caption reveal, drop-in for CaptionBar
+- `remotion/compositions/StoryEpisode.jsx` — `typewriterCaptions` prop added (default false, backward-compatible)
+- `remotion/index.jsx` — ActivityChallenge registered (1950 frames default)
+- `scripts/render-video.mjs` — ActivityChallenge computeDuration added
+- `scripts/render-batch.mjs` — NEW: batch renderer, scans stories/ + asmr/ for pending folders, renders all
+- `scripts/prepend-hook.mjs` — NEW: HookIntro prepend + FFmpeg concat for any existing video
+- `package.json` — animate:challenge, generate:videos, prepend:hook scripts added
+- `MEMORY.md` — §10 Remotion Engine table updated with new compositions + components
+- `C:\Users\BESOO\...\memory\*.md` — all 39 old memory files stamped STALE with redirect to MEMORY.md
+
+**What works (dry-run verified):**
+- `npm run animate:challenge:dry` → 1950 frames (65.0s @ 30fps) OK
+- `npm run generate:videos:dry` → correctly detects missing images, skips with explanation
+- AsmrReveal + StoryEpisode dry-runs clean
+
+**What's still blocked on images:**
+- `ep01-the-firefly-who-remembered-the-stars` — needs 01.png … NN.png
+- `maze-butterfly-garden` — needs maze.png + solved.png
+- AsmrReveal live render — needs blank.png + colored.png in any asmr/ folder
+
+**Remaining tasks:**
+- L2a: AsmrReveal live test (images only — no code)
+- L4b: Audio auto-selection
+- L5a: Auto-thumbnail extraction
+- L5b: Preview mode flag
+
+---
+**2026-04-13 s3 — Remotion L4b + L5a + L5b: audio auto-select, thumbnail, preview mode**
+
+Files changed: `scripts/render-video.mjs` (3 features added)
+
+**L4b — Audio auto-selection:**
+`AUDIO_MAP` lookup in render-video.mjs. If story.json/activity.json has no `musicPath`/`audioPath`, auto-picks:
+- coloring/maze → `assets/audio/crayon.mp3`
+- story → `assets/audio/Twinkle - The Grey Room _ Density & Time.mp3`
+Both `storyJsonToProps` and `activityJsonToProps` made async to support the `resolveAudio()` await.
+
+**L5a — Auto-thumbnail:**
+After every full render, calls `renderStill` at frame 90 (3s) → `*-thumb.jpg` alongside the mp4.
+Skipped in `--preview` mode. Failure is non-fatal (warns, continues).
+
+**L5b — Preview mode:**
+`--preview` flag caps duration at 90 frames (3s) and sets `scale: 0.5` on renderMedia → 540×960 output.
+Output filename gets `-preview` suffix. Available as `npm run animate:preview -- --comp X`.
+
+All dry-runs pass: ActivityChallenge (65s), HookIntro preview (3s @ 540×960), AsmrReveal (34.5s).
+
+**All Remotion layers now complete.** Next: drop images into output/stories/ and output/asmr/ and run `npm run generate:videos` for first live renders.

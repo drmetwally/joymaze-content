@@ -14,8 +14,8 @@
  *   HookIntro     — short 3-5s hook clip     (headline, subline, backgroundPath)
  */
 
-import { bundle }                          from '@remotion/bundler';
-import { renderMedia, selectComposition }  from '@remotion/renderer';
+import { bundle }                                      from '@remotion/bundler';
+import { renderMedia, selectComposition, renderStill } from '@remotion/renderer';
 import path   from 'path';
 import fs     from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -35,11 +35,36 @@ const propsArg      = getArg('--props');
 const outArg        = getArg('--out');
 const dryRun        = hasFlag('--dry-run');
 const verbose       = hasFlag('--verbose');
+const previewMode   = hasFlag('--preview');  // render first 3s at half resolution
+
+const PREVIEW_FRAMES = 90;  // 3s @ 30fps
+const PREVIEW_SCALE  = 0.5; // half resolution → 540×960
+
+// ─── Audio auto-selection ─────────────────────────────────────────────────────
+// Maps activity/composition type → audio file in assets/audio/.
+// Only applied when the caller has NOT already set an explicit audioPath/musicPath.
+// Falls back gracefully if the file doesn't exist (logs a warning, uses '').
+
+const AUDIO_MAP = {
+  coloring: 'assets/audio/crayon.mp3',   // soft crayon ASMR
+  maze:     'assets/audio/crayon.mp3',   // same for now — add pencil.mp3 when available
+  story:    'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
+  default:  'assets/audio/crayon.mp3',
+};
+
+async function resolveAudio(type) {
+  const rel = AUDIO_MAP[type] ?? AUDIO_MAP.default;
+  const abs  = path.join(ROOT, rel);
+  try { await fs.access(abs); return rel; } catch {
+    console.warn(`    [audio] ${rel} not found — skipping music`);
+    return '';
+  }
+}
 
 // ─── Props loaders ────────────────────────────────────────────────────────────
 
 // story.json → StoryEpisode props
-function storyJsonToProps(story, storyDir) {
+async function storyJsonToProps(story, storyDir) {
   const fps = 30;
   const slides = (story.slides ?? []).map((slide) => {
     // story.json uses `image`; render-video.mjs native format uses `imagePath` — accept both
@@ -54,17 +79,22 @@ function storyJsonToProps(story, storyDir) {
       durationFrames: Math.round(durationSec * fps),
     };
   });
+  // Auto-select music if story.json doesn't specify one
+  const musicPath = story.musicPath !== undefined
+    ? story.musicPath
+    : await resolveAudio('story');
+
   return {
     slides,
     hookText:    story.hook ?? story.hookText ?? '',
-    musicPath:   story.musicPath ?? '',
+    musicPath,
     musicVolume: story.musicVolume ?? 0.28,
     showJoyo:    story.showJoyo ?? true,
   };
 }
 
 // activity.json → AsmrReveal props
-function activityJsonToProps(activity, activityDir) {
+async function activityJsonToProps(activity, activityDir) {
   const fps = 30;
   const toRelative = (filename) =>
     path.relative(ROOT, path.resolve(activityDir, filename)).replace(/\\/g, '/');
@@ -85,7 +115,9 @@ function activityJsonToProps(activity, activityDir) {
     hookDurationSec:  hookSec,
     revealDurationSec: revealSec,
     holdDurationSec:  holdSec,
-    audioPath:        activity.audioPath ?? 'assets/audio/crayon.mp3',
+    audioPath:        activity.audioPath !== undefined
+                        ? activity.audioPath
+                        : await resolveAudio(activity.type ?? 'coloring'),
     audioVolume:      activity.audioVolume ?? 0.85,
     showJoyo:         activity.showJoyo ?? true,
     showParticles:    activity.showParticles ?? true,
@@ -128,6 +160,12 @@ function computeDuration(inputProps, compId) {
     const count   = inputProps.facts?.length ?? 3;
     return Math.round((2 + cardSec * count) * fps); // 2s title intro + cards
   }
+  if (compId === 'ActivityChallenge') {
+    const hookSec  = inputProps.hookDurationSec ?? 2.5;
+    const timerSec = inputProps.countdownSec    ?? 60;
+    const holdSec  = inputProps.holdAfterSec    ?? 2.5;
+    return Math.round((hookSec + timerSec + holdSec) * fps);
+  }
   return fps * 30;
 }
 
@@ -156,16 +194,22 @@ async function main() {
   // Clean _totalSec before passing to composition (internal helper field)
   const { _totalSec, ...cleanProps } = inputProps;
 
+  // Preview mode: cap duration + half resolution
+  const renderFrames = previewMode ? Math.min(totalFrames, PREVIEW_FRAMES) : totalFrames;
+
   const outputPath = outArg
-    ?? path.join(ROOT, 'output', 'videos', `${compositionId}-${Date.now()}.mp4`);
+    ?? path.join(ROOT, 'output', 'videos', `${compositionId}-${Date.now()}${previewMode ? '-preview' : ''}.mp4`);
 
   console.log('\n🎬  Remotion Render');
   console.log(`    Composition : ${compositionId}`);
-  console.log(`    Duration    : ${totalFrames} frames (${(totalFrames / 30).toFixed(1)}s @ 30fps)`);
+  console.log(`    Duration    : ${renderFrames} frames (${(renderFrames / 30).toFixed(1)}s @ 30fps)${previewMode ? '  [PREVIEW]' : ''}`);
+  if (previewMode)                console.log(`    Scale       : ${PREVIEW_SCALE}× (${Math.round(1080 * PREVIEW_SCALE)}×${Math.round(1920 * PREVIEW_SCALE)})`);
   if (cleanProps.slides?.length)  console.log(`    Slides      : ${cleanProps.slides.length}`);
   if (cleanProps.blankImagePath)  console.log(`    Blank       : ${cleanProps.blankImagePath}`);
   if (cleanProps.solvedImagePath) console.log(`    Solved      : ${cleanProps.solvedImagePath}`);
   if (cleanProps.hookText)        console.log(`    Hook        : "${cleanProps.hookText}"`);
+  if (cleanProps.musicPath)       console.log(`    Music       : ${cleanProps.musicPath}`);
+  if (cleanProps.audioPath)       console.log(`    Audio       : ${cleanProps.audioPath}`);
   console.log(`    Output      : ${outputPath}`);
 
   if (dryRun) {
@@ -176,7 +220,7 @@ async function main() {
 
   const serveUrl    = await getBundle();
   const composition = await selectComposition({ serveUrl, id: compositionId, inputProps: cleanProps });
-  composition.durationInFrames = totalFrames;
+  composition.durationInFrames = renderFrames;
 
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
@@ -190,6 +234,7 @@ async function main() {
     codec:          'h264',
     outputLocation: outputPath,
     inputProps:     cleanProps,
+    scale:          previewMode ? PREVIEW_SCALE : 1,
     onProgress: ({ progress }) => {
       const pct = Math.round(progress * 100);
       if (pct !== lastPct) {
@@ -200,7 +245,30 @@ async function main() {
   });
 
   const elapsed = ((Date.now() - t) / 1000).toFixed(1);
-  console.log(`\n\n    ✓ Done in ${elapsed}s → ${outputPath}\n`);
+  console.log(`\n\n    ✓ Done in ${elapsed}s → ${outputPath}`);
+
+  // ── Auto-thumbnail: extract frame at 3s as JPEG ───────────────────────────
+  if (!previewMode) {
+    const thumbFrame = Math.min(Math.round(3 * 30), renderFrames - 1);
+    const thumbPath  = outputPath.replace(/\.mp4$/, '-thumb.jpg');
+    try {
+      console.log(`\n    Extracting thumbnail (frame ${thumbFrame})...`);
+      await renderStill({
+        composition,
+        serveUrl,
+        output:     thumbPath,
+        inputProps: cleanProps,
+        frame:      thumbFrame,
+        imageFormat: 'jpeg',
+        jpegQuality: 85,
+      });
+      console.log(`    ✓ Thumbnail → ${thumbPath}`);
+    } catch (err) {
+      console.warn(`    [thumb] skipped: ${err.message}`);
+    }
+  }
+
+  console.log();
 }
 
 main().catch((err) => {
