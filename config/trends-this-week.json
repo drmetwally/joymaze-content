@@ -1,73 +1,58 @@
 {
-  "generated": "2026-04-05",
-  "valid_until": "2026-04-12",
+  "generated": "2026-04-13",
+  "valid_until": "2026-04-20",
   "sources": [
-    "google_trends",
     "seasonal_calendar"
   ],
   "trending_themes": [
     {
-      "theme": "Easter",
-      "score": 500
-    },
-    {
       "theme": "Garden/Flowers",
-      "score": 330
-    },
-    {
-      "theme": "Spring Animals",
-      "score": 300
-    },
-    {
-      "theme": "Spring",
-      "score": 150
+      "score": 110
     },
     {
       "theme": "Ocean/Underwater",
-      "score": 30
+      "score": 80
     },
     {
       "theme": "Forest/Woodland",
-      "score": 30
+      "score": 80
     },
     {
       "theme": "Bugs/Insects",
+      "score": 80
+    },
+    {
+      "theme": "Pets/Home",
+      "score": 30
+    },
+    {
+      "theme": "Birds/Sky",
       "score": 30
     }
   ],
   "boost_themes": [
-    "Easter",
     "Garden/Flowers",
-    "Spring Animals",
-    "Spring",
-    "Ocean/Underwater"
+    "Ocean/Underwater",
+    "Forest/Woodland",
+    "Bugs/Insects",
+    "Pets/Home"
   ],
   "rising_searches": [
-    "resurrection coloring pages for kids",
-    "lds coloring pages for kids",
-    "good friday coloring pages for kids",
-    "april coloring pages",
-    "april coloring pages for kids",
-    "funny coloring pages for kids",
-    "christian coloring pages for kids",
-    "easter coloring pages"
+    "earth day activities for kids",
+    "nature printables",
+    "mothers day printables",
+    "mothers day activities for kids"
   ],
   "upcoming_moments": [
     {
-      "event": "Easter Sunday",
-      "date": "2026-04-04",
-      "days_away": 0
-    },
-    {
-      "event": "Spring Break",
-      "date": "2026-03-28",
-      "days_away": 0,
-      "is_break": true
-    },
-    {
       "event": "Earth Day",
-      "date": "2026-04-21",
-      "days_away": 17
+      "date": "2026-04-22",
+      "days_away": 9
+    },
+    {
+      "event": "Mother's Day",
+      "date": "2026-05-11",
+      "days_away": 28
     }
   ],
   "caption_keywords": [
@@ -75,7 +60,7 @@
     "printable",
     "quiet time",
     "ages 4-8",
-    "easter printables for kids",
-    "spring break activities for kids"
+    "earth day activities for kids",
+    "mothers day printables"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-10",
+    "last_updated": "2026-04-13",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_type": 12,
     "description": "Winning hook patterns with real performance scores. Injected into generate-prompts.mjs system prompt and generate-captions.mjs as additional examples."
@@ -16,7 +16,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-07",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -29,7 +29,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-07",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -42,7 +42,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -55,7 +55,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -68,7 +68,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -81,7 +81,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -94,7 +94,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -107,7 +107,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -120,7 +120,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -133,7 +133,46 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260413_000",
+      "hook_type": "save_hook",
+      "text": "You're going to want to save this.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260413_001",
+      "hook_type": "save_hook",
+      "text": "Save this for your next slump day.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260413_002",
+      "hook_type": "engagement_question",
+      "text": "What if I told you [X] isn't as hard as you think?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": []
     }
@@ -165,7 +204,12 @@
       "hook_comp_20260411_003"
     ],
     "engagement_question": [
-      "hook_comp_20260411_004"
+      "hook_comp_20260411_004",
+      "hook_comp_20260413_002"
+    ],
+    "save_hook": [
+      "hook_comp_20260413_000",
+      "hook_comp_20260413_001"
     ]
   }
 }

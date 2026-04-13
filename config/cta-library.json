@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-10",
+    "last_updated": "2026-04-13",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_platform_per_type": 8,
     "description": "Winning CTA patterns by platform and content type. Merged with hardcoded CTAS in generate-captions.mjs."
@@ -17,18 +17,43 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-07",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         }
       ],
       "both": [],
       "books": [],
-      "seasonal": []
+      "seasonal": [
+        {
+          "id": "cta_pinterest_seasonal_20260413_000",
+          "text": "Print this week's Spring Adventure Pack – link in bio!",
+          "performance_score": null,
+          "outbound_click_rate_pct": null,
+          "source": "competitor_analysis",
+          "added_week": "2026-04-13",
+          "times_used": 0,
+          "decay_weeks": 0,
+          "brand_safe": true
+        }
+      ]
     },
     "instagram": {
       "app": [],
       "both": [],
-      "books": []
+      "books": [],
+      "engagement": [
+        {
+          "id": "cta_instagram_engagement_20260413_001",
+          "text": "Show us their masterpiece! Tag @JoyMazeApp to share their creations.",
+          "performance_score": null,
+          "outbound_click_rate_pct": null,
+          "source": "competitor_analysis",
+          "added_week": "2026-04-13",
+          "times_used": 0,
+          "decay_weeks": 0,
+          "brand_safe": true
+        }
+      ]
     },
     "tiktok": {
       "app": [],

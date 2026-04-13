@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-10",
+    "last_updated": "2026-04-13",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries": 20,
     "description": "Dynamic extension of PATTERN_INTERRUPT_POOL in generate-prompts.mjs. Entry shape matches hardcoded pool exactly — only lifecycle fields added."
@@ -17,7 +17,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Directly confronts parental screen time guilt by distinguishing between types of screen engagement, offering permission and understanding."
     },
@@ -31,7 +31,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Highlights a lesser-known but crucial benefit of JoyMaze activities, connecting physical engagement to academic success, appealing to parents' desire for their child's development."
     },
@@ -45,7 +45,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -59,7 +59,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -73,7 +73,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -87,9 +87,121 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "printables that creatively bridge the physical and digital worlds in a non-screen-time way",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-13",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "complex, multi-step paper engineering projects or 3D printable crafts",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-13",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "interactive physical-digital hybrids",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-13",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "augmented reality-ready coloring pages",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-13",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "printables that act as controllers for imaginative play inspired by popular digital games",
+      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
+      "added_week": "2026-04-13",
+      "source": "competitor_analysis",
+      "confidence": 0.7,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "myth-bust",
+      "topic": "Myth: Kids only learn from 'hands-on' crafts with physical materials. Fact: The brain develops fine motor skills and problem-solving just as effectively with digital tracing and printable mazes, without the mess.",
+      "visual": "Split screen: one side a child tracing on a tablet, other side a child tracing on paper, both focused.",
+      "added_week": "2026-04-13",
+      "source": "intelligence_refresh",
+      "confidence": 0.9,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Directly addresses parental guilt about screen time by validating the educational value of digital/printable activities, a core JoyMaze benefit."
+    },
+    {
+      "subtype": "did-you-know",
+      "topic": "Did you know? Engaging in simple pattern recognition activities, like those found in dot-to-dot or sudoku, significantly boosts a child's early math and logical reasoning abilities, setting them up for school success.",
+      "visual": "A child proudly pointing at a completed dot-to-dot or a simple graphic illustrating brain activity during problem-solving.",
+      "added_week": "2026-04-13",
+      "source": "intelligence_refresh",
+      "confidence": 0.85,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Connects JoyMaze's core activities to specific, tangible educational outcomes, providing parents with a logical justification for their choices."
+    },
+    {
+      "subtype": "surprising-stat",
+      "topic": "Surprising Stat: Children who regularly engage in focused, quiet activities for even 15-20 minutes a day show improved attention spans and reduced impulsivity compared to those with constant stimulation.",
+      "visual": "A clock with 20 minutes highlighted, or a serene image of a child deeply absorbed in a JoyMaze activity.",
+      "added_week": "2026-04-13",
+      "source": "intelligence_refresh",
+      "confidence": 0.8,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Addresses the parent's inner thought 'Nothing holds their attention for long' and 'I'd love just 20 minutes where I know they're okay' with a compelling, data-backed benefit."
     }
   ]
 }
