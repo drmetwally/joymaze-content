@@ -2,7 +2,7 @@
 
 > Print this. Follow it top to bottom. Every day. No thinking needed.
 
-Last updated: 2026-04-14
+Last updated: 2026-04-14 (dot-to-dot ASMR + seamless loop)
 
 ---
 
@@ -93,7 +93,7 @@ This does automatically, in order:
 5. Runs intelligence loop (Monday only)
 6. Generates 10 fresh AI image prompts → `output/prompts/prompts-YYYY-MM-DD.md`
 7. Generates story idea → `output/stories/`
-8. Generates ASMR brief → `output/asmr/` (rotates: coloring/maze/coloring/wordsearch/maze)
+8. Generates ASMR brief → `output/asmr/` (rotates: coloring/maze/coloring/wordsearch/dotdot/maze)
 9. Generates challenge brief → `output/challenge/` (rotates: maze/word-search/dot-to-dot)
 10. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
 
@@ -153,17 +153,22 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
 3. Save per type:
    ```
    # Coloring:
-   output/asmr/[type]-[theme]/blank.png      ← blank line art
-   output/asmr/[type]-[theme]/colored.png    ← fully colored
+   output/asmr/[type]-[theme]/blank.png      ← blank line art (zero color)
+   output/asmr/[type]-[theme]/solved.png     ← fully colored version
 
    # Maze:
-   output/asmr/[type]-[theme]/maze.png       ← empty maze
+   output/asmr/[type]-[theme]/blank.png      ← empty maze
    output/asmr/[type]-[theme]/solved.png     ← solved maze (with solution path drawn)
 
    # Word Search:
    output/asmr/[type]-[theme]/blank.png      ← word search grid, no highlights
    output/asmr/[type]-[theme]/solved.png     ← same grid with words highlighted in color
+
+   # Dot-to-Dot:
+   output/asmr/[type]-[theme]/blank.png      ← dot-to-dot puzzle (numbered dots, no lines)
+   output/asmr/[type]-[theme]/solved.png     ← same subject as connected clean line art
    ```
+   > **Dot-to-dot tip:** For pre-purchased assets, copy your existing blank/solved pair directly — no Gemini needed.
 
 ### 2D — Challenge Video Image (1 image)
 
@@ -209,6 +214,18 @@ npm run animate:asmr -- --asmr output/asmr/[folder]/
 # → words highlight one-by-one (marker wipe across each word), 30s total
 ```
 
+**Dot-to-Dot ASMR (2 steps — dot detection + sequential line-drawing animation):**
+```bash
+npm run extract:dotdot -- --asmr output/asmr/[folder]/
+# → dots.json (dot centroids in drawing order, inferred from solved outline skeleton)
+npm run animate:asmr -- --asmr output/asmr/[folder]/
+# → connecting lines draw dot→dot in sequence, cross-fades to solved at 90%
+```
+Check console: `Detected dots: N` — expect 20–70. If low, lower `DARK_THRESH` in extract-dotdot-path.mjs.
+
+**Seamless loop (all ASMR types):**
+Last 2s of every video: blank image fades back in → last frame ≈ first frame → platform loop is invisible. No action needed — built into the engine.
+
 **Dry-run (verify props without rendering):**
 ```bash
 npm run animate:asmr:dry -- --asmr output/asmr/[folder]/
@@ -218,6 +235,8 @@ npm run animate:asmr:dry -- --asmr output/asmr/[folder]/
 
 **extract:wordsearch — what it does:** Scale 40% → diff mask → dilate (radius 3) → BFS connected components (each = one word) → bounding box per word → filter noise → normalize → sort top-to-bottom → sample highlightColor. Check log for word count (expect 6–8 words).
 
+**extract:dotdot — what it does:** Scale 60% → threshold → BFS components → filter by area (10–500px) + compactness (area/bbox > 0.28) + max bbox dim (42px) → dot centroids. Separately: scale 20% solved → Zhang-Suen skeleton → walk. Project each dot onto skeleton → sort by path index = drawing order. Teleport-jump filter removes artifacts. Check log: `Detected dots: N` (expect 20–70).
+
 **Troubleshooting:**
 
 | Symptom | Cause | Fix |
@@ -226,6 +245,9 @@ npm run animate:asmr:dry -- --asmr output/asmr/[folder]/
 | Path traces wrong area | Faint solution line | Regenerate solved with bolder path |
 | `wordsearch.json` shows 0–2 word regions | DIFF_THRESHOLD too high or low-contrast highlights | Regenerate solved with more vivid highlight colors |
 | Too many word regions (>15) | Background noise | Increase MIN_PIXELS or DIFF_THRESHOLD in extract-wordsearch-path.mjs |
+| `dots.json` shows < 10 dots | DARK_THRESH too low or dots too light | Lower DARK_THRESH (try 130–150) in extract-dotdot-path.mjs |
+| Too many dots detected (noise) | Outline fragments passing filter | Raise MIN_FILL_RATIO or lower MAX_DOT_AREA in extract-dotdot-path.mjs |
+| Dot animation connects in wrong order | Skeleton walk took unexpected path | Check solved image has clean connected outline; or manually provide dots.json |
 | ENOSPC during render | Stale Remotion bundles | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
 | ProtocolError at ~93% | Non-fatal Chrome tab close | Ignore — render still completes |
 
@@ -384,7 +406,7 @@ npm run post:scheduled:dry
 | 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
 | 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
 | 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
-| 3 | Assemble ASMR video | 1–2 min | Coloring: `npm run animate:asmr -- --asmr output/asmr/[folder]/` · Maze: `extract:path` then `animate:asmr` · Wordsearch: `extract:wordsearch` then `animate:asmr` |
+| 3 | Assemble ASMR video | 1–2 min | Coloring: `animate:asmr` · Maze: `extract:path` → `animate:asmr` · Wordsearch: `extract:wordsearch` → `animate:asmr` · Dot-to-dot: `extract:dotdot` → `animate:asmr` |
 | 3B | Assemble challenge video | 1 min | `npm run animate:challenge -- --challenge output/challenge/[folder]/` |
 | 4 | Assemble story video (optional) | 1 min | `npm run generate:story:remotion -- --story [folder]` |
 | 5 | Activity puzzle videos | 1 min | `npm run generate:activity:video` |
@@ -489,7 +511,7 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | Output log shows 0 images | Archive is done by npm run daily — if you haven't archived yet, count is 0 |
 | Series name not in prompts | Series tags are Mon/Wed/Fri only. Other days: none (by design) |
 | Intelligence pools empty | First live Monday run still needed. Run `npm run intelligence:full` |
-| ASMR Remotion: missing images | Drop correct images into output/asmr/[folder]/ first (coloring: blank.png+colored.png; maze: maze.png+solved.png; wordsearch: blank.png+solved.png) |
+| ASMR Remotion: missing images | Drop correct images into output/asmr/[folder]/ first — all types use blank.png + solved.png |
 | Word search: 0 word regions | Solved image lacks visible highlights — regenerate with bright color (yellow/orange/green) over each word |
 | Word search: too many regions (>15) | Noise — increase MIN_PIXELS or DIFF_THRESHOLD in extract-wordsearch-path.mjs |
 | Challenge video: image not found | Confirm `puzzle.png` exists in `output/challenge/[folder]/` |
@@ -508,6 +530,7 @@ npm run brief:asmr
 npm run brief:asmr:coloring
 npm run brief:asmr:maze
 npm run brief:asmr:wordsearch
+npm run brief:asmr:dotdot
 
 # Challenge video brief
 npm run brief:challenge

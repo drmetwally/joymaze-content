@@ -672,3 +672,14 @@
 4. **Hook pause bug fixed:** Coloring was sitting on blank screen for 3s before wipe. Unified all types to `drawStart = 0`. `revealStart` dead code flagged for cleanup at dot-to-dot.
 
 **Next:** Dot-to-dot progressive reveal (new ASMR type + extraction script).
+
+---
+
+**2026-04-14 — Session N+2 — Dot-to-dot progressive reveal ASMR**
+
+1. Discussed asset types: pre-purchased (blank dot-to-dot + solved line art, matched pair) and AI-generated (dots-only, no numbers). Ahmed confirmed: actual connecting lines animation required.
+2. **Extraction approach decided:** detect dots from blank via compactness filter (no OCR), infer order by projecting onto solved image skeleton. Zero OCR, works on both asset types.
+3. **Built:** `extract-dotdot-path.mjs` + `DotToDoReveal.jsx` (stroke-dashoffset polyline draw) + wired into AsmrReveal + render-video + brief generator + package.json.
+4. Workflow: copy blank/solved → `extract:dotdot` → `animate:asmr`. Tuning via MIN_DOT_AREA / DARK_THRESH if detection needs adjustment.
+
+**Next:** Scheduled ASMR queue (seasonal brief pre-scheduling), then loop freeze-frame, then sudoku.

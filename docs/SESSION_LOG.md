@@ -1406,3 +1406,25 @@ Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome clos
 - **Earth Day briefs:** 3 coloring ASMR folders created manually: `coloring-garden-flowers` (Apr 19), `coloring-bugs-insects` (Apr 20), `coloring-forest-animals` (Apr 21). Each has `activity.json` + `brief.md` with full Gemini prompts.
 
 **Next:** Dot-to-dot progressive reveal (new ASMR type). Clean up `revealStart` dead code during that pass.
+
+---
+
+## 2026-04-14 — [Agent: Claude] — Dot-to-dot progressive reveal ASMR type
+
+**Files changed:** `scripts/extract-dotdot-path.mjs` (new), `remotion/components/DotToDoReveal.jsx` (new), `remotion/compositions/AsmrReveal.jsx`, `scripts/render-video.mjs`, `scripts/generate-asmr-brief.mjs`, `package.json`
+
+- **extract-dotdot-path.mjs:** Detects dot positions from blank image via size+compactness filters (rejects number labels — digits are elongated, dots are circular). Extracts solved image outline skeleton (Zhang-Suen, same as maze). Projects each dot centroid onto skeleton path → sorts by path index = drawing order. No OCR. Outputs `dots.json`. Teleport-jump filter removes ordering artifacts where skeleton jumps across figure.
+
+- **DotToDoReveal.jsx:** SVG polyline + `stroke-dashoffset` trick draws all connecting lines progressively (0→totalLength). Dot markers appear as line reaches each point. Cross-fades to solved at 90% progress. Clean, no external deps.
+
+- **AsmrReveal.jsx:** 4th branch added (priority: dotdot > wordsearch > maze > coloring). Dead `revealStart` variable removed. `dotWaypoints` + `dotColor` props added.
+
+- **render-video.mjs:** Loads `dots.json` with same AR letterbox correction as maze/wordsearch.
+
+- **generate-asmr-brief.mjs:** `dotdot` added to rotation (`coloring/maze/coloring/wordsearch/dotdot/maze`, 1/6 days). Blank/solved descriptions, `extract:dotdot` step in brief markdown, pre-purchased asset note.
+
+- **package.json:** `extract:dotdot` + `brief:asmr:dotdot` npm scripts added.
+
+**Tuning knobs if extraction fails:** `MIN_DOT_AREA`, `MAX_DOT_AREA`, `DARK_THRESH` at top of extract-dotdot-path.mjs. Check console: "Detected dots: N" — expect 20–70.
+
+**Next:** Scheduled ASMR queue (config/scheduled-asmr.json maps dates to pre-built folders for seasonal pushes). Then: loop freeze-frame, sudoku cell-fill.
