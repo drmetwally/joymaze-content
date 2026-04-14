@@ -1372,3 +1372,21 @@ npm run animate:asmr -- --asmr output/asmr/[slug]/activity.json
 Added post-render cleanup to `render-video.mjs`: after every successful render, scans `%TEMP%` for `remotion-webpack-bundle-*` dirs and deletes all except the current one. Prevents disk exhaustion across sessions (each bundle was ~14MB lean but stale ones accumulate). Cleanup line printed to console on each invocation that removes bundles. Non-fatal — wrapped in try/catch.
 
 Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome closes tab after work is done); render completes to 100% and output is valid.
+
+---
+
+## 2026-04-14 — [Agent: Claude] — Animation engine expansion: Countdown Challenge + Word Search ASMR + Remotion story migration
+
+**Files changed:** `scripts/generate-challenge-brief.mjs` (new), `scripts/extract-wordsearch-path.mjs` (new), `remotion/components/WordSearchReveal.jsx` (new), `remotion/compositions/AsmrReveal.jsx`, `remotion/compositions/StoryEpisode.jsx`, `scripts/render-video.mjs`, `scripts/generate-asmr-brief.mjs`, `scripts/track-output.mjs`, `package.json`, memory files
+
+- **Strategy:** Competitor analysis + trend data identified 3 high-impact engine upgrades. Earth Day (Apr 21) + "Can your kid?" challenge hook formula + word search as underserved content gap.
+
+- **Countdown Challenge format (Task 1):** `ActivityChallenge.jsx` composition was already built + `animate:challenge` already existed. Added: `generate-challenge-brief.mjs` — Groq brief generator for challenge videos (maze/word-search/dot-to-dot puzzles, single image, hook = "Can your kid solve this?", CTA = time drop comment bait). Added `--challenge` flag + `challengeJsonToProps()` to `render-video.mjs`. Auto-sets `ActivityChallenge` comp when `--challenge` passed without `--comp`. `output/challenge/` folder added to Remotion publicDir copy. `brief:challenge` + `brief:challenge:dry` npm scripts. Challenge folder type rotation: maze/word-search/dot-to-dot/maze/word-search by day.
+
+- **Word Search Highlight Reveal ASMR (Task 2):** New 3rd ASMR type. `extract-wordsearch-path.mjs` — diff blank/solved → dilate (radius 3) to merge word pixels → BFS connected components → bounding box per word → filter noise (MIN_PIXELS=25, MAX_PIXELS_PCT=8%) → normalize → sort top-to-bottom → sample highlight color → save `wordsearch.json`. `WordSearchReveal.jsx` — SVG rect per word, horizontal wipe expand (14 frames/word), glow filter, cross-fade to solved at 92%. AR-corrected coordinate mapping added to `render-video.mjs` (same letterboxing logic as maze path). `AsmrReveal.jsx` now branches: wordsearch → WordSearchReveal, maze → MazeSolverReveal, coloring → WipeReveal. ASMR type rotation updated: coloring/maze/coloring/wordsearch/maze. `extract:wordsearch` npm script. Brief generator updated: wordsearch `blankDesc`/`coloredDesc`/CRITICAL RULES. Brief markdown now conditionally shows `extract:path` or `extract:wordsearch` step. `brief:asmr*` family of npm shortcuts added.
+
+- **Remotion story migration (Task 3):** `storyJsonToProps` now passes `typewriterCaptions: true` (default on), `peakSlideIndex` (defaults to 2nd-to-last slide — resolution beat). `StoryEpisode.jsx` updated: imports `FloatingParticles`, `peakSlideIndex` prop added, FloatingParticles fires at the peak slide (35% into the scene, 2.5s duration). The `--remotion` flag was already wired to call `renderWithRemotion()` which calls `render-video.mjs --comp StoryEpisode`. Now each story rendered via `--remotion` gets: word-by-word typewriter captions, sparkle particles on the emotional high point.
+
+- **Daily workflow integration (Task 4):** `generate-challenge-brief.mjs --save` added to `daily` npm script (additive — challenge brief now generates daily alongside ASMR brief). `track-output.mjs`: `challengeVideos` counter added (videos/*.mp4 matching 'challenge' keyword), report table updated with Challenge column, archive counter excludes '-challenge-' pattern. Phase 0 gate unchanged (challenge is bonus metric).
+
+- **Earth Day push:** To be done as content (no code needed) — use `brief:asmr:coloring` with Garden/Flowers/Bugs themes, April 19-21.

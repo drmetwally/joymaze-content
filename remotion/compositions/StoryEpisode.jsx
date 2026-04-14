@@ -12,6 +12,7 @@ import { HookText }            from '../components/HookText.jsx';
 import { JoyoWatermark }       from '../components/JoyoWatermark.jsx';
 import { CaptionBar }          from '../components/CaptionBar.jsx';
 import { TypewriterCaption }   from '../components/TypewriterCaption.jsx';
+import { FloatingParticles }   from '../components/FloatingParticles.jsx';
 
 // ─── Default props / schema ──────────────────────────────────────────────────
 // Used as defaultProps in index.jsx and as a reference for callers.
@@ -27,6 +28,7 @@ export const storyEpisodeSchema = {
   showJoyo: true,         // Show floating Joyo watermark
   transitionFrames: 15,   // Cross-fade duration in frames (15 = 0.5s @ 30fps)
   typewriterCaptions: false,  // If true, use animated word-by-word TypewriterCaption instead of static CaptionBar
+  peakSlideIndex: -1,          // Slide index where FloatingParticles fires (emotional high point). -1 = disabled.
 };
 
 // ─── StoryEpisode ─────────────────────────────────────────────────────────────
@@ -46,6 +48,7 @@ export const StoryEpisode = ({
   showJoyo = true,
   transitionFrames = 15,
   typewriterCaptions = false,
+  peakSlideIndex = -1,
 }) => {
   const { fps } = useVideoConfig();
 
@@ -83,6 +86,18 @@ export const StoryEpisode = ({
           <HookText text={hookText} position="center" />
         </Sequence>
       )}
+
+      {/* ── Floating particles on peak scene (emotional high point) ─── */}
+      {peakSlideIndex >= 0 && schedule[peakSlideIndex] && (() => {
+        const peak = schedule[peakSlideIndex];
+        const particleFrames = Math.round(fps * 2.5);
+        const particleStart  = peak.startFrame + Math.floor((peak.durationFrames ?? fps * 4) * 0.35);
+        return (
+          <Sequence from={particleStart} durationInFrames={particleFrames}>
+            <FloatingParticles count={18} emoji="✨" startFrame={0} />
+          </Sequence>
+        );
+      })()}
 
       {/* ── Joyo watermark (full video) ──────────────────────────────── */}
       <JoyoWatermark visible={showJoyo} />

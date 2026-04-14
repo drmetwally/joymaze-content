@@ -2,7 +2,7 @@
 
 > Print this. Follow it top to bottom. Every day. No thinking needed.
 
-Last updated: 2026-04-12
+Last updated: 2026-04-14
 
 ---
 
@@ -14,11 +14,12 @@ MONDAY AUTOMATIC (npm run daily + GitHub Actions):
   weekly-scorecard.mjs    → config/performance-weights.json    (save-rate by archetype/category)
   collect-trends.mjs      → config/trends-this-week.json       (Google Trends + seasonal calendar)
   intelligence-refresh.mjs→ config/content-intelligence.json   (Gemini competitor web search)
-  apply-intelligence.mjs  → 4 dynamic pool files:
-                              config/theme-pool-dynamic.json    (trending topics)
-                              config/hooks-library.json         (proven hook patterns)
-                              config/cta-pool-dynamic.json      (high-CTR CTAs)
-                              config/pattern-interrupt-dynamic.json (did-you-know facts)
+  apply-intelligence.mjs  → 5 dynamic pool files:
+                              config/theme-pool-dynamic.json       (trending topics)
+                              config/hooks-library.json            (proven hook patterns)
+                              config/cta-library.json              (high-CTR CTAs)
+                              config/pattern-interrupt-dynamic.json(did-you-know facts)
+                              config/x-post-topics-dynamic.json    (X angle diversity)
 
 DAILY (generate-prompts.mjs reads everything above):
   themes         ← trending themes (boost_themes) + analytics ranking
@@ -92,8 +93,9 @@ This does automatically, in order:
 5. Runs intelligence loop (Monday only)
 6. Generates 10 fresh AI image prompts → `output/prompts/prompts-YYYY-MM-DD.md`
 7. Generates story idea → `output/stories/`
-8. Generates ASMR brief → `output/asmr/`
-9. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
+8. Generates ASMR brief → `output/asmr/` (rotates: coloring/maze/coloring/wordsearch/maze)
+9. Generates challenge brief → `output/challenge/` (rotates: maze/word-search/dot-to-dot)
+10. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
 
 **Check today's prompts:** Open `output/prompts/prompts-YYYY-MM-DD.md`
 
@@ -144,11 +146,11 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
 
 > Goes into its own folder, NOT output/raw/
 
-1. Open: `output/asmr/[type]-[theme]/brief.md` (or check prompts file for ASMR brief)
+1. Open: `output/asmr/[type]-[theme]/brief.md`
 2. Generate in Gemini — **same chat for both images for visual consistency**:
    - **Image 1 (blank):** empty activity, line art, white background
    - **Image 2 (solved/colored):** same activity fully completed
-3. Save:
+3. Save per type:
    ```
    # Coloring:
    output/asmr/[type]-[theme]/blank.png      ← blank line art
@@ -157,10 +159,24 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
    # Maze:
    output/asmr/[type]-[theme]/maze.png       ← empty maze
    output/asmr/[type]-[theme]/solved.png     ← solved maze (with solution path drawn)
-   ```
-   Make sure `activity.json` has `"blankImage": "maze.png"` and `"solvedImage": "solved.png"` for mazes (already set if brief was auto-generated).
 
-### 2D — Story Video Images (7 images, optional)
+   # Word Search:
+   output/asmr/[type]-[theme]/blank.png      ← word search grid, no highlights
+   output/asmr/[type]-[theme]/solved.png     ← same grid with words highlighted in color
+   ```
+
+### 2D — Challenge Video Image (1 image)
+
+> Goes into its own folder, NOT output/raw/
+
+1. Open: `output/challenge/[type]-[theme]/brief.md`
+2. Generate ONE puzzle image in Gemini (blank/unsolved puzzle, no answers shown)
+3. Save:
+   ```
+   output/challenge/[type]-[theme]/puzzle.png   ← blank puzzle only
+   ```
+
+### 2E — Story Video Images (7 images, optional)
 
 > Goes into its own folder, NOT output/raw/
 
@@ -172,41 +188,66 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
 
 ## STEP 3 — Assemble ASMR Video (1–2 min)
 
-**Maze ASMR (2 steps — skeleton path extraction + drawing animation):**
+**Coloring ASMR (1 step — top-to-bottom color wipe):**
 ```bash
-npm run extract:path -- output/asmr/[folder]/activity.json
-# Outputs: path.json (400 waypoints + pathColor auto-detected from solved image)
-
-npm run animate:asmr -- --asmr output/asmr/[folder]/activity.json
-# Renders: pencil draws solution path start→finish, cross-fades to solved image. 30s total.
+npm run animate:asmr -- --asmr output/asmr/[folder]/
 ```
 
-**Coloring ASMR (1 step — top-to-bottom wipe fill):**
+**Maze ASMR (2 steps — path extraction + pencil-drawing animation):**
 ```bash
-npm run animate:asmr -- --asmr output/asmr/[folder]/activity.json
+npm run extract:path -- --asmr output/asmr/[folder]/
+# → path.json (400 waypoints + pathColor auto-detected from solved image)
+npm run animate:asmr -- --asmr output/asmr/[folder]/
+# → pencil draws solution path start→finish, 30s total
+```
+
+**Word Search ASMR (2 steps — word region extraction + highlight animation):**
+```bash
+npm run extract:wordsearch -- --asmr output/asmr/[folder]/
+# → wordsearch.json (word bounding boxes + highlightColor from solved image)
+npm run animate:asmr -- --asmr output/asmr/[folder]/
+# → words highlight one-by-one (marker wipe across each word), 30s total
 ```
 
 **Dry-run (verify props without rendering):**
 ```bash
-npm run animate:asmr:dry -- --asmr output/asmr/[folder]/activity.json
+npm run animate:asmr:dry -- --asmr output/asmr/[folder]/
 ```
 
-**Maze ASMR — what extract:path does:**
-- Scales image to 20% → diff mask → Zhang-Suen skeleton → BFS walk from maze entrance
-- Auto-detects path color from highest-diff pixels (matches the solution line color in solved image)
-- Output: `path.json` alongside `activity.json`
-- Log line to check: `Raw path length: NNN pixels` — if < 50, something is wrong with images
+**extract:path — what it does:** Scale 20% → diff mask → Zhang-Suen skeleton → BFS walk → arc-length subsample 400 waypoints → sample pathColor. Check log: `Raw path length: NNN pixels` — if < 50, images are wrong.
+
+**extract:wordsearch — what it does:** Scale 40% → diff mask → dilate (radius 3) → BFS connected components (each = one word) → bounding box per word → filter noise → normalize → sort top-to-bottom → sample highlightColor. Check log for word count (expect 6–8 words).
 
 **Troubleshooting:**
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `path.json` missing or raw path < 50px | Images look too similar / DIFF_THRESHOLD too high | Check blank vs solved are actually different; lower DIFF_THRESHOLD in extract-maze-path.mjs |
-| Path traces wrong area of maze | Maze has very faint solution line | Regenerate solved image with bolder solution line |
-| ENOSPC during render | Stale Remotion bundles in %TEMP% | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
-| ProtocolError at ~93% | Non-fatal Chrome tab close — render still completes | Ignore |
+| `path.json` missing or raw path < 50px | Images too similar / threshold too high | Check blank vs solved differ; lower DIFF_THRESHOLD in extract-maze-path.mjs |
+| Path traces wrong area | Faint solution line | Regenerate solved with bolder path |
+| `wordsearch.json` shows 0–2 word regions | DIFF_THRESHOLD too high or low-contrast highlights | Regenerate solved with more vivid highlight colors |
+| Too many word regions (>15) | Background noise | Increase MIN_PIXELS or DIFF_THRESHOLD in extract-wordsearch-path.mjs |
+| ENOSPC during render | Stale Remotion bundles | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
+| ProtocolError at ~93% | Non-fatal Chrome tab close | Ignore — render still completes |
 
 Replace `[folder]` with your folder from `output/asmr/`.
+
+---
+
+## STEP 3B — Assemble Challenge Video (1 min)
+
+```bash
+npm run animate:challenge -- --challenge output/challenge/[folder]/
+# → hook screen (2.5s) + puzzle + counting timer + CTA. ~65s total.
+```
+
+**Dry-run:**
+```bash
+npm run animate:challenge:dry -- --challenge output/challenge/[folder]/
+```
+
+Challenge videos go straight to queue → publish with `npm run publish`.
+
+Replace `[folder]` with your folder from `output/challenge/`.
 
 ---
 
@@ -214,8 +255,9 @@ Replace `[folder]` with your folder from `output/asmr/`.
 
 **Option A — Remotion (recommended, animated):**
 ```bash
-# Remotion path — fully animated slides with spring transitions
 npm run generate:story:remotion -- --story epNN-[title]
+# Animated: typewriter captions word-by-word + ✨ FloatingParticles on resolution scene
+# Override defaults in story.json: "typewriterCaptions": false, "peakSlide": N
 ```
 
 **Option B — Edge TTS + FFmpeg (free, fast):**
@@ -340,16 +382,18 @@ npm run post:scheduled:dry
 | 2A | Inspiration images (5) | 10–15 min | Gemini → `output/raw/<slot>/` |
 | 2B | Activity puzzle images (5) | 15–20 min | Gemini → `output/raw/<type>/` |
 | 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
-| 2D | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
-| 3 | Assemble ASMR video | 1–2 min | Maze: `npm run extract:path -- output/asmr/[folder]/activity.json && npm run animate:asmr -- --asmr output/asmr/[folder]/activity.json` · Coloring: skip extract:path |
-| 4 | Assemble story video (optional) | 1 min | `npm run generate:story:edge -- --story [folder]` |
+| 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
+| 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
+| 3 | Assemble ASMR video | 1–2 min | Coloring: `npm run animate:asmr -- --asmr output/asmr/[folder]/` · Maze: `extract:path` then `animate:asmr` · Wordsearch: `extract:wordsearch` then `animate:asmr` |
+| 3B | Assemble challenge video | 1 min | `npm run animate:challenge -- --challenge output/challenge/[folder]/` |
+| 4 | Assemble story video (optional) | 1 min | `npm run generate:story:remotion -- --story [folder]` |
 | 5 | Activity puzzle videos | 1 min | `npm run generate:activity:video` |
 | 6 | Import + brand images | 1 min | `npm run import:raw` |
 | 7 | AI captions | 2–3 min | `npm run generate:captions` |
 | 8 | Push queue to GitHub ⚠️ | 1 min | `git add output/queue/ && git commit -m "queue: date" && git push` |
 | 9 | Done — cloud posts at 4 AM | auto | GitHub Actions |
 
-**Total active time: ~40–45 min/day**
+**Total active time: ~42–48 min/day** (Challenge video adds ~2 min of image gen + 1 min render)
 
 ---
 
@@ -445,7 +489,10 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | Output log shows 0 images | Archive is done by npm run daily — if you haven't archived yet, count is 0 |
 | Series name not in prompts | Series tags are Mon/Wed/Fri only. Other days: none (by design) |
 | Intelligence pools empty | First live Monday run still needed. Run `npm run intelligence:full` |
-| ASMR Remotion: missing images | Drop blank.png + colored.png into output/asmr/[folder]/ first |
+| ASMR Remotion: missing images | Drop correct images into output/asmr/[folder]/ first (coloring: blank.png+colored.png; maze: maze.png+solved.png; wordsearch: blank.png+solved.png) |
+| Word search: 0 word regions | Solved image lacks visible highlights — regenerate with bright color (yellow/orange/green) over each word |
+| Word search: too many regions (>15) | Noise — increase MIN_PIXELS or DIFF_THRESHOLD in extract-wordsearch-path.mjs |
+| Challenge video: image not found | Confirm `puzzle.png` exists in `output/challenge/[folder]/` |
 
 ---
 
@@ -456,9 +503,15 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 npm run generate:story:idea
 npm run generate:story:ideas -- --theme "lost penguin"
 
-# Extra ASMR brief
-npm run generate:asmr:brief
-npm run generate:asmr:brief -- --type maze
+# Extra ASMR brief (auto-rotates type)
+npm run brief:asmr
+npm run brief:asmr:coloring
+npm run brief:asmr:maze
+npm run brief:asmr:wordsearch
+
+# Challenge video brief
+npm run brief:challenge
+npm run brief:challenge -- --type word-search
 
 # Force analytics run
 npm run analytics

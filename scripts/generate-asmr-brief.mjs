@@ -38,9 +38,10 @@ const FORCE_TYPE = typeIdx !== -1 ? args[typeIdx + 1] : null;
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
-// Alternate coloring / maze by calendar day
+// Rotate coloring / maze / wordsearch by calendar day
 function getDefaultType() {
-  return new Date().getDate() % 2 === 0 ? 'coloring' : 'maze';
+  const types = ['coloring', 'maze', 'coloring', 'wordsearch', 'maze'];
+  return types[new Date().getDate() % types.length];
 }
 
 // ── Context loading ───────────────────────────────────────────────────────────
@@ -192,11 +193,15 @@ function buildPrompt(type, context) {
 
   const blankDesc = type === 'coloring'
     ? 'UNCOLORED black line art only — a printable coloring page with zero color applied. Clean black outlines on white background. Every shape interior is white and empty.'
-    : 'blank maze — clean black lines on white, no solution path shown, clear Start and Finish labels';
+    : type === 'wordsearch'
+      ? 'blank word search grid — 10×10 or 12×12 grid of random letters on white, with 6-8 hidden words on the theme. Clean black letters, no highlights, word list shown below the grid.'
+      : 'blank maze — clean black lines on white, no solution path shown, clear Start and Finish labels';
 
   const coloredDesc = type === 'coloring'
     ? 'same scene fully colored in vibrant, kid-friendly colors — identical composition and characters as blank version, now fully colored'
-    : 'same maze with the correct solution path drawn in a single bright contrasting color — all other areas unchanged';
+    : type === 'wordsearch'
+      ? 'same word search grid with each hidden word highlighted in a bright, distinct color (yellow, orange, or green marker stroke over each word) — identical layout, only the word highlights added'
+      : 'same maze with the correct solution path drawn in a single bright contrasting color — all other areas unchanged';
 
   return `${styleGuide}
 
@@ -229,9 +234,11 @@ Return a JSON object with exactly these fields:
 CRITICAL RULES — read carefully:
 - Theme must NOT be in the recently used list
 - Both image prompts must describe the SAME scene (same characters, same composition, same art style)
-- BLANK IMAGE (${type === 'coloring' ? 'coloring' : 'maze'}): ${type === 'coloring'
+- BLANK IMAGE (${type}): ${type === 'coloring'
     ? 'ZERO color. No fills. No shading. No "soft colors", no "pastel tones", no "lightly colored". If ANY color word appears in blankPrompt other than "black" and "white", it is WRONG. The blankPrompt describes a printable coloring sheet — black outlines, white interior, nothing else.'
-    : 'NO solution path. No highlighted route. No colored lines. Only the blank maze structure.'}
+    : type === 'wordsearch'
+      ? 'NO word highlights. No colored letters. No marker strokes. Only the plain grid of letters on white, identical to a printable word search puzzle before any answers are found.'
+      : 'NO solution path. No highlighted route. No colored lines. Only the blank maze structure.'}
 - Hook: 3-6 words, builds curiosity or wonder, no hashtags, no emoji
 - Art style: whimsical, warm, appealing to kids 4-8 and their parents`;
 }
@@ -285,12 +292,22 @@ ${brief.coloredPrompt}
 
 Both must be 1080×1920 px (9:16 portrait).
 
-## Step 3 — Generate the video
+${type === 'maze' ? `## Step 3 — Extract maze solution path
 \`\`\`
-npm run generate:asmr -- --asmr ${folderName}
+npm run extract:path -- --asmr ${folderName}
 \`\`\`
 
-## Step 4 — Publish
+## Step 4 — Generate the video` : type === 'wordsearch' ? `## Step 3 — Extract word highlight rects
+\`\`\`
+npm run extract:wordsearch -- --asmr ${folderName}
+\`\`\`
+
+## Step 4 — Generate the video` : `## Step 3 — Generate the video`}
+\`\`\`
+npm run animate:asmr -- --asmr ${folderName}
+\`\`\`
+
+## ${type === 'coloring' ? 'Step 4' : 'Step 5'} — Publish
 \`\`\`
 npm run publish
 \`\`\`

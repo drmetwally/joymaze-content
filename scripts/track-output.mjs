@@ -38,6 +38,7 @@ async function countImages() {
       f.endsWith('.json') &&
       !f.includes('story-ep') &&
       !f.includes('-asmr-') &&
+      !f.includes('-challenge-') &&
       !f.startsWith('x-text-')
     ).length;
   } catch { return 0; }
@@ -90,13 +91,14 @@ async function report(log) {
   const recent = log.slice(-7);
   console.log('\nDaily Output Log — last 7 days');
   console.log('─'.repeat(70));
-  console.log('Date        │ Images │ Stories │ ASMR │ X Posts │ Gate');
-  console.log('─'.repeat(70));
+  console.log('Date        │ Images │ Stories │ ASMR │ Challenge │ X Posts │ Gate');
+  console.log('─'.repeat(78));
   for (const e of recent) {
     const gate = meetsGate(e);
-    const xp = e.xTextPosts ?? 0;
+    const xp   = e.xTextPosts ?? 0;
+    const cv   = e.challengeVideos ?? 0;
     console.log(
-      `${e.date}  │  ${String(e.images).padStart(4)}  │   ${String(e.storyVideos).padStart(4)}  │  ${String(e.asmrVideos).padStart(3)} │   ${String(xp).padStart(4)}  │ ${gate ? 'MET' : '---'}`
+      `${e.date}  │  ${String(e.images).padStart(4)}  │   ${String(e.storyVideos).padStart(4)}  │  ${String(e.asmrVideos).padStart(3)} │     ${String(cv).padStart(4)}    │   ${String(xp).padStart(4)}  │ ${gate ? 'MET' : '---'}`
     );
   }
   console.log('─'.repeat(70));
@@ -119,30 +121,32 @@ async function main() {
   }
 
   // Count today's output
-  const [images, storyVideos, asmrVideos, xTextPosts] = await Promise.all([
+  const [images, storyVideos, asmrVideos, challengeVideos, xTextPosts] = await Promise.all([
     countImages(),
     countVideos('story'),
     countVideos('asmr'),
+    countVideos('challenge'),
     countXTextPosts(),
   ]);
 
   // Upsert today's entry
   log = log.filter(e => e.date !== today);
-  log.push({ date: today, images, storyVideos, asmrVideos, xTextPosts, loggedAt: new Date().toISOString() });
+  log.push({ date: today, images, storyVideos, asmrVideos, challengeVideos, xTextPosts, loggedAt: new Date().toISOString() });
   log = log.slice(-90); // keep last 90 days
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   await fs.writeFile(LOG_PATH, JSON.stringify(log, null, 2));
 
   // Summary
-  const entry = { images, storyVideos, asmrVideos, xTextPosts };
+  const entry = { images, storyVideos, asmrVideos, challengeVideos, xTextPosts };
   const gate = meetsGate(entry);
   const streak = countStreak(log);
   console.log(`\nDaily Output — ${today}`);
-  console.log(`  Images:        ${images}/10  ${images >= 10 ? 'OK' : '--'}`);
-  console.log(`  Story videos:  ${storyVideos}/1   ${storyVideos >= 1 ? 'OK' : '--'}`);
-  console.log(`  ASMR videos:   ${asmrVideos}/1   ${asmrVideos >= 1 ? 'OK' : '--'}`);
-  console.log(`  X text posts:  ${xTextPosts}/4   ${xTextPosts >= 4 ? 'OK' : '--'}`);
+  console.log(`  Images:          ${images}/10  ${images >= 10 ? 'OK' : '--'}`);
+  console.log(`  Story videos:    ${storyVideos}/1   ${storyVideos >= 1 ? 'OK' : '--'}`);
+  console.log(`  ASMR videos:     ${asmrVideos}/1   ${asmrVideos >= 1 ? 'OK' : '--'}`);
+  console.log(`  Challenge videos: ${challengeVideos}     (bonus)`);
+  console.log(`  X text posts:    ${xTextPosts}/4   ${xTextPosts >= 4 ? 'OK' : '--'}`);
   console.log(`  Phase 0 gate: ${gate ? 'MET' : 'not yet'} | Streak: ${streak}/30 days`);
   console.log(`  Saved: output/daily-output-log.json\n`);
 }

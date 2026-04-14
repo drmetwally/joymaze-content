@@ -646,3 +646,18 @@
 - [Claude 2026-04-13 s4] AsmrReveal 6-improvement pass: hand+pencil cursor (MazeHandCursor.jsx, follows actual solution path via path.json), progress bar 7→14px, objectFit contain (no side-crop), removed joymaze.com watermark, hook text persistent full-video, audio loops. Plus extract-maze-path.mjs script + npm run extract:path. publicDir lean copy (~14MB) cuts bundle from 66s→1.5s, fixes ENOSPC. Live render confirmed 34.5s. Cheatsheet + memory updated.
 
 - [Claude 2026-04-13 s4 addendum] Post-render Remotion bundle auto-cleanup: render-video.mjs now purges all stale remotion-webpack-bundle-* dirs from %TEMP% after each render. Prevents ENOSPC recurrence. ProtocolError at 93% confirmed non-fatal.
+
+---
+
+## 2026-04-14 — Animation engine expansion
+
+**Session:** Animation engine expansion — Countdown Challenge, Word Search ASMR, Remotion story migration.
+
+**Work done:**
+1. **Countdown Challenge**: `generate-challenge-brief.mjs` + `--challenge` loader in `render-video.mjs`. `ActivityChallenge.jsx` was already built. `brief:challenge` npm script. "Can your kid solve this?" viral mechanic. maze/word-search/dot-to-dot rotation.
+2. **Word Search Reveal ASMR**: `extract-wordsearch-path.mjs` (diff → dilate → BFS components → bounding boxes → normalize) + `WordSearchReveal.jsx` (SVG rects, horizontal wipe per word, glow) + wired into `AsmrReveal.jsx` as `revealType='wordsearch'`. `extract:wordsearch` script. Brief generator updated with wordsearch prompts + instructions.
+3. **Remotion story migration**: `StoryEpisode.jsx` now has `FloatingParticles` on `peakSlideIndex` (defaults to 2nd-to-last slide). `storyJsonToProps` passes `typewriterCaptions: true` + `peakSlideIndex`. `--remotion` flag was already wired end-to-end.
+4. **Daily workflow**: `brief:challenge` added to `daily` npm script. `track-output.mjs` tracks `challengeVideos` as bonus metric.
+5. **Memory**: `project_animation_engine_expansion.md` created + MEMORY.md indexed.
+
+**Next:** Earth Day content push (April 19-21) using `brief:asmr:coloring` with Garden/Flowers/Bugs themes. No code needed.

@@ -28,9 +28,16 @@ const args    = process.argv.slice(2);
 const getArg  = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] ?? null : null; };
 const hasFlag = (f) => args.includes(f);
 
-const compositionId = getArg('--comp') ?? 'StoryEpisode';
+// Auto-select composition from context flags if --comp not given explicitly
+const _compArg = getArg('--comp');
+const compositionId = _compArg
+  ?? (args.includes('--challenge') ? 'ActivityChallenge'
+    : args.includes('--asmr')      ? 'AsmrReveal'
+    : args.includes('--story')     ? 'StoryEpisode'
+    : 'StoryEpisode');
 const storyFile     = getArg('--story');
 const asmrFile      = getArg('--asmr');
+const challengeFile = getArg('--challenge');
 const propsArg      = getArg('--props');
 const outArg        = getArg('--out');
 const dryRun        = hasFlag('--dry-run');
@@ -84,12 +91,21 @@ async function storyJsonToProps(story, storyDir) {
     ? story.musicPath
     : await resolveAudio('story');
 
+  // Peak slide: where FloatingParticles fires (emotional high point).
+  // story.json can set `peakSlide: N` explicitly; defaults to the 2nd-to-last slide
+  // (typically the resolution beat). -1 disables particles.
+  const peakSlideIndex = story.peakSlide !== undefined
+    ? story.peakSlide
+    : slides.length >= 3 ? slides.length - 2 : -1;
+
   return {
     slides,
-    hookText:    story.hook ?? story.hookText ?? '',
+    hookText:          story.hook ?? story.hookText ?? '',
     musicPath,
-    musicVolume: story.musicVolume ?? 0.28,
-    showJoyo:    story.showJoyo ?? true,
+    musicVolume:       story.musicVolume ?? 0.28,
+    showJoyo:          story.showJoyo ?? true,
+    typewriterCaptions: story.typewriterCaptions ?? true,  // default on for Remotion renders
+    peakSlideIndex,
   };
 }
 
@@ -139,6 +155,36 @@ async function activityJsonToProps(activity, activityDir) {
     // path.json not present — solver disabled; run `npm run extract:path` to generate it
   }
 
+  // Load word search rects if wordsearch.json exists (for wordsearch ASMR type)
+  let wordRects       = null;
+  let highlightColor  = '#FFD700';
+  const wsJsonFile = path.resolve(activityDir, 'wordsearch.json');
+  try {
+    const wsData   = JSON.parse(await fs.readFile(wsJsonFile, 'utf-8'));
+    const imgW     = wsData.width  ?? 1080;
+    const imgH     = wsData.height ?? 1920;
+    const imgAR    = imgW / imgH;
+    const videoAR  = VW / VH;
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAR > videoAR) {
+      renderW = VW; renderH = VW / imgAR;
+      offsetX = 0;  offsetY = (VH - renderH) / 2;
+    } else {
+      renderH = VH; renderW = VH * imgAR;
+      offsetX = (VW - renderW) / 2; offsetY = 0;
+    }
+    // Map normalized rects to video pixel space
+    wordRects = wsData.rects.map(r => ({
+      x1: offsetX + r.x1 * renderW,
+      y1: offsetY + r.y1 * renderH,
+      x2: offsetX + r.x2 * renderW,
+      y2: offsetY + r.y2 * renderH,
+    }));
+    if (wsData.highlightColor) highlightColor = wsData.highlightColor;
+  } catch {
+    // wordsearch.json not present — word search solver disabled; run `npm run extract:wordsearch` to generate it
+  }
+
   return {
     blankImagePath,
     solvedImagePath,
@@ -156,8 +202,26 @@ async function activityJsonToProps(activity, activityDir) {
     particleEmoji:    activity.particleEmoji ?? '✨',
     pathWaypoints,
     pathColor:        activity.pathColor ?? pathColor,
+    wordRects,
+    highlightColor:   activity.highlightColor ?? highlightColor,
     // computed total for duration override
     _totalSec: hookSec + revealSec + holdSec,
+  };
+}
+
+// challenge/activity.json → ActivityChallenge props
+async function challengeJsonToProps(activity, activityDir) {
+  const toRelative = (filename) =>
+    path.relative(ROOT, path.resolve(activityDir, filename)).replace(/\\/g, '/');
+  return {
+    imagePath:       toRelative(activity.imagePath ?? 'puzzle.png'),
+    hookText:        activity.hookText        ?? 'Can your kid solve this?',
+    ctaText:         activity.ctaText         ?? 'Drop your time below!',
+    activityLabel:   activity.activityLabel   ?? 'PUZZLE',
+    hookDurationSec: activity.hookDurationSec ?? 2.5,
+    countdownSec:    activity.countdownSec    ?? 60,
+    holdAfterSec:    activity.holdAfterSec    ?? 2.5,
+    showJoyo:        activity.showJoyo        ?? true,
   };
 }
 
@@ -169,6 +233,14 @@ async function loadInputProps() {
   if (asmrFile) {
     const activity = JSON.parse(await fs.readFile(path.resolve(ROOT, asmrFile), 'utf-8'));
     return activityJsonToProps(activity, path.dirname(path.resolve(ROOT, asmrFile)));
+  }
+  if (challengeFile) {
+    // Accept either a folder path (loads activity.json) or a direct .json path
+    let jsonPath = path.resolve(ROOT, challengeFile);
+    const stat = await fs.stat(jsonPath).catch(() => null);
+    if (stat?.isDirectory()) jsonPath = path.join(jsonPath, 'activity.json');
+    const activity = JSON.parse(await fs.readFile(jsonPath, 'utf-8'));
+    return challengeJsonToProps(activity, path.dirname(jsonPath));
   }
   if (propsArg) return JSON.parse(propsArg);
   return {};
@@ -219,9 +291,10 @@ async function getBundle() {
   // Subdirs to mirror: assets/ + output/asmr/ + output/stories/
   // cp -r equivalent using Node.js fs (no symlinks — avoids Windows EPERM)
   const toCopy = [
-    [path.join(ROOT, 'assets'),           path.join(publicDir, 'assets')],
-    [path.join(ROOT, 'output', 'asmr'),   path.join(publicDir, 'output', 'asmr')],
-    [path.join(ROOT, 'output', 'stories'), path.join(publicDir, 'output', 'stories')],
+    [path.join(ROOT, 'assets'),                path.join(publicDir, 'assets')],
+    [path.join(ROOT, 'output', 'asmr'),        path.join(publicDir, 'output', 'asmr')],
+    [path.join(ROOT, 'output', 'stories'),     path.join(publicDir, 'output', 'stories')],
+    [path.join(ROOT, 'output', 'challenge'),   path.join(publicDir, 'output', 'challenge')],
   ];
   async function copyDir(src, dst) {
     await fs.mkdir(dst, { recursive: true });

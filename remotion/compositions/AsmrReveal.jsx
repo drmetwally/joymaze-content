@@ -7,8 +7,9 @@ import {
   interpolate,
   staticFile,
 } from 'remotion';
-import { WipeReveal }        from '../components/WipeReveal.jsx';
-import { MazeSolverReveal }  from '../components/MazeSolverReveal.jsx';
+import { WipeReveal }          from '../components/WipeReveal.jsx';
+import { MazeSolverReveal }   from '../components/MazeSolverReveal.jsx';
+import { WordSearchReveal }   from '../components/WordSearchReveal.jsx';
 import { HookText }          from '../components/HookText.jsx';
 import { JoyoWatermark }     from '../components/JoyoWatermark.jsx';
 import { FloatingParticles } from '../components/FloatingParticles.jsx';
@@ -29,6 +30,8 @@ export const asmrRevealSchema = {
   particleEmoji:   '✨',
   pathWaypoints:   null,    // [{x, y}] in video pixel space — drives MazeSolverReveal
   pathColor:       '#22BB44', // solution line color (sampled by extract-maze-path.mjs)
+  wordRects:       null,    // [{x1,y1,x2,y2}] normalized 0-1 — drives WordSearchReveal
+  highlightColor:  '#FFD700', // word highlight color (sampled by extract-wordsearch-path.mjs)
 };
 
 // ─── AsmrReveal ───────────────────────────────────────────────────────────────
@@ -56,6 +59,8 @@ export const AsmrReveal = ({
   particleEmoji    = '✨',
   pathWaypoints    = null,
   pathColor        = '#22BB44',
+  wordRects        = null,
+  highlightColor   = '#FFD700',
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -66,11 +71,17 @@ export const AsmrReveal = ({
   const revealStart  = hookFrames;
   const holdStart    = hookFrames + revealFrames;
 
-  // For maze solver: drawing starts at frame 0 (hook text is already a persistent overlay).
-  // For wipe (coloring): drawing starts at revealStart as before.
-  const useSolverReveal = pathWaypoints?.length > 0 && revealType !== 'ttb' && revealType !== 'coloring';
-  const drawStart  = useSolverReveal ? 0 : revealStart;
-  const drawFrames = useSolverReveal ? hookFrames + revealFrames : revealFrames;
+  // Determine reveal mode:
+  //   WordSearch: wordRects array provided or revealType === 'wordsearch'
+  //   MazeSolver: pathWaypoints array provided (and not coloring/ttb/wordsearch)
+  //   WipeReveal: coloring TTB wipe (default)
+  const useWordSearch  = (wordRects?.length > 0) || revealType === 'wordsearch';
+  const useSolverReveal = !useWordSearch && pathWaypoints?.length > 0
+    && revealType !== 'ttb' && revealType !== 'coloring';
+
+  // Maze solver + word search draw from frame 0 (hook text is a persistent overlay)
+  const drawStart  = (useSolverReveal || useWordSearch) ? 0 : revealStart;
+  const drawFrames = (useSolverReveal || useWordSearch) ? hookFrames + revealFrames : revealFrames;
 
   // Progress bar: 0→1 during draw window
   const barProgress = Math.min(Math.max(0, frame - drawStart) / drawFrames, 1);
@@ -89,8 +100,17 @@ export const AsmrReveal = ({
   return (
     <AbsoluteFill style={{ backgroundColor: '#f5f5f0' }}>
 
-      {/* ── Reveal layer — MazeSolverReveal for mazes, WipeReveal for coloring ── */}
-      {useSolverReveal ? (
+      {/* ── Reveal layer — branch by type ────────────────────────────────── */}
+      {useWordSearch ? (
+        <WordSearchReveal
+          blankPath={blankImagePath}
+          solvedPath={solvedImagePath}
+          rects={wordRects ?? []}
+          highlightColor={highlightColor}
+          startFrame={drawStart}
+          durationFrames={drawFrames}
+        />
+      ) : useSolverReveal ? (
         <MazeSolverReveal
           blankPath={blankImagePath}
           solvedPath={solvedImagePath}

@@ -362,6 +362,4 @@ Protection rules:
 
 ---
 
-*Last updated: 2026-04-13 s3*
-*Changes: render-video.mjs — --preview flag, auto-thumbnail (renderStill), audio auto-selection. All 5 Remotion layers complete.*
-*Source: all memory files from C:\Users\BESOO\.claude\projects\D--Joymaze-Content\memory\, TASKS.md state, SESSION_LOG through 2026-04-13 s2*
+*Last updated: 2026-04-13 s3 — all Remotion layers complete, pushed (a284e5a). Next: AsmrReveal live test.*
