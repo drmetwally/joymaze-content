@@ -56,7 +56,7 @@ async function getNextEpisode() {
   }
 }
 
-// Scan existing story folders to avoid repeating themes
+// Scan existing story folders to avoid repeating themes and character species
 async function getExistingStories() {
   const storiesDir = path.join(ROOT, 'output', 'stories');
   try {
@@ -66,7 +66,8 @@ async function getExistingStories() {
       const jsonPath = path.join(storiesDir, e, 'story.json');
       try {
         const data = JSON.parse(await fs.readFile(jsonPath, 'utf-8'));
-        titles.push(`Episode ${data.episode}: ${data.title} — ${data.theme}`);
+        const charNote = data.character ? ` [character: ${data.character.split(',')[0]}]` : '';
+        titles.push(`Episode ${data.episode}: ${data.title} — ${data.theme}${charNote}`);
       } catch {}
     }
     return titles;
@@ -203,8 +204,8 @@ NEVER end with: "And so she learned..." / "From that day on, she knew..." / "The
 
 Beat 1 is the only chance to stop a scroll. The first sentence must create an unanswered question.
 
-- NO: "In a forest filled with towering trees, Luna lived with her family." — world-building, viewer scrolls past.
-- YES: "The moon was full. Luna was the only firefly not dancing." — tension, specificity, a question formed immediately.
+- NO: "In a forest filled with towering trees, Pip lived with her family." — world-building, viewer scrolls past.
+- YES: "The bridge was out. Pip was the only fox who knew another way." — tension, specificity, a question formed immediately.
 - YES: "She had one night to find a new home. She had no map." — stakes, urgency, drop into the problem.
 
 ## NARRATION RULES — CRITICAL
@@ -216,11 +217,11 @@ Each slide's narration is read aloud at TTS speed 0.85. Target: 3–4 seconds pe
 At 15 words and speed 0.85, TTS produces ~3.5–4.0s of audio — exactly the target.
 Count your words after writing each slide. If you are at 16, cut one word. Do not negotiate.
 
-Examples of complete beats at ≤15 words:
-- Beat 1: "The Easter garden went dark. Every glowstone, every lantern — gone." (11 words)
-- Beat 3: "She used her own glow to light the path. It faded in minutes." (13 words)
-- Beat 5: "She sat down. Her glow dimmed. She had nothing left to give." (12 words)
-- Beat 8: "She still dims her glow near other fireflies. Just in case." (11 words)
+Examples of complete beats at ≤15 words (different animals — do not copy these characters):
+- Beat 1 (fox): "The bridge was gone. Pip was the only one who knew another way." (13 words)
+- Beat 3 (turtle): "She carried the stone herself. Each step slower than the last." (11 words)
+- Beat 5 (crow): "He dropped it. The wind took it. He watched it disappear." (11 words)
+- Beat 8 (rabbit): "She still leaves a carrot at the hollow root. Every winter." (11 words)
 
 These examples prove full story beats are achievable within the limit. There is no reason to exceed it.
 
@@ -315,9 +316,14 @@ Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides
 }
 
 function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes) {
+  // Characters banned due to overuse (update this list as new species accumulate)
+  const BANNED_CHARACTERS = ['firefly', 'fireflies'];
+
   const avoidBlock = existingStories.length > 0
-    ? `\n\nALREADY USED — do NOT repeat these themes or story types:\n${existingStories.map(s => `- ${s}`).join('\n')}`
+    ? `\n\nALREADY USED — do NOT repeat these themes, story types, OR main character species:\n${existingStories.map(s => `- ${s}`).join('\n')}`
     : '';
+
+  const bannedCharsBlock = `\n\nBANNED CHARACTERS — overused recently, do NOT use these as the main character: ${BANNED_CHARACTERS.join(', ')}. Pick a completely different animal.`;
 
   const themeBlock = themeSeed
     ? `\n\nTheme seed from the user: "${themeSeed}" — build a story around this idea.`
@@ -395,7 +401,7 @@ Scroll-stopper formulas:\n${stoppers}`;
 The story must:
 1. Feature an animal or fantastical creature as the main character (no human protagonists)
 2. Follow the ${SLIDE_COUNT}-slide 8-beat viral arc exactly — output exactly ${SLIDE_COUNT} slides, no more, no fewer
-3. Have a title that is specific and evocative — not generic ("The Firefly Who Remembered the Stars" not "A Story About Courage")
+3. Have a title that is specific and evocative — not generic ("The Fox Who Crossed the River Alone" not "A Story About Courage")
 4. Beat 1 narration: ONE sentence. Drop into action. Hook the viewer before they know the character's name.
 5. Beat 8 narration: ONE sentence. The share trigger. Must land without context. Write this last.
 6. End with a payoff that makes parents want to screenshot and share the final slide
@@ -405,7 +411,7 @@ Story arcs that travel well for short-form:
 - A lost creature finds their way home
 - Two very different characters become unexpected friends
 - A creature who feels like a burden discovers they are the key
-- An animal faces a fear alone and finds they were never as alone as they thought${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${themeBlock}
+- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${themeBlock}
 
 Return ONLY the JSON. No explanation. No markdown fences.`;
 }
