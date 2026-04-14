@@ -83,6 +83,9 @@ async function loadStyleContext() {
 
   let trends = null;
   let weights = null;
+  let competitor = null;
+  let hooksData = null;
+  let dynamicThemes = null;
 
   try {
     trends = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'trends-this-week.json'), 'utf-8'));
@@ -92,7 +95,19 @@ async function loadStyleContext() {
     weights = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, archetypes, trends, weights };
+  try {
+    competitor = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'competitor-intelligence.json'), 'utf-8'));
+  } catch {}
+
+  try {
+    hooksData = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8'));
+  } catch {}
+
+  try {
+    dynamicThemes = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'theme-pool-dynamic.json'), 'utf-8'));
+  } catch {}
+
+  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes };
 }
 
 // Extract only Archetype 8 section from archetypes doc
@@ -299,7 +314,7 @@ Return a single JSON object with this exact structure — no extra text:
 Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides: 7–8s. Final slide: 8–10s.`;
 }
 
-function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights) {
+function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes) {
   const avoidBlock = existingStories.length > 0
     ? `\n\nALREADY USED — do NOT repeat these themes or story types:\n${existingStories.map(s => `- ${s}`).join('\n')}`
     : '';
@@ -337,6 +352,44 @@ ${topHooks.length ? `- Top-performing hook patterns: ${topHooks.join(' | ')}` : 
 Lean your story theme and emotional arc toward the boost categories.`;
   }
 
+  // Competitor intelligence: format signals + hook patterns
+  let competitorBlock = '';
+  if (competitor) {
+    const formats  = (competitor.top_formats || []).slice(0, 3).map(f => `- ${f}`).join('\n');
+    const hooks    = (competitor.winning_hooks || []).slice(0, 4).map(h => `- "${h}"`).join('\n');
+    const stoppers = (competitor.scroll_stopper_formulas || []).slice(0, 3).map(s => `- ${s}`).join('\n');
+    competitorBlock = `\n\nCOMPETITOR INTELLIGENCE (use to strengthen Beat 1 hook and visual direction — do not change slide count):
+Format signals:\n${formats}
+Winning hook patterns (inform Beat 1 narration style):\n${hooks}
+Scroll-stopper formulas:\n${stoppers}`;
+  }
+
+  // Top hooks from intelligence library — Beat 1 inspiration
+  let hookSeedsBlock = '';
+  if (hooksData?.hooks?.length) {
+    const topHooks = (hooksData.hooks || [])
+      .filter(h => h.brand_safe !== false && h.text)
+      .sort((a, b) => (b.performance_score ?? -1) - (a.performance_score ?? -1))
+      .slice(0, 5)
+      .map(h => `- [${h.hook_type || 'hook'}] "${h.text}"`);
+    if (topHooks.length) {
+      hookSeedsBlock = `\n\nINTELLIGENCE HOOK LIBRARY — use as rhythm/tone inspiration for Beat 1 narration (never copy verbatim):\n${topHooks.join('\n')}`;
+    }
+  }
+
+  // Active intelligence themes — optional story angle seeds
+  let activeThemesBlock = '';
+  if (dynamicThemes?.themes?.length) {
+    const active = (dynamicThemes.themes || [])
+      .filter(t => t.status !== 'evicted' && t.brand_safe !== false)
+      .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+      .slice(0, 4)
+      .map(t => `- ${t.name}${t.rationale ? ': ' + t.rationale : ''}`);
+    if (active.length) {
+      activeThemesBlock = `\n\nACTIVE INTELLIGENCE THEMES — if the story theme overlaps naturally with one of these, prefer it:\n${active.join('\n')}`;
+    }
+  }
+
   return `Generate a complete "Joyo's Story Corner" Episode ${episodeNum} story.
 
 The story must:
@@ -352,7 +405,7 @@ Story arcs that travel well for short-form:
 - A lost creature finds their way home
 - Two very different characters become unexpected friends
 - A creature who feels like a burden discovers they are the key
-- An animal faces a fear alone and finds they were never as alone as they thought${avoidBlock}${trendsBlock}${weightsBlock}${themeBlock}
+- An animal faces a fear alone and finds they were never as alone as they thought${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${themeBlock}
 
 Return ONLY the JSON. No explanation. No markdown fences.`;
 }
@@ -443,16 +496,19 @@ async function main() {
   console.log('=== Joyo\'s Story Corner — Idea Generator ===\n');
 
   const episodeNum = await getNextEpisode();
-  const [existing, { styleGuide, archetypes, trends, weights }] = await Promise.all([
+  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes }] = await Promise.all([
     getExistingStories(),
     loadStyleContext(),
   ]);
 
   if (trends) console.log(`  Trends loaded: ${trends.trending_themes?.slice(0,3).map(t => t.theme).join(', ')} ...`);
   if (weights?.categories?.length) console.log(`  Performance weights loaded: ${weights.categories.length} categories`);
+  if (competitor) console.log(`  Competitor intelligence loaded (${competitor.date})`);
+  if (hooksData?.hooks?.length) console.log(`  Hooks library loaded: ${hooksData.hooks.length} hooks`);
+  if (dynamicThemes?.themes?.length) console.log(`  Dynamic themes loaded: ${dynamicThemes.themes.length} themes`);
 
   const systemPrompt = buildSystemPrompt(styleGuide, archetypes);
-  const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights);
+  const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes);
 
   if (DRY_RUN) {
     console.log('=== SYSTEM PROMPT ===\n');

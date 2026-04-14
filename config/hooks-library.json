@@ -16,7 +16,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-07",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -29,7 +29,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-07",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -42,7 +42,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -55,7 +55,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -68,7 +68,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -81,7 +81,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -94,7 +94,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -107,7 +107,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -120,7 +120,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -133,46 +133,277 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
     {
+      "id": "hook_comp_20260412_000",
+      "hook_type": "engagement_question",
+      "text": "What if I told you [X] isn't as hard as you think?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 2,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260412_001",
+      "hook_type": "problem_solution",
+      "text": "Having trouble…? This post should solve your problem!",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 2,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_20260412_000",
+      "hook_type": "emotional_mirror",
+      "text": "That quiet guilt about screen time? It stops here.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "permission_giver",
+        "guilt_reliever"
+      ]
+    },
+    {
+      "id": "hook_20260412_001",
+      "hook_type": "identity_hook",
+      "text": "You're the parent who chooses purpose over passive scrolling.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "aspirational_parent",
+        "conscious_chooser"
+      ]
+    },
+    {
+      "id": "hook_20260412_002",
+      "hook_type": "transformation_hint",
+      "text": "Picture their little face, utterly absorbed, pencil in hand.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "peaceful_moment",
+        "engaged_child"
+      ]
+    },
+    {
+      "id": "hook_20260412_003",
+      "hook_type": "relief_hook",
+      "text": "The search for 'just 20 minutes' ends with this.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "time_saver",
+        "sanity_saver"
+      ]
+    },
+    {
+      "id": "hook_20260412_004",
+      "hook_type": "curiosity_gap",
+      "text": "What if screen time could actually feel... good?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "myth_buster",
+        "paradigm_shifter"
+      ]
+    },
+    {
+      "id": "hook_20260412_005",
+      "hook_type": "sensory_hook",
+      "text": "The rustle of paper, the whisper of a crayon – pure focus.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "calm_creator",
+        "mindful_moment"
+      ]
+    },
+    {
+      "id": "hook_20260412_006",
+      "hook_type": "transformation_hint",
+      "text": "Unlock more than just fun; unlock their potential.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-12",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": [
+        "developmental_booster",
+        "future_focused"
+      ]
+    },
+    {
+      "id": "hook_20260413_000",
+      "hook_type": "emotional_mirror",
+      "text": "That little voice whispering about screen time? We hear it too.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "I worry I'm giving my kid too much screen time."
+      ]
+    },
+    {
+      "id": "hook_20260413_001",
+      "hook_type": "identity_hook",
+      "text": "This is how you turn 'just playing' into 'deeply learning'.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "I'm the kind of parent who makes good choices."
+      ]
+    },
+    {
+      "id": "hook_20260413_002",
+      "hook_type": "relief_hook",
+      "text": "Twenty minutes of calm, without the screen-time guilt.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "I'd love just 20 minutes where I know they're okay.",
+        "I worry I'm giving my kid too much screen time."
+      ]
+    },
+    {
+      "id": "hook_20260413_003",
+      "hook_type": "curiosity_gap",
+      "text": "What if their favorite screen time was also their best learning time?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "I want to be the parent who makes good choices.",
+        "I worry I'm giving my kid too much screen time."
+      ]
+    },
+    {
+      "id": "hook_20260413_004",
+      "hook_type": "sensory_hook",
+      "text": "The focused hum of a child immersed, pencil in hand.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "Nothing holds their attention for long.",
+        "I'd love just 20 minutes where I know they're okay."
+      ]
+    },
+    {
+      "id": "hook_20260413_005",
+      "hook_type": "transformation_hint",
+      "text": "Watch their focus bloom, without a single 'are we there yet?'",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-04-13",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "Nothing holds their attention for long."
+      ]
+    },
+    {
       "id": "hook_comp_20260413_000",
-      "hook_type": "save_hook",
-      "text": "You're going to want to save this.",
+      "hook_type": "insight",
+      "text": "Parents, if you have been trying to figure out a way an activity.",
       "performance_score": null,
       "save_rate_pct": null,
       "source": "competitor_analysis",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 0,
       "brand_safe": true,
       "archetype_fit": []
     },
     {
       "id": "hook_comp_20260413_001",
       "hook_type": "save_hook",
-      "text": "Save this for your next slump day.",
+      "text": "Save this to try later",
       "performance_score": null,
       "save_rate_pct": null,
       "source": "competitor_analysis",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 0,
       "brand_safe": true,
       "archetype_fit": []
     },
     {
       "id": "hook_comp_20260413_002",
-      "hook_type": "engagement_question",
-      "text": "What if I told you [X] isn't as hard as you think?",
+      "hook_type": "insight",
+      "text": "54 Superb Screen-Free Activities for Kids (2026)",
       "performance_score": null,
       "save_rate_pct": null,
       "source": "competitor_analysis",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 0,
       "brand_safe": true,
       "archetype_fit": []
     }
@@ -181,34 +412,51 @@
     "pattern_interrupt": [],
     "curiosity_gap": [
       "hook_comp_20260411_002",
-      "hook_comp_20260411_001"
+      "hook_comp_20260411_001",
+      "hook_20260412_004",
+      "hook_20260413_003"
     ],
-    "emotional_mirror": [],
+    "emotional_mirror": [
+      "hook_20260412_000",
+      "hook_20260413_000"
+    ],
     "identity_hook": [
       "hook_comp_20260411_001",
-      "hook_comp_20260411_002"
+      "hook_comp_20260411_002",
+      "hook_20260412_001",
+      "hook_20260413_001"
     ],
-    "transformation_hint": [],
+    "transformation_hint": [
+      "hook_20260412_002",
+      "hook_20260412_006",
+      "hook_20260413_005"
+    ],
     "relief_hook": [
-      "hook_20260407_001"
+      "hook_20260407_001",
+      "hook_20260412_003",
+      "hook_20260413_002"
     ],
     "sensory_hook": [
-      "hook_20260407_000"
+      "hook_20260407_000",
+      "hook_20260412_005",
+      "hook_20260413_004"
     ],
     "secret_insider": [],
     "problem_solution": [
       "hook_comp_20260411_000",
-      "hook_comp_20260411_000"
+      "hook_comp_20260411_000",
+      "hook_comp_20260412_001"
     ],
     "insight": [
-      "hook_comp_20260411_003"
+      "hook_comp_20260411_003",
+      "hook_comp_20260413_000",
+      "hook_comp_20260413_002"
     ],
     "engagement_question": [
       "hook_comp_20260411_004",
-      "hook_comp_20260413_002"
+      "hook_comp_20260412_000"
     ],
     "save_hook": [
-      "hook_comp_20260413_000",
       "hook_comp_20260413_001"
     ]
   }

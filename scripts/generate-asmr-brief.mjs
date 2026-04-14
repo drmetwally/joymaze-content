@@ -85,7 +85,27 @@ async function loadContext() {
     trends = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'trends-this-week.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, archetypes, analyticsContext, recentThemes, trends };
+  let competitor = null;
+  try {
+    competitor = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'competitor-intelligence.json'), 'utf-8'));
+  } catch {}
+
+  let hooksData = null;
+  try {
+    hooksData = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8'));
+  } catch {}
+
+  let dynamicThemes = null;
+  try {
+    dynamicThemes = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'theme-pool-dynamic.json'), 'utf-8'));
+  } catch {}
+
+  let perfWeights = null;
+  try {
+    perfWeights = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8'));
+  } catch {}
+
+  return { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights };
 }
 
 // ── Groq call ─────────────────────────────────────────────────────────────────
@@ -109,7 +129,7 @@ async function callGroq(prompt) {
 // ── Prompt builder ────────────────────────────────────────────────────────────
 
 function buildPrompt(type, context) {
-  const { styleGuide, archetypes, analyticsContext, recentThemes, trends } = context;
+  const { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights } = context;
 
   const recentStr = recentThemes.length
     ? `\nRecently used themes — pick something different: ${recentThemes.join(', ')}`
@@ -125,6 +145,49 @@ function buildPrompt(type, context) {
       + (trends.upcoming_moments?.length
         ? `\nUpcoming: ${trends.upcoming_moments.filter(e => e.days_away >= 0 && e.days_away <= 21).map(e => `${e.event} in ${e.days_away} days`).join(', ')}`
         : '')
+    : '';
+
+  // Active intelligence themes — preferred theme pool for this week
+  const activeThemesStr = dynamicThemes?.themes?.length
+    ? '\nACTIVE THEMES THIS WEEK (prefer one if it fits the activity type naturally):\n'
+      + (dynamicThemes.themes || [])
+          .filter(t => t.status !== 'evicted' && t.brand_safe !== false)
+          .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+          .slice(0, 5)
+          .map(t => `- ${t.name}`)
+          .join('\n')
+    : '';
+
+  // Competitor intelligence: winning hook patterns for hookText generation
+  const competitorStr = competitor
+    ? '\nCOMPETITOR HOOK PATTERNS — use to inform hookText and hookAlternatives style:\n'
+      + (competitor.winning_hooks || []).slice(0, 4).map(h => `- "${h}"`).join('\n')
+      + '\nScroll-stopper formulas:\n'
+      + (competitor.scroll_stopper_formulas || []).slice(0, 3).map(s => `- ${s}`).join('\n')
+    : '';
+
+  // Top performing hooks from intelligence library — direct hookText inspiration
+  const hookLibraryStr = hooksData?.hooks?.length
+    ? '\nINTELLIGENCE HOOK LIBRARY — use as style/rhythm reference when writing hookText (adapt to 3-6 words, never copy verbatim):\n'
+      + (hooksData.hooks || [])
+          .filter(h => h.brand_safe !== false && h.text)
+          .sort((a, b) => (b.performance_score ?? -1) - (a.performance_score ?? -1))
+          .slice(0, 6)
+          .map(h => `- [${h.hook_type || 'hook'}] "${h.text}"`)
+          .join('\n')
+    : '';
+
+  // Performance weights: which activity types are resonating most
+  const perfStr = perfWeights?.weights
+    ? (() => {
+        const w = perfWeights.weights;
+        const top = Object.entries(w)
+          .filter(([, v]) => typeof v === 'object' && v.weight > 1.0)
+          .sort(([, a], [, b]) => (b.weight ?? 0) - (a.weight ?? 0))
+          .slice(0, 2)
+          .map(([k]) => k);
+        return top.length ? `\nHigh-resonance activity types this week (prefer if choosing between options): ${top.join(', ')}` : '';
+      })()
     : '';
 
   const blankDesc = type === 'coloring'
@@ -149,7 +212,7 @@ Today's ASMR type: **${type}**
 The video reveals the activity progressively: ${type === 'coloring'
   ? 'blank coloring page slowly fills with color top-to-bottom'
   : 'maze path draws itself left-to-right'}
-${analyticsStr}${trendsStr}${recentStr}
+${analyticsStr}${trendsStr}${activeThemesStr}${perfStr}${competitorStr}${hookLibraryStr}${recentStr}
 
 Generate a fresh, engaging theme for today's ASMR video.
 

@@ -10,3 +10,5 @@ output/queue/*
 Thumbs.db
 .claude/
 *.txt
+.remotion-public/
+public/

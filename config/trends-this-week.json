@@ -46,12 +46,12 @@
   "upcoming_moments": [
     {
       "event": "Earth Day",
-      "date": "2026-04-22",
+      "date": "2026-04-21",
       "days_away": 9
     },
     {
       "event": "Mother's Day",
-      "date": "2026-05-11",
+      "date": "2026-05-10",
       "days_away": 28
     }
   ],

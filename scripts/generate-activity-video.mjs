@@ -57,8 +57,8 @@ const MUSIC_VOLUME = 0.25;
 // Activity types that have a puzzle element and work as short-form challenge videos
 const PUZZLE_TYPES = ['maze', 'matching', 'quiz', 'dot-to-dot', 'spot-the-difference', 'tracing'];
 
-// Default hook text per activity type (fallback if hookText not in queue JSON)
-const DEFAULT_HOOKS = {
+// Static fallback hook text per activity type — used when intelligence pool is empty
+const STATIC_DEFAULT_HOOKS = {
   maze:                  'Can you solve this maze?',
   matching:              'Can you match all pairs?',
   quiz:                  'Can you answer this?',
@@ -66,6 +66,39 @@ const DEFAULT_HOOKS = {
   'spot-the-difference': 'Spot all the differences!',
   tracing:               'Can you trace the path?',
 };
+
+// Load challenge hooks from intelligence system (silent fallback to static defaults)
+// Looks for hooks with hook_type matching challenge/curiosity patterns — short enough for overlay.
+async function loadIntelligenceHooks() {
+  try {
+    const raw = JSON.parse(
+      await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8')
+    );
+    const challengeTypes = new Set(['challenge_hook', 'curiosity_gap', 'pattern_interrupt', 'curiosity_hook']);
+    const candidates = (raw.hooks || [])
+      .filter(h => h.brand_safe !== false && challengeTypes.has(h.hook_type) && h.text)
+      .sort((a, b) => (b.performance_score ?? 0) - (a.performance_score ?? 0))
+      .slice(0, 6)
+      .map(h => h.text)
+      // Activity video hooks must fit on one overlay line — keep under 40 chars
+      .filter(t => t.length <= 40);
+    return candidates.length >= 2 ? candidates : null;
+  } catch {
+    return null;
+  }
+}
+
+// Build DEFAULT_HOOKS: merge intelligence-sourced short challenges with static fallbacks
+const _intelligenceHooks = await loadIntelligenceHooks();
+const DEFAULT_HOOKS = Object.fromEntries(
+  Object.entries(STATIC_DEFAULT_HOOKS).map(([type, staticText]) => {
+    // Use an intelligence hook if available, otherwise keep the static default
+    const pick = _intelligenceHooks
+      ? _intelligenceHooks[Math.floor(Math.random() * _intelligenceHooks.length)]
+      : null;
+    return [type, pick || staticText];
+  })
+);
 
 // FFmpeg binary detection
 const FFMPEG_PATHS = ['ffmpeg', 'D:/Dev/ffmpeg/ffmpeg.exe', 'C:/ffmpeg/bin/ffmpeg.exe'];

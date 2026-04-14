@@ -1,0 +1,6 @@
+output/archive
+output/videos
+output/queue
+output/raw
+node_modules
+.git

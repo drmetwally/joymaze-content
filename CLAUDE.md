@@ -8,7 +8,7 @@ Joymaze-Content is the content automation engine for the JoyMaze kids activity a
 
 **Goal:** Drive app installs and Amazon KDP book sales through high-volume, branded social media content.
 
-**Daily targets:** 10 image posts + 10 story videos + 10 ASMR videos (threshold goal — see docs/TASKS.md)
+**Daily targets:** 10 image posts + 1 ASMR video + 1 story video + 4 X text posts (Phase 0 gate — see MEMORY.md §2)
 
 ## Tech Stack
 
@@ -77,11 +77,11 @@ npm run calendar              # Manage content calendar
 Every tool call and every line of conversation context costs quota. Follow these rules strictly:
 
 ### Startup (do this ONCE per session, not per task)
-1. Read `docs/TASKS.md` — current work and locked decisions
-2. Read `memory/MEMORY.md` — cross-session decisions Ahmed trusted you with; read any relevant memory files it points to before acting
-3. Read `docs/CONTENT_ARCHETYPES.md` lines 1–50 + 530–583 — daily mix, slot rules, CTA rules, archetype cheat sheet (MANDATORY for any content task)
-4. Read the **last entry only** of `docs/SESSION_LOG.md` (last ~20 lines) — for recent context
-5. **Stop. Do NOT read** `AGENTS.md`, `docs/ACTIVE_SPRINT.md`, or `docs/BUG_BOARD.md` unless the task explicitly requires one of them
+1. Read `MEMORY.md` — the universal project memory. Single source of truth. **ALL agents read this first.**
+2. Read `docs/TASKS.md` — current work and blockers
+3. Read the **last entry only** of `docs/SESSION_LOG.md` (last ~20 lines) — recent context
+4. For content tasks only: Read `docs/CONTENT_ARCHETYPES.md` lines 1–50 + 530–583 — slot rules, CTA rules, daily mix
+5. **Stop. Do NOT read** `AGENTS.md`, `docs/ACTIVE_SPRINT.md`, or `docs/BUG_BOARD.md` unless the task explicitly requires one
 6. Ask: **"What is the single task? What are the exact files?"** — then go straight to those files
 
 ### During work

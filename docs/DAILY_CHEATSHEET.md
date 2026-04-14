@@ -150,10 +150,15 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
    - **Image 2 (solved/colored):** same activity fully completed
 3. Save:
    ```
-   output/asmr/[type]-[theme]/blank.png      ← coloring: blank line art
-   output/asmr/[type]-[theme]/colored.png    ← coloring: fully colored
+   # Coloring:
+   output/asmr/[type]-[theme]/blank.png      ← blank line art
+   output/asmr/[type]-[theme]/colored.png    ← fully colored
+
+   # Maze:
+   output/asmr/[type]-[theme]/maze.png       ← empty maze
+   output/asmr/[type]-[theme]/solved.png     ← solved maze (with solution path drawn)
    ```
-   *(For mazes: `maze.png` and `solved.png`)*
+   Make sure `activity.json` has `"blankImage": "maze.png"` and `"solvedImage": "solved.png"` for mazes (already set if brief was auto-generated).
 
 ### 2D — Story Video Images (7 images, optional)
 
@@ -165,24 +170,43 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
 
 ---
 
-## STEP 3 — Assemble ASMR Video (1 min)
+## STEP 3 — Assemble ASMR Video (1–2 min)
 
-**Option A — Remotion (recommended, cleaner result):**
+**Maze ASMR (2 steps — skeleton path extraction + drawing animation):**
 ```bash
-npm run animate:asmr:remotion -- --asmr coloring-spring-flowers
+npm run extract:path -- output/asmr/[folder]/activity.json
+# Outputs: path.json (400 waypoints + pathColor auto-detected from solved image)
+
+npm run animate:asmr -- --asmr output/asmr/[folder]/activity.json
+# Renders: pencil draws solution path start→finish, cross-fades to solved image. 30s total.
 ```
 
-**Option B — FFmpeg (fallback):**
+**Coloring ASMR (1 step — top-to-bottom wipe fill):**
 ```bash
-npm run generate:asmr -- --asmr coloring-spring-flowers
+npm run animate:asmr -- --asmr output/asmr/[folder]/activity.json
 ```
 
-Replace folder name with your folder from `output/asmr/`.
-
-**Remotion dry-run (check before committing):**
+**Dry-run (verify props without rendering):**
 ```bash
-npm run animate:asmr:remotion:dry -- --asmr coloring-spring-flowers
+npm run animate:asmr:dry -- --asmr output/asmr/[folder]/activity.json
 ```
+
+**Maze ASMR — what extract:path does:**
+- Scales image to 20% → diff mask → Zhang-Suen skeleton → BFS walk from maze entrance
+- Auto-detects path color from highest-diff pixels (matches the solution line color in solved image)
+- Output: `path.json` alongside `activity.json`
+- Log line to check: `Raw path length: NNN pixels` — if < 50, something is wrong with images
+
+**Troubleshooting:**
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `path.json` missing or raw path < 50px | Images look too similar / DIFF_THRESHOLD too high | Check blank vs solved are actually different; lower DIFF_THRESHOLD in extract-maze-path.mjs |
+| Path traces wrong area of maze | Maze has very faint solution line | Regenerate solved image with bolder solution line |
+| ENOSPC during render | Stale Remotion bundles in %TEMP% | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
+| ProtocolError at ~93% | Non-fatal Chrome tab close — render still completes | Ignore |
+
+Replace `[folder]` with your folder from `output/asmr/`.
 
 ---
 
@@ -317,7 +341,7 @@ npm run post:scheduled:dry
 | 2B | Activity puzzle images (5) | 15–20 min | Gemini → `output/raw/<type>/` |
 | 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
 | 2D | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
-| 3 | Assemble ASMR video | 1 min | `npm run animate:asmr:remotion -- --asmr [folder]` |
+| 3 | Assemble ASMR video | 1–2 min | Maze: `npm run extract:path -- output/asmr/[folder]/activity.json && npm run animate:asmr -- --asmr output/asmr/[folder]/activity.json` · Coloring: skip extract:path |
 | 4 | Assemble story video (optional) | 1 min | `npm run generate:story:edge -- --story [folder]` |
 | 5 | Activity puzzle videos | 1 min | `npm run generate:activity:video` |
 | 6 | Import + brand images | 1 min | `npm run import:raw` |
@@ -410,7 +434,11 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | Story VO not playing | Check OPENAI_API_KEY in .env. Or switch to Edge TTS (free): `--tts edge` |
 | Activity video skips all items | Only maze/matching/quiz/tracing/dottodot are eligible |
 | YouTube post fails | Re-run `node scripts/get-youtube-token.mjs` if refresh token expired |
-| ASMR Remotion fails | Confirm `blank.png` + `colored.png` exist in the asmr folder |
+| ASMR Remotion fails (images not found) | Confirm `maze.png`+`solved.png` or `blank.png`+`colored.png` exist; check `blankImage`/`solvedImage` fields in activity.json |
+| ASMR hand cursor missing | Run `npm run extract:path -- output/asmr/[folder]/activity.json` first — generates path.json |
+| ASMR audio cuts off mid-video | Audio loops by default; if silence persists check `audioPath` in activity.json or `assets/audio/crayon.mp3` exists |
+| ASMR image edges clipped | Should not happen — objectFit is now `contain`. If it occurs, check image aspect ratio vs 9:16 |
+| ASMR render fails with ENOSPC | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` then retry |
 | ASMR FFmpeg fails | Confirm `blank.png` + `colored.png` exist AND FFmpeg is on PATH |
 | Story video not generating | Confirm `01.png` through `07.png` all exist in the story folder |
 | Remotion bundle takes 60s | Normal on first run — cached for subsequent renders in same process |

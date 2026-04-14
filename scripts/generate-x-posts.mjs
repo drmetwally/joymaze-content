@@ -13,12 +13,14 @@ const OUTPUT_DIR = path.join(ROOT, 'output', 'queue');
 const SCORES_DIR = path.join(ROOT, 'output', 'scores');
 
 // Config paths
-const WRITING_STYLE_PATH  = path.join(ROOT, 'config', 'writing-style.md');
-const TRENDS_PATH          = path.join(ROOT, 'config', 'trends-this-week.json');
-const HOOKS_PATH           = path.join(ROOT, 'config', 'hooks-library.json');
-const THEME_POOL_PATH      = path.join(ROOT, 'config', 'theme-pool-dynamic.json');
-const CTA_LIBRARY_PATH     = path.join(ROOT, 'config', 'cta-library.json');
-const PERF_WEIGHTS_PATH    = path.join(ROOT, 'config', 'performance-weights.json');
+const WRITING_STYLE_PATH    = path.join(ROOT, 'config', 'writing-style.md');
+const TRENDS_PATH            = path.join(ROOT, 'config', 'trends-this-week.json');
+const HOOKS_PATH             = path.join(ROOT, 'config', 'hooks-library.json');
+const THEME_POOL_PATH        = path.join(ROOT, 'config', 'theme-pool-dynamic.json');
+const CTA_LIBRARY_PATH       = path.join(ROOT, 'config', 'cta-library.json');
+const PERF_WEIGHTS_PATH      = path.join(ROOT, 'config', 'performance-weights.json');
+const X_POST_TOPICS_PATH     = path.join(ROOT, 'config', 'x-post-topics-dynamic.json');
+const COMPETITOR_INTEL_PATH  = path.join(ROOT, 'config', 'competitor-intelligence.json');
 
 const args      = process.argv.slice(2);
 const DRY_RUN   = args.includes('--dry-run');
@@ -210,15 +212,57 @@ function buildCtaNotes(ctaLib) {
 
 function buildPerfNotes(perfWeights) {
   if (!perfWeights) return '';
-  // performance-weights.json schema: { weights: { [archetype]: { weight, save_rate } } }
-  const w = perfWeights.weights || perfWeights;
-  if (typeof w !== 'object') return '';
-  const top = Object.entries(w)
-    .filter(([, v]) => typeof v === 'object' ? v.weight > 1.0 : false)
-    .sort(([, a], [, b]) => (b.weight ?? 0) - (a.weight ?? 0))
-    .slice(0, 3)
-    .map(([k]) => k);
-  return top.length ? `High-resonance archetypes this week (lean into these angles): ${top.join(', ')}` : '';
+  // performance-weights.json schema (weekly-scorecard.mjs):
+  // { categories: [{ category, label, tier, weight, saveRate, topHook }] }
+  const cats = perfWeights.categories;
+  if (!Array.isArray(cats) || cats.length === 0) return '';
+  const boost  = cats.filter(c => c.tier === 'boost').map(c => c.label || c.category);
+  const reduce = cats.filter(c => c.tier === 'reduce').map(c => c.label || c.category);
+  const topHooks = cats.filter(c => c.topHook).slice(0, 2).map(c => `"${c.topHook}"`);
+  const parts = [];
+  if (boost.length)    parts.push(`High-performing content this week (lean into these angles): ${boost.join(', ')}`);
+  if (reduce.length)   parts.push(`Low-performing (deprioritise): ${reduce.join(', ')}`);
+  if (topHooks.length) parts.push(`Top-performing hook patterns: ${topHooks.join(' | ')}`);
+  return parts.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Topic seeds — weekly intelligence-refreshed angle pool
+// Picks least-used seeds per type and injects as inspiration (never verbatim).
+// ---------------------------------------------------------------------------
+function buildCompetitorNotes(competitor) {
+  if (!competitor) return '';
+  const hooks    = (competitor.winning_hooks           || []).slice(0, 4).map(h => `- "${h}"`).join('\n');
+  const stoppers = (competitor.scroll_stopper_formulas || []).slice(0, 3).map(s => `- ${s}`).join('\n');
+  const gaps     = (competitor.content_gaps            || []).slice(0, 2).map(g => `- ${g}`).join('\n');
+  const parts = [];
+  if (hooks)    parts.push(`Competitor winning hooks (patterns, not words — never copy):\n${hooks}`);
+  if (stoppers) parts.push(`Scroll-stopper formulas:\n${stoppers}`);
+  if (gaps)     parts.push(`Content gaps competitors are missing (potential angles):\n${gaps}`);
+  return parts.length ? `Competitor intelligence this week:\n${parts.join('\n')}` : '';
+}
+
+function buildTopicSeeds(topicsData) {
+  if (!topicsData?.topics?.length) return '';
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Pick seeds that haven't been used today, sorted by least-used first
+  const available = topicsData.topics
+    .filter(t => t.brand_safe !== false && t.status !== 'evicted' && t.last_used !== today)
+    .sort((a, b) => (a.times_used ?? 0) - (b.times_used ?? 0));
+
+  const pick = (type, n) => available.filter(t => t.type === type).slice(0, n).map(t => `- ${t.text}`);
+
+  const insightSeeds  = pick('insight',  2);
+  const identitySeeds = pick('identity', 2);
+  const storySeeds    = pick('story',    1);
+
+  const blocks = [];
+  if (insightSeeds.length)  blocks.push(`Insight angle seeds (fresh takes from intelligence pool — USE AS INSPIRATION, do not copy verbatim):\n${insightSeeds.join('\n')}`);
+  if (identitySeeds.length) blocks.push(`Identity scene seeds:\n${identitySeeds.join('\n')}`);
+  if (storySeeds.length)    blocks.push(`Story-hook scene seeds:\n${storySeeds.join('\n')}`);
+
+  return blocks.length ? blocks.join('\n\n') : '';
 }
 
 // ---------------------------------------------------------------------------
@@ -263,7 +307,7 @@ function nextScheduledHour(afterHour) {
   return next ?? afterHour + 3;
 }
 
-function buildUserPrompt({ trendNotes, hookNotes, themeNotes, ctaNotes, perfNotes, recentFingerprints, date }) {
+function buildUserPrompt({ trendNotes, hookNotes, themeNotes, ctaNotes, perfNotes, topicSeeds, competitorNotes, recentFingerprints, date }) {
   const slotLines = POST_TYPES.map((type, i) =>
     `${i + 1}. ${type} at ${scheduledHours(POST_TYPES.length)[i]}:00 UTC`
   ).join('\n');
@@ -284,10 +328,12 @@ function buildUserPrompt({ trendNotes, hookNotes, themeNotes, ctaNotes, perfNote
       : '',
   ].filter(Boolean).join('\n\n');
 
-  const perfBlock  = perfNotes  ? `\n${perfNotes}\n`  : '';
-  const trendBlock = trendNotes ? `\nWeekly trend notes:\n${trendNotes}\n` : '';
-  const themeBlock = themeNotes ? `\n${themeNotes}\n`  : '';
-  const hookBlock  = hookNotes  ? `\nWinning hook examples (use as inspiration, never copy):\n${hookNotes}\n` : '';
+  const perfBlock       = perfNotes       ? `\n${perfNotes}\n`  : '';
+  const trendBlock      = trendNotes      ? `\nWeekly trend notes:\n${trendNotes}\n` : '';
+  const themeBlock      = themeNotes      ? `\n${themeNotes}\n`  : '';
+  const hookBlock       = hookNotes       ? `\nWinning hook examples (use as inspiration, never copy):\n${hookNotes}\n` : '';
+  const seedBlock       = topicSeeds      ? `\n${topicSeeds}\n` : '';
+  const competitorBlock = competitorNotes ? `\n${competitorNotes}\n` : '';
   const ctaBlock   = ctaNotes   ? `\n${ctaNotes}\n`   : '';
 
   return `You are writing 4 standalone X (Twitter) text posts for JoyMaze on ${date}.
@@ -358,7 +404,7 @@ IDENTITY:
   GOOD reply: a specific detail, an unexpected turn, or a truth so precise it stings. "She stopped asking you to watch. You stopped noticing she'd stopped." "The permission slip was already in his bag."
 - Value test: after reading tweet1 + reply, the parent received something — a recognition, a laugh, a truth they needed. If they received nothing, rewrite the reply.
 - If using a CTA, use "save this for when you need it" AT MOST ONCE across the entire daily batch — only if the post genuinely earns it
-${perfBlock}${trendBlock}${themeBlock}${hookBlock}
+${perfBlock}${trendBlock}${themeBlock}${seedBlock}${competitorBlock}${hookBlock}
 ═══ QUALITY BAR ═══
 - Every tweet1 must stop the scroll on its own — assume the reader sees ONLY this line before deciding
 - Specificity beats generality every time: one crayon > "art supplies", 17 minutes > "a while"
@@ -716,26 +762,30 @@ async function main() {
   log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'} | Date: ${date}`);
 
   // ── Load all context in parallel ──
-  const [writingStyle, trends, hooks, themePool, ctaLib, perfWeights, recentFingerprints] = await Promise.all([
+  const [writingStyle, trends, hooks, themePool, ctaLib, perfWeights, xTopics, competitor, recentFingerprints] = await Promise.all([
     readTextIfExists(WRITING_STYLE_PATH),
     readJsonIfExists(TRENDS_PATH),
     readJsonIfExists(HOOKS_PATH),
     readJsonIfExists(THEME_POOL_PATH),
     readJsonIfExists(CTA_LIBRARY_PATH),
     readJsonIfExists(PERF_WEIGHTS_PATH),
+    readJsonIfExists(X_POST_TOPICS_PATH),
+    readJsonIfExists(COMPETITOR_INTEL_PATH),
     loadRecentFingerprints(),
   ]);
 
   // ── Build prompts ──
-  const systemPrompt = buildSystemPrompt(writingStyle);
-  const trendNotes   = buildTrendNotes(trends);
-  const hookNotes    = buildHookNotes(hooks);
-  const themeNotes   = buildThemeNotes(themePool);
-  const ctaNotes     = buildCtaNotes(ctaLib);
-  const perfNotes    = buildPerfNotes(perfWeights);
+  const systemPrompt    = buildSystemPrompt(writingStyle);
+  const trendNotes      = buildTrendNotes(trends);
+  const hookNotes       = buildHookNotes(hooks);
+  const themeNotes      = buildThemeNotes(themePool);
+  const ctaNotes        = buildCtaNotes(ctaLib);
+  const perfNotes       = buildPerfNotes(perfWeights);
+  const topicSeeds      = buildTopicSeeds(xTopics);
+  const competitorNotes = buildCompetitorNotes(competitor);
 
   const userPrompt = buildUserPrompt({
-    trendNotes, hookNotes, themeNotes, ctaNotes, perfNotes,
+    trendNotes, hookNotes, themeNotes, ctaNotes, perfNotes, topicSeeds, competitorNotes,
     recentFingerprints, date,
   });
 

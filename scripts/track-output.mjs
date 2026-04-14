@@ -3,11 +3,13 @@
 /**
  * track-output.mjs — Daily output counter
  *
- * Counts today's generated content (images, story videos, ASMR videos)
- * and appends one entry to output/daily-output-log.json.
+ * Counts today's generated content and appends one entry to output/daily-output-log.json.
  *
  * Zero API cost. Idempotent — re-running overwrites today's entry.
- * Phase 0 gate: 30 consecutive days with images≥10, storyVideos≥10, asmrVideos≥10.
+ *
+ * Phase 0 gate (updated 2026-04-13):
+ *   images ≥ 10  AND  asmrVideos ≥ 1  AND  storyVideos ≥ 1  AND  xTextPosts ≥ 4
+ *   30 consecutive days meeting all four thresholds = Phase 0 cleared.
  *
  * Usage:
  *   node scripts/track-output.mjs           # Count and append
@@ -54,17 +56,31 @@ async function countVideos(keyword) {
   } catch { return 0; }
 }
 
+// Count X text posts in today's queue file.
+// Counts total entries (generated) — covers both manual warmup (not posted:true) and automation.
+async function countXTextPosts() {
+  const queuePath = path.join(OUTPUT_DIR, 'queue', `x-text-${today}.json`);
+  try {
+    const data = JSON.parse(await fs.readFile(queuePath, 'utf-8'));
+    return Array.isArray(data) ? data.length : 0;
+  } catch { return 0; }
+}
+
+// Phase 0 gate check — updated 2026-04-13
+// images ≥ 10, asmrVideos ≥ 1, storyVideos ≥ 1, xTextPosts ≥ 4
+function meetsGate(e) {
+  return e.images >= 10 && e.asmrVideos >= 1 && e.storyVideos >= 1 && (e.xTextPosts ?? 0) >= 4;
+}
+
 // Count consecutive days at the gate threshold.
 // Returns how many trailing days (including today) all meet the gate.
 function countStreak(log) {
   let streak = 0;
-  // Walk backwards from most recent entry
   for (let i = log.length - 1; i >= 0; i--) {
-    const e = log[i];
-    if (e.images >= 10 && e.storyVideos >= 10 && e.asmrVideos >= 10) {
+    if (meetsGate(log[i])) {
       streak++;
     } else {
-      break; // streak broken
+      break;
     }
   }
   return streak;
@@ -73,17 +89,19 @@ function countStreak(log) {
 async function report(log) {
   const recent = log.slice(-7);
   console.log('\nDaily Output Log — last 7 days');
-  console.log('─'.repeat(56));
-  console.log('Date        │ Images │ Stories │ ASMR │ Gate');
-  console.log('─'.repeat(56));
+  console.log('─'.repeat(70));
+  console.log('Date        │ Images │ Stories │ ASMR │ X Posts │ Gate');
+  console.log('─'.repeat(70));
   for (const e of recent) {
-    const gate = e.images >= 10 && e.storyVideos >= 10 && e.asmrVideos >= 10;
+    const gate = meetsGate(e);
+    const xp = e.xTextPosts ?? 0;
     console.log(
-      `${e.date}  │  ${String(e.images).padStart(4)}  │   ${String(e.storyVideos).padStart(4)}  │  ${String(e.asmrVideos).padStart(3)} │ ${gate ? 'MET' : '---'}`
+      `${e.date}  │  ${String(e.images).padStart(4)}  │   ${String(e.storyVideos).padStart(4)}  │  ${String(e.asmrVideos).padStart(3)} │   ${String(xp).padStart(4)}  │ ${gate ? 'MET' : '---'}`
     );
   }
-  console.log('─'.repeat(56));
+  console.log('─'.repeat(70));
   const streak = countStreak(log);
+  console.log(`Gate: images≥10, ASMR≥1, stories≥1, X text posts≥4`);
   console.log(`Streak: ${streak}/30 consecutive gate days\n`);
 }
 
@@ -101,27 +119,30 @@ async function main() {
   }
 
   // Count today's output
-  const [images, storyVideos, asmrVideos] = await Promise.all([
+  const [images, storyVideos, asmrVideos, xTextPosts] = await Promise.all([
     countImages(),
     countVideos('story'),
     countVideos('asmr'),
+    countXTextPosts(),
   ]);
 
   // Upsert today's entry
   log = log.filter(e => e.date !== today);
-  log.push({ date: today, images, storyVideos, asmrVideos, loggedAt: new Date().toISOString() });
+  log.push({ date: today, images, storyVideos, asmrVideos, xTextPosts, loggedAt: new Date().toISOString() });
   log = log.slice(-90); // keep last 90 days
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   await fs.writeFile(LOG_PATH, JSON.stringify(log, null, 2));
 
   // Summary
-  const gate = images >= 10 && storyVideos >= 10 && asmrVideos >= 10;
+  const entry = { images, storyVideos, asmrVideos, xTextPosts };
+  const gate = meetsGate(entry);
   const streak = countStreak(log);
   console.log(`\nDaily Output — ${today}`);
-  console.log(`  Images:       ${images}/10  ${images >= 10 ? 'OK' : '--'}`);
-  console.log(`  Story videos: ${storyVideos}/10  ${storyVideos >= 10 ? 'OK' : '--'}`);
-  console.log(`  ASMR videos:  ${asmrVideos}/10  ${asmrVideos >= 10 ? 'OK' : '--'}`);
+  console.log(`  Images:        ${images}/10  ${images >= 10 ? 'OK' : '--'}`);
+  console.log(`  Story videos:  ${storyVideos}/1   ${storyVideos >= 1 ? 'OK' : '--'}`);
+  console.log(`  ASMR videos:   ${asmrVideos}/1   ${asmrVideos >= 1 ? 'OK' : '--'}`);
+  console.log(`  X text posts:  ${xTextPosts}/4   ${xTextPosts >= 4 ? 'OK' : '--'}`);
   console.log(`  Phase 0 gate: ${gate ? 'MET' : 'not yet'} | Streak: ${streak}/30 days`);
   console.log(`  Saved: output/daily-output-log.json\n`);
 }

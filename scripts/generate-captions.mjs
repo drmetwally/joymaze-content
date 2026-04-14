@@ -66,6 +66,63 @@ try {
   }
 } catch {}
 
+// Load trend signals, active themes, and competitor intelligence (silent fallback)
+// Injected as lightweight context so captions reflect what's trending and what's working for competitors.
+let intelligenceContext = '';
+try {
+  const [trendsRaw, themesRaw, competitorRaw] = await Promise.all([
+    fs.readFile(path.join(ROOT, 'config', 'trends-this-week.json'), 'utf-8').catch(() => null),
+    fs.readFile(path.join(ROOT, 'config', 'theme-pool-dynamic.json'), 'utf-8').catch(() => null),
+    fs.readFile(path.join(ROOT, 'config', 'competitor-intelligence.json'), 'utf-8').catch(() => null),
+  ]);
+  const lines = [];
+  if (trendsRaw) {
+    const trends = JSON.parse(trendsRaw);
+    const boost   = (trends.boost_themes    || []).slice(0, 4).join(', ');
+    const rising  = (trends.rising_searches || []).slice(0, 4).join(', ');
+    const kw      = (trends.caption_keywords || []).slice(0, 5).join(', ');
+    if (boost)  lines.push(`Trending themes this week: ${boost}`);
+    if (rising) lines.push(`Rising search terms: ${rising}`);
+    if (kw)     lines.push(`High-resonance caption words: ${kw}`);
+  }
+  if (themesRaw) {
+    const pool = JSON.parse(themesRaw);
+    const active = (pool.themes || [])
+      .filter(t => t.status !== 'evicted' && t.brand_safe !== false)
+      .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+      .slice(0, 3)
+      .map(t => t.name);
+    if (active.length) lines.push(`Active content themes: ${active.join(', ')}`);
+  }
+  if (competitorRaw) {
+    const comp = JSON.parse(competitorRaw);
+    const patterns = (comp.caption_patterns || []).slice(0, 3).join(' | ');
+    const hooks    = (comp.winning_hooks    || []).slice(0, 3).join(' | ');
+    const themes   = (comp.viral_themes     || []).slice(0, 3).join(', ');
+    if (patterns) lines.push(`Competitor caption patterns (what's working in this niche): ${patterns}`);
+    if (hooks)    lines.push(`Competitor winning hooks (style reference only): ${hooks}`);
+    if (themes)   lines.push(`Competitor viral themes: ${themes}`);
+  }
+
+  // Performance weights: which categories are saving vs not
+  try {
+    const perfRaw = await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8');
+    const perf = JSON.parse(perfRaw);
+    const cats = perf.categories || [];
+    if (cats.length > 0) {
+      const boost  = cats.filter(c => c.tier === 'boost').map(c => c.label || c.category);
+      const reduce = cats.filter(c => c.tier === 'reduce').map(c => c.label || c.category);
+      if (boost.length)  lines.push(`High-saving content categories this week: ${boost.join(', ')} — lean into these`);
+      if (reduce.length) lines.push(`Low-saving categories: ${reduce.join(', ')} — vary hook approach`);
+    }
+  } catch {}
+
+  if (lines.length) {
+    intelligenceContext = '\n\n## INTELLIGENCE SIGNALS (weave naturally into captions when relevant — do not force):\n'
+      + lines.join('\n');
+  }
+} catch {}
+
 // Platform caption targets
 const PLATFORMS = ['pinterest', 'instagram', 'x', 'tiktok', 'youtube'];
 
@@ -354,10 +411,10 @@ async function generateCaptionsForContent(metadata) {
           .replace('{{activityType}}', activityType)
           .replace('{{difficulty}}', difficulty);
 
-        // Full prompt: style guide + template (for Gemini and Groq — large context models)
+        // Full prompt: style guide + intelligence context + template (for Gemini and Groq — large context models)
         const fullPrompt = writingStyleGuide
-          ? `${writingStyleGuide}${dynamicHookSupplement}\n\n---\n\n${templatePrompt}`
-          : templatePrompt;
+          ? `${writingStyleGuide}${dynamicHookSupplement}${intelligenceContext}\n\n---\n\n${templatePrompt}`
+          : `${intelligenceContext}\n\n---\n\n${templatePrompt}`;
 
         // Short prompt: template only (for Ollama — llama3.2:3b has limited context)
         const shortPrompt = templatePrompt;

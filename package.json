@@ -74,6 +74,7 @@
     "animate:story:dry": "node scripts/render-video.mjs --comp StoryEpisode --dry-run",
     "animate:asmr": "node scripts/render-video.mjs --comp AsmrReveal",
     "animate:asmr:dry": "node scripts/render-video.mjs --comp AsmrReveal --dry-run",
+    "extract:path": "node scripts/extract-maze-path.mjs",
     "animate:hook": "node scripts/render-video.mjs --comp HookIntro",
     "animate:hook:dry": "node scripts/render-video.mjs --comp HookIntro --dry-run",
     "animate:factcard": "node scripts/render-video.mjs --comp AnimatedFactCard",

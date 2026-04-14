@@ -4,6 +4,28 @@
 
 ---
 
+### 2026-04-14 — Intelligence pipeline full-connect + perf-weights fix + X topic engine
+
+- **Daily audit:** X post 4 (identity/reply) was a non-sequitur — fixed to quiet-morning parenting hook. Prompt 9 was Easter-themed post-Easter — replaced with spring nature.
+- **Post-Easter fix (systemic):** `getEasterDate(year)` function added to generate-prompts.mjs. `seasonalNote` switches modes after Easter. New `post-easter` penalty rule in pre-check layer. Self-maintaining across all future years.
+- **X post topic pool:** `x-post-topics-dynamic.json` created with 10 seeds (insight/identity/story types). Fully wired: intelligence-refresh generates → apply-intelligence manages decay/eviction → generate-x-posts injects least-used seeds per type. 7-day dedup on content; pool prevents angle repeats across weeks.
+- **Competitor intel gap closed:** Captions and X posts were not receiving competitor intelligence. Both now load competitor-intelligence.json and inject winning hook patterns, scroll-stopper formulas, caption patterns.
+- **perf-weights schema bug:** `buildPerfNotes()` in generate-x-posts.mjs was reading `weights: {}` (wrong) — weekly-scorecard actually writes `categories: []`. Fixed. Was silently returning empty string.
+- **Full intelligence coverage achieved:** All 5 content-generating scripts now consume trends + perf-weights + competitor-intel + hooks-library + theme-pool. Assembler scripts (story-video, asmr-video) correctly remain dumb.
+- **Memory locked:** Puzzle X posts — fun/value + kids connection is the bar; activity-topic relevancy is NOT required. Argued twice, saved to memory.
+
+---
+
+### 2026-04-13 — Maze ASMR path-drawing engine complete
+
+- **Core change:** Replaced LTR wipe with true path-drawing animation for maze ASMR. Kids complained wipe revealed path "all at once at corners." Now a pencil draws the actual solution line from start to finish.
+- **extract-maze-path.mjs rebuilt:** Zhang-Suen skeleton thinning + BFS walk. Handles vertical segments, U-turns, junctions. Auto-detects path color from highest-diff pixels in solved image. Outputs 400 waypoints + pathColor to path.json.
+- **MazeSolverReveal.jsx (new component):** SVG polyline grows waypoint-by-waypoint, pencil rides the tip, cross-fades to solved image at end. Starts at frame 0 (no dead hook wait).
+- **Hand cursor removed** — too hard to get right in SVG. Pencil-only cursor looks clean and professional.
+- **Video now 30s** (was 34.5s): revealDurationSec=26 + holdDurationSec=1.
+- **Progress bar:** Black outline frame, centred (48px margins), just below hook text.
+- **Coloring ASMR:** Unchanged — still uses TTB wipe (works perfectly for coloring).
+
 ### 2026-04-11 — X suspension recovery + platform reset + daily brief
 
 - **X suspended** for spam (bulk posting + Blue Premium on new account day 1). No appeal — repurposed clean 3-year-old fit-clinic account → `@playjoymaze`. New Developer app, all API keys rotated.
@@ -619,3 +641,8 @@
 - [Claude 2026-04-13 s1] Universal MEMORY.md created at project root — consolidates all 30+ scattered memory files into one canonical source for all agents. Phase 0 gate updated: images≥10 + ASMR≥1 + story≥1 + X text≥4 (was images/stories/ASMR all ≥10). track-output.mjs now counts X text queue entries. CLAUDE.md startup updated to read local MEMORY.md first.
 2026-04-13 s2 — Remotion L2–4: ActivityChallenge comp, TypewriterCaption, AsmrReveal progress bar, batch renderer (render-batch.mjs), hook prepend (prepend-hook.mjs). 39 stale memory files redirected to MEMORY.md.
 2026-04-13 s3 — render-video.mjs: --preview flag (3s @ 0.5×), auto-thumbnail (renderStill → *-thumb.jpg), audio auto-selection (AUDIO_MAP). All 9 Remotion tasks done.
+2026-04-13 s3 addendum — pushed a284e5a. Config conflicts resolved (accepted remote intelligence data). /clear incoming, next: AsmrReveal live test.
+
+- [Claude 2026-04-13 s4] AsmrReveal 6-improvement pass: hand+pencil cursor (MazeHandCursor.jsx, follows actual solution path via path.json), progress bar 7→14px, objectFit contain (no side-crop), removed joymaze.com watermark, hook text persistent full-video, audio loops. Plus extract-maze-path.mjs script + npm run extract:path. publicDir lean copy (~14MB) cuts bundle from 66s→1.5s, fixes ENOSPC. Live render confirmed 34.5s. Cheatsheet + memory updated.
+
+- [Claude 2026-04-13 s4 addendum] Post-render Remotion bundle auto-cleanup: render-video.mjs now purges all stale remotion-webpack-bundle-* dirs from %TEMP% after each render. Prevents ENOSPC recurrence. ProtocolError at 93% confirmed non-fatal.

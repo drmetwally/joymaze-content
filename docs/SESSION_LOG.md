@@ -4,6 +4,41 @@
 
 ---
 
+## 2026-04-14 — [Agent: Claude] — Intelligence pipeline full-connect + X post engine overhaul + perf-weights fix
+
+**Files changed:** `scripts/generate-x-posts.mjs`, `scripts/generate-captions.mjs`, `scripts/generate-story-ideas.mjs`, `scripts/generate-asmr-brief.mjs`, `scripts/generate-activity-video.mjs`, `scripts/apply-intelligence.mjs`, `scripts/intelligence-refresh.mjs`, `scripts/generate-prompts.mjs`, `config/x-post-topics-dynamic.json` (new), `output/queue/x-text-2026-04-14.json`, `output/prompts/prompts-2026-04-14.md`, memory files
+
+- **Daily audit (2026-04-14):** X post 4 non-sequitur reply fixed. Prompt 9 post-Easter Easter theme caught and replaced with spring nature spot-the-difference.
+- **Post-Easter staleness fix (generate-prompts.mjs):** Added `getEasterDate(year)` (Anonymous Gregorian algorithm). `seasonalNote` now switches to "Easter already passed" mode after Easter. New `post-easter` pre-check rule (penalty -4) fires when today > easter AND prompt contains `\beaster\b`.
+- **X post topic pool created:** `config/x-post-topics-dynamic.json` — 10 hand-seeded entries (insight×4, identity×3, story×3). Full decay/eviction schema. Wired into full intelligence pipeline (refresh generates → apply manages → x-posts injects).
+- **generate-x-posts.mjs:** Added `buildTopicSeeds()` (least-used per type), `buildCompetitorNotes()`. Both injected into prompt. Competitor intel now flows to X captions.
+- **`buildPerfNotes()` bug fix:** Was reading `weights: {}` (wrong schema); weekly-scorecard writes `categories: []`. Fixed to read `categories[].tier/label/weight`. Was silently broken — always returned empty string.
+- **generate-captions.mjs:** Added parallel load of trends, theme-pool, competitor-intel, perf-weights. Injects `## INTELLIGENCE SIGNALS` block into caption prompt. Competitor caption patterns + boost/reduce tiers now influence caption generation.
+- **generate-story-ideas.mjs:** Added competitor-intel, hooks-library, theme-pool loads. Beat 1 hook now influenced by competitor scroll-stopper formulas and top intelligence hooks.
+- **generate-asmr-brief.mjs:** Added competitor-intel, hooks-library, theme-pool, perf-weights loads. hookText and hookAlternatives now guided by intelligence hooks and competitor patterns.
+- **generate-activity-video.mjs:** Static hooks replaced with dynamic `loadIntelligenceHooks()` — pulls challenge_hook/curiosity_gap/pattern_interrupt from hooks-library. Static fallback if <2 available.
+- **apply-intelligence.mjs:** Added `applyNewXPostTopics()` function + x-post-topics-dynamic.json write. Topic pool now managed by intelligence cycle.
+- **intelligence-refresh.mjs:** Added `new_x_post_topics` to Gemini schema (insight/identity/story types). Added x.engagement CTA generation instruction (CTA pool was empty for X).
+- **Memory saved:** `feedback_puzzle_post_relevancy.md` — puzzle X posts: fun/value + kids connection is bar; activity relevancy not required. Argued twice, now locked.
+- **Final coverage:** All 5 content-generating scripts (prompts, captions, x-posts, story-ideas, asmr-brief) now consume full intelligence suite (trends + perf-weights + competitor-intel + hooks-library + theme-pool).
+
+---
+
+## 2026-04-13 — [Agent: Claude] — Maze ASMR: skeleton path tracer + MazeSolverReveal + pencil cursor
+
+**Files changed:** `scripts/extract-maze-path.mjs` (full rewrite), `scripts/render-video.mjs`, `remotion/compositions/AsmrReveal.jsx`, `remotion/components/MazeSolverReveal.jsx` (new), `remotion/components/MazeHandCursor.jsx` (kept but unused in maze path)
+
+- **Problem:** Old LTR-wipe reveal for mazes looked wrong (path drawn all at once in corners). Replaced with true path-drawing animation.
+- **extract-maze-path.mjs rewritten:** Scale image to 20% → diff mask → largest connected component → Zhang-Suen thinning (1px skeleton) → BFS walk from leftmost endpoint (direction-continuation at junctions, teleport on stuck) → smooth (moving-average) → arc-length subsample 400 waypoints → sample pathColor from highest-diff pixels. Saves `path.json` with `waypoints`, `width`, `height`, `pathColor`.
+- **MazeSolverReveal.jsx (new):** Shows blank maze, draws SVG polyline growing from start to end (400 waypoints, green glow), pencil cursor (no hand) at the tip, cross-fades to solved image at 92% progress. Drawing starts at frame 0 (overlaps hook phase — no dead wait).
+- **AsmrReveal.jsx:** Branches on `pathWaypoints + revealType !== ttb` → MazeSolverReveal (maze) vs WipeReveal (coloring). Coloring unchanged.
+- **render-video.mjs:** AR-corrected coordinate mapping for waypoints (accounts for objectFit:contain letterboxing). Reads `pathColor` from path.json. New defaults: `revealDurationSec=26`, `holdDurationSec=1` → 30s total (was 34.5s).
+- **Hand cursor removed from maze path.** PencilTip (pencil-only SVG) inlined in MazeSolverReveal — no hand.
+- **Progress bar:** Black outline frame (`rgba(0,0,0,0.72)`), `top:261` (2px below hook text card), `left:48/width:calc(100%-96px)` (centred with margins), transparent track (no dark background).
+- **Render confirmed:** maze-butterfly-garden → 30s, green path #14ae5c, pencil cursor, correct skeleton trace 521/554 pixels.
+
+---
+
 ## 2026-04-11 — [Agent: Claude] — X suspension recovery + platform reset + daily brief built
 
 **Files changed:** `scripts/generate-brief.mjs` (new), `package.json`, `.env`, memory files, `docs/TASKS.md`
@@ -1295,3 +1330,45 @@ Output filename gets `-preview` suffix. Available as `npm run animate:preview --
 All dry-runs pass: ActivityChallenge (65s), HookIntro preview (3s @ 540×960), AsmrReveal (34.5s).
 
 **All Remotion layers now complete.** Next: drop images into output/stories/ and output/asmr/ and run `npm run generate:videos` for first live renders.
+
+---
+**2026-04-13 s3 addendum — Push complete, conflicts resolved**
+
+Remote had updated config/ files from Monday intelligence run (GitHub Actions). Resolved by accepting remote versions for all 6 config JSON files (intelligence data — not code). Local code changes pushed clean. Commit: a284e5a.
+
+Stash dropped. Working tree clean except: CLAUDE.md (unstaged), config/ (unstaged intelligence data), scripts/track-output.mjs (unstaged), config/performance-weights.json (untracked), output/queue/x-text-2026-04-13.json (untracked).
+
+Next: test AsmrReveal live render. Drop blank.png + colored.png into output/asmr/ folder, run npm run generate:videos.
+
+---
+**2026-04-13 s4 — AsmrReveal: 6 improvements + audio loop + lean publicDir**
+
+**What shipped:**
+
+1. **Hand + pencil cursor** — `MazeHandCursor.jsx` (new Remotion component). SVG hand ported from FFmpeg pipeline. Follows actual maze solution path via precomputed waypoints.
+2. **Path extraction** — `scripts/extract-maze-path.mjs` (new). Diffs blank vs solved pixel-by-pixel, extracts Y centroid per X column, smooths, samples 200 waypoints → `path.json`. Added `npm run extract:path`.
+3. **Progress bar** — height 7px → 14px.
+4. **No side-crop** — `objectFit: cover` → `contain` in WipeReveal.jsx. Both images now fully visible.
+5. **joymaze.com removed** — BrandWatermark dropped from AsmrReveal. Link in bio only.
+6. **Hook text persistent** — removed `<Sequence durationInFrames={hookFrames}>` cap; text stays full video.
+7. **Audio loops** — added `loop` prop to `<Audio>` — no more silence mid-video.
+8. **Lean publicDir** — render-video.mjs now pre-copies only `assets/` + `output/asmr/` + `output/stories/` (~14MB) to `.remotion-public/` before bundling. Bundle time: 1.5s (was 66s). Fixes ENOSPC from `node_modules`/archive being bundled.
+
+**Files changed:** `remotion/compositions/AsmrReveal.jsx`, `remotion/components/WipeReveal.jsx`, `remotion/components/HookText.jsx`, `scripts/render-video.mjs`, `package.json`, `.gitignore`, `.remotionignore`
+
+**Files created:** `remotion/components/MazeHandCursor.jsx`, `scripts/extract-maze-path.mjs`, `.remotion-public/` (gitignored)
+
+**Live render confirmed:** `output/videos/AsmrReveal-1776077723900.mp4` (34.5s, thumbnail extracted)
+
+**Workflow for new maze ASMR slugs:**
+```bash
+npm run extract:path -- output/asmr/[slug]/activity.json
+npm run animate:asmr -- --asmr output/asmr/[slug]/activity.json
+```
+
+---
+**2026-04-13 s4 addendum — auto-cleanup of Remotion temp bundles**
+
+Added post-render cleanup to `render-video.mjs`: after every successful render, scans `%TEMP%` for `remotion-webpack-bundle-*` dirs and deletes all except the current one. Prevents disk exhaustion across sessions (each bundle was ~14MB lean but stale ones accumulate). Cleanup line printed to console on each invocation that removes bundles. Non-fatal — wrapped in try/catch.
+
+Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome closes tab after work is done); render completes to 100% and output is valid.

@@ -8,9 +8,9 @@ import {
   staticFile,
 } from 'remotion';
 import { WipeReveal }        from '../components/WipeReveal.jsx';
+import { MazeSolverReveal }  from '../components/MazeSolverReveal.jsx';
 import { HookText }          from '../components/HookText.jsx';
 import { JoyoWatermark }     from '../components/JoyoWatermark.jsx';
-import { BrandWatermark }    from '../components/BrandWatermark.jsx';
 import { FloatingParticles } from '../components/FloatingParticles.jsx';
 
 // ─── Default props / schema ──────────────────────────────────────────────────
@@ -18,8 +18,8 @@ export const asmrRevealSchema = {
   blankImagePath:  '',      // path relative to project root (e.g. "output/asmr/maze-slug/blank.png")
   solvedImagePath: '',      // path relative to project root
   revealType:      'ltr',   // 'ltr' (maze) | 'ttb' (coloring)
-  hookText:        '',      // shown for first hookDurationSec seconds
-  hookDurationSec: 3,
+  hookText:        '',      // shown throughout the video as persistent visual hook
+  hookDurationSec: 3,       // unused for timing now; kept for API compat
   revealDurationSec: 30,    // wipe takes this long
   holdDurationSec:   1.5,   // hold on completed reveal before video ends
   audioPath:       'assets/audio/crayon.mp3',
@@ -27,6 +27,8 @@ export const asmrRevealSchema = {
   showJoyo:        true,
   showParticles:   true,    // sparkles after reveal completes
   particleEmoji:   '✨',
+  pathWaypoints:   null,    // [{x, y}] in video pixel space — drives MazeSolverReveal
+  pathColor:       '#22BB44', // solution line color (sampled by extract-maze-path.mjs)
 };
 
 // ─── AsmrReveal ───────────────────────────────────────────────────────────────
@@ -52,6 +54,8 @@ export const AsmrReveal = ({
   showJoyo         = true,
   showParticles    = true,
   particleEmoji    = '✨',
+  pathWaypoints    = null,
+  pathColor        = '#22BB44',
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -62,14 +66,22 @@ export const AsmrReveal = ({
   const revealStart  = hookFrames;
   const holdStart    = hookFrames + revealFrames;
 
-  // Progress bar: 0→1 during reveal window, then holds at 1 during hold
-  const revealLocalFrame = Math.max(0, frame - revealStart);
-  const barProgress = Math.min(revealLocalFrame / revealFrames, 1);
+  // For maze solver: drawing starts at frame 0 (hook text is already a persistent overlay).
+  // For wipe (coloring): drawing starts at revealStart as before.
+  const useSolverReveal = pathWaypoints?.length > 0 && revealType !== 'ttb' && revealType !== 'coloring';
+  const drawStart  = useSolverReveal ? 0 : revealStart;
+  const drawFrames = useSolverReveal ? hookFrames + revealFrames : revealFrames;
 
-  // Bar fades in with the reveal and out with the video end
+  // Progress bar: 0→1 during draw window
+  const barProgress = Math.min(Math.max(0, frame - drawStart) / drawFrames, 1);
+
+  // Bar fades in at drawStart and out at video end.
+  // Guards ensure monotonic range even in preview mode (very short durationInFrames).
+  const _bt1 = Math.min(drawStart + fps * 0.5, durationInFrames - 2);
+  const _bt2 = Math.max(_bt1 + 1, durationInFrames - Math.round(fps * 0.4));
   const barOpacity = interpolate(
     frame,
-    [revealStart, revealStart + fps * 0.5, durationInFrames - fps * 0.4, durationInFrames],
+    [drawStart, _bt1, _bt2, durationInFrames],
     [0, 1, 1, 0],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
@@ -77,21 +89,31 @@ export const AsmrReveal = ({
   return (
     <AbsoluteFill style={{ backgroundColor: '#f5f5f0' }}>
 
-      {/* ── Wipe reveal — runs for the full video under everything ─────── */}
-      <WipeReveal
-        blankPath={blankImagePath}
-        solvedPath={solvedImagePath}
-        revealType={revealType === 'coloring' ? 'ttb' : 'ltr'}
-        startFrame={revealStart}
-        durationFrames={revealFrames}
-        easing="linear"
-      />
+      {/* ── Reveal layer — MazeSolverReveal for mazes, WipeReveal for coloring ── */}
+      {useSolverReveal ? (
+        <MazeSolverReveal
+          blankPath={blankImagePath}
+          solvedPath={solvedImagePath}
+          waypoints={pathWaypoints}
+          pathColor={pathColor}
+          startFrame={drawStart}
+          durationFrames={drawFrames}
+        />
+      ) : (
+        <WipeReveal
+          blankPath={blankImagePath}
+          solvedPath={solvedImagePath}
+          revealType={revealType === 'coloring' ? 'ttb' : revealType}
+          startFrame={revealStart}
+          durationFrames={revealFrames}
+          easing="linear"
+          pathWaypoints={null}
+        />
+      )}
 
-      {/* ── Hook text overlay (first hookDurationSec) ────────────────── */}
+      {/* ── Hook text overlay — persistent throughout for visual hook ── */}
       {hookText && (
-        <Sequence from={0} durationInFrames={hookFrames}>
-          <HookText text={hookText} position="top" />
-        </Sequence>
+        <HookText text={hookText} position="top" />
       )}
 
       {/* ── Sparkle particles after reveal completes ─────────────────── */}
@@ -108,13 +130,11 @@ export const AsmrReveal = ({
       {/* ── Joyo watermark ───────────────────────────────────────────── */}
       <JoyoWatermark visible={showJoyo} />
 
-      {/* ── Brand watermark ──────────────────────────────────────────── */}
-      <BrandWatermark text="joymaze.com" position="bottom-center" />
-
-      {/* ── ASMR audio — fade in, hold, fade out ─────────────────────── */}
+      {/* ── ASMR audio — loops to fill the full video, fade in + fade out ── */}
       {audioPath && (
         <Audio
           src={audioPath.startsWith('http') ? audioPath : staticFile(audioPath)}
+          loop
           volume={(frame) =>
             interpolate(
               frame,
@@ -126,25 +146,27 @@ export const AsmrReveal = ({
         />
       )}
 
-      {/* ── Progress bar — fills left→right as wipe progresses ───────── */}
+      {/* ── Progress bar — framed, centred, just below hook text ─────────── */}
+      {/* Frame sits at ~264px — 5px below the hook text card bottom (~259px) */}
       <div
         style={{
-          position:        'absolute',
-          top:             0,
-          left:            0,
-          width:           '100%',
-          height:          7,
-          opacity:         barOpacity,
-          backgroundColor: 'rgba(0,0,0,0.12)',
+          position:     'absolute',
+          top:          261,
+          left:         48,
+          width:        'calc(100% - 96px)',
+          height:       18,
+          opacity:      barOpacity,
+          border:       '2.5px solid rgba(0, 0, 0, 0.72)',
+          borderRadius: 5,
+          overflow:     'hidden',
         }}
       >
         <div
           style={{
             height:          '100%',
             width:           `${(barProgress * 100).toFixed(2)}%`,
-            backgroundColor: '#FF6B35',   // JoyMaze orange
-            borderRadius:    '0 4px 4px 0',
-            boxShadow:       '0 0 8px rgba(255,107,53,0.6)',
+            backgroundColor: '#FF6B35',
+            boxShadow:       '0 0 8px rgba(255,107,53,0.5)',
           }}
         />
       </div>

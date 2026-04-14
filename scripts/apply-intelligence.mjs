@@ -28,6 +28,7 @@ const THEME_DYNAMIC_FILE = path.join(ROOT, 'config', 'theme-pool-dynamic.json');
 const HOOKS_FILE         = path.join(ROOT, 'config', 'hooks-library.json');
 const CTAS_FILE          = path.join(ROOT, 'config', 'cta-library.json');
 const INTERRUPTS_FILE    = path.join(ROOT, 'config', 'pattern-interrupt-dynamic.json');
+const X_POST_TOPICS_FILE = path.join(ROOT, 'config', 'x-post-topics-dynamic.json');
 const ARCHIVE_DIR        = path.join(ROOT, 'output', 'archive');
 const QUEUE_DIR          = path.join(ROOT, 'output', 'queue');
 const PERF_WEIGHTS_FILE  = path.join(ROOT, 'config', 'performance-weights.json');
@@ -356,6 +357,67 @@ async function applyNewCtas(newCtas, current) {
 }
 
 // ────────────────────────────────────────────────────────────────────
+// X POST TOPIC SEEDS
+// insight_seeds, identity_scenes, story_seeds — rotate weekly
+// ────────────────────────────────────────────────────────────────────
+
+async function applyNewXPostTopics(newTopics, current) {
+  if (!newTopics?.length) return { added: 0, pool: current };
+
+  const MAX = current._meta?.max_entries || 40;
+  const today = new Date().toISOString().slice(0, 10);
+  const VALID_TYPES = new Set(['insight', 'identity', 'story']);
+
+  const existingNorm = new Set(current.topics.map(t => normalize(t.text)));
+
+  const toAdd = newTopics.filter(t => {
+    if (!t.brand_safe) return false;
+    if (!t.text || !VALID_TYPES.has(t.type)) return false;
+    return !existingNorm.has(normalize(t.text));
+  });
+
+  if (!toAdd.length) {
+    console.log('  X topics: nothing new to add (all duplicates or invalid)');
+    return { added: 0, pool: current };
+  }
+
+  let pool = [...current.topics];
+
+  // Evict lowest-value entries to make room
+  const overflow = pool.length + toAdd.length - MAX;
+  if (overflow > 0) {
+    const candidates = pool
+      .filter(e => !isProtected(e))
+      .sort((a, b) => evictionScore(b) - evictionScore(a));
+    candidates.slice(0, overflow).forEach(e => {
+      const idx = pool.indexOf(e);
+      if (idx !== -1) pool.splice(idx, 1);
+    });
+  }
+
+  let added = 0;
+  for (const t of toAdd) {
+    pool.push({
+      text: t.text,
+      type: t.type,
+      source: t.source || 'intelligence_refresh',
+      added_week: today,
+      confidence: t.confidence ?? 0.75,
+      times_used: 0,
+      last_used: null,
+      decay_weeks: 2,
+      brand_safe: true,
+    });
+    console.log(`  ${DRY_RUN ? '[DRY] Would add' : 'Added'} X topic [${t.type}]: "${(t.text || '').slice(0, 70)}"`);
+    added++;
+  }
+
+  current.topics = pool;
+  current._meta.last_updated = today;
+  return { added, pool: current };
+}
+
+// ────────────────────────────────────────────────────────────────────
 // PATTERN INTERRUPT POOL
 // ────────────────────────────────────────────────────────────────────
 
@@ -628,16 +690,21 @@ async function main() {
   if (status === 'entropy_blocked') console.log('  (Forcing past entropy block as requested)');
 
   // 2. Load current dynamic pools
-  const [themesPool, hooksLibrary, ctaLibrary, patternPool] = await Promise.all([
+  const [themesPool, hooksLibrary, ctaLibrary, patternPool, xPostTopics] = await Promise.all([
     loadJson(THEME_DYNAMIC_FILE),
     loadJson(HOOKS_FILE),
     loadJson(CTAS_FILE),
     loadJson(INTERRUPTS_FILE),
+    loadJson(X_POST_TOPICS_FILE),
   ]);
 
   if (!themesPool || !hooksLibrary || !ctaLibrary || !patternPool) {
     console.error('One or more dynamic pool files missing. Run from repo root after initial setup.');
     process.exit(1);
+  }
+
+  if (!xPostTopics) {
+    console.warn('  Warning: x-post-topics-dynamic.json missing — X topic seeds will not be updated.');
   }
 
   // 3. Weekly aging pass (always runs — independent of new intelligence)
@@ -664,14 +731,20 @@ async function main() {
   const { added: interruptsAdded } =
     await applyNewPatternInterrupts(intelligence.new_pattern_interrupts, patternPool);
 
+  const { added: xTopicsAdded } = xPostTopics
+    ? await applyNewXPostTopics(intelligence.new_x_post_topics, xPostTopics)
+    : { added: 0 };
+
   // 6. Write updated pools
   console.log('\n--- Writing updated pools ---');
-  await Promise.all([
+  const writes = [
     writeJson(THEME_DYNAMIC_FILE, themesPool, 'theme-pool-dynamic.json'),
     writeJson(HOOKS_FILE, hooksLibrary, 'hooks-library.json'),
     writeJson(CTAS_FILE, ctaLibrary, 'cta-library.json'),
     writeJson(INTERRUPTS_FILE, patternPool, 'pattern-interrupt-dynamic.json'),
-  ]);
+  ];
+  if (xPostTopics) writes.push(writeJson(X_POST_TOPICS_FILE, xPostTopics, 'x-post-topics-dynamic.json'));
+  await Promise.all(writes);
 
   // 7. Mark intelligence as applied
   if (!DRY_RUN) {
@@ -682,10 +755,11 @@ async function main() {
 
   // 8. Summary
   console.log(`\n--- Summary ---`);
-  console.log(`  Themes:   +${themesAdded} added, ${themesEvicted} evicted`);
-  console.log(`  Hooks:    +${hooksAdded} added`);
-  console.log(`  CTAs:     +${ctasAdded} added`);
+  console.log(`  Themes:     +${themesAdded} added, ${themesEvicted} evicted`);
+  console.log(`  Hooks:      +${hooksAdded} added`);
+  console.log(`  CTAs:       +${ctasAdded} added`);
   console.log(`  Interrupts: +${interruptsAdded} added`);
+  console.log(`  X topics:   +${xTopicsAdded} added`);
   console.log(`  Pruned (aging): ${pruned}`);
   if (DRY_RUN) console.log('\n  [DRY RUN] No files were written.');
 }

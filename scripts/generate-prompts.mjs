@@ -1351,6 +1351,27 @@ function stripRuleViolations(result) {
 }
 
 /**
+ * Compute Easter Sunday date for a given year (Gregorian calendar, Anonymous Gregorian algorithm).
+ */
+function getEasterDate(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=March, 4=April
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+/**
  * Pre-check all prompts for hard rule violations before LLM scoring.
  * Returns Map<promptNumber, violations[]> — each violation: {rule, penalty}.
  * These penalties are applied deterministically, regardless of LLM score.
@@ -1384,6 +1405,18 @@ function preCheckViolations(result) {
     if (month >= 3 && month <= 5) {
       if (/autumn leaves|fall leaves|autumn theme|harvest moon|harvest time|falling leaves|autumn.{0,20}color/i.test(section)) {
         v.push({ rule: 'wrong-season', penalty: -3 });
+      }
+    }
+    // Post-Easter: Easter themes are stale after Easter Sunday has passed
+    {
+      const today = new Date();
+      const easter = getEasterDate(today.getFullYear());
+      today.setHours(0, 0, 0, 0);
+      easter.setHours(0, 0, 0, 0);
+      if (today > easter && month >= 3 && month <= 5) {
+        if (/\beaster\b/i.test(section)) {
+          v.push({ rule: 'post-easter', penalty: -4 });
+        }
       }
     }
     // Pipe separator in Caption hook idea line (AI content tell)
@@ -1652,7 +1685,11 @@ function buildUserPrompt(mix, count, performanceContext, assignedThemes = [], as
 
     // Seasonal context: prevent LLM from defaulting to off-season holidays
     const m = new Date().getMonth() + 1;
-    const seasonalNote = m >= 3 && m <= 5 ? 'SPRING (Easter, Earth Day, spring nature — NOT Christmas/Halloween)' :
+    const todayForSeason = new Date();
+    const easterDate = getEasterDate(todayForSeason.getFullYear());
+    todayForSeason.setHours(0, 0, 0, 0); easterDate.setHours(0, 0, 0, 0);
+    const pastEaster = todayForSeason > easterDate;
+    const seasonalNote = m >= 3 && m <= 5 ? (pastEaster ? 'SPRING (Earth Day, spring nature, outdoor play — Easter already passed this year, do NOT use Easter themes)' : 'SPRING (Easter, Earth Day, spring nature — NOT Christmas/Halloween)') :
                          m >= 6 && m <= 8 ? 'SUMMER (summer break, outdoors, 4th of July — NOT Christmas)' :
                          m >= 9 && m <= 10 ? 'FALL (Halloween, harvest, back-to-school)' :
                                              'WINTER/HOLIDAY (Christmas, Hanukkah, New Year)';

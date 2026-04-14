@@ -104,8 +104,40 @@ async function activityJsonToProps(activity, activityDir) {
   const solvedImagePath = toRelative(activity.solvedImage ?? 'solved.png');
 
   const hookSec    = activity.hookDurationSec    ?? 3;
-  const revealSec  = activity.revealDurationSec  ?? 30;
-  const holdSec    = activity.holdDurationSec    ?? 1.5;
+  const revealSec  = activity.revealDurationSec  ?? 26;  // 3+26+1 = 30s total
+  const holdSec    = activity.holdDurationSec    ?? 1;
+
+  // Load precomputed path waypoints if path.json exists alongside activity.json
+  let pathWaypoints = null;
+  let pathColor     = '#22BB44'; // fallback — overwritten if path.json has a sampled color
+  const pathJsonFile = path.resolve(activityDir, 'path.json');
+  try {
+    const pathData = JSON.parse(await fs.readFile(pathJsonFile, 'utf-8'));
+    // AR-corrected mapping: account for objectFit:contain letterboxing so the SVG overlay
+    // aligns with the actual image position in the 1080×1920 video frame.
+    const VW = 1080, VH = 1920;
+    const imgW = pathData.width ?? VW;
+    const imgH = pathData.height ?? VH;
+    const imgAR   = imgW / imgH;
+    const videoAR = VW / VH;
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAR > videoAR) {
+      // image is relatively wider than video → width-constrained
+      renderW = VW; renderH = VW / imgAR;
+      offsetX = 0;  offsetY = (VH - renderH) / 2;
+    } else {
+      // image is relatively taller than video → height-constrained
+      renderH = VH; renderW = VH * imgAR;
+      offsetX = (VW - renderW) / 2; offsetY = 0;
+    }
+    pathWaypoints = pathData.waypoints.map(p => ({
+      x: offsetX + p.x * renderW,
+      y: offsetY + p.y * renderH,
+    }));
+    if (pathData.pathColor) pathColor = pathData.pathColor;
+  } catch {
+    // path.json not present — solver disabled; run `npm run extract:path` to generate it
+  }
 
   return {
     blankImagePath,
@@ -122,6 +154,8 @@ async function activityJsonToProps(activity, activityDir) {
     showJoyo:         activity.showJoyo ?? true,
     showParticles:    activity.showParticles ?? true,
     particleEmoji:    activity.particleEmoji ?? '✨',
+    pathWaypoints,
+    pathColor:        activity.pathColor ?? pathColor,
     // computed total for duration override
     _totalSec: hookSec + revealSec + holdSec,
   };
@@ -177,9 +211,33 @@ async function getBundle() {
   if (_cachedServeUrl) return _cachedServeUrl;
   console.log('\n    Bundling compositions...');
   const t = Date.now();
+  // Build a lean publicDir with only the folders staticFile() paths reference.
+  // Remotion copies publicDir into a temp webpack bundle — including node_modules or
+  // output/archive would exhaust disk space on Windows. Pre-copy only what's needed.
+  const publicDir = path.join(ROOT, '.remotion-public');
+  await fs.mkdir(publicDir, { recursive: true });
+  // Subdirs to mirror: assets/ + output/asmr/ + output/stories/
+  // cp -r equivalent using Node.js fs (no symlinks — avoids Windows EPERM)
+  const toCopy = [
+    [path.join(ROOT, 'assets'),           path.join(publicDir, 'assets')],
+    [path.join(ROOT, 'output', 'asmr'),   path.join(publicDir, 'output', 'asmr')],
+    [path.join(ROOT, 'output', 'stories'), path.join(publicDir, 'output', 'stories')],
+  ];
+  async function copyDir(src, dst) {
+    await fs.mkdir(dst, { recursive: true });
+    for (const entry of await fs.readdir(src, { withFileTypes: true })) {
+      const s = path.join(src, entry.name), d = path.join(dst, entry.name);
+      if (entry.isDirectory()) await copyDir(s, d);
+      else await fs.copyFile(s, d);
+    }
+  }
+  for (const [src, dst] of toCopy) {
+    const exists = await fs.access(src).then(() => true).catch(() => false);
+    if (exists) await copyDir(src, dst);
+  }
   _cachedServeUrl = await bundle({
     entryPoint:      path.join(ROOT, 'remotion', 'index.jsx'),
-    publicDir:       ROOT,
+    publicDir,
     webpackOverride: (config) => config,
   });
   console.log(`    Bundled in ${((Date.now() - t) / 1000).toFixed(1)}s`);
@@ -210,6 +268,8 @@ async function main() {
   if (cleanProps.hookText)        console.log(`    Hook        : "${cleanProps.hookText}"`);
   if (cleanProps.musicPath)       console.log(`    Music       : ${cleanProps.musicPath}`);
   if (cleanProps.audioPath)       console.log(`    Audio       : ${cleanProps.audioPath}`);
+  if (cleanProps.pathWaypoints)   console.log(`    Path pts    : ${cleanProps.pathWaypoints.length} waypoints (solver active)`);
+  if (cleanProps.pathColor)       console.log(`    Path color  : ${cleanProps.pathColor}`);
   console.log(`    Output      : ${outputPath}`);
 
   if (dryRun) {
@@ -267,6 +327,25 @@ async function main() {
       console.warn(`    [thumb] skipped: ${err.message}`);
     }
   }
+
+  // ── Purge stale Remotion temp bundles ────────────────────────────────────────
+  // Remotion writes each bundle to a fresh tmp dir and never cleans up.
+  // After a successful render we delete all bundles EXCEPT the one we just used,
+  // so disk space doesn't accumulate across sessions.
+  try {
+    const os   = await import('os');
+    const tmpDir = os.tmpdir();
+    const entries = await fs.readdir(tmpDir);
+    const bundles = entries.filter(e => e.startsWith('remotion-webpack-bundle-'));
+    const currentBundle = serveUrl.startsWith('file:///')
+      ? serveUrl.replace('file:///', '').split('/')[0]
+      : null;
+    for (const b of bundles) {
+      if (b === currentBundle) continue; // keep the one we just used
+      await fs.rm(path.join(tmpDir, b), { recursive: true, force: true }).catch(() => {});
+    }
+    if (bundles.length > 1) console.log(`    [cleanup] removed ${bundles.length - 1} stale bundle(s) from ${tmpDir}`);
+  } catch { /* non-fatal */ }
 
   console.log();
 }

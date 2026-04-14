@@ -714,6 +714,15 @@ Return ONLY valid JSON matching this exact structure — no markdown fences, no 
       "rationale": "Why this topic is timely or missing from current pool"
     }
   ],
+  "new_x_post_topics": [
+    {
+      "type": "insight|identity|story",
+      "text": "One complete seed sentence — insight: a surprising parenting or child-development observation; identity: a specific micro-scene that opens with the parent already in a moment (not 'you're the kind of parent who'); story: a scene fragment that drops the reader mid-action",
+      "brand_safe": true,
+      "source": "trend_analysis|competitor_analysis|intelligence_refresh",
+      "rationale": "Why this angle is fresh (what emotional territory it opens that recent posts haven't covered)"
+    }
+  ],
   "intelligence_summary": {
     "top_performing_archetype_this_week": "category name",
     "weakest_archetype_this_week": "category name",
@@ -727,8 +736,9 @@ Return ONLY valid JSON matching this exact structure — no markdown fences, no 
 Generate:
 - 3-5 new_themes (genuinely novel — not already in pools or last 14 days)
 - 4-8 new_hooks (prioritize hook types not well-represented in existing library)
-- 2-4 new_ctas across different platforms (patterns you observed, not generic)
+- 2-4 new_ctas across different platforms (patterns you observed, not generic) — include at least 1 for platform "x", type "engagement"
 - 2-4 new_pattern_interrupts (specific, surprising facts — not vague)
+- 4-8 new_x_post_topics: 2 insight (surprising observation a parent couldn't dismiss), 2 identity (scene-entry micro-moment, NOT a trait list), 1-2 story (mid-action scene fragment). Each must feel like something that HAPPENED, not advice. Avoid: school drop-off, maze on the kitchen wall, quiet morning — those are overused angles.
 - Complete intelligence_summary
 
 Quality bar: every suggestion must be specific enough to act on immediately. "Kids activities" is too vague. "Spring cleanup maze for 5-year-olds with a vacuum cleaner theme" is specific.`;
@@ -739,7 +749,7 @@ Quality bar: every suggestion must be specific enough to act on immediately. "Ki
     // Strip any markdown fences if Gemini added them
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
     const parsed = JSON.parse(cleaned);
-    log(`  Intelligence synthesized: ${parsed.new_themes?.length || 0} themes, ${parsed.new_hooks?.length || 0} hooks, ${parsed.new_ctas?.length || 0} CTAs, ${parsed.new_pattern_interrupts?.length || 0} interrupts`);
+    log(`  Intelligence synthesized: ${parsed.new_themes?.length || 0} themes, ${parsed.new_hooks?.length || 0} hooks, ${parsed.new_ctas?.length || 0} CTAs, ${parsed.new_pattern_interrupts?.length || 0} interrupts, ${parsed.new_x_post_topics?.length || 0} X topics`);
     return parsed;
   } catch (err) {
     throw new Error(`Gemini synthesis failed: ${err.message}`);

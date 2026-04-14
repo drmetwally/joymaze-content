@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "last_updated": "2026-04-14",
+    "managed_by": "scripts/apply-intelligence.mjs",
+    "max_entries": 40,
+    "description": "Rotating angle seeds for X text post generation. Insight, identity-scene, and story-seed entries — refreshed weekly by intelligence engine. Injected into generate-x-posts.mjs as inspiration (never verbatim copy)."
+  },
+  "topics": [
+    {
+      "text": "Most kids solve a maze faster on the second attempt than any adult on the first.",
+      "type": "insight",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.8,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "Screen-free activities don't replace screens — they train the attention span that makes screens less necessary.",
+      "type": "insight",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.85,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "The hardest puzzle for a 5-year-old is the one they're two steps away from finishing — that gap is where persistence lives.",
+      "type": "insight",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.8,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "Fine motor skills are the one thing pediatric OTs keep asking about — and the one thing most screen time skips entirely.",
+      "type": "insight",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.82,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "You're the parent who paused the show because you heard them say 'wait, I almost have it.'",
+      "type": "identity",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.85,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "You printed it out just to see what they'd do with it. Three hours later you still haven't cleaned the table.",
+      "type": "identity",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.82,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "You're the one who bought crayons 'for them' and keeps finding yourself picking the colors first.",
+      "type": "identity",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.78,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "The Saturday morning where nothing was planned and everything went exactly right.",
+      "type": "story",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.8,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "The crayon on the floor. The finished page on the fridge. The hour you didn't notice passing.",
+      "type": "story",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.82,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    },
+    {
+      "text": "She asked me to turn the music off so she could concentrate on her coloring.",
+      "type": "story",
+      "source": "hand_seeded",
+      "added_week": "2026-04-14",
+      "confidence": 0.85,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 3,
+      "brand_safe": true
+    }
+  ]
+}
