@@ -1,0 +1,41 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "The tiny hand that held mine during the storm is now the one drawing a maze on the kitchen wall.",
+    "scheduledHour": 13,
+    "reply1": "I stood frozen, unsure whether to scold or marvel at the concentration.",
+    "replies": [
+      "I stood frozen, unsure whether to scold or marvel at the concentration.",
+      "Then I saw the dead ends, the turns, the way it mirrored our afternoon."
+    ]
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "I have a voice that's heard by kids in the forest, yet I have no mouth. What am I?",
+    "scheduledHour": 17,
+    "reply1": "Think carefully... drop your guess below 👇 — answer drops in a few hours",
+    "replies": [
+      "Think carefully... drop your guess below 👇 — answer drops in a few hours"
+    ],
+    "answer_tweet": "The answer is: an Echo! It repeats back what was said, even in the forest. Did you get it?",
+    "answer_scheduledHour": 21
+  },
+  {
+    "type": "insight",
+    "tweet1": "Most kids stop a maze at the first dead end. Then they try again when no one is watching.",
+    "scheduledHour": 21,
+    "reply1": "Let them finish it alone next time. The perseverance they learn is worth more than a completed maze.",
+    "replies": [
+      "Let them finish it alone next time. The perseverance they learn is worth more than a completed maze."
+    ]
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're the one sitting in the car after drop-off, wondering if today's quiet moment will come from a puzzle or a book.",
+    "scheduledHour": 23,
+    "reply1": "Some mornings, the quiet moment finds you. You just have to let it.",
+    "replies": [
+      "Some mornings, the quiet moment finds you. You just have to let it."
+    ]
+  }
+]

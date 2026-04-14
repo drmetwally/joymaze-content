@@ -134,34 +134,49 @@ function escapeXml(str) {
  * Auto-wraps at 20 chars to a second line.
  */
 function buildHookOverlaySvg(text) {
+  // Auto-wrap at 22 chars
   let lines = [text];
   if (text.length > 22) {
     const mid = text.lastIndexOf(' ', Math.floor(text.length / 2));
     if (mid > 0) lines = [text.slice(0, mid), text.slice(mid + 1)];
   }
 
-  const lineH   = 80;
-  const startY  = Math.round(VIDEO_HEIGHT * 0.10); // top 10% of frame
+  // Yellow pill geometry — matches ASMR HookText component
+  const fontSize   = 56;
+  const lineH      = 72;
+  const padV       = 28;
+  const pillMargin = 48;
+  const pillTop    = 48;
+  const pillW      = VIDEO_WIDTH - pillMargin * 2;
+  const pillH      = padV * 2 + fontSize + (lines.length - 1) * lineH;
+  const textStartY = pillTop + padV + fontSize / 2;
+
   const textEls = lines.map((line, i) =>
     `<text
       x="${VIDEO_WIDTH / 2}"
-      y="${startY + i * lineH}"
+      y="${textStartY + i * lineH}"
       text-anchor="middle"
       dominant-baseline="middle"
       font-family="Arial Black, Arial, sans-serif"
-      font-size="68"
+      font-size="${fontSize}"
       font-weight="900"
-      fill="white"
-      filter="url(#sh)"
+      fill="#111111"
     >${escapeXml(line)}</text>`
   ).join('\n');
 
   return `<svg width="${VIDEO_WIDTH}" height="${VIDEO_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="black" flood-opacity="1"/>
+      <filter id="sh" x="-20%" y="-40%" width="140%" height="180%">
+        <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="black" flood-opacity="0.28"/>
       </filter>
     </defs>
+    <rect
+      x="${pillMargin}" y="${pillTop}"
+      width="${pillW}" height="${pillH}"
+      rx="22" ry="22"
+      fill="rgba(255,210,0,0.93)"
+      filter="url(#sh)"
+    />
     ${textEls}
   </svg>`;
 }
@@ -215,8 +230,8 @@ async function pickAudio() {
     const files = await fs.readdir(AUDIO_DIR);
     const audioFiles = files.filter(f => /\.(mp3|wav|ogg|m4a)$/i.test(f));
     if (audioFiles.length === 0) return null;
-    // Prefer crayon.mp3 for playful activity posts; fall back to first available
-    const preferred = audioFiles.find(f => f.includes('crayon'));
+    // Prefer soft background music; fall back to first available
+    const preferred = audioFiles.find(f => f.includes('Twinkle')) || audioFiles.find(f => !f.includes('crayon'));
     return path.join(AUDIO_DIR, preferred || audioFiles[0]);
   } catch {
     return null;

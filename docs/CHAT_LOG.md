@@ -4,6 +4,16 @@
 
 ---
 
+### 2026-04-14 — Audio swap + activity video overlay + cheatsheet cleanup
+
+- **Audio:** All ASMR and activity videos now use Twinkle soft music instead of crayon.mp3. Crayon sound didn't fit coloring wipe or static puzzle videos.
+- **Activity video overlay:** Yellow pill background (matches ASMR HookText) — `rgba(255,210,0,0.93)`, dark text, positioned at very top (y=48). Old style was white text + drop shadow floating over the puzzle image.
+- **Cheatsheet restructured:** Heavy intro (intelligence loop, architecture) moved to Appendix. Workflow steps now first. Fixed wrong step order (activity video must run after import:raw). ASMR 2-step flow clarified (coloring=1 step, others=2). Carousel explained as zero-friction auto via import:raw. Warmup: push required (YouTube live), X paused pending credits.
+- **Decisions:** X via GitHub Actions = correct after warmup + credits. YouTube via Actions = keep as-is. Manual posting during warmup via `npm run brief` → HTML page.
+- **Memory gap closed:** `npm run brief` generates `output/daily-brief-YYYY-MM-DD.html` — the manual posting view. Was not in memory; Claude incorrectly said it didn't exist.
+
+---
+
 ### 2026-04-14 — Intelligence pipeline full-connect + perf-weights fix + X topic engine
 
 - **Daily audit:** X post 4 (identity/reply) was a non-sequitur — fixed to quiet-morning parenting hook. Prompt 9 was Easter-themed post-Easter — replaced with spring nature.
@@ -683,3 +693,7 @@
 4. Workflow: copy blank/solved → `extract:dotdot` → `animate:asmr`. Tuning via MIN_DOT_AREA / DARK_THRESH if detection needs adjustment.
 
 **Next:** Scheduled ASMR queue (seasonal brief pre-scheduling), then loop freeze-frame, then sudoku.
+
+---
+**2026-04-14 — X text archive fix**
+Added x-text sweep to `archive-queue.mjs`. Files named `x-text-YYYY-MM-DD.json` are arrays, not objects — existing loop skipped them. New sweep matches by filename regex, extracts date, moves to `output/archive/x-text/`. `npm run daily` now fully cleans up X text post files.

@@ -36,8 +36,20 @@ const compositionId = _compArg
     : args.includes('--story')     ? 'StoryEpisode'
     : 'StoryEpisode');
 const storyFile     = getArg('--story');
-const asmrFile      = getArg('--asmr');
 const challengeFile = getArg('--challenge');
+
+// --asmr can be used as a flag (value comes from positional slug) or as a key-value pair.
+// Positional slug: first non-flag arg that isn't already consumed as a --comp value.
+const _asmrArgVal  = getArg('--asmr');
+const _positional  = args.find((a, i) =>
+  !a.startsWith('-') && args[i - 1] !== '--comp' && args[i - 1] !== '--story' &&
+  args[i - 1] !== '--asmr' && args[i - 1] !== '--challenge' &&
+  args[i - 1] !== '--props' && args[i - 1] !== '--out'
+);
+const asmrFile = _asmrArgVal
+  ?? (hasFlag('--asmr') && _positional
+      ? `output/asmr/${_positional}/activity.json`
+      : null);
 const propsArg      = getArg('--props');
 const outArg        = getArg('--out');
 const dryRun        = hasFlag('--dry-run');
@@ -52,11 +64,15 @@ const PREVIEW_SCALE  = 0.5; // half resolution → 540×960
 // Only applied when the caller has NOT already set an explicit audioPath/musicPath.
 // Falls back gracefully if the file doesn't exist (logs a warning, uses '').
 
+const SOFT_MUSIC = 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3';
+
 const AUDIO_MAP = {
-  coloring: 'assets/audio/crayon.mp3',   // soft crayon ASMR
-  maze:     'assets/audio/crayon.mp3',   // same for now — add pencil.mp3 when available
-  story:    'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
-  default:  'assets/audio/crayon.mp3',
+  coloring:   SOFT_MUSIC,   // screen wipe — soft background music
+  maze:       SOFT_MUSIC,   // path drawing — soft background music
+  wordsearch: SOFT_MUSIC,
+  dotdot:     SOFT_MUSIC,
+  story:      SOFT_MUSIC,
+  default:    SOFT_MUSIC,
 };
 
 async function resolveAudio(type) {

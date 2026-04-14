@@ -1,0 +1,143 @@
+{
+  "id": "2026-04-14-activity-tracing-08",
+  "category": "activity-tracing",
+  "categoryName": "Activity: Tracing Activity",
+  "subject": "trace",
+  "source": "manual-import",
+  "sourceFile": "trace.png",
+  "textOverlay": null,
+  "hookText": "Dare them to try.",
+  "generatedAt": "2026-04-14T21:06:18.903Z",
+  "scheduledHour": 19,
+  "dryRun": false,
+  "carouselGroup": null,
+  "slideIndex": null,
+  "outputs": {
+    "pinterest": "2026-04-14-activity-tracing-08-pin.png",
+    "instagram_portrait": "2026-04-14-activity-tracing-08-ig-pt.png",
+    "instagram_square": "2026-04-14-activity-tracing-08-ig-sq.png",
+    "tiktok": "2026-04-14-activity-tracing-08-tt.png",
+    "x": "2026-04-14-activity-tracing-08-x.png"
+  },
+  "platforms": {
+    "pinterest": {
+      "image": "2026-04-14-activity-tracing-08-pin.png",
+      "status": "pending"
+    },
+    "instagram": {
+      "image": "2026-04-14-activity-tracing-08-ig-pt.png",
+      "status": "pending"
+    },
+    "x": {
+      "image": "2026-04-14-activity-tracing-08-x.png",
+      "status": "pending"
+    }
+  },
+  "captions": {
+    "pinterest": {
+      "text": "Most 6-year-olds take 4 tries to trace this path correctly. Every wrong turn is a micro-decision, building spatial reasoning without feeling like homework. Save this for Saturday morning, more puzzles like this in JoyMaze — free on iOS & Android.",
+      "rawCaption": "Most 6-year-olds take 4 tries to trace this path correctly. Every wrong turn is a micro-decision, building spatial reasoning without feeling like homework. Save this for Saturday morning, more puzzles like this in JoyMaze — free on iOS & Android.",
+      "hashtags": [
+        "#JoyMaze",
+        "#KidsActivities",
+        "#ScreenFreeActivities",
+        "#PrewritingSkills",
+        "#FineMotorSkills",
+        "#LineTracing",
+        "#TracingActivities",
+        "#TracingForKids",
+        "#HandwritingPractice",
+        "#KidsHandwriting",
+        "#MotorSkillsDevelopment",
+        "#ChildrensActivities",
+        "#LearningThroughPlay",
+        "#ScreenFreeParenting",
+        "#NoScreenTime"
+      ],
+      "cta": "Find more printable activities at joymaze.com",
+      "characterCount": 246
+    },
+    "instagram": {
+      "text": "You hand this to your kid. Don't say a word. See what happens.\nEyes narrow. Pencil slows. Then — the sound of it stopping. They got it.\nThat frustration before the breakthrough — that's the skill. Not the finished maze.\nHow fast did yours solve it? Drop the time below.\nMore like this in JoyMaze — link in bio.\n\n.\n.\n.\n#JoyMaze #KidsActivities #LearningThroughPlay #ScreenFreeActivities #PrewritingSkills #TracingForKids #MotorSkillsDevelopment #LineTracing #FineMotorSkills #HandwritingPractice #TracingActivities #KidsHandwriting #JoymazeApp #KidsGames #ScreenFreeKids #AnalogPlay #UnpluggedPlay #BrainDevelopment #KidsBrainGames #ProblemSolvingSkills #TravelActivities #QuietTimeActivities #CalmKids #ScreenTimeThatMatters #MomLife",
+      "rawCaption": "You hand this to your kid. Don't say a word. See what happens.\nEyes narrow. Pencil slows. Then — the sound of it stopping. They got it.\nThat frustration before the breakthrough — that's the skill. Not the finished maze.\nHow fast did yours solve it? Drop the time below.\nMore like this in JoyMaze — link in bio.",
+      "hashtags": [
+        "#JoyMaze",
+        "#KidsActivities",
+        "#LearningThroughPlay",
+        "#ScreenFreeActivities",
+        "#PrewritingSkills",
+        "#TracingForKids",
+        "#MotorSkillsDevelopment",
+        "#LineTracing",
+        "#FineMotorSkills",
+        "#HandwritingPractice",
+        "#TracingActivities",
+        "#KidsHandwriting",
+        "#JoymazeApp",
+        "#KidsGames",
+        "#ScreenFreeKids",
+        "#AnalogPlay",
+        "#UnpluggedPlay",
+        "#BrainDevelopment",
+        "#KidsBrainGames",
+        "#ProblemSolvingSkills",
+        "#TravelActivities",
+        "#QuietTimeActivities",
+        "#CalmKids",
+        "#ScreenTimeThatMatters",
+        "#MomLife"
+      ],
+      "cta": "Link in bio for more",
+      "characterCount": 733
+    },
+    "x": {
+      "text": "The turn that stops most kids.",
+      "rawCaption": "The turn that stops most kids.",
+      "hashtags": [],
+      "cta": "More printables at joymaze.com",
+      "characterCount": 30,
+      "thread": {
+        "tweet1": "The turn that stops most kids.",
+        "reply1": "What's the shape that stumps them most? Was it a circle or something more complex? Tell us below"
+      }
+    },
+    "tiktok": {
+      "text": "Most kids solve the top half. The bottom is where focus breaks.\n\n#JoyMaze #HandwritingPractice #PrewritingSkills #JoymazeApp",
+      "rawCaption": "Most kids solve the top half. The bottom is where focus breaks.",
+      "hashtags": [
+        "#JoyMaze",
+        "#HandwritingPractice",
+        "#PrewritingSkills",
+        "#JoymazeApp"
+      ],
+      "cta": "More printables at joymaze.com",
+      "characterCount": 124
+    },
+    "youtube": {
+      "text": "Watch what happens when a 6-year-old's fingers move with purpose. They scan the maze, backtrack, and try again - that's spatial reasoning in action. For parents who choose activities with intention, more printable puzzles at joymaze.com\n\n#JoyMaze #KidsActivities #MotorSkillsDevelopment #HandwritingPractice #FineMotorSkills #TracingActivities #PrewritingSkills #Joyo #EducationalGames #EducationalApp",
+      "rawCaption": "Watch what happens when a 6-year-old's fingers move with purpose. They scan the maze, backtrack, and try again - that's spatial reasoning in action. For parents who choose activities with intention, more printable puzzles at joymaze.com",
+      "hashtags": [
+        "#JoyMaze",
+        "#KidsActivities",
+        "#MotorSkillsDevelopment",
+        "#HandwritingPractice",
+        "#FineMotorSkills",
+        "#TracingActivities",
+        "#PrewritingSkills",
+        "#Joyo",
+        "#EducationalGames",
+        "#EducationalApp"
+      ],
+      "cta": "Find more printable activities at joymaze.com",
+      "characterCount": 401
+    }
+  },
+  "cloudUrls": {
+    "pinterest": "https://res.cloudinary.com/dm9eqz4ex/image/upload/v1776200779/joymaze/images/joymaze/images/2026-04-14-activity-tracing-08-pin-1776200778.png",
+    "instagram_portrait": "https://res.cloudinary.com/dm9eqz4ex/image/upload/v1776200781/joymaze/images/joymaze/images/2026-04-14-activity-tracing-08-ig-pt-1776200780.png",
+    "instagram_square": "https://res.cloudinary.com/dm9eqz4ex/image/upload/v1776200782/joymaze/images/joymaze/images/2026-04-14-activity-tracing-08-ig-sq-1776200782.png",
+    "tiktok": "https://res.cloudinary.com/dm9eqz4ex/image/upload/v1776200784/joymaze/images/joymaze/images/2026-04-14-activity-tracing-08-tt-1776200783.png",
+    "x": "https://res.cloudinary.com/dm9eqz4ex/image/upload/v1776200785/joymaze/images/joymaze/images/2026-04-14-activity-tracing-08-x-1776200785.png"
+  },
+  "captionsGeneratedAt": "2026-04-14T21:09:37.094Z"
+}

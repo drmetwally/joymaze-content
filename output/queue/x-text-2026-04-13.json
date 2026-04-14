@@ -1,0 +1,41 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "She stopped coloring when I picked up the pencil.",
+    "scheduledHour": 13,
+    "reply1": "The silence was louder than the scribbles on the wall.",
+    "replies": [
+      "The silence was louder than the scribbles on the wall.",
+      "I waited for her to ask why. She didn't."
+    ]
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "I have a voice but only whisper to those who listen closely. What am I?",
+    "scheduledHour": 17,
+    "reply1": "Think carefully... drop your guess below 👇 — answer drops in a few hours",
+    "replies": [
+      "Think carefully... drop your guess below 👇 — answer drops in a few hours"
+    ],
+    "answer_tweet": "The answer is: a book! It has a voice through its words, but only whispers to those who listen closely. Did you get it?",
+    "answer_scheduledHour": 21
+  },
+  {
+    "type": "insight",
+    "tweet1": "Most kids don't notice the missing piece in a puzzle until they step back.",
+    "scheduledHour": 21,
+    "reply1": "Encourage them to take that step back often — it's where the learning happens.",
+    "replies": [
+      "Encourage them to take that step back often — it's where the learning happens."
+    ]
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're the one who still remembers the first time they drew a flower.",
+    "scheduledHour": 23,
+    "reply1": "The petals were shaped like tears, and it was the most beautiful thing you'd ever seen.",
+    "replies": [
+      "The petals were shaped like tears, and it was the most beautiful thing you'd ever seen."
+    ]
+  }
+]

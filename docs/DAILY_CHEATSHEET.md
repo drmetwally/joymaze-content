@@ -1,135 +1,80 @@
 # JoyMaze Daily Production Cheatsheet
 
-> Print this. Follow it top to bottom. Every day. No thinking needed.
+> Follow top to bottom. Every day.
 
-Last updated: 2026-04-14 (dot-to-dot ASMR + seamless loop)
-
----
-
-## The Intelligence Feedback Loop (how everything connects)
-
-```
-MONDAY AUTOMATIC (npm run daily + GitHub Actions):
-  collect-analytics.mjs   → output/analytics/YYYY-MM-DD.json
-  weekly-scorecard.mjs    → config/performance-weights.json    (save-rate by archetype/category)
-  collect-trends.mjs      → config/trends-this-week.json       (Google Trends + seasonal calendar)
-  intelligence-refresh.mjs→ config/content-intelligence.json   (Gemini competitor web search)
-  apply-intelligence.mjs  → 5 dynamic pool files:
-                              config/theme-pool-dynamic.json       (trending topics)
-                              config/hooks-library.json            (proven hook patterns)
-                              config/cta-library.json              (high-CTR CTAs)
-                              config/pattern-interrupt-dynamic.json(did-you-know facts)
-                              config/x-post-topics-dynamic.json    (X angle diversity)
-
-DAILY (generate-prompts.mjs reads everything above):
-  themes         ← trending themes (boost_themes) + analytics ranking
-  hook examples  ← hooks-library top performers
-  fact cards     ← pattern-interrupt-dynamic keyword-matched to today's activity
-  carousel pick  ← analytics activityRanking (save-rate winner drives Format 2+3)
-  series naming  ← SERIES_NAMES[day]: Mon=Maze Monday, Wed=Puzzle Power Wednesday, Fri=Fine Motor Friday
-
-DAILY (generate-captions.mjs):
-  CTAs + hooks   ← cta-pool-dynamic + hooks-library
-
-POSTED CONTENT → collect-analytics.mjs (next day) → feeds back into rankings
-TRACK GATE     → track-output.mjs → output/daily-output-log.json (Phase 0: 30 days ≥ 10/10/10)
-```
-
-**The loop is automatic after git push. Your job: generate content and push the queue.**
+Last updated: 2026-04-14
 
 ---
 
-## Architecture — What Runs Where
+## Quick Summary
 
-| Layer | What it does | Needs PC on? |
-|-------|-------------|--------------|
-| **Local — you** | Generate images in Gemini, import, caption | Yes |
-| **Local — npm run daily** | 9 AM daily generation (prompts, briefs, X posts, output tracking) | Yes (at 9 AM) |
-| **GitHub Actions — hourly** | X text post drip (generate if needed + post due entries) | No |
-| **GitHub Actions — 4 AM Cairo** | Post all pending media to Pinterest/YouTube/X/TikTok | No |
-| **GitHub Actions — Monday 7 AM** | Pinterest token refresh + intelligence + trends | No |
+| Step | What | Time | Command |
+|------|------|------|---------|
+| 1 | Archive yesterday + generate today's briefs | 2 min | `npm run daily` |
+| 2A | Inspiration images (5) | 10–15 min | Gemini → `output/raw/<slot>/` |
+| 2B | Activity puzzle images (5) | 15–20 min | Gemini → `output/raw/<type>/` |
+| 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
+| 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
+| 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
+| 3 | ASMR video | 1–2 min | Coloring: 1 cmd · Maze/Wordsearch/Dot-to-dot: 2 cmds |
+| 3B | Challenge video | 1 min | `npm run animate:challenge` |
+| 4 | Story video (optional) | 1 min | `npm run generate:story:remotion` |
+| 5 | Import + brand images | 1 min | `npm run import:raw` |
+| 6 | Activity puzzle videos | 1 min | `npm run generate:activity:video` (runs after import) |
+| 7 | AI captions | 2–3 min | `npm run generate:captions` |
+| 8 | Push queue ⚠️ | 1 min | `git add output/queue/ && git commit -m "queue: date" && git push` |
 
-**Key rule:** After you import and caption content, `git push` before going to sleep. Actions reads the queue from the repo — if you don't push, nothing posts at 4 AM.
-
-**Where files live:**
-
-| File type | Location | In GitHub? | In Cloudinary? |
-|-----------|----------|------------|----------------|
-| Prompts, story/ASMR briefs | `output/prompts/`, `output/stories/`, `output/asmr/` | No — local only | No |
-| Raw images (from Gemini) | `output/raw/` | No — local only | No |
-| Branded images + videos | `output/images/`, `output/videos/` | No — local only | **Yes** (auto-uploaded) |
-| Queue metadata (JSON) | `output/queue/` | **Yes** (committed + pushed) | No |
-| Archive | `output/archive/` | No — local only | No |
-| Analytics | `output/analytics/` | No — local only | No |
-| Config pools (intelligence) | `config/` | **Yes** (Actions commits back) | No |
-| Daily output log | `output/daily-output-log.json` | No — local only | No |
+**Total: ~42–48 min/day**
 
 ---
 
 ## Before You Start
 
-Open a terminal in `D:\Joymaze-Content\`
-
-Check pipeline health (30 seconds):
 ```bash
-npm run health-check     # API keys, config files, queue state
-npm run status           # X queue + cooldown + recent posts
+npm run health-check     # API keys, config, queue state
+npm run status           # X queue + cooldown
 npm run output:report    # Phase 0 gate — last 7 days
 ```
 
 ---
 
-## STEP 1 — Clean Yesterday + Get Today's Prompts (2 min)
+## STEP 1 — Clean + Plan (2 min)
 
 ```bash
 npm run daily
 ```
 
-This does automatically, in order:
+Automatically:
 1. Archives yesterday's queue → `output/archive/YYYY-MM-DD/`
-2. Counts today's output → `output/daily-output-log.json` (Phase 0 gate tracking)
-3. Collects analytics data (Monday only)
-4. Refreshes trend signals (Monday only)
-5. Runs intelligence loop (Monday only)
-6. Generates 10 fresh AI image prompts → `output/prompts/prompts-YYYY-MM-DD.md`
-7. Generates story idea → `output/stories/`
-8. Generates ASMR brief → `output/asmr/` (rotates: coloring/maze/coloring/wordsearch/dotdot/maze)
-9. Generates challenge brief → `output/challenge/` (rotates: maze/word-search/dot-to-dot)
-10. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
+2. Tracks today's output count (Phase 0 gate)
+3. Generates 10 image prompts → `output/prompts/prompts-YYYY-MM-DD.md`
+4. Generates story idea → `output/stories/`
+5. Generates ASMR brief → `output/asmr/` (rotation: coloring → maze → coloring → wordsearch → dotdot → maze)
+6. Generates challenge brief → `output/challenge/`
+7. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
+8. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
 
-**Check today's prompts:** Open `output/prompts/prompts-YYYY-MM-DD.md`
+**Check:** Open `output/prompts/prompts-YYYY-MM-DD.md`
 
-**Series naming (automatic):**
-- **Monday → Maze Monday** — caption hooks for maze/activity slots include "Maze Monday"
-- **Wednesday → Puzzle Power Wednesday** — hooks reference the series
-- **Friday → Fine Motor Friday** — hooks reference the series
-- Other days: no series tag, normal hooks
-
-**Carousel day (every ~3 days):** Check the `## CAROUSEL DAY` or `## FACTS CAROUSEL DAY` or `## PROGRESSION CAROUSEL DAY` block at the bottom of the prompts file. Follow it exactly.
+**Series days:** Mon = Maze Monday · Wed = Puzzle Power Wednesday · Fri = Fine Motor Friday (auto-injected into prompts)
 
 ---
 
-## STEP 2 — Generate ALL Images in Gemini (30–40 min)
+## STEP 2 — Generate Images in Gemini (30–40 min)
 
-Open Gemini. Keep it open. Generate everything in one sitting.
-
-### 2A — Inspiration Post Images (5 images)
-
-Copy each inspiration prompt (items 1–5) into Gemini. Save to matching subfolder:
+### 2A — Inspiration Images (5)
 
 | Slot | Folder | What to generate |
 |------|--------|-----------------|
 | Fact Card | `output/raw/fact-card/` | Bold educational poster + stat overlay |
-| Challenge | `output/raw/challenge/` | Child at peak engagement with a printable activity |
-| Quiet Moment | `output/raw/quiet/` | Child absorbed in activity, no screens, warm light |
-| Printable Tease | `output/raw/printable/` | Beautiful flat-lay close-up of printed activity sheet |
+| Challenge | `output/raw/challenge/` | Child engaged with a printable activity |
+| Quiet Moment | `output/raw/quiet/` | Child absorbed in activity, warm light |
+| Printable Tease | `output/raw/printable/` | Flat-lay close-up of a printed activity sheet |
 | Identity | `output/raw/identity/` | Parent identity scene or bold text design |
 
-**Naming:** `fact-dinosaurs.png`, `challenge-ocean.png`, `quiet-rainy-day.png`, `printable-matching.png`, `identity-screen-free.png`
+Naming: `fact-dinosaurs.png`, `challenge-ocean.png`, `quiet-rainy-day.png`, etc.
 
-### 2B — Activity Post Images (5 images)
-
-Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle looks correct.
+### 2B — Activity Puzzle Images (5)
 
 | Type | Folder | Name pattern |
 |------|--------|-------------|
@@ -137,129 +82,91 @@ Copy each activity prompt (items 6–10) into Gemini. Iterate until the puzzle l
 | Word Search | `output/raw/wordsearch/` | `wordsearch-{theme}.png` |
 | Matching | `output/raw/matching/` | `matching-{theme}.png` |
 | Tracing | `output/raw/tracing/` | `tracing-{theme}.png` |
-| Quiz | `output/raw/quiz/` | `quiz-{theme}.png` |
 | Coloring | `output/raw/coloring/` | `coloring-{theme}.png` |
 | Dot-to-Dot | `output/raw/dottodot/` | `dottodot-{theme}.png` |
-| Sudoku | `output/raw/sudoku/` | `sudoku-{theme}.png` |
 
-### 2C — ASMR Video Images (2 images)
+### 2C — ASMR Images (2)
 
-> Goes into its own folder, NOT output/raw/
+1. Open `output/asmr/[type]-[theme]/brief.md`
+2. Generate **both images in the same Gemini chat** for visual consistency:
 
-1. Open: `output/asmr/[type]-[theme]/brief.md`
-2. Generate in Gemini — **same chat for both images for visual consistency**:
-   - **Image 1 (blank):** empty activity, line art, white background
-   - **Image 2 (solved/colored):** same activity fully completed
-3. Save per type:
-   ```
-   # Coloring:
-   output/asmr/[type]-[theme]/blank.png      ← blank line art (zero color)
-   output/asmr/[type]-[theme]/solved.png     ← fully colored version
+| Type | blank.png | solved.png |
+|------|-----------|-----------|
+| Coloring | Empty line art, white background | Fully colored version |
+| Maze | Empty maze | Same maze with solution path drawn |
+| Word Search | Grid, no highlights | Same grid with words highlighted in color |
+| Dot-to-Dot | Numbered dots, no connecting lines | Clean connected line art of the subject |
 
-   # Maze:
-   output/asmr/[type]-[theme]/blank.png      ← empty maze
-   output/asmr/[type]-[theme]/solved.png     ← solved maze (with solution path drawn)
+> Dot-to-dot tip: for purchased assets, copy your existing blank/solved pair directly — no Gemini needed.
 
-   # Word Search:
-   output/asmr/[type]-[theme]/blank.png      ← word search grid, no highlights
-   output/asmr/[type]-[theme]/solved.png     ← same grid with words highlighted in color
+3. Save to `output/asmr/[type]-[theme]/blank.png` + `solved.png`
 
-   # Dot-to-Dot:
-   output/asmr/[type]-[theme]/blank.png      ← dot-to-dot puzzle (numbered dots, no lines)
-   output/asmr/[type]-[theme]/solved.png     ← same subject as connected clean line art
-   ```
-   > **Dot-to-dot tip:** For pre-purchased assets, copy your existing blank/solved pair directly — no Gemini needed.
+### 2D — Challenge Image (1)
 
-### 2D — Challenge Video Image (1 image)
+1. Open `output/challenge/[type]-[theme]/brief.md`
+2. Generate one puzzle image (blank/unsolved, no answers)
+3. Save to `output/challenge/[type]-[theme]/puzzle.png`
 
-> Goes into its own folder, NOT output/raw/
+### 2E — Story Slides (7, optional)
 
-1. Open: `output/challenge/[type]-[theme]/brief.md`
-2. Generate ONE puzzle image in Gemini (blank/unsolved puzzle, no answers shown)
-3. Save:
-   ```
-   output/challenge/[type]-[theme]/puzzle.png   ← blank puzzle only
-   ```
-
-### 2E — Story Video Images (7 images, optional)
-
-> Goes into its own folder, NOT output/raw/
-
-1. Open: `output/stories/epNN-[title]/image-prompts.md`
-2. Generate each slide image in Gemini (keep same chat for visual consistency)
+1. Open `output/stories/epNN-[title]/image-prompts.md`
+2. Generate each slide in Gemini (same chat)
 3. Save as `01.png` through `07.png` in the story folder
+
+### Carousel Days
+
+Carousels are automatic via `import:raw` — no extra commands.
+
+Check the **CAROUSEL DAY block at the bottom of the prompts file** (appears every ~3 days). It tells you:
+- What folder to create inside `output/raw/`
+- What images to generate, named `01-xxx.png`, `02-xxx.png`, etc.
+
+That's it. Run `import:raw` as normal — it detects and builds the carousel queue automatically.
 
 ---
 
-## STEP 3 — Assemble ASMR Video (1–2 min)
+## STEP 3 — ASMR Video (1–2 min)
 
-**Coloring ASMR (1 step — top-to-bottom color wipe):**
+**Coloring — 1 step:**
 ```bash
 npm run animate:asmr -- --asmr output/asmr/[folder]/
 ```
 
-**Maze ASMR (2 steps — path extraction + pencil-drawing animation):**
+**Maze, Word Search, Dot-to-Dot — 2 steps (extract first, then animate):**
 ```bash
+# Maze:
 npm run extract:path -- --asmr output/asmr/[folder]/
-# → path.json (400 waypoints + pathColor auto-detected from solved image)
 npm run animate:asmr -- --asmr output/asmr/[folder]/
-# → pencil draws solution path start→finish, 30s total
-```
 
-**Word Search ASMR (2 steps — word region extraction + highlight animation):**
-```bash
+# Word Search:
 npm run extract:wordsearch -- --asmr output/asmr/[folder]/
-# → wordsearch.json (word bounding boxes + highlightColor from solved image)
 npm run animate:asmr -- --asmr output/asmr/[folder]/
-# → words highlight one-by-one (marker wipe across each word), 30s total
-```
 
-**Dot-to-Dot ASMR (2 steps — dot detection + sequential line-drawing animation):**
-```bash
+# Dot-to-Dot:
 npm run extract:dotdot -- --asmr output/asmr/[folder]/
-# → dots.json (dot centroids in drawing order, inferred from solved outline skeleton)
 npm run animate:asmr -- --asmr output/asmr/[folder]/
-# → connecting lines draw dot→dot in sequence, cross-fades to solved at 90%
 ```
-Check console: `Detected dots: N` — expect 20–70. If low, lower `DARK_THRESH` in extract-dotdot-path.mjs.
 
-**Seamless loop (all ASMR types):**
-Last 2s of every video: blank image fades back in → last frame ≈ first frame → platform loop is invisible. No action needed — built into the engine.
+The extract step creates a data file (`path.json` / `wordsearch.json` / `dots.json`) that drives the animation. Without it, the animation falls back to a plain wipe.
+
+**Check extract output:**
+- Maze: `Raw path length: NNN pixels` — expect > 50
+- Word search: word count in log — expect 6–8
+- Dot-to-dot: `Detected dots: N` — expect 20–70. If low, lower `DARK_THRESH` in extract-dotdot-path.mjs
 
 **Dry-run (verify props without rendering):**
 ```bash
 npm run animate:asmr:dry -- --asmr output/asmr/[folder]/
 ```
 
-**extract:path — what it does:** Scale 20% → diff mask → Zhang-Suen skeleton → BFS walk → arc-length subsample 400 waypoints → sample pathColor. Check log: `Raw path length: NNN pixels` — if < 50, images are wrong.
-
-**extract:wordsearch — what it does:** Scale 40% → diff mask → dilate (radius 3) → BFS connected components (each = one word) → bounding box per word → filter noise → normalize → sort top-to-bottom → sample highlightColor. Check log for word count (expect 6–8 words).
-
-**extract:dotdot — what it does:** Scale 60% → threshold → BFS components → filter by area (10–500px) + compactness (area/bbox > 0.28) + max bbox dim (42px) → dot centroids. Separately: scale 20% solved → Zhang-Suen skeleton → walk. Project each dot onto skeleton → sort by path index = drawing order. Teleport-jump filter removes artifacts. Check log: `Detected dots: N` (expect 20–70).
-
-**Troubleshooting:**
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `path.json` missing or raw path < 50px | Images too similar / threshold too high | Check blank vs solved differ; lower DIFF_THRESHOLD in extract-maze-path.mjs |
-| Path traces wrong area | Faint solution line | Regenerate solved with bolder path |
-| `wordsearch.json` shows 0–2 word regions | DIFF_THRESHOLD too high or low-contrast highlights | Regenerate solved with more vivid highlight colors |
-| Too many word regions (>15) | Background noise | Increase MIN_PIXELS or DIFF_THRESHOLD in extract-wordsearch-path.mjs |
-| `dots.json` shows < 10 dots | DARK_THRESH too low or dots too light | Lower DARK_THRESH (try 130–150) in extract-dotdot-path.mjs |
-| Too many dots detected (noise) | Outline fragments passing filter | Raise MIN_FILL_RATIO or lower MAX_DOT_AREA in extract-dotdot-path.mjs |
-| Dot animation connects in wrong order | Skeleton walk took unexpected path | Check solved image has clean connected outline; or manually provide dots.json |
-| ENOSPC during render | Stale Remotion bundles | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
-| ProtocolError at ~93% | Non-fatal Chrome tab close | Ignore — render still completes |
-
-Replace `[folder]` with your folder from `output/asmr/`.
+**Seamless loop:** Last 2s of every video, blank image fades back in → invisible platform loop. Built-in, no action needed.
 
 ---
 
-## STEP 3B — Assemble Challenge Video (1 min)
+## STEP 3B — Challenge Video (1 min)
 
 ```bash
 npm run animate:challenge -- --challenge output/challenge/[folder]/
-# → hook screen (2.5s) + puzzle + counting timer + CTA. ~65s total.
 ```
 
 **Dry-run:**
@@ -267,106 +174,61 @@ npm run animate:challenge -- --challenge output/challenge/[folder]/
 npm run animate:challenge:dry -- --challenge output/challenge/[folder]/
 ```
 
-Challenge videos go straight to queue → publish with `npm run publish`.
-
-Replace `[folder]` with your folder from `output/challenge/`.
-
 ---
 
-## STEP 4 — Assemble Story Video (optional, 1 min)
+## STEP 4 — Story Video (optional, 1 min)
 
-**Option A — Remotion (recommended, animated):**
 ```bash
 npm run generate:story:remotion -- --story epNN-[title]
-# Animated: typewriter captions word-by-word + ✨ FloatingParticles on resolution scene
-# Override defaults in story.json: "typewriterCaptions": false, "peakSlide": N
 ```
 
-**Option B — Edge TTS + FFmpeg (free, fast):**
+Other options:
 ```bash
-npm run generate:story:edge -- --story epNN-[title]
-```
-
-**Option C — OpenAI TTS + FFmpeg (~$0.01, better voice):**
-```bash
-npm run generate:story:openai -- --story epNN-[title]
-```
-
-**Remotion standalone compositions (for advanced use):**
-```bash
-npm run animate:factcard        # AnimatedFactCard educational carousel video
-npm run animate:hook            # HookIntro 4s hook clip
-npm run remotion:studio         # Visual preview + scrubbing
+npm run generate:story:edge   -- --story epNN-[title]   # free, Edge TTS
+npm run generate:story:openai -- --story epNN-[title]   # ~$0.01, better voice
 ```
 
 ---
 
-## STEP 5 — Activity Puzzle Videos (1 min)
-
-```bash
-npm run generate:activity:video
-```
-
-Converts maze, matching, quiz, tracing, dot-to-dot images into 15-second YouTube Shorts.
-Output: `output/videos/*-yt-short.mp4`
-
----
-
-## STEP 6 — Import + Brand Images (1 min)
+## STEP 5 — Import + Brand Images (1 min)
 
 ```bash
 npm run import:raw
 ```
 
-Takes everything in `output/raw/` and:
-- Adds **JoyMaze logo only** (no text overlays — hook text goes in the caption, not burned on the image)
-- Resizes cleanly for each platform (no blur, no cropping of printables)
+- Adds JoyMaze logo, resizes for all platforms
 - Assigns `scheduledHour` (spread 6 AM–9 PM)
-- Uploads all variants to Cloudinary (for 4 AM cloud posting)
+- Uploads to Cloudinary
 - Creates queue metadata in `output/queue/`
-- **If any images have carousel sidecar JSONs → also creates a carousel queue file** (see Carousel section below)
+- Detects `carousel-*` / `facts-carousel-*` / `progress-carousel-*` subfolders → builds carousel queue
 
-**Check:** 10 items processed, ~40 platform-sized images in `output/images/`
-
-### Carousel Posts (Instagram + TikTok)
-
-**Fully automatic — no manual steps.** Carousels rotate on a 9-day cycle — one format every ~3 days.
-
-**3 formats, all zero-friction:**
-
-| Format | Trigger | Slides | Folder prefix | Intelligence signal |
-|--------|---------|--------|---------------|---------------------|
-| **1 — Activity Collection** | `doy%9===0` | 5 activity images | `carousel-{theme}-{date}/` | trending theme drives topic |
-| **2 — Educational Facts** | `doy%9===3` | 5 (hook + 4 brain-benefit facts) | `facts-carousel-{activity}-{date}/` | analytics ranking picks activity; dynamic facts injected from pattern-interrupt pool |
-| **3 — Activity Progression** | `doy%9===6` | 3 (blank → half → done) | `progress-carousel-{activity}-{date}/` | boost_themes override → analytics ranking → doy fallback |
-
-**Your only action on carousel day:**
-1. Check the carousel instructions block at the bottom of the prompts file
-2. Create the folder it specifies inside `output/raw/`
-3. Drop your images in, named `01-xxx.png`, `02-xxx.png`, etc.
-4. Run `npm run import:raw` — carousel queue file built automatically
-
-**Notes:**
-- `import-raw.mjs` detects `carousel-*`, `facts-carousel-*`, and `progress-carousel-*` subfolders automatically
-- Files sorted alphabetically = slide order
-- Format 2: prompts file includes exact fact copy for each slide — render as infographic card in Gemini
-- Format 3: generate all 3 slides in the **same Gemini chat** for visual consistency
-- The `intelligenceSignal` field in `carousel-plan-{date}.json` shows what drove the pick: `analytics-ranked` / `trend-boost` / `doy-rotation`
+**Check:** 10 items processed, ~40 images in `output/images/`
 
 ---
 
-## STEP 7 — Generate Captions (2–3 min)
+## STEP 6 — Activity Puzzle Videos (1 min)
+
+> Run AFTER `import:raw` — reads from the queue.
+
+```bash
+npm run generate:activity:video
+```
+
+Eligible types: maze, matching, tracing, dot-to-dot. Creates 15-second YouTube Shorts in `output/videos/`.
+
+---
+
+## STEP 7 — AI Captions (2–3 min)
 
 ```bash
 npm run generate:captions
 ```
 
-AI writes platform-specific captions for all image posts.
-**Rules enforced:** Soft CTAs only, no brand name on X, 0 hashtags on X.
-
 ---
 
-## STEP 8 — Push Queue to GitHub ⚠️ REQUIRED
+## STEP 8 — Push Queue to GitHub
+
+**Push is required** — YouTube is live and posts at 4 AM Cairo via GitHub Actions. If you don't push, nothing posts.
 
 ```bash
 git add output/queue/
@@ -374,108 +236,78 @@ git commit -m "queue: $(date +%Y-%m-%d)"
 git push
 ```
 
-**Why this matters:** GitHub Actions reads the queue from the repo. If you don't push, the 4 AM posting job has nothing to work with. Your images are already on Cloudinary — this just tells Actions what to post.
+> X text posts are generated and queued but **won't fire until you add API credits** at console.x.com. Queue them now — they'll post automatically once credits are loaded.
+
+---
+
+## Manual Posting (X warmup)
+
+```bash
+npm run brief
+# → opens output/daily-brief-YYYY-MM-DD.html
+# All captions, hashtags, and X text posts in one page — copy-paste to post manually
+```
 
 ---
 
 ## STEP 9 — Done. Cloud handles the rest.
 
-- **Hourly (GitHub Actions):** X text posts drip throughout the day
-- **4:00 AM Cairo (GitHub Actions):** All pending images/videos post to Pinterest, YouTube, X
-- **PC can be off** — posting is fully cloud-based after your push
+- **Hourly:** X text posts drip throughout the day
+- **4:00 AM Cairo:** All pending media posts to active platforms
+- **PC can be off**
 
-**To verify the queue:**
 ```bash
-npm run calendar
-```
-
-**To dry-run posting locally:**
-```bash
-npm run post:scheduled:dry
+npm run calendar         # View queue
+npm run post:scheduled:dry   # Dry-run posting locally
 ```
 
 ---
 
-## Daily Summary
-
-| Step | What | Time | Command |
-|------|------|------|---------|
-| 1 | Archive + generate all briefs + output log | 2 min | `npm run daily` |
-| 2A | Inspiration images (5) | 10–15 min | Gemini → `output/raw/<slot>/` |
-| 2B | Activity puzzle images (5) | 15–20 min | Gemini → `output/raw/<type>/` |
-| 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
-| 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
-| 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
-| 3 | Assemble ASMR video | 1–2 min | Coloring: `animate:asmr` · Maze: `extract:path` → `animate:asmr` · Wordsearch: `extract:wordsearch` → `animate:asmr` · Dot-to-dot: `extract:dotdot` → `animate:asmr` |
-| 3B | Assemble challenge video | 1 min | `npm run animate:challenge -- --challenge output/challenge/[folder]/` |
-| 4 | Assemble story video (optional) | 1 min | `npm run generate:story:remotion -- --story [folder]` |
-| 5 | Activity puzzle videos | 1 min | `npm run generate:activity:video` |
-| 6 | Import + brand images | 1 min | `npm run import:raw` |
-| 7 | AI captions | 2–3 min | `npm run generate:captions` |
-| 8 | Push queue to GitHub ⚠️ | 1 min | `git add output/queue/ && git commit -m "queue: date" && git push` |
-| 9 | Done — cloud posts at 4 AM | auto | GitHub Actions |
-
-**Total active time: ~42–48 min/day** (Challenge video adds ~2 min of image gen + 1 min render)
-
----
-
-## Phase 0 Gate Tracking
-
-**Target:** 30 consecutive days with images ≥ 10, story videos ≥ 10, ASMR videos ≥ 10
-
-```bash
-npm run output:report    # Table: last 7 days + streak count
-npm run output:track     # Manually log today's count (auto-runs in npm run daily)
-```
-
-Gate is logged to `output/daily-output-log.json` — one entry per day, 90-day rolling window.
-
-**Phase roadmap:**
-- Phase 0 → 1: 30 consecutive gate days
-- Phase 1 → 2: Pinterest 75K+ impressions/mo AND installs ≥100/mo or KDP ≥20 units/mo
-- Phase 2 → 3: Installs ≥1,000/mo OR KDP ≥150 units/mo for 2 consecutive months
-
----
-
-## Anti-Spam Rules (ALL platforms)
-
-- **No bulk posting** — hourly drip only, max 2 creative posts per hour
-- **X captions:** 0 hashtags, no brand name ("JoyMaze"), soft CTAs only
-- **All platforms:** No hard-sell CTAs, no identical captions across days
-- **X text posts:** 4/day max, staggered hourly
-
----
-
-## Platform Status (as of 2026-04-12)
+## Platform Status
 
 | Platform | Account | Status | Posting |
 |----------|---------|--------|---------|
-| X | @playjoymaze | Active — 2-week manual warmup (ends ~2026-04-26) | Manual only |
-| Pinterest | joymaze.pp@gmail.com | New account — NO API keys yet | Paused |
-| Instagram | joymaze.pp@gmail.com | New account — NO API keys yet | Paused |
-| TikTok | joymaze.pp@gmail.com | New account — NO API keys yet | Paused |
+| X | @playjoymaze | Active — no API credits | Posts queued, won't fire until credits added at console.x.com |
+| Pinterest | joymaze.pp@gmail.com | New — no API keys yet | Paused |
+| Instagram | joymaze.pp@gmail.com | New — no API keys yet | Paused |
+| TikTok | joymaze.pp@gmail.com | New — no API keys yet | Paused |
 | YouTube | joymaze.pp@gmail.com | Live | Active (4 AM Actions) |
 
-**Warmup resume date (X): 2026-04-26**
-- Re-enable x-posts.yml: remove `if: false` from workflow
-- `npm run cooldown:clear` + push
+**To resume X posting:** Add credits at console.x.com — no code changes needed, queued posts will fire automatically.
+
+---
+
+## Phase 0 Gate
+
+**Target:** 30 consecutive days ≥ 10 images + 10 story videos + 10 ASMR videos
+
+```bash
+npm run output:report    # Last 7 days + streak
+npm run output:track     # Manual log (auto-runs in npm run daily)
+```
+
+**Phases:**
+- Phase 0 → 1: 30 consecutive gate days
+- Phase 1 → 2: Pinterest 75K+ impressions/mo AND installs ≥100/mo or KDP ≥20 units/mo
+- Phase 2 → 3: Installs ≥1,000/mo OR KDP ≥150 units/mo × 2 months
+
+---
+
+## Anti-Spam Rules
+
+- **X:** 0 hashtags, no "JoyMaze", soft CTAs only, 4 text posts/day max
+- **All platforms:** No bulk posting, no identical captions across days
 
 ---
 
 ## Cooldown Management
 
 ```bash
-npm run cooldown:status                          # Check if posting is paused
-npm run cooldown:clear                           # Resume posting + push to GitHub
-```
-
-To pause posting (stops BOTH local and GitHub Actions):
-```bash
+npm run cooldown:status
+npm run cooldown:clear           # Resume + push
 npm run cooldown:set 2026-04-26 "X warmup resume"
 git add output/posting-cooldown.json && git commit -m "cooldown: active" && git push
 ```
-
-**Important:** Always push after setting a cooldown — GitHub Actions ignores a local-only cooldown file.
 
 ---
 
@@ -483,113 +315,104 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 
 | Problem | Fix |
 |---------|-----|
-| `npm run daily` fails | Check if `output/queue/` exists. First run: `npm run generate:prompts -- --save` |
-| Captions say "using default" | Groq rate limited. Wait 60s and rerun, or check GROQ_API_KEY in .env |
-| `npm run post:x` gives 402 | X credits depleted. Buy more at console.x.com |
-| `npm run post:x` gives 429 | Rate limited. Wait 15 min and retry |
-| Images not importing | Check files are in `output/raw/<subfolder>/` and are .png or .jpg |
-| Wrong category detected | Use correct folder name — folder → category mapping is in import-raw.mjs |
+| `npm run daily` fails | Check `output/queue/` exists. First run: `npm run generate:prompts -- --save` |
+| Captions say "using default" | Groq rate limited — wait 60s and rerun |
+| `npm run post:x` gives 402 | X credits depleted — buy at console.x.com |
+| `npm run post:x` gives 429 | Rate limited — wait 15 min |
+| Images not importing | Files must be in `output/raw/<subfolder>/` as .png or .jpg |
 | Want to redo captions | `npm run generate:captions -- --force` |
-| Want to post 1 specific item | `npm run post:x -- --id 2026-03-29-maze-ocean-00` |
-| Cloudinary upload fails | Check CLOUDINARY_* keys in .env. Media still works locally. |
-| 4 AM posting didn't happen | Check GitHub Actions tab → post-media.yml. Did you push queue first? |
-| Actions posting fails | Check GitHub Secrets — may have expired token (Pinterest/YouTube) |
-| X text posts not dripping | Check GitHub Actions tab → x-posts.yml logs |
-| Queue JSON not on GitHub | Run `git add output/queue/ && git commit && git push` |
+| Cloudinary upload fails | Check CLOUDINARY_* keys in .env |
+| 4 AM posting didn't happen | Check x-posts.yml in Actions tab. Did you push queue? |
+| Queue JSON not on GitHub | `git add output/queue/ && git commit && git push` |
+| Activity video: no items found | Run `import:raw` first — activity video reads from the queue |
+| Activity video skips all items | Only maze/matching/tracing/dottodot are eligible types |
 | Vertex key expired / 403 | Check console.cloud.google.com — 90-day trial |
-| Story VO not playing | Check OPENAI_API_KEY in .env. Or switch to Edge TTS (free): `--tts edge` |
-| Activity video skips all items | Only maze/matching/quiz/tracing/dottodot are eligible |
-| YouTube post fails | Re-run `node scripts/get-youtube-token.mjs` if refresh token expired |
-| ASMR Remotion fails (images not found) | Confirm `maze.png`+`solved.png` or `blank.png`+`colored.png` exist; check `blankImage`/`solvedImage` fields in activity.json |
-| ASMR hand cursor missing | Run `npm run extract:path -- output/asmr/[folder]/activity.json` first — generates path.json |
-| ASMR audio cuts off mid-video | Audio loops by default; if silence persists check `audioPath` in activity.json or `assets/audio/crayon.mp3` exists |
-| ASMR image edges clipped | Should not happen — objectFit is now `contain`. If it occurs, check image aspect ratio vs 9:16 |
-| ASMR render fails with ENOSPC | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` then retry |
-| ASMR FFmpeg fails | Confirm `blank.png` + `colored.png` exist AND FFmpeg is on PATH |
+| ASMR images not found | Confirm `blank.png` + `solved.png` exist in `output/asmr/[folder]/` |
+| ASMR maze: no path drawn | Run `extract:path` first — generates `path.json` |
+| ASMR wordsearch: 0 word regions | Regenerate solved with bright highlight colors (yellow/orange/green) |
+| ASMR dots: < 10 detected | Lower `DARK_THRESH` (try 130–150) in extract-dotdot-path.mjs |
+| ASMR render fails with ENOSPC | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
+| ProtocolError at ~93% | Non-fatal Chrome race condition — render still completes, ignore |
+| Challenge video: image not found | Confirm `puzzle.png` in `output/challenge/[folder]/` |
 | Story video not generating | Confirm `01.png` through `07.png` all exist in the story folder |
-| Remotion bundle takes 60s | Normal on first run — cached for subsequent renders in same process |
-| Output log shows 0 images | Archive is done by npm run daily — if you haven't archived yet, count is 0 |
-| Series name not in prompts | Series tags are Mon/Wed/Fri only. Other days: none (by design) |
-| Intelligence pools empty | First live Monday run still needed. Run `npm run intelligence:full` |
-| ASMR Remotion: missing images | Drop correct images into output/asmr/[folder]/ first — all types use blank.png + solved.png |
-| Word search: 0 word regions | Solved image lacks visible highlights — regenerate with bright color (yellow/orange/green) over each word |
-| Word search: too many regions (>15) | Noise — increase MIN_PIXELS or DIFF_THRESHOLD in extract-wordsearch-path.mjs |
-| Challenge video: image not found | Confirm `puzzle.png` exists in `output/challenge/[folder]/` |
+| Intelligence pools empty | Run `npm run intelligence:full` |
+| YouTube token expired | `node scripts/get-youtube-token.mjs` |
 
 ---
 
-## Manual Extras (any time)
+## Manual Extras
 
 ```bash
-# Extra story idea
-npm run generate:story:idea
-npm run generate:story:ideas -- --theme "lost penguin"
-
-# Extra ASMR brief (auto-rotates type)
-npm run brief:asmr
-npm run brief:asmr:coloring
-npm run brief:asmr:maze
-npm run brief:asmr:wordsearch
-npm run brief:asmr:dotdot
-
-# Challenge video brief
+npm run brief:asmr                          # Extra ASMR brief (auto-rotates type)
+npm run brief:asmr:coloring / :maze / :wordsearch / :dotdot
 npm run brief:challenge
 npm run brief:challenge -- --type word-search
-
-# Force analytics run
-npm run analytics
-
-# Weekly scorecard
-npm run scorecard
-
-# Manual X text generation
+npm run generate:story:idea
 npm run x:generate
-npm run x:generate:dry
-
-# Manually track today's output
-npm run output:track
-
-# View Phase 0 gate history
-npm run output:report
-
-# Full pipeline health check
+npm run analytics
+npm run scorecard
 npm run health-check
-
-# Trigger Actions workflows manually
-# → Go to github.com/drmetwally/joymaze-content → Actions tab → pick workflow → Run workflow
+npm run remotion:studio                     # Visual preview + scrubbing
 ```
 
 ---
 
-## Weekly Routine (Monday — 15 min)
+## Monday Routine (15 min)
 
-Monday's `npm run daily` + GitHub Actions automatically:
-1. Refreshes Pinterest OAuth token (cloud)
-2. Runs analytics + weekly scorecard → `config/performance-weights.json`
-3. Collects fresh trends → `config/trends-this-week.json`
-4. Runs intelligence refresh → `config/content-intelligence.json`
-5. Applies intelligence → updates 4 dynamic pool files
-6. Today's prompts use all fresh data (themes, hooks, CTAs, facts)
-7. Carousel activity selection biased toward analytics top performer
+`npm run daily` on Monday automatically: refreshes Pinterest token (cloud), runs analytics + scorecard, refreshes trends, runs intelligence loop, updates all 5 dynamic pools.
 
-**Monday caption audit (10 min):**
-Open 5 random files from `output/archive/`. Read `rawCaption` for pinterest and instagram. Score 1–5:
+**Caption audit (10 min):** Open 5 random files from `output/archive/`. For each caption score 1–5:
 1. Does the first line stop the scroll?
 2. Is there a specific number, name, or sensory detail?
 3. Does every sentence pass the "So What?" test?
 4. Does the last line land as a feeling?
 5. Would a parent save or share this?
 
-**Score ≤3 → flag in TASKS.md. That template needs fixing.**
+Score ≤ 3 → flag in TASKS.md.
 
 ---
 
-## GitHub Actions — Manual Triggers
+## Appendix — How Everything Connects
 
-Go to: `github.com/drmetwally/joymaze-content` → **Actions** tab
+```
+MONDAY AUTOMATIC (npm run daily + GitHub Actions):
+  collect-analytics.mjs    → output/analytics/YYYY-MM-DD.json
+  weekly-scorecard.mjs     → config/performance-weights.json
+  collect-trends.mjs       → config/trends-this-week.json
+  intelligence-refresh.mjs → config/content-intelligence.json
+  apply-intelligence.mjs   → 5 dynamic pools:
+    config/theme-pool-dynamic.json
+    config/hooks-library.json
+    config/cta-library.json
+    config/pattern-interrupt-dynamic.json
+    config/x-post-topics-dynamic.json
 
-| Workflow | When to trigger manually |
-|----------|--------------------------|
-| X Text Posts | Test X posting anytime |
-| Post Media | Force a posting run before 4 AM |
-| Weekly Maintenance | Force intelligence refresh |
+DAILY (generate-prompts.mjs reads all of the above):
+  themes     ← trending themes + analytics ranking
+  hooks      ← hooks-library top performers
+  facts      ← pattern-interrupt-dynamic
+  carousel   ← analytics activityRanking
+  series tag ← Mon/Wed/Fri names
+
+POSTED CONTENT → collect-analytics.mjs (next Monday) → feeds back into rankings
+```
+
+**Where files live:**
+
+| File type | Location | GitHub? | Cloudinary? |
+|-----------|----------|---------|-------------|
+| Prompts, briefs | `output/prompts/`, `output/asmr/`, `output/stories/` | No | No |
+| Raw images | `output/raw/` | No | No |
+| Branded images + videos | `output/images/`, `output/videos/` | No | Yes |
+| Queue metadata | `output/queue/` | **Yes** | No |
+| Config pools | `config/` | **Yes** | No |
+
+**What runs where:**
+
+| Layer | What | Needs PC? |
+|-------|------|-----------|
+| Local — you | Generate + import + caption | Yes |
+| Local — npm run daily | 9 AM: prompts + briefs + tracking | Yes (at 9 AM) |
+| GitHub Actions — hourly | X text post drip | No |
+| GitHub Actions — 4 AM Cairo | Post all pending media | No |
+| GitHub Actions — Monday 7 AM | Token refresh + intelligence | No |

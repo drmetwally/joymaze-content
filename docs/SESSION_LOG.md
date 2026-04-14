@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-04-14 — [Agent: Claude] — Audio swap + activity video yellow pill overlay + cheatsheet restructure
+
+**Files changed:** `scripts/render-video.mjs`, `scripts/generate-activity-video.mjs`, `remotion/compositions/AsmrReveal.jsx`, `docs/DAILY_CHEATSHEET.md`
+
+- **Audio: crayon.mp3 → Twinkle across all video types.** `AUDIO_MAP` in render-video.mjs now routes coloring/maze/wordsearch/dotdot/story all to Twinkle. `AsmrReveal.jsx` default prop updated. `generate-activity-video.mjs` `pickAudio()` now prefers Twinkle, falls back to any non-crayon file.
+- **Activity video overlay: yellow pill.** `buildHookOverlaySvg()` rewritten — SVG `<rect>` with `rgba(255,210,0,0.93)` fill, `rx=22`, dark `#111111` text. Matches ASMR `HookText` component style exactly. Positioned at `y=48px` (very top). Drop shadow on pill via `feDropShadow`.
+- **Cheatsheet restructured:** Moved intelligence loop + architecture + file table to Appendix. Summary table now first. Fixed step order (activity video after import:raw). Clarified ASMR 2-step flow. Simplified carousel section. Warmup/push guidance updated (YouTube live → push required; X credits depleted note).
+- **Memory:** Added `project_daily_brief.md` — `npm run brief` → daily HTML with all captions/hashtags/X posts for manual posting.
+
+---
+
 ## 2026-04-14 — [Agent: Claude] — Intelligence pipeline full-connect + X post engine overhaul + perf-weights fix
 
 **Files changed:** `scripts/generate-x-posts.mjs`, `scripts/generate-captions.mjs`, `scripts/generate-story-ideas.mjs`, `scripts/generate-asmr-brief.mjs`, `scripts/generate-activity-video.mjs`, `scripts/apply-intelligence.mjs`, `scripts/intelligence-refresh.mjs`, `scripts/generate-prompts.mjs`, `config/x-post-topics-dynamic.json` (new), `output/queue/x-text-2026-04-14.json`, `output/prompts/prompts-2026-04-14.md`, memory files
@@ -1428,3 +1439,10 @@ Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome clos
 **Tuning knobs if extraction fails:** `MIN_DOT_AREA`, `MAX_DOT_AREA`, `DARK_THRESH` at top of extract-dotdot-path.mjs. Check console: "Detected dots: N" — expect 20–70.
 
 **Next:** Scheduled ASMR queue (config/scheduled-asmr.json maps dates to pre-built folders for seasonal pushes). Then: loop freeze-frame, sudoku cell-fill.
+
+---
+**2026-04-14 — X text post archiving fix**
+- **Bug:** `x-text-YYYY-MM-DD.json` files (arrays) were not being picked up by `archive-queue.mjs` — the existing queue loop expects objects with `generatedAt`, not arrays.
+- **Fix:** Added dedicated sweep in `archive-queue.mjs` that matches `x-text-YYYY-MM-DD.json` by filename pattern, extracts date from filename, moves to `output/archive/x-text/`.
+- Summary counter updated: `xTextArchived` included in final log line.
+- `npm run daily` now cleans up X text post files automatically.
