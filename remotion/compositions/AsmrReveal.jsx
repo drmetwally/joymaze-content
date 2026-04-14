@@ -140,7 +140,7 @@ export const AsmrReveal = ({
           blankPath={blankImagePath}
           solvedPath={solvedImagePath}
           revealType={revealType === 'coloring' ? 'ttb' : revealType}
-          startFrame={revealStart}
+          startFrame={drawStart}
           durationFrames={revealFrames}
           easing="linear"
           pathWaypoints={null}
