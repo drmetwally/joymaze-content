@@ -11,6 +11,7 @@ import {
 import { WipeReveal }          from '../components/WipeReveal.jsx';
 import { MazeSolverReveal }   from '../components/MazeSolverReveal.jsx';
 import { WordSearchReveal }   from '../components/WordSearchReveal.jsx';
+import { DotToDoReveal }      from '../components/DotToDoReveal.jsx';
 import { HookText }          from '../components/HookText.jsx';
 import { JoyoWatermark }     from '../components/JoyoWatermark.jsx';
 import { FloatingParticles } from '../components/FloatingParticles.jsx';
@@ -34,6 +35,8 @@ export const asmrRevealSchema = {
   pathColor:       '#22BB44', // solution line color (sampled by extract-maze-path.mjs)
   wordRects:       null,    // [{x1,y1,x2,y2}] normalized 0-1 — drives WordSearchReveal
   highlightColor:  '#FFD700', // word highlight color (sampled by extract-wordsearch-path.mjs)
+  dotWaypoints:    null,    // [{x,y}] in video px, ordered — drives DotToDoReveal
+  dotColor:        '#FF6B35', // connecting line color (sampled or brand orange default)
 };
 
 // ─── AsmrReveal ───────────────────────────────────────────────────────────────
@@ -64,6 +67,8 @@ export const AsmrReveal = ({
   pathColor        = '#22BB44',
   wordRects        = null,
   highlightColor   = '#FFD700',
+  dotWaypoints     = null,
+  dotColor         = '#FF6B35',
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -72,21 +77,18 @@ export const AsmrReveal = ({
   const revealFrames = Math.round(revealDurationSec * fps);
   const holdFrames   = Math.round(holdDurationSec * fps);
   const loopFrames   = Math.round(loopDurationSec * fps);
-  const revealStart  = hookFrames;
   const holdStart    = hookFrames + revealFrames;
   const loopStart    = holdStart + holdFrames;
-
-  // Determine reveal mode:
-  //   WordSearch: wordRects array provided or revealType === 'wordsearch'
-  //   MazeSolver: pathWaypoints array provided (and not coloring/ttb/wordsearch)
-  //   WipeReveal: coloring TTB wipe (default)
-  const useWordSearch  = (wordRects?.length > 0) || revealType === 'wordsearch';
-  const useSolverReveal = !useWordSearch && pathWaypoints?.length > 0
-    && revealType !== 'ttb' && revealType !== 'coloring';
 
   // All types start at frame 0 — hook text is a persistent overlay, not a timed pause
   const drawStart  = 0;
   const drawFrames = hookFrames + revealFrames;
+
+  // Reveal mode priority: DotToDo → WordSearch → MazeSolver → WipeReveal (default)
+  const useDotDo        = (dotWaypoints?.length > 0) || revealType === 'dotdot';
+  const useWordSearch   = !useDotDo && ((wordRects?.length > 0) || revealType === 'wordsearch');
+  const useSolverReveal = !useDotDo && !useWordSearch && pathWaypoints?.length > 0
+    && revealType !== 'ttb' && revealType !== 'coloring';
 
   // Progress bar: 0→1 during draw window
   const barProgress = Math.min(Math.max(0, frame - drawStart) / drawFrames, 1);
@@ -106,7 +108,16 @@ export const AsmrReveal = ({
     <AbsoluteFill style={{ backgroundColor: '#f5f5f0' }}>
 
       {/* ── Reveal layer — branch by type ────────────────────────────────── */}
-      {useWordSearch ? (
+      {useDotDo ? (
+        <DotToDoReveal
+          blankPath={blankImagePath}
+          solvedPath={solvedImagePath}
+          dots={dotWaypoints ?? []}
+          dotColor={dotColor}
+          startFrame={drawStart}
+          durationFrames={drawFrames}
+        />
+      ) : useWordSearch ? (
         <WordSearchReveal
           blankPath={blankImagePath}
           solvedPath={solvedImagePath}

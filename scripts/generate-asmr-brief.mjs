@@ -38,9 +38,9 @@ const FORCE_TYPE = typeIdx !== -1 ? args[typeIdx + 1] : null;
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
-// Rotate coloring / maze / wordsearch by calendar day
+// Rotate coloring / maze / wordsearch / dotdot by calendar day
 function getDefaultType() {
-  const types = ['coloring', 'maze', 'coloring', 'wordsearch', 'maze'];
+  const types = ['coloring', 'maze', 'coloring', 'wordsearch', 'dotdot', 'maze'];
   return types[new Date().getDate() % types.length];
 }
 
@@ -195,13 +195,17 @@ function buildPrompt(type, context) {
     ? 'UNCOLORED black line art only — a printable coloring page with zero color applied. Clean black outlines on white background. Every shape interior is white and empty.'
     : type === 'wordsearch'
       ? 'blank word search grid — 10×10 or 12×12 grid of random letters on white, with 6-8 hidden words on the theme. Clean black letters, no highlights, word list shown below the grid.'
-      : 'blank maze — clean black lines on white, no solution path shown, clear Start and Finish labels';
+      : type === 'dotdot'
+        ? 'dot-to-dot puzzle — 30-50 small numbered dots on white background that outline the subject when connected. Dots are clearly visible small filled circles with numbers beside them. NO connecting lines drawn. The subject shape is suggested by dot placement only.'
+        : 'blank maze — clean black lines on white, no solution path shown, clear Start and Finish labels';
 
   const coloredDesc = type === 'coloring'
     ? 'same scene fully colored in vibrant, kid-friendly colors — identical composition and characters as blank version, now fully colored'
     : type === 'wordsearch'
       ? 'same word search grid with each hidden word highlighted in a bright, distinct color (yellow, orange, or green marker stroke over each word) — identical layout, only the word highlights added'
-      : 'same maze with the correct solution path drawn in a single bright contrasting color — all other areas unchanged';
+      : type === 'dotdot'
+        ? 'same subject as clean connected line art — all dots joined to form the complete outline of the subject. The connecting lines are drawn between dots in order. Same composition as the blank version, now fully connected.'
+        : 'same maze with the correct solution path drawn in a single bright contrasting color — all other areas unchanged';
 
   return `${styleGuide}
 
@@ -216,7 +220,9 @@ You are creating a daily ASMR video brief for JoyMaze — a kids activity app fo
 Today's ASMR type: **${type}**
 The video reveals the activity progressively: ${type === 'coloring'
   ? 'blank coloring page slowly fills with color top-to-bottom'
-  : 'maze path draws itself left-to-right'}
+  : type === 'dotdot'
+    ? 'connecting lines draw between numbered dots in sequence, building the complete image dot-by-dot'
+    : 'maze path draws itself left-to-right'}
 ${analyticsStr}${trendsStr}${activeThemesStr}${perfStr}${competitorStr}${hookLibraryStr}${recentStr}
 
 Generate a fresh, engaging theme for today's ASMR video.
@@ -238,7 +244,9 @@ CRITICAL RULES — read carefully:
     ? 'ZERO color. No fills. No shading. No "soft colors", no "pastel tones", no "lightly colored". If ANY color word appears in blankPrompt other than "black" and "white", it is WRONG. The blankPrompt describes a printable coloring sheet — black outlines, white interior, nothing else.'
     : type === 'wordsearch'
       ? 'NO word highlights. No colored letters. No marker strokes. Only the plain grid of letters on white, identical to a printable word search puzzle before any answers are found.'
-      : 'NO solution path. No highlighted route. No colored lines. Only the blank maze structure.'}
+      : type === 'dotdot'
+        ? 'ONLY numbered dots — no connecting lines whatsoever. If any line connecting dots appears in blankPrompt, it is WRONG. Small numbered dots on white background only. NOTE: If using pre-purchased assets instead of AI generation, copy your existing blank/solved pair as blank.png / solved.png and skip Gemini generation.'
+        : 'NO solution path. No highlighted route. No colored lines. Only the blank maze structure.'}
 - Hook: 3-6 words, builds curiosity or wonder, no hashtags, no emoji
 - Art style: whimsical, warm, appealing to kids 4-8 and their parents`;
 }
@@ -254,21 +262,43 @@ function buildActivityJson(type, brief) {
     hookAlternatives: brief.hookAlternatives,
     theme: type === 'coloring'
       ? 'Watch the colors fill in, stroke by stroke'
-      : 'Watch the maze path reveal itself',
+      : type === 'dotdot'
+        ? 'Watch the dots connect one by one'
+        : 'Watch the maze path reveal itself',
     music: null,
   };
 }
 
 function buildBriefMd(type, brief) {
   const folderName = `${type}-${brief.slug}`;
-  const file1 = type === 'coloring' ? 'blank.png'  : 'maze.png';
-  const file2 = type === 'coloring' ? 'colored.png' : 'solved.png';
-  const desc1 = type === 'coloring' ? 'blank coloring page (line art, no color)' : 'blank maze (no solution shown)';
-  const desc2 = type === 'coloring' ? 'fully colored version' : 'solved version with path highlighted';
+  const file1 = 'blank.png';
+  const file2 = 'solved.png';
+  const desc1 = type === 'coloring'
+    ? 'blank coloring page (line art, no color)'
+    : type === 'dotdot'
+      ? 'dot-to-dot puzzle (numbered dots, no connecting lines)'
+      : type === 'wordsearch'
+        ? 'blank word search grid (no highlights)'
+        : 'blank maze (no solution shown)';
+  const desc2 = type === 'coloring'
+    ? 'fully colored version'
+    : type === 'dotdot'
+      ? 'solved — dots fully connected as clean line art'
+      : type === 'wordsearch'
+        ? 'solved — words highlighted'
+        : 'solved — path highlighted';
+
+  const typeLabel = type === 'coloring'
+    ? 'Coloring reveal (top-to-bottom color sweep)'
+    : type === 'dotdot'
+      ? 'Dot-to-dot reveal (connecting lines draw in sequence)'
+      : type === 'wordsearch'
+        ? 'Word search reveal (word highlights expand)'
+        : 'Maze reveal (solution path draws left-to-right)';
 
   return `# ASMR Brief: ${brief.theme}
 Date: ${TODAY}
-Type: ${type === 'coloring' ? 'Coloring reveal (top-to-bottom color sweep)' : 'Maze reveal (left-to-right path draw)'}
+Type: ${typeLabel}
 Hook: "${brief.hookText}"
 Hook alternatives: ${brief.hookAlternatives.map(h => `"${h}"`).join(' | ')}
 
@@ -292,22 +322,18 @@ ${brief.coloredPrompt}
 
 Both must be 1080×1920 px (9:16 portrait).
 
-${type === 'maze' ? `## Step 3 — Extract maze solution path
-\`\`\`
-npm run extract:path -- --asmr ${folderName}
-\`\`\`
-
-## Step 4 — Generate the video` : type === 'wordsearch' ? `## Step 3 — Extract word highlight rects
-\`\`\`
-npm run extract:wordsearch -- --asmr ${folderName}
-\`\`\`
-
-## Step 4 — Generate the video` : `## Step 3 — Generate the video`}
+${type === 'maze'
+  ? `## Step 3 — Extract maze solution path\n\`\`\`\nnpm run extract:path -- --asmr ${folderName}\n\`\`\`\n\n## Step 4 — Generate the video`
+  : type === 'wordsearch'
+    ? `## Step 3 — Extract word highlight rects\n\`\`\`\nnpm run extract:wordsearch -- --asmr ${folderName}\n\`\`\`\n\n## Step 4 — Generate the video`
+    : type === 'dotdot'
+      ? `## Step 3 — Extract dot positions + drawing order\n\`\`\`\nnpm run extract:dotdot -- --asmr ${folderName}\n\`\`\`\nNote: For pre-purchased assets, copy your blank/solved pair as blank.png / solved.png before running.\n\n## Step 4 — Generate the video`
+      : `## Step 3 — Generate the video`}
 \`\`\`
 npm run animate:asmr -- --asmr ${folderName}
 \`\`\`
 
-## ${type === 'coloring' ? 'Step 4' : 'Step 5'} — Publish
+## ${type === 'coloring' ? 'Step 3' : 'Step 5'} — Publish
 \`\`\`
 npm run publish
 \`\`\`

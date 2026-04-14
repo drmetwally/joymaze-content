@@ -83,6 +83,8 @@
     "animate:asmr:dry": "node scripts/render-video.mjs --comp AsmrReveal --dry-run",
     "extract:path": "node scripts/extract-maze-path.mjs",
     "extract:wordsearch": "node scripts/extract-wordsearch-path.mjs",
+    "extract:dotdot": "node scripts/extract-dotdot-path.mjs",
+    "brief:asmr:dotdot": "node scripts/generate-asmr-brief.mjs --type dotdot --save",
     "animate:hook": "node scripts/render-video.mjs --comp HookIntro",
     "animate:hook:dry": "node scripts/render-video.mjs --comp HookIntro --dry-run",
     "animate:factcard": "node scripts/render-video.mjs --comp AnimatedFactCard",

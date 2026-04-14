@@ -186,6 +186,33 @@ async function activityJsonToProps(activity, activityDir) {
     // wordsearch.json not present — word search solver disabled; run `npm run extract:wordsearch` to generate it
   }
 
+  // Load dot positions if dots.json exists (for dotdot ASMR type)
+  let dotWaypoints = null;
+  let dotColor     = '#FF6B35'; // brand orange — visible on white, distinct from black outlines
+  const dotsJsonFile = path.resolve(activityDir, 'dots.json');
+  try {
+    const dotsData = JSON.parse(await fs.readFile(dotsJsonFile, 'utf-8'));
+    const imgW  = dotsData.width  ?? VW;
+    const imgH  = dotsData.height ?? VH;
+    const imgAR = imgW / imgH;
+    const videoAR = VW / VH;
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAR > videoAR) {
+      renderW = VW; renderH = VW / imgAR;
+      offsetX = 0;  offsetY = (VH - renderH) / 2;
+    } else {
+      renderH = VH; renderW = VH * imgAR;
+      offsetX = (VW - renderW) / 2; offsetY = 0;
+    }
+    dotWaypoints = dotsData.dots.map(d => ({
+      x: offsetX + d.x * renderW,
+      y: offsetY + d.y * renderH,
+    }));
+    if (dotsData.dotColor) dotColor = dotsData.dotColor;
+  } catch {
+    // dots.json not present — run `npm run extract:dotdot` to generate it
+  }
+
   return {
     blankImagePath,
     solvedImagePath,
@@ -206,6 +233,8 @@ async function activityJsonToProps(activity, activityDir) {
     pathColor:        activity.pathColor ?? pathColor,
     wordRects,
     highlightColor:   activity.highlightColor ?? highlightColor,
+    dotWaypoints,
+    dotColor:         activity.dotColor ?? dotColor,
     // computed total for duration override
     _totalSec: hookSec + revealSec + holdSec + loopSec,
   };
