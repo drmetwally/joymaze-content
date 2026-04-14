@@ -661,3 +661,14 @@
 5. **Memory**: `project_animation_engine_expansion.md` created + MEMORY.md indexed.
 
 **Next:** Earth Day content push (April 19-21) using `brief:asmr:coloring` with Garden/Flowers/Bugs themes. No code needed.
+
+---
+
+**2026-04-14 — Session N+1 — Seamless loop + ASMR hook fix**
+
+1. Earth Day ASMR briefs created (zero code): `coloring-garden-flowers`, `coloring-bugs-insects`, `coloring-forest-animals` for Apr 19-21.
+2. Engine improvement discussion: hook overlay already existed; screen-free badge rejected (video IS screen time); confirmed dot-to-dot, loop, sudoku as next targets.
+3. **Seamless loop built:** `loopDurationSec: 2.0` phase in AsmrReveal — blank fades back in at end, last frame ≈ first frame. Duration wired in render-video.mjs.
+4. **Hook pause bug fixed:** Coloring was sitting on blank screen for 3s before wipe. Unified all types to `drawStart = 0`. `revealStart` dead code flagged for cleanup at dot-to-dot.
+
+**Next:** Dot-to-dot progressive reveal (new ASMR type + extraction script).

@@ -1390,3 +1390,19 @@ Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome clos
 - **Daily workflow integration (Task 4):** `generate-challenge-brief.mjs --save` added to `daily` npm script (additive — challenge brief now generates daily alongside ASMR brief). `track-output.mjs`: `challengeVideos` counter added (videos/*.mp4 matching 'challenge' keyword), report table updated with Challenge column, archive counter excludes '-challenge-' pattern. Phase 0 gate unchanged (challenge is bonus metric).
 
 - **Earth Day push:** To be done as content (no code needed) — use `brief:asmr:coloring` with Garden/Flowers/Bugs themes, April 19-21.
+
+---
+
+## 2026-04-14 — [Agent: Claude] — Seamless loop + hook fix for ASMR engine
+
+**Files changed:** `remotion/compositions/AsmrReveal.jsx`, `scripts/render-video.mjs`
+
+- **Seamless loop (new):** Added `loopDurationSec: 2.0` phase to AsmrReveal. After hold ends, blank image fades in (opacity 0→1) over 2s on top of the completed reveal. Last frame = blank = first frame → near-seamless platform loop. Duration updated in both AsmrReveal schema and render-video.mjs `computeDuration` + `activityJsonToProps`. Per-activity override available via `loopDurationSec` in activity.json. Audio already fades at `durationInFrames - 1s`, now falls inside loop phase — dies as image returns to blank.
+
+- **Hook pause fix (pre-existing bug):** Maze + word search were already starting at frame 0. Coloring (WipeReveal) was incorrectly pausing on a static blank screen for 3s before the wipe began — `drawStart` was `revealStart` (hookFrames) instead of 0. Fixed: `drawStart = 0` unconditionally for all types. Hook is a persistent text+audio overlay, not a timed pause. `revealStart` is now dead code — will clean at dot-to-dot.
+
+- **hookDurationSec: 3 retained** — now acts as a slow-start buffer (coloring wipe draws over 29s instead of 26s), better for ASMR pacing. Can be set to 0 in schema if tighter reveal preferred.
+
+- **Earth Day briefs:** 3 coloring ASMR folders created manually: `coloring-garden-flowers` (Apr 19), `coloring-bugs-insects` (Apr 20), `coloring-forest-animals` (Apr 21). Each has `activity.json` + `brief.md` with full Gemini prompts.
+
+**Next:** Dot-to-dot progressive reveal (new ASMR type). Clean up `revealStart` dead code during that pass.

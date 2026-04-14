@@ -1,5 +1,6 @@
 import {
   AbsoluteFill,
+  Img,
   Sequence,
   Audio,
   useCurrentFrame,
@@ -22,7 +23,8 @@ export const asmrRevealSchema = {
   hookText:        '',      // shown throughout the video as persistent visual hook
   hookDurationSec: 3,       // unused for timing now; kept for API compat
   revealDurationSec: 30,    // wipe takes this long
-  holdDurationSec:   1.5,   // hold on completed reveal before video ends
+  holdDurationSec:   1.5,   // hold on completed reveal before loop fade begins
+  loopDurationSec:   2.0,   // blank fades back in — last frame ≈ first frame for seamless loop
   audioPath:       'assets/audio/crayon.mp3',
   audioVolume:     0.85,
   showJoyo:        true,
@@ -52,6 +54,7 @@ export const AsmrReveal = ({
   hookDurationSec  = 3,
   revealDurationSec = 30,
   holdDurationSec  = 1.5,
+  loopDurationSec  = 2.0,
   audioPath        = 'assets/audio/crayon.mp3',
   audioVolume      = 0.85,
   showJoyo         = true,
@@ -68,8 +71,10 @@ export const AsmrReveal = ({
   const hookFrames   = Math.round(hookDurationSec * fps);
   const revealFrames = Math.round(revealDurationSec * fps);
   const holdFrames   = Math.round(holdDurationSec * fps);
+  const loopFrames   = Math.round(loopDurationSec * fps);
   const revealStart  = hookFrames;
   const holdStart    = hookFrames + revealFrames;
+  const loopStart    = holdStart + holdFrames;
 
   // Determine reveal mode:
   //   WordSearch: wordRects array provided or revealType === 'wordsearch'
@@ -79,9 +84,9 @@ export const AsmrReveal = ({
   const useSolverReveal = !useWordSearch && pathWaypoints?.length > 0
     && revealType !== 'ttb' && revealType !== 'coloring';
 
-  // Maze solver + word search draw from frame 0 (hook text is a persistent overlay)
-  const drawStart  = (useSolverReveal || useWordSearch) ? 0 : revealStart;
-  const drawFrames = (useSolverReveal || useWordSearch) ? hookFrames + revealFrames : revealFrames;
+  // All types start at frame 0 — hook text is a persistent overlay, not a timed pause
+  const drawStart  = 0;
+  const drawFrames = hookFrames + revealFrames;
 
   // Progress bar: 0→1 during draw window
   const barProgress = Math.min(Math.max(0, frame - drawStart) / drawFrames, 1);
@@ -129,6 +134,24 @@ export const AsmrReveal = ({
           easing="linear"
           pathWaypoints={null}
         />
+      )}
+
+      {/* ── Loop fade — blank image fades back in for seamless loop ────── */}
+      {/* Sits above the reveal, below HookText/Joyo so branding persists */}
+      {loopFrames > 0 && (
+        <AbsoluteFill style={{
+          opacity: interpolate(
+            frame,
+            [loopStart, loopStart + loopFrames],
+            [0, 1],
+            { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+          ),
+        }}>
+          <Img
+            src={blankImagePath?.startsWith('http') ? blankImagePath : staticFile(blankImagePath ?? '')}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </AbsoluteFill>
       )}
 
       {/* ── Hook text overlay — persistent throughout for visual hook ── */}

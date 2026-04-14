@@ -120,8 +120,9 @@ async function activityJsonToProps(activity, activityDir) {
   const solvedImagePath = toRelative(activity.solvedImage ?? 'solved.png');
 
   const hookSec    = activity.hookDurationSec    ?? 3;
-  const revealSec  = activity.revealDurationSec  ?? 26;  // 3+26+1 = 30s total
+  const revealSec  = activity.revealDurationSec  ?? 26;  // 3+26+1+2 = 32s total
   const holdSec    = activity.holdDurationSec    ?? 1;
+  const loopSec    = activity.loopDurationSec    ?? 2.0; // loop fade-back to blank
 
   // Load precomputed path waypoints if path.json exists alongside activity.json
   let pathWaypoints = null;
@@ -193,6 +194,7 @@ async function activityJsonToProps(activity, activityDir) {
     hookDurationSec:  hookSec,
     revealDurationSec: revealSec,
     holdDurationSec:  holdSec,
+    loopDurationSec:  loopSec,
     audioPath:        activity.audioPath !== undefined
                         ? activity.audioPath
                         : await resolveAudio(activity.type ?? 'coloring'),
@@ -205,7 +207,7 @@ async function activityJsonToProps(activity, activityDir) {
     wordRects,
     highlightColor:   activity.highlightColor ?? highlightColor,
     // computed total for duration override
-    _totalSec: hookSec + revealSec + holdSec,
+    _totalSec: hookSec + revealSec + holdSec + loopSec,
   };
 }
 
@@ -255,7 +257,7 @@ function computeDuration(inputProps, compId) {
   }
   if (compId === 'AsmrReveal') {
     const totalSec = inputProps._totalSec
-      ?? ((inputProps.hookDurationSec ?? 3) + (inputProps.revealDurationSec ?? 30) + (inputProps.holdDurationSec ?? 1.5));
+      ?? ((inputProps.hookDurationSec ?? 3) + (inputProps.revealDurationSec ?? 30) + (inputProps.holdDurationSec ?? 1.5) + (inputProps.loopDurationSec ?? 2.0));
     return Math.round(totalSec * fps);
   }
   if (compId === 'HookIntro') {
