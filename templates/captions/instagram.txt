@@ -5,13 +5,18 @@ TOPIC: {{topic}}
 CATEGORY: {{category}}
 VISUAL: {{visualDescription}}
 
+⚠ MANDATORY TOPIC ANCHOR — READ BEFORE WRITING:
+Your caption MUST be specifically and exclusively about: {{topic}}
+Every single line must relate to this exact content. If the topic is "Earth Day outdoor activity," write about Earth Day and outdoor activities. If the topic is "maze," write about mazes. Do NOT drift to a different activity type.
+All formula examples below are STYLE STRUCTURE REFERENCES ONLY. Never copy them verbatim into your output. Use the structure, not the words.
+
 AUDIENCE: Parents of children ages 4–8 who feel the quiet guilt of screen time and want something better for their child.
 
 IDENTITY SHIFT TO CREATE:
 From: "I feel guilty about screen time."
 To: "I'm the parent who turns every moment into something that matters."
 
-IF CATEGORY is "pattern-interrupt", use FORMULA B below. Otherwise use FORMULA A.
+IF CATEGORY is "pattern-interrupt" OR "fact card" OR "educational", use FORMULA B below. Otherwise use FORMULA A.
 
 ━━ FORMULA A — HYPNOTIC STORY ━━
 WRITE AN INSTAGRAM CAPTION using this exact Hypnotic Social Formula:
@@ -38,27 +43,27 @@ WRITE AN INSTAGRAM CAPTION using this exact Hypnotic Social Formula:
    "Let this be the afternoon that feels different."
    "This is where it begins — link in bio."
 
-━━ FORMULA B — EDUCATIONAL INSIGHT (for pattern-interrupt posts) ━━
+━━ FORMULA B — EDUCATIONAL INSIGHT (for pattern-interrupt, fact card, educational posts) ━━
 
-1. HOOK FACT (1 line) — Open with the number or counterintuitive claim. No preamble.
-   "45 minutes of coloring reduces cortisol — the stress hormone — in children. Even if they don't think they're creative."
-   "Kids who do mazes 3x a week score 30% higher on spatial reasoning tests. The same skill chess uses."
-   Lead with the specific number or mechanism. Never bury it.
+⚠ REMINDER: Write ONLY about {{topic}}. Do not reference coloring, mazes, or any other activity unless that IS the topic.
 
-2. THE QUALIFIER (1 line) — Remove the objection before they have it.
-   "You don't have to be artistic. The physiological shift happens regardless."
-   "They don't need to be 'puzzle kids.' The brain doesn't ask permission."
+1. HOOK FACT (1 line) — Open with a specific number, mechanism, or counterintuitive claim about {{topic}}. No preamble.
+   STRUCTURE: "[X minutes/times/percent] of [{{topic}}] [specific measurable outcome]."
+   Lead with the specific number or mechanism. Never bury it. Must be about {{topic}}.
 
-3. THE REFRAME (1-2 lines) — Elevate what the parent already does. Make them feel smart.
-   "That coloring page you printed last Tuesday wasn't busywork. It was regulation."
-   "The maze on the table isn't a toy. It's the same cognitive loop that makes great problem-solvers."
+2. THE QUALIFIER (1 line) — Remove the parent's objection before they have it. Still about {{topic}}.
+   STRUCTURE: "[Objection removed]. The [mechanism] happens regardless."
+
+3. THE REFRAME (1-2 lines) — Elevate what the parent already does. Make them feel smart for choosing {{topic}}.
+   STRUCTURE: "That [{{topic}} thing] wasn't [dismissive label]. It was [the real mechanism]."
 
 4. SOFT ENGAGEMENT PULL (1 line) — Drive a save or comment, not just a like.
-   "Save this for the next time someone tells you screen-free activities are 'just play.'"
+   STRUCTURE: "Save this for the next time [relatable scenario]."
    "Share with a parent who needs to hear this."
 
-5. BRAND (1 line) — Educational framing, never promotional.
-   "More like this at joymaze.com — link in bio."
+5. CTA (1 line) — Educational framing, never promotional. No URLs.
+   "More like this — link in bio."
+   "Save for later."
 
 HALBERT FINAL PASS — apply before writing your output:
 - First line: would YOU stop scrolling for it? If not, rewrite it until you would.

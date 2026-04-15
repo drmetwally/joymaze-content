@@ -126,31 +126,75 @@ try {
 // Platform caption targets
 const PLATFORMS = ['pinterest', 'instagram', 'x', 'tiktok', 'youtube'];
 
-// CTAs for rotation — soft only (no hard "Download now!" energy)
+// CTAs for rotation — save-bait + link-in-bio only. NO joymaze.com URLs, NO "download", NO app name plugs.
 const CTAS = {
   app: [
-    'More activities at joymaze.com',
     'Link in bio for more',
-    'For more kids activities → joymaze.com',
+    'More in bio',
+    'Save for later',
   ],
   both: [
-    'More activities at joymaze.com',
-    'More printables at joymaze.com',
     'Link in bio for more',
+    'Save for later',
+    'More in bio',
   ],
   website: [
-    'More at joymaze.com',
-    'More activities at joymaze.com',
+    'Link in bio for more',
+    'Save for later',
   ],
   books: [
-    'More printables at joymaze.com',
-    'Find more printable activities at joymaze.com',
+    'Save for later',
+    'More printables — link in bio',
   ],
   bio: [
     'Link in bio for more',
-    'For more activities → link in bio',
+    'More in bio',
   ],
 };
+
+// Phrases that indicate generic AI marketing copy — trigger auto-regen if found
+const BANNED_PHRASES = [
+  'joymaze.com',
+  'download joymaze',
+  'free on ios',
+  'free on android',
+  'get joymaze',
+  'try joymaze',
+  'check out joymaze',
+  'more at joymaze',
+  'activities at joymaze',
+  'printables at joymaze',
+  'download now',
+  'download free',
+  'available on ios',
+  'available on android',
+  'app store',
+  'google play',
+];
+
+// Verbatim template-example phrases — LLM copy-pasted from the prompt instead of generating
+const TEMPLATE_LEAK_PHRASES = [
+  '45 minutes of coloring reduces cortisol',
+  'kids who do mazes 3x a week score 30%',
+  'the maze on the table isn\'t a toy',
+  'that coloring page you printed last tuesday',
+  'you don\'t have to be artistic. the physiological shift',
+  'more like this at joymaze.com — link in bio',
+  'hand this to your kid. don\'t say a word. see what happens',  // activity-activity.txt example
+  'eyes narrow. pencil slows. then — the sound of it stopping',  // activity-activity.txt example
+];
+
+/**
+ * Check if a caption contains any banned marketing phrases.
+ * Returns array of found phrases (empty = clean).
+ */
+function findBannedPhrases(text) {
+  const lower = (text || '').toLowerCase();
+  return [
+    ...BANNED_PHRASES.filter(p => lower.includes(p)),
+    ...TEMPLATE_LEAK_PHRASES.filter(p => lower.includes(p.toLowerCase())),
+  ];
+}
 
 /**
  * Pick random items from an array
@@ -404,10 +448,21 @@ async function generateCaptionsForContent(metadata) {
         const activityType = isActivity ? metadata.category.replace('activity-', '').replace(/-/g, ' ') : '';
         const difficulty = metadata.difficulty || 'medium';
 
+        // Derive the best topic signal — sourceFile often has richer info than subject for imported posts
+        const sourceFileHint = metadata.sourceFile
+          ? path.basename(metadata.sourceFile, path.extname(metadata.sourceFile))
+              .replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim()
+          : '';
+        const VAGUE_SUBJECTS = ['fact card', 'activity challenge', 'activity', 'post', 'content'];
+        const isVagueTopic = VAGUE_SUBJECTS.some(v => (metadata.subject || '').toLowerCase() === v);
+        const effectiveTopic = isVagueTopic && sourceFileHint
+          ? sourceFileHint
+          : (metadata.subject || metadata.categoryName || '');
+
         const templatePrompt = template
-          .replace('{{topic}}', metadata.subject || metadata.categoryName)
+          .replace('{{topic}}', effectiveTopic)
           .replace('{{category}}', metadata.categoryName || metadata.category)
-          .replace('{{visualDescription}}', metadata.prompt || '')
+          .replace('{{visualDescription}}', metadata.prompt || sourceFileHint || '')
           .replace('{{activityType}}', activityType)
           .replace('{{difficulty}}', difficulty);
 
@@ -441,6 +496,29 @@ async function generateCaptionsForContent(metadata) {
             }
           }
         }
+
+        // Quality gate: auto-regen once if banned marketing phrases detected
+        const bannedFound = findBannedPhrases(caption);
+        if (bannedFound.length > 0) {
+          console.log(`    ${platform}: ⚠ banned phrases found (${bannedFound.join(', ')}) — regenerating`);
+          const fixNote = `\n\nCRITICAL OVERRIDE — your previous output contained forbidden phrases. DO NOT include any of these: ${bannedFound.join(', ')}. No URLs. No app names. No download CTAs. Rewrite the caption now, keeping the same style but removing every forbidden phrase.`;
+          const fixPrompt = fullPrompt + fixNote;
+          try {
+            caption = await generateWithGroq(fixPrompt);
+            await new Promise(r => setTimeout(r, 2500));
+            const stillBanned = findBannedPhrases(caption);
+            if (stillBanned.length > 0) {
+              console.log(`    ${platform}: ⚠ still has banned phrases after regen — stripping manually`);
+              // Last-resort: strip the offending sentence
+              caption = caption.split(/[.!?]/).filter(s => !findBannedPhrases(s).length).join('. ').trim();
+            } else {
+              console.log(`    ${platform}: ✓ quality gate passed after regen`);
+            }
+          } catch {
+            // Strip offending sentences if regen fails
+            caption = caption.split(/[.!?]/).filter(s => !findBannedPhrases(s).length).join('. ').trim();
+          }
+        }
       }
     }
 
@@ -461,11 +539,33 @@ async function generateCaptionsForContent(metadata) {
     const ctaPool = [...hardcodedCtaPool, ...dynamicCtaPool];
     const cta = pickRandom(ctaPool);
 
-    // Assemble final caption
+    // ── Pinterest: parse TITLE + DESC from structured LLM output ──────────────
+    if (platform === 'pinterest') {
+      const titleMatch = caption.match(/^TITLE:\s*(.+)/m);
+      const descMatch  = caption.match(/^DESC:\s*([\s\S]+)/m);
+      const pinTitle   = titleMatch ? titleMatch[1].trim().slice(0, 100) : '';
+      const pinDesc    = descMatch  ? descMatch[1].trim()                : caption;
+
+      // Tags = plain keywords (no #) — strip # from hashtag pool, max 10
+      const pinTags = hashtags.map(h => h.replace(/^#/, '')).slice(0, 10);
+
+      captions[platform] = {
+        title:          pinTitle,
+        description:    pinDesc,
+        text:           pinDesc,   // backwards compat for any posting script
+        link:           'https://joymaze.com',
+        tags:           pinTags,
+        rawCaption:     caption,
+        characterCount: pinDesc.length,
+      };
+      continue;
+    }
+
+    // Assemble final caption (non-Pinterest)
     let finalCaption = caption;
     if (platform === 'instagram' && hashtags.length > 0) {
       finalCaption = `${caption}\n\n.\n.\n.\n${hashtags.join(' ')}`;
-    } else if (hashtags.length > 0 && platform !== 'pinterest') {
+    } else if (hashtags.length > 0 && platform !== 'x') {
       finalCaption = `${caption}\n\n${hashtags.join(' ')}`;
     }
 

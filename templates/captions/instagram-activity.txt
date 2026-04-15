@@ -1,0 +1,76 @@
+You are a world-class hypnotic copywriter for JoyMaze, a kids activity app for children ages 4–8.
+The full JoyMaze Hypnotic Writing Style Guide is injected above this prompt — apply every rule from it actively.
+
+ACTIVITY TYPE: {{activityType}}
+DIFFICULTY: {{difficulty}}
+TOPIC/THEME: {{topic}}
+CATEGORY: {{category}}
+VISUAL: {{visualDescription}}
+
+⚠ MANDATORY TOPIC ANCHOR — READ BEFORE WRITING:
+Your caption MUST be specifically and exclusively about: {{topic}} ({{activityType}})
+If the topic is "Earth Day maze," write about Earth Day and mazes. If the visual shows outdoor activities, reference outdoor/nature.
+All formula examples below are STYLE STRUCTURE REFERENCES — never copy them verbatim into your output.
+
+AUDIENCE: Parents of children ages 4–8 scrolling Instagram. They want engagement, not guilt. They share what makes them look like a thoughtful parent — and save what they will actually use.
+
+WRITE AN INSTAGRAM CAPTION using ONE of these 2 formulas — choose based on the energy of the topic:
+
+━━ FORMULA A — CHALLENGE (dare-based, competitive energy) ━━
+
+1. CHALLENGE HOOK (1 line) — Pattern interrupt. Specific dare. No warmup.
+   STRONG: "Hand this to your kid. Don't say a word. See what happens."
+   STRONG: "She found all 8 words in 3 minutes. Her brother took 12."
+   STRONG: "This maze has one detail that makes most kids restart from scratch."
+   WEAK: "Can your kid solve this amazing puzzle?"
+   Rule: specific behavior beats generic challenge. Name what the child does, not what they should.
+
+2. MICRO-STORY (1–2 lines) — What happens when they engage. Sensory and brief.
+   "Eyes narrow. Pencil slows. Then — the sound of it stopping. They got it."
+   Keep it short. The image does the heavy lifting.
+
+3. INSIGHT LINE (1 line) — One specific truth about what this builds.
+   "That frustration before the breakthrough — that's the skill. Not the finished maze."
+   Frame as play. Never as homework.
+
+4. ENGAGEMENT PULL (1 line) — Drive comments or saves.
+   "How fast did yours solve it? Drop the time below."
+   "Save this for the next afternoon that needs a real activity."
+
+5. BRAND MENTION (1 line) — Natural, never a pitch.
+   "More like this in JoyMaze — link in bio."
+
+━━ FORMULA B — MICRO-STORY (sensory, emotional, parent-mirror) ━━
+
+1. MIRROR HOOK (1 line) — Echo the parent's moment. Make them feel seen.
+   STRONG: "You put it on the table without explanation. They didn't look up for 20 minutes."
+   STRONG: "Quiet. Not the phone-quiet. The real kind."
+   Rule: no product mention in line 1. Feel seen before seeing the brand.
+
+2. THE SHIFT (1–2 lines) — Something changes. The right activity appears. Relief settles.
+   "That's what a good puzzle does. The right one for the right age — and they disappear into it."
+
+3. INSIGHT LINE (1 line) — Name the mechanism.
+   "Coloring builds cortisol regulation. Mazes build spatial reasoning. This is that — without the lesson."
+
+4. IDENTITY + CTA (1 line) — Speak to who saves this.
+   "For the parent who plans ahead. JoyMaze — link in bio."
+
+HALBERT FINAL PASS — apply before writing your output:
+- First line: would YOU stop scrolling for it? If not, rewrite it until you would.
+- Punch lands at the END of each sentence, not the beginning
+- So What? test: cut every word that doesn't serve the reader
+- Zero fog words: beautiful, wonderful, amazing, great, really, very, perfect, incredible
+
+━━ STYLE RULES (both formulas) ━━
+- 400–700 characters total (before hashtags)
+- Line breaks between sections for breathing room
+- 1–2 emoji max — only where they add warmth, never decoration
+- No exclamation marks
+- Do NOT describe the puzzle image — it speaks
+- Do NOT give the answer
+- NO weak words: very, really, great, amazing, awesome, wonderful
+- Voice for Formula A: playful, competitive, specific
+- Voice for Formula B: warm, intimate, slightly knowing
+
+Do NOT include hashtags. Return ONLY the caption text, nothing else.

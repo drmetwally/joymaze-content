@@ -21,6 +21,26 @@ const PLATFORM_META = {
   x:          { label: 'X',         color: '#888',    emoji: '✕' },
 };
 
+// Advisory optimal posting windows per platform (local time — adjust for your timezone)
+const PLATFORM_OPTIMAL = {
+  pinterest:  '8–11 PM local',
+  instagram:  '6–9 AM · 5–7 PM local',
+  tiktok:     '7–9 AM · 7–9 PM local',
+  youtube:    '12–3 PM · 7–9 PM local',
+  x:          '1–5 PM local',
+};
+
+// Map category → caption template type label (for post-type verification in brief)
+function templateTypeLabel(category, format) {
+  if (format === 'asmr') return 'ASMR';
+  if (!category) return 'Generic';
+  if (category.startsWith('activity-')) return 'Activity';
+  if (category === 'fact-card' || category === 'fun-facts') return 'Educational';
+  if (category === 'story' || category === 'story-marketing') return 'Story';
+  if (category === 'pattern-interrupt') return 'Edu-Insight';
+  return 'Generic';
+}
+
 // ─── File discovery ──────────────────────────────────────────────────────────
 
 function readQueueFiles() {
@@ -118,8 +138,6 @@ function mediaPlatformBlock(platform, metadata) {
   const pm      = PLATFORM_META[platform] || { label: platform, color: '#666', emoji: '📱' };
   const pStatus = metadata.platforms?.[platform]?.status || 'pending';
   const caption = metadata.captions?.[platform];
-  const text    = caption?.text || caption?.rawCaption || '(no caption yet — run generate:captions)';
-  const tags    = (caption?.hashtags || []).map(h => h.startsWith('#') ? h : `#${h}`).join(' ');
 
   const cloudUrl =
     metadata.cloudUrls?.[platform] ||
@@ -136,10 +154,47 @@ function mediaPlatformBlock(platform, metadata) {
         : `<a href="${esc(cloudUrl)}" target="_blank" class="media-tile"><img src="${esc(cloudUrl)}" loading="lazy" onerror="this.parentElement.innerHTML='⚠ load err'"></a>`)
     : `<div class="media-tile no-media">No URL</div>`;
 
+  const optimalTime = PLATFORM_OPTIMAL[platform] || '';
+
+  // ── Pinterest: structured title / description / link / tags layout ──────────
+  if (platform === 'pinterest') {
+    const title = caption?.title || '';
+    const desc  = caption?.description || caption?.text || caption?.rawCaption || '(no caption yet)';
+    const link  = caption?.link || 'https://joymaze.com';
+    const tags  = (caption?.tags || caption?.hashtags || [])
+      .map(t => t.replace(/^#/, ''))   // plain keywords, no #
+      .join(', ');
+
+    return `
+<div class="p-block ${pStatus === 'posted' ? 'p-done' : ''}">
+  <div class="p-hd" style="border-left:4px solid ${pm.color}">
+    <span class="p-name">${pm.emoji} ${pm.label}</span>
+    ${optimalTime ? `<span class="p-optimal">⏰ ${esc(optimalTime)}</span>` : ''}
+    <span class="p-pill ${pStatus === 'posted' ? 'done' : 'todo'}">${pStatus === 'posted' ? '✓ Posted' : '⏳ Pending'}</span>
+  </div>
+  <div class="p-body">
+    ${mediaTile}
+    <div class="caption-col">
+      ${title ? `<div class="lbl">Title <span class="field-note">(max 100 chars)</span></div>${copyBox(title, 'pin-title-box')}` : '<div class="lbl" style="color:#c04020">⚠ No title — regenerate captions</div>'}
+      <div class="lbl">Description</div>
+      ${copyBox(desc)}
+      <div class="lbl">Link</div>
+      ${copyBox(link, 'link-box')}
+      ${tags ? `<div class="lbl">Tags <span class="field-note">(plain keywords, no #)</span></div>${copyBox(tags, 'tags-box pin-tags-box')}` : ''}
+    </div>
+  </div>
+</div>`;
+  }
+
+  // ── All other platforms ──────────────────────────────────────────────────────
+  const text = caption?.text || caption?.rawCaption || '(no caption yet — run generate:captions)';
+  const tags = (caption?.hashtags || []).map(h => h.startsWith('#') ? h : `#${h}`).join(' ');
+
   return `
 <div class="p-block ${pStatus === 'posted' ? 'p-done' : ''}">
   <div class="p-hd" style="border-left:4px solid ${pm.color}">
     <span class="p-name">${pm.emoji} ${pm.label}</span>
+    ${optimalTime ? `<span class="p-optimal">⏰ ${esc(optimalTime)}</span>` : ''}
     <span class="p-pill ${pStatus === 'posted' ? 'done' : 'todo'}">${pStatus === 'posted' ? '✓ Posted' : '⏳ Pending'}</span>
   </div>
   <div class="p-body">
@@ -158,13 +213,28 @@ function mediaCard(metadata, uid) {
   const allPosted  = platforms.length > 0 && platforms.every(p => metadata.platforms[p]?.status === 'posted');
   const blocks     = platforms.map(p => mediaPlatformBlock(p, metadata)).join('');
 
+  const tmplLabel  = templateTypeLabel(metadata.category, metadata.format);
+  const schedHour  = metadata.scheduledHour != null ? `${String(metadata.scheduledHour).padStart(2,'0')}:00 UTC` : '';
+  const hookText   = metadata.hookText ? `"${metadata.hookText}"` : '';
+  const overlay    = metadata.textOverlay || '';
+
+  const hookRow = (hookText || overlay) ? `
+  <div class="hook-row">
+    ${hookText ? `<span class="hook-lbl">Hook</span><span class="hook-val">${esc(hookText)}</span>` : ''}
+    ${overlay  ? `<span class="overlay-badge">${esc(overlay)}</span>` : ''}
+  </div>` : '';
+
   return `
 <div class="card ${allPosted ? 'is-posted' : ''}" id="${uid}">
   <div class="card-hd">
     <span class="badge cat-badge">${esc(metadata.categoryName || metadata.category || 'post')}</span>
+    <span class="badge tmpl-badge tmpl-${tmplLabel.toLowerCase().replace(/[^a-z]/g,'-')}">${esc(tmplLabel)}</span>
     <span class="id-lbl">${esc(metadata.id || '')}</span>
+    ${schedHour ? `<span class="sched">${schedHour}</span>` : ''}
     <span class="status-pill ${allPosted ? 'done' : 'todo'}">${allPosted ? '✓ All Posted' : '⏳ Pending'}</span>
+    <button class="mark-btn" onclick="toggle('${uid}',this)">${allPosted ? 'Unmark' : 'Mark Posted'}</button>
   </div>
+  ${hookRow}
   ${blocks}
 </div>`;
 }
@@ -235,6 +305,28 @@ a{color:inherit;text-decoration:none}
 .no-media{font-size:11px;color:#333;border:1px dashed #252535}
 .caption-col{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
 
+.field-note{font-size:10px;color:#444;font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px}
+.pin-title-box{font-size:15px;font-weight:600;color:#e0c060}
+.link-box{font-size:12px;color:#6090d0;font-family:monospace}
+.pin-tags-box{font-size:12px;color:#60b080}
+
+/* Template-type badges */
+.tmpl-badge{font-size:11px;padding:2px 8px}
+.tmpl-activity{background:#1a2d1a;color:#60c060}
+.tmpl-educational,.tmpl-edu-insight{background:#1a2040;color:#6090e0}
+.tmpl-story{background:#2a1a30;color:#c070e0}
+.tmpl-asmr{background:#1a2a2a;color:#50c0c0}
+.tmpl-generic{background:#202020;color:#666}
+
+/* Hook row */
+.hook-row{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0e0e1a;border-top:1px solid #1a1a28;flex-wrap:wrap}
+.hook-lbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.hook-val{font-size:13px;color:#c0a050;font-style:italic;flex:1}
+.overlay-badge{padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#2a2010;border:1px solid #504020;color:#d0a040;white-space:nowrap}
+
+/* Platform optimal time */
+.p-optimal{font-size:10px;color:#506080;white-space:nowrap}
+
 @media(max-width:600px){.p-body{flex-direction:column}.media-tile{width:100%;height:140px}}
 </style>
 </head>
@@ -276,21 +368,31 @@ function toggle(id,btn){
 const files = readQueueFiles();
 console.log(`Reading ${files.length} queue file(s) for ${DATE}...`);
 
+// Collect all items first so we can sort by scheduledHour
+const allItems = [];
+for (const filepath of files) {
+  const items = isXTextFile(filepath) ? parseXTextFile(filepath) : parseMediaFile(filepath);
+  allItems.push(...items);
+}
+
+// Sort chronologically by scheduledHour (nulls go last)
+allItems.sort((a, b) => {
+  const ha = a.scheduledHour ?? 99;
+  const hb = b.scheduledHour ?? 99;
+  return ha - hb;
+});
+
 const cards = [];
 let total = 0, posted = 0;
 
-for (const filepath of files) {
-  const items = isXTextFile(filepath) ? parseXTextFile(filepath) : parseMediaFile(filepath);
+for (const item of allItems) {
+  total++;
+  const isPosted = item.posted === true
+    || (item.platforms && Object.values(item.platforms).every(p => p?.status === 'posted'));
+  if (isPosted) posted++;
 
-  for (const item of items) {
-    total++;
-    const isPosted = item.posted === true
-      || (item.platforms && Object.values(item.platforms).every(p => p?.status === 'posted'));
-    if (isPosted) posted++;
-
-    const uid = `card-${cards.length}`;
-    cards.push(item._src === 'x-text' ? xTextCard(item, uid) : mediaCard(item, uid));
-  }
+  const uid = `card-${cards.length}`;
+  cards.push(item._src === 'x-text' ? xTextCard(item, uid) : mediaCard(item, uid));
 }
 
 fs.mkdirSync('output', { recursive: true });

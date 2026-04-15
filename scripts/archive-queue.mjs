@@ -279,6 +279,27 @@ async function main() {
     }
   } catch { /* no videos dir */ }
 
+  // Sweep X text post files — output/queue/x-text-YYYY-MM-DD.json → output/archive/x-text/
+  let xTextArchived = 0;
+  try {
+    const xTextFiles = (await fs.readdir(QUEUE_DIR)).filter(f => /^x-text-\d{4}-\d{2}-\d{2}\.json$/.test(f));
+    for (const file of xTextFiles) {
+      const fileDate = file.slice(7, 17); // extract YYYY-MM-DD from x-text-YYYY-MM-DD.json
+      if (!ARCHIVE_ALL && fileDate >= TODAY) {
+        console.log(`  Skip x-text: ${file} (today — ${fileDate})`);
+        continue;
+      }
+      const src = path.join(QUEUE_DIR, file);
+      const dest = path.join(ARCHIVE_DIR, 'x-text', file);
+      console.log(`  Archive x-text: ${file} → archive/x-text/`);
+      if (!DRY_RUN) {
+        await fs.mkdir(path.join(ARCHIVE_DIR, 'x-text'), { recursive: true });
+        await moveFile(src, dest);
+      }
+      xTextArchived++;
+    }
+  } catch { /* no x-text files */ }
+
   // Sweep prompt files — output/prompts/*.json → output/archive/prompts/
   let promptsArchived = 0;
   try {
@@ -306,7 +327,7 @@ async function main() {
 
   // Summary
   console.log('\n--- Summary ---');
-  if (archived === 0 && rawArchived === 0 && asmrArchived === 0 && storiesArchived === 0 && videosArchived === 0 && promptsArchived === 0) {
+  if (archived === 0 && rawArchived === 0 && asmrArchived === 0 && storiesArchived === 0 && videosArchived === 0 && promptsArchived === 0 && xTextArchived === 0) {
     console.log('Nothing to archive. All items are from today.');
   } else {
     for (const [date, count] of Object.entries(summary).sort()) {
@@ -317,7 +338,8 @@ async function main() {
     if (storiesArchived > 0) console.log(`  story episodes: ${storiesArchived} folder(s)`);
     if (videosArchived > 0) console.log(`  videos: ${videosArchived} file(s)`);
     if (promptsArchived > 0) console.log(`  prompts: ${promptsArchived} file(s)`);
-    console.log(`\nArchived: ${archived} queue + ${rawArchived} raw + ${asmrArchived} ASMR + ${storiesArchived} stories + ${videosArchived} videos + ${promptsArchived} prompts${DRY_RUN ? ' (dry run)' : ''}`);
+    if (xTextArchived > 0) console.log(`  x-text posts: ${xTextArchived} file(s)`);
+    console.log(`\nArchived: ${archived} queue + ${rawArchived} raw + ${asmrArchived} ASMR + ${storiesArchived} stories + ${videosArchived} videos + ${promptsArchived} prompts + ${xTextArchived} x-text${DRY_RUN ? ' (dry run)' : ''}`);
   }
   if (skipped > 0) console.log(`Skipped: ${skipped} item(s)`);
   console.log('');

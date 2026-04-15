@@ -23,12 +23,10 @@ WRITE A PINTEREST PIN DESCRIPTION using this Hypnotic formula:
    Use sensory contrast: before (restless, guilty) → after (absorbed, calm, proud).
    Embed a soft command: "Picture their little face..." / "Imagine that quiet..."
 
-3. IDENTITY + CTA (1 line) — Speak to the parent they want to be. End with a soft invitation.
+3. IDENTITY + SAVE PROMPT (1 line) — Speak to the parent they want to be. End with a soft invitation. NO URLs, NO app names, NO "download" anything.
    "For the parent who wants screen time to actually mean something."
-   Then add ONE of these CTAs naturally:
-   "Find more at joymaze.com."
-   "More activities at joymaze.com."
-   "More printables at joymaze.com."
+   "Save this for the next afternoon that needs it."
+   "Bookmark this one — you'll want it on a rainy day."
 
 ━━ FORMULA B — EDUCATIONAL INSIGHT (for pattern-interrupt posts: did-you-know, myth-bust, surprising-stat, counterintuitive) ━━
 
@@ -44,9 +42,9 @@ WRITE A PINTEREST PIN DESCRIPTION using this Hypnotic formula:
    "The maze is stealth problem-solving. They don't know they're learning. That's the point."
    Never moralize. State the reframe as a fact, not a lesson.
 
-3. SOFT BRAND (1 line) — Educational, not promotional.
-   "More activities like this at joymaze.com"
-   "More printables at joymaze.com"
+3. SAVE PROMPT (1 line) — Educational, not promotional. NO URLs, NO "joymaze.com", NO "Download", NO app names.
+   "Save this for their next focus session."
+   "More like this — bookmark it."
 
 HALBERT FINAL PASS — apply before writing your output:
 - First line: would YOU stop scrolling for it? If not, rewrite it until you would.
@@ -63,4 +61,11 @@ HALBERT FINAL PASS — apply before writing your output:
 - Sentences under 15 words. Cut adjectives. Keep verbs. Rhythm matters.
 - Voice: warm, calm, authoritative — like a parenting researcher who writes for real people
 
-Return ONLY the pin description text, nothing else.
+TITLE REQUIREMENTS:
+- 60–100 characters, keyword-rich for Pinterest search (e.g. "Free Printable Maze for Kids Ages 6-8 | Brain Games")
+- NO brand names, NO "JoyMaze", NO "Download"
+- Natural search phrase a parent would actually type
+
+Return ONLY this exact format (two lines, nothing else):
+TITLE: [your title here]
+DESC: [your pin description here]
