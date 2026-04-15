@@ -1446,3 +1446,61 @@ Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome clos
 - **Fix:** Added dedicated sweep in `archive-queue.mjs` that matches `x-text-YYYY-MM-DD.json` by filename pattern, extracts date from filename, moves to `output/archive/x-text/`.
 - Summary counter updated: `xTextArchived` included in final log line.
 - `npm run daily` now cleans up X text post files automatically.
+
+---
+
+## 2026-04-15 — [Agent: Claude] — Caption quality gate, Pinterest structured fields, brief posting times
+
+**Files changed:** `scripts/generate-captions.mjs`, `scripts/generate-brief.mjs`, `templates/captions/pinterest.txt`, `templates/captions/pinterest-activity.txt`, `templates/captions/pinterest-asmr.txt`, `templates/captions/instagram.txt`, `templates/captions/instagram-activity.txt`
+
+**Caption quality gate:**
+- Added `BANNED_PHRASES` (16 entries: joymaze.com, download, app store, etc.) + `TEMPLATE_LEAK_PHRASES` (verbatim template examples that LLMs copy when topic is vague)
+- Auto-regen: if banned phrase detected after generation → resend with explicit override instruction → strip offending sentences as last resort
+- Root cause of cortisol/coloring caption on wrong post: `instagram.txt` Formula B had verbatim example text ("45 minutes of coloring reduces cortisol...") that Groq copied when `subject="fact card"` and `prompt=""`. Fixed by replacing examples with structural STRUCTURE: templates and adding mandatory TOPIC ANCHOR block to all Instagram templates
+- Vague-topic fallback: when subject is one of the known-generic labels, `sourceFile` filename becomes the effective topic
+
+**Pinterest structured fields:**
+- All 3 Pinterest templates now output `TITLE: [...]\nDESC: [...]` format
+- `generate-captions.mjs` parses into `{title, description, link, tags}` — tags = plain keywords, no `#`, max 10
+- `link` defaults to `https://joymaze.com`
+- All joymaze.com CTAs removed from CTAS pool; save-bait + link-in-bio variants only
+
+**Brief upgrades:**
+- Scheduled hour (`scheduledHour`) shown on every media card header
+- Platform optimal time advisory in every platform block (`⏰ 8–11 PM local` etc.)
+- Template-type badge per card: Activity (green) / Educational (blue) / Story (purple) / ASMR (teal) for post-type verification
+- Hook row: `hookText` + `textOverlay` shown between card header and platform blocks
+- Mark Posted button added to all media cards (was missing)
+- Cards now sorted chronologically by `scheduledHour`
+- Pinterest platform block shows 4 separate copy fields: Title / Description / Link / Tags
+
+**Next:** Scheduled ASMR queue (seasonal pre-scheduling), loop freeze-frame, sudoku cell-fill ASMR.
+
+---
+## Session — 2026-04-15 (post-daily audit)
+
+**Task:** Audit npm run daily output, fix systemic issues, re-audit, push.
+
+**Audit findings (original gen):**
+- Prompt 7 labeled "Tracing/Drawing" but generated a dot-to-dot (numbered dots) — no tracing template existed
+- 3 prompts flagged (6.5/10) with rule-violations; avg 8.3/10 · 7 pass · 3 flagged
+- ASMR activity.json `theme` field for wordsearch fell through to maze string ("Watch the maze path reveal itself")
+- ASMR `coloredPrompt` (solved.png) missing "White background." enforcement for non-coloring types
+
+**Fixes applied:**
+- `generate-prompts.mjs`: added EXAMPLE F (tracing fill-in-the-blank template) with explicit rule "NOT numbered dots — that is dot-to-dot"
+- `generate-asmr-brief.mjs`: added wordsearch case to `buildActivityJson` theme field
+- `generate-asmr-brief.mjs`: `coloredPrompt` now enforces "White background." for all non-coloring types
+
+**Re-gen results:**
+- Prompts: avg 8.9/10 · 10 pass · 0 flagged · 0 rejected ✓
+- ASMR wordsearch theme: "Watch the hidden words reveal themselves" ✓
+- ASMR solved.png: "White background." present ✓
+
+**Advisory (not fixed — no systemic issue):**
+- Quality gate doesn't block "children's book illustration / gouache" on story slots (only blocks watercolor/anime/etc.)
+- Activity prompts occasionally use unconventional styles (3D Pixar maze, photography-style word search) — no style restrictions enforced on activity slots
+
+**Commit:** 3e6a067 | pushed main
+
+**Next:** Scheduled ASMR queue, loop freeze-frame, sudoku cell-fill ASMR.

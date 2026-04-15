@@ -697,3 +697,12 @@
 ---
 **2026-04-14 — X text archive fix**
 Added x-text sweep to `archive-queue.mjs`. Files named `x-text-YYYY-MM-DD.json` are arrays, not objects — existing loop skipped them. New sweep matches by filename regex, extracts date, moves to `output/archive/x-text/`. `npm run daily` now fully cleans up X text post files.
+
+---
+
+**2026-04-15 — Caption quality + Pinterest fields + brief posting times**
+Fixed 3 issues from manual posting review: (1) Pinterest captions now generate structured Title/Description/Link/Tags fields; templates updated with TITLE:/DESC: output format. (2) Caption quality gate added — BANNED_PHRASES + TEMPLATE_LEAK_PHRASES catch marketing copy and verbatim template leaks, auto-regen once with override. Root cause of cortisol caption on wrong post: Groq copied verbatim Formula B example from instagram.txt when topic was vague. Fixed by adding TOPIC ANCHOR blocks and replacing verbatim examples with structural STRUCTURE: descriptors. (3) Brief now shows scheduled hour + platform optimal windows on every post, template-type badge, hook text row, and sorts cards chronologically. Pushed 43eab04.
+
+---
+**2026-04-15 — Daily output audit + systemic prompt/ASMR fixes**
+Audited full npm run daily output (prompts, X posts, story, ASMR brief, carousel plan). Found 3 systemic issues: (1) Tracing slot had no gold-standard example so LLM defaulted to dot-to-dot structure — fixed by adding EXAMPLE F with fill-in-the-blank tracing template and hard rule against numbered dots. (2) ASMR activity.json theme field for wordsearch fell through to maze string — added wordsearch case. (3) ASMR solved.png (coloredPrompt) missing "White background." enforcement for non-coloring types — added conditional. Re-gen: 8.9 avg · 10 pass · 0 flagged (was 8.3 · 7 pass · 3 flagged). Advisory: style gate doesn't catch "children's book illustration/gouache" on story slots; activity prompts can pick unconventional styles (no restriction enforced). Pushed 3e6a067.
