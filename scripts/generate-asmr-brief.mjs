@@ -232,7 +232,7 @@ Return a JSON object with exactly these fields:
   "theme": "short kid-friendly theme name, 2-3 words (e.g. 'Ocean Animals')",
   "slug": "kebab-case folder name (e.g. 'ocean-animals')",
   "blankPrompt": "Gemini image prompt for the BLANK image (${blankDesc}). Must end with: 'Portrait orientation, 9:16 aspect ratio (1080x1920 pixels). White background.'",
-  "coloredPrompt": "Gemini image prompt for the FINISHED image (${coloredDesc}). Must end with: 'Portrait orientation, 9:16 aspect ratio (1080x1920 pixels).'",
+  "coloredPrompt": "Gemini image prompt for the FINISHED image (${coloredDesc}). Must end with: 'Portrait orientation, 9:16 aspect ratio (1080x1920 pixels).${type !== 'coloring' ? ' White background.' : ''}'",
   "hookText": "3-6 word hook for the video overlay text — curiosity-driven, Halbert style from the writing guide, no emoji",
   "hookAlternatives": ["alternative hook 1", "alternative hook 2", "alternative hook 3"]
 }
@@ -264,7 +264,9 @@ function buildActivityJson(type, brief) {
       ? 'Watch the colors fill in, stroke by stroke'
       : type === 'dotdot'
         ? 'Watch the dots connect one by one'
-        : 'Watch the maze path reveal itself',
+        : type === 'wordsearch'
+          ? 'Watch the hidden words reveal themselves'
+          : 'Watch the maze path reveal itself',
     music: null,
   };
 }

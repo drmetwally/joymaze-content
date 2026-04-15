@@ -891,7 +891,7 @@ These must be real, usable, saveable activities:
 1. **Maze (A1):** Follow the EXAMPLE C pattern exactly — character at start point, age-targeted difficulty (thick lines, easy-to-follow), themed decorations, clear start/end, solvability time. Keep simple — do NOT over-specify layout details. No solution shown.
 2. **Word Search (A2):** Generate a word search grid — clear letter grid with hidden words. Show word list beside/below. Theme the words (animals, colors, seasons). No words circled.
 3. **Matching (A3):** Generate a matching game — find-the-pair OR spot-the-difference. Clear objects with space between. For spot-the-diff: two images, 3-5 subtle differences.
-4. **Tracing (A4):** Generate a tracing activity — dotted/dashed lines for tracing. Fun theme ("Help the bunny get home"). Thick lines that work when printed.
+4. **Tracing (A4):** Follow the EXAMPLE F pattern exactly — dashed/dotted path for the child to trace with a pencil. The path IS the activity (not numbered dots to connect — that is dot-to-dot, a completely different activity). Thick dashed lines, clearly defined start and finish, fun themed shape. Do NOT generate numbered dots. Do NOT say "connect the dots." The child traces OVER the dashed line, they do not connect separate dots.
 5. **Quiz (A5):** Generate a visual puzzle — odd-one-out, counting challenge, pattern completion, "which shadow matches?". Answer NOT shown (revealed in comments).
 
 Activity image rules:
@@ -1122,6 +1122,38 @@ Generate a kids' coloring page featuring [CHARACTER/SCENE DESCRIPTION]. Clean bl
 \`\`\`
 
 Fill in the brackets. NEVER describe the image as colored, filled, or painted. NEVER say "colored with bright colors" or "pastel colors" — this will produce a colored illustration instead of a coloring page. The page must look like a printed coloring book sheet: black outlines, white interior, nothing else.
+
+### EXAMPLE F — Proven Tracing Prompt (use this as the template for ALL tracing prompts)
+---
+### Prompt — Activity: Tracing (Easy)
+**Type:** Activity
+**Activity type:** Tracing
+**Difficulty:** Easy
+**Theme:** Farm Animals
+**Skill target:** Fine motor skills, pencil control, hand-eye coordination
+**Output dimensions:** 2:3 portrait — 1000×1500 px
+
+**Image prompt:**
+Generate a kids' tracing activity page. A thick dashed path winds from a cartoon barn (START) to a smiling cow (FINISH). The path curves gently 3-4 times — wide enough for small hands to trace with a pencil without going off the line. The dashes are bold and clearly spaced — NOT numbered dots, NOT dots to connect. The child traces the full dashed line from start to finish with a pencil. Clean black outlines on white background. Add small decorative farm elements in the corners (tiny tractor, sunflower, fence post). Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+
+**Caption hook idea:** "Can your little one trace the path from the barn to the cow? Save this for quiet time."
+---
+
+Why this works:
+- PATH is the hero — a dashed winding route from START to FINISH
+- DASHES, NOT DOTS — "bold dashed path" tells the generator to draw dashes, not numbered dots
+- THEME gives the path meaning (barn to cow — child understands the goal)
+- START and FINISH clearly labeled (makes it printable and usable)
+- NO numbered dots, NO "connect the dots" language — this distinguishes tracing from dot-to-dot
+
+**⚠️ TRACING PROMPTS: USE THIS EXACT FILL-IN-THE-BLANK STRUCTURE. NO EXCEPTIONS.**
+**CRITICAL: Never use "numbered dots", "connect the dots", or "1 to N" in a tracing prompt. That produces a dot-to-dot, not a tracing page.**
+
+\`\`\`
+Generate a kids' tracing activity page. A thick dashed path winds from [START ELEMENT] to [FINISH ELEMENT]. The path curves gently [3-5] times — wide enough for small hands to trace with a pencil without going off the line. The dashes are bold and clearly spaced — NOT numbered dots, NOT dots to connect. The child traces the full dashed line from start to finish with a pencil. Clean black outlines on white background. Add small decorative [THEME] elements in the corners — [2-3 tiny themed decorations]. Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+\`\`\`
+
+Fill in the brackets. The start and finish elements should be thematically related (barn→cow, house→school, rocket→moon). The path must be a DASHED LINE, not isolated dots. Never add numbers.
 
 ## OUTPUT DIMENSIONS — MANDATORY
 All content targets Pinterest (primary) and Instagram (secondary) — both portrait-first platforms.
