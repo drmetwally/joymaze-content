@@ -12,8 +12,18 @@
  *   30 consecutive days meeting all four thresholds = Phase 0 cleared.
  *
  * Usage:
- *   node scripts/track-output.mjs           # Count and append
- *   node scripts/track-output.mjs --report  # Print last 7 days, no write
+ *   node scripts/track-output.mjs                                           # Count today
+ *   node scripts/track-output.mjs --report                                  # Print last 7 days, no write
+ *   node scripts/track-output.mjs --backfill 2026-04-15 --images 10 --x 4  # Manual entry for a past day
+ *
+ * Backfill flags (all optional, default 0):
+ *   --backfill YYYY-MM-DD   date to log
+ *   --images N              image count
+ *   --story N               story video count
+ *   --asmr N                ASMR video count
+ *   --challenge N           challenge video count
+ *   --x N                   X text post count
+ *   --note "text"           optional note appended to the entry
  */
 
 import fs from 'fs/promises';
@@ -27,6 +37,19 @@ const LOG_PATH = path.join(OUTPUT_DIR, 'daily-output-log.json');
 const REPORT_ONLY = process.argv.includes('--report');
 
 const today = new Date().toISOString().slice(0, 10);
+
+// Parse --backfill mode
+const backfillIdx = process.argv.indexOf('--backfill');
+const BACKFILL_DATE = backfillIdx !== -1 ? process.argv[backfillIdx + 1] : null;
+
+function argInt(flag) {
+  const i = process.argv.indexOf(flag);
+  return i !== -1 ? parseInt(process.argv[i + 1], 10) || 0 : 0;
+}
+function argStr(flag) {
+  const i = process.argv.indexOf(flag);
+  return i !== -1 ? process.argv[i + 1] : null;
+}
 
 // Count image queue JSONs in today's archive folder.
 // Excludes x-text posts and video queue entries.
@@ -120,28 +143,48 @@ async function main() {
     return;
   }
 
-  // Count today's output
-  const [images, storyVideos, asmrVideos, challengeVideos, xTextPosts] = await Promise.all([
-    countImages(),
-    countVideos('story'),
-    countVideos('asmr'),
-    countVideos('challenge'),
-    countXTextPosts(),
-  ]);
+  let targetDate, images, storyVideos, asmrVideos, challengeVideos, xTextPosts;
 
-  // Upsert today's entry
-  log = log.filter(e => e.date !== today);
-  log.push({ date: today, images, storyVideos, asmrVideos, challengeVideos, xTextPosts, loggedAt: new Date().toISOString() });
+  if (BACKFILL_DATE) {
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(BACKFILL_DATE)) {
+      console.error('Error: --backfill date must be YYYY-MM-DD');
+      process.exit(1);
+    }
+    targetDate     = BACKFILL_DATE;
+    images         = argInt('--images');
+    storyVideos    = argInt('--story');
+    asmrVideos     = argInt('--asmr');
+    challengeVideos = argInt('--challenge');
+    xTextPosts     = argInt('--x');
+    console.log(`\nBackfill mode — logging ${targetDate} manually`);
+  } else {
+    // Count today's output from files
+    targetDate = today;
+    [images, storyVideos, asmrVideos, challengeVideos, xTextPosts] = await Promise.all([
+      countImages(),
+      countVideos('story'),
+      countVideos('asmr'),
+      countVideos('challenge'),
+      countXTextPosts(),
+    ]);
+  }
+
+  // Upsert entry (replaces existing entry for that date if present)
+  const entry = { date: targetDate, images, storyVideos, asmrVideos, challengeVideos, xTextPosts, loggedAt: new Date().toISOString() };
+  if (BACKFILL_DATE) entry.note = argStr('--note') ?? 'backfill — manually posted';
+  log = log.filter(e => e.date !== targetDate);
+  log.push(entry);
+  log.sort((a, b) => a.date.localeCompare(b.date));
   log = log.slice(-90); // keep last 90 days
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   await fs.writeFile(LOG_PATH, JSON.stringify(log, null, 2));
 
   // Summary
-  const entry = { images, storyVideos, asmrVideos, challengeVideos, xTextPosts };
   const gate = meetsGate(entry);
   const streak = countStreak(log);
-  console.log(`\nDaily Output — ${today}`);
+  console.log(`\nDaily Output — ${targetDate}${BACKFILL_DATE ? ' (backfill)' : ''}`);
   console.log(`  Images:          ${images}/10  ${images >= 10 ? 'OK' : '--'}`);
   console.log(`  Story videos:    ${storyVideos}/1   ${storyVideos >= 1 ? 'OK' : '--'}`);
   console.log(`  ASMR videos:     ${asmrVideos}/1   ${asmrVideos >= 1 ? 'OK' : '--'}`);

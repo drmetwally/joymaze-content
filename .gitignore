@@ -3,6 +3,7 @@ node_modules/
 output/*
 !output/queue/
 !output/posting-cooldown.json
+!output/daily-output-log.json
 output/queue/*
 !output/queue/*.json
 *.log
