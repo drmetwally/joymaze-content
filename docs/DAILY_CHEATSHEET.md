@@ -2,7 +2,7 @@
 
 > Follow top to bottom. Every day.
 
-Last updated: 2026-04-14
+Last updated: 2026-04-16
 
 ---
 
@@ -279,11 +279,15 @@ npm run post:scheduled:dry   # Dry-run posting locally
 
 ## Phase 0 Gate
 
-**Target:** 30 consecutive days ≥ 10 images + 10 story videos + 10 ASMR videos
+**Target:** 30 consecutive days ≥ 10 images + 1 story video + 1 ASMR video + 4 X text posts
 
 ```bash
 npm run output:report    # Last 7 days + streak
 npm run output:track     # Manual log (auto-runs in npm run daily)
+
+# Log a day you posted manually (files not on this machine):
+node scripts/track-output.mjs --backfill 2026-04-15 --images 10 --x 4
+node scripts/track-output.mjs --backfill 2026-04-15 --images 10 --story 1 --asmr 1 --x 4 --note "Pinterest only"
 ```
 
 **Phases:**
@@ -322,7 +326,8 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | Images not importing | Files must be in `output/raw/<subfolder>/` as .png or .jpg |
 | Want to redo captions | `npm run generate:captions -- --force` |
 | Cloudinary upload fails | Check CLOUDINARY_* keys in .env |
-| 4 AM posting didn't happen | Check x-posts.yml in Actions tab. Did you push queue? |
+| 4 AM posting didn't happen | Check post-media.yml in Actions tab. Did you push queue? |
+| post-media exits code 128 | Already fixed (2026-04-16) — was bash glob on empty queue |
 | Queue JSON not on GitHub | `git add output/queue/ && git commit && git push` |
 | Activity video: no items found | Run `import:raw` first — activity video reads from the queue |
 | Activity video skips all items | Only maze/matching/tracing/dottodot are eligible types |

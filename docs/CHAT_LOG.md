@@ -706,3 +706,7 @@ Fixed 3 issues from manual posting review: (1) Pinterest captions now generate s
 ---
 **2026-04-15 — Daily output audit + systemic prompt/ASMR fixes**
 Audited full npm run daily output (prompts, X posts, story, ASMR brief, carousel plan). Found 3 systemic issues: (1) Tracing slot had no gold-standard example so LLM defaulted to dot-to-dot structure — fixed by adding EXAMPLE F with fill-in-the-blank tracing template and hard rule against numbered dots. (2) ASMR activity.json theme field for wordsearch fell through to maze string — added wordsearch case. (3) ASMR solved.png (coloredPrompt) missing "White background." enforcement for non-coloring types — added conditional. Re-gen: 8.9 avg · 10 pass · 0 flagged (was 8.3 · 7 pass · 3 flagged). Advisory: style gate doesn't catch "children's book illustration/gouache" on story slots; activity prompts can pick unconventional styles (no restriction enforced). Pushed 3e6a067.
+
+---
+**2026-04-16 — GitHub Actions fix + backfill flag**
+Fixed post-media workflow exit code 128 (bash glob expansion failure on empty queue). Added `--backfill` flag to track-output.mjs for manual-post days. Unignored daily-output-log.json from .gitignore. Upgraded Actions Node.js to 22. Backfilled 2026-04-15: 10 images + 4 X posts. Daily audit clean. Pushed 8488d81, 1da6ec1.

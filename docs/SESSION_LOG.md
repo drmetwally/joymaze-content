@@ -1504,3 +1504,23 @@ Also confirmed: `ProtocolError: Target closed` at ~93% is non-fatal (Chrome clos
 **Commit:** 3e6a067 | pushed main
 
 **Next:** Scheduled ASMR queue, loop freeze-frame, sudoku cell-fill ASMR.
+
+---
+**2026-04-16 — GitHub Actions fix + backfill flag + daily audit**
+
+**Task 1 — GitHub Actions post-media fix**
+`post-media` job was failing with exit code 128. Root cause: `git add output/queue/*.json` — when queue has no JSON files, bash leaves the literal glob string, git fatals. Fixed by replacing with `find output/queue -maxdepth 1 -name "*.json" | xargs -r git add` (xargs -r silently skips on empty). Also upgraded `node-version` from `'20'` to `'22'` (LTS) to address Node.js 20 deprecation warning ahead of June 2026 cutoff. Also unignored `output/daily-output-log.json` in .gitignore — it was being swallowed by `output/*`. Pushed 8488d81, 1da6ec1.
+
+**Task 2 — `--backfill` flag on track-output.mjs**
+No way to log a manually-posted day. Added `--backfill YYYY-MM-DD --images N --story N --asmr N --challenge N --x N --note "text"` flags. Backfill entries are date-sorted into the log and tagged with a note field. Backfilled 2026-04-15: images=10, x=4, no videos.
+
+**Daily audit (2026-04-16):**
+- X posts: 4/4 ✓ (avg 0.75)
+- Prompts: 10 generated (3 auto-regenned for illustration-on-story pre-check violations)
+- Story ep02: "The Little Dragon Who Saved the Reef" ✓
+- ASMR brief: dotdot-forest-friends ✓
+- Challenge brief: word-search-garden-bugs ✓
+- Advisory: Groq quality gate JSON parse error (malformed response from Groq scorer) — not new, pre-check handled it
+- Images/videos: 0 — pending manual Gemini generation
+
+**Next:** Generate images in Gemini for today's prompts → import:raw → captions → push queue.
