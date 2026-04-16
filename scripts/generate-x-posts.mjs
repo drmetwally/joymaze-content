@@ -21,6 +21,7 @@ const CTA_LIBRARY_PATH       = path.join(ROOT, 'config', 'cta-library.json');
 const PERF_WEIGHTS_PATH      = path.join(ROOT, 'config', 'performance-weights.json');
 const X_POST_TOPICS_PATH     = path.join(ROOT, 'config', 'x-post-topics-dynamic.json');
 const COMPETITOR_INTEL_PATH  = path.join(ROOT, 'config', 'competitor-intelligence.json');
+const PSYCHOLOGY_PATH        = path.join(ROOT, 'config', 'psychology-triggers.json');
 
 const args      = process.argv.slice(2);
 const DRY_RUN   = args.includes('--dry-run');
@@ -121,7 +122,7 @@ function extractStyleSections(writingStyle) {
 // ---------------------------------------------------------------------------
 // System prompt — focused style sections + hard banned-patterns block
 // ---------------------------------------------------------------------------
-function buildSystemPrompt(writingStyle) {
+function buildSystemPrompt(writingStyle, psychTriggers = null) {
   const styleCore = extractStyleSections(writingStyle);
 
   const bannedBlock = `
@@ -152,9 +153,22 @@ function buildSystemPrompt(writingStyle) {
 - Rhythm: vary sentence length — short for impact, long for immersion, short again
 `;
 
+  const psychBlock = psychTriggers ? `
+
+## PSYCHOLOGY LAYER — PER POST TYPE TRIGGERS
+
+Each of your 4 post types activates a specific psychological trigger. Apply the named trigger to that post's hook and emotional register:
+
+- **story** (tweet type "story"): NOSTALGIA — open in a sensory moment that lands in the parent's memory. Not "let me tell you about..." — drop straight into a scene they've already lived.
+- **puzzle** (tweet type "puzzle"): CURIOSITY_GAP — open the loop, never close it in tweet1. The answer is the reward for reading thread or engaging. Tease, don't tell.
+- **insight** (tweet type "insight"): DEV_FOMO — frame the insight as a developmental window. Parents should feel a gentle urgency: "if I don't pay attention to this, I might miss it."
+- **identity** (tweet type "identity"): IDENTITY_MIRROR — show the parent a version of themselves they want to be. Never say "you're a good parent." Show the action that good parents take.
+
+Do NOT name the trigger. Activate it through specificity, scene-entry, and emotional precision.` : '';
+
   return styleCore
-    ? `${styleCore}\n\n${bannedBlock}`
-    : `You are a brand copywriter for JoyMaze, a kids activity app for ages 4–8.\n${bannedBlock}`;
+    ? `${styleCore}\n\n${bannedBlock}${psychBlock}`
+    : `You are a brand copywriter for JoyMaze, a kids activity app for ages 4–8.\n${bannedBlock}${psychBlock}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -762,7 +776,7 @@ async function main() {
   log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'} | Date: ${date}`);
 
   // ── Load all context in parallel ──
-  const [writingStyle, trends, hooks, themePool, ctaLib, perfWeights, xTopics, competitor, recentFingerprints] = await Promise.all([
+  const [writingStyle, trends, hooks, themePool, ctaLib, perfWeights, xTopics, competitor, recentFingerprints, psychTriggers] = await Promise.all([
     readTextIfExists(WRITING_STYLE_PATH),
     readJsonIfExists(TRENDS_PATH),
     readJsonIfExists(HOOKS_PATH),
@@ -772,10 +786,11 @@ async function main() {
     readJsonIfExists(X_POST_TOPICS_PATH),
     readJsonIfExists(COMPETITOR_INTEL_PATH),
     loadRecentFingerprints(),
+    readJsonIfExists(PSYCHOLOGY_PATH),
   ]);
 
   // ── Build prompts ──
-  const systemPrompt    = buildSystemPrompt(writingStyle);
+  const systemPrompt    = buildSystemPrompt(writingStyle, psychTriggers);
   const trendNotes      = buildTrendNotes(trends);
   const hookNotes       = buildHookNotes(hooks);
   const themeNotes      = buildThemeNotes(themePool);

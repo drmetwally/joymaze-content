@@ -108,7 +108,12 @@ async function loadStyleContext() {
     dynamicThemes = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'theme-pool-dynamic.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes };
+  let psychTriggers = null;
+  try {
+    psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
+  } catch {}
+
+  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers };
 }
 
 // Extract only Archetype 8 section from archetypes doc
@@ -149,7 +154,7 @@ function extractVoiceRules(styleGuide) {
   return extracted.join('\n');
 }
 
-function buildSystemPrompt(styleGuide, archetypes) {
+function buildSystemPrompt(styleGuide, archetypes, psychTriggers = null) {
   const voice = extractVoiceRules(styleGuide);
   const arch8 = extractArchetype8(archetypes);
 
@@ -312,7 +317,20 @@ Return a single JSON object with this exact structure — no extra text:
   ]
 }
 
-Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides: 7–8s. Final slide: 8–10s.`;
+Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides: 7–8s. Final slide: 8–10s.${psychTriggers ? `
+
+## PSYCHOLOGY LAYER — STORY TRIGGERS
+
+Stories activate two triggers simultaneously. Apply both:
+
+**NOSTALGIA** — The parent watching this should feel something they recognise from their own childhood. Ground the story in a sensation, a smell, a particular kind of light, or a quiet moment they have already lived. The "Grab" slide should land in the parent's memory before it lands in the child's imagination.
+
+**IDENTITY_MIRROR** — The parent should see their own values reflected in the story's resolution. When the hero solves the problem through patience, curiosity, or kindness — the parent thinks "my child does that." Never name a virtue directly. Show it in a single precise action.
+
+**Application rules:**
+- Slide 1 narration: anchor in a sensory moment that parents recognise (NOSTALGIA)
+- Resolution slide: the hero's winning action must mirror a virtue parents want to see in their child (IDENTITY_MIRROR)
+- Image prompts: use warm, slightly nostalgic lighting (golden hour, morning window light, firelight) to reinforce the emotional register` : ''}`;
 }
 
 function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes) {
@@ -502,7 +520,7 @@ async function main() {
   console.log('=== Joyo\'s Story Corner — Idea Generator ===\n');
 
   const episodeNum = await getNextEpisode();
-  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes }] = await Promise.all([
+  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers }] = await Promise.all([
     getExistingStories(),
     loadStyleContext(),
   ]);
@@ -512,8 +530,9 @@ async function main() {
   if (competitor) console.log(`  Competitor intelligence loaded (${competitor.date})`);
   if (hooksData?.hooks?.length) console.log(`  Hooks library loaded: ${hooksData.hooks.length} hooks`);
   if (dynamicThemes?.themes?.length) console.log(`  Dynamic themes loaded: ${dynamicThemes.themes.length} themes`);
+  if (psychTriggers) console.log(`  Psychology triggers loaded: ${Object.keys(psychTriggers.triggers || {}).length} triggers`);
 
-  const systemPrompt = buildSystemPrompt(styleGuide, archetypes);
+  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, psychTriggers);
   const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes);
 
   if (DRY_RUN) {

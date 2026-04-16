@@ -105,7 +105,12 @@ async function loadContext() {
     perfWeights = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights };
+  let psychTriggers = null;
+  try {
+    psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
+  } catch {}
+
+  return { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers };
 }
 
 // ── Groq call ─────────────────────────────────────────────────────────────────
@@ -129,7 +134,7 @@ async function callGroq(prompt) {
 // ── Prompt builder ────────────────────────────────────────────────────────────
 
 function buildPrompt(type, context) {
-  const { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights } = context;
+  const { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers } = context;
 
   const activityLabel = ACTIVITY_LABEL_MAP[type] ?? type.toUpperCase();
   const countdownSec  = COUNTDOWN_MAP[type] ?? 60;
@@ -189,7 +194,13 @@ You are creating a "Challenge" video brief for JoyMaze — a kids activity app f
 
 The video format: a ${activityLabel} puzzle is shown with a counting timer running. Parents share it to challenge their kids and each other.
 Video length: ${countdownSec + 5} seconds total (${countdownSec}s timer + 5s hook/CTA).
-${trendsStr}${activeThemesStr}${competitorStr}${hookLibraryStr}${recentStr}
+${trendsStr}${activeThemesStr}${competitorStr}${hookLibraryStr}${recentStr}${psychTriggers ? `
+
+## PSYCHOLOGY TRIGGER — CHALLENGE
+This format's viral mechanic is competitive activation. Wire it into every output field:
+- **hookText**: Direct challenge with implicit social proof. Use fraction phrasing ("1 in 5 kids...") or clock urgency ("Can you beat ${countdownSec}s?"). Never a generic question.
+- **ctaText**: Make the viewer want to prove themselves or compare — time drops, family tags, repost-to-challenge formats.
+- The CHALLENGE trigger works best when failure feels possible. Make the puzzle look just hard enough.` : ''}
 
 Today's puzzle type: **${type}** — ${activityLabel}
 

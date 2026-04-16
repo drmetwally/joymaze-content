@@ -106,7 +106,12 @@ async function loadContext() {
     perfWeights = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights };
+  let psychTriggers = null;
+  try {
+    psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
+  } catch {}
+
+  return { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers };
 }
 
 // ── Groq call ─────────────────────────────────────────────────────────────────
@@ -130,7 +135,7 @@ async function callGroq(prompt) {
 // ── Prompt builder ────────────────────────────────────────────────────────────
 
 function buildPrompt(type, context) {
-  const { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights } = context;
+  const { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers } = context;
 
   const recentStr = recentThemes.length
     ? `\nRecently used themes — pick something different: ${recentThemes.join(', ')}`
@@ -223,7 +228,14 @@ The video reveals the activity progressively: ${type === 'coloring'
   : type === 'dotdot'
     ? 'connecting lines draw between numbered dots in sequence, building the complete image dot-by-dot'
     : 'maze path draws itself left-to-right'}
-${analyticsStr}${trendsStr}${activeThemesStr}${perfStr}${competitorStr}${hookLibraryStr}${recentStr}
+${analyticsStr}${trendsStr}${activeThemesStr}${perfStr}${competitorStr}${hookLibraryStr}${recentStr}${psychTriggers ? `
+
+## PSYCHOLOGY TRIGGER — COMPLETION_SATISFACTION
+This ASMR video's core viral mechanic IS the trigger: blank → solved. Use it deliberately.
+- **hookText must activate** the anticipation of completion — the viewer should feel the itch to see the reveal before it starts.
+- hookText style: imply an unfinished loop ("Watch what happens...", "Something's about to appear...")
+- Image pair must visually reward the viewer — blank and solved must contrast dramatically.
+- Caption writers will get this trigger context separately — your job is to encode it into the hookText.` : ''}
 
 Generate a fresh, engaging theme for today's ASMR video.
 
