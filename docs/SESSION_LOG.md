@@ -1524,3 +1524,19 @@ No way to log a manually-posted day. Added `--backfill YYYY-MM-DD --images N --s
 - Images/videos: 0 — pending manual Gemini generation
 
 **Next:** Generate images in Gemini for today's prompts → import:raw → captions → push queue.
+
+---
+**2026-04-16 — Viral psychology layer + long-form video engine (ultrathink)**
+
+**Part 1 — Viral Psychology Layer**
+Researched psychological triggers behind viral kids-content (saves, shares, watch-time). Distilled into 7 triggers: IDENTITY_MIRROR, SCREEN_RELIEF, CURIOSITY_GAP, CHALLENGE, NOSTALGIA, DEV_FOMO, COMPLETION_SATISFACTION. Built `config/psychology-triggers.json` with full spec for each (description, image rule, caption structure, opener examples, archetype fit, platform primary). Injected into both generation scripts:
+- `generate-prompts.mjs`: new `buildPsychologyLayer()` helper; new `**Primary trigger:**` field in output; loaded in main()
+- `generate-captions.mjs`: per-caption triggerContext block from category→trigger map; injected before template
+Added 7 psychologically-engineered hooks to `hooks-library.json`. Created `docs/VIRAL_PSYCHOLOGY.md` (5-beat viral arc, CTA paradox, platform strategy table).
+
+**Part 2 — Long-Form Video Engine (~8 min)**
+5 new Remotion components in `remotion/components/longform/`: IntroSegment, StorySegment, TransitionCard, ActivitySegment, OutroSegment. Master composition `LongFormEpisode.jsx` via `<Series>`. ActivitySegment reuses existing reveal components (no duplication). 3 formats: adventure-activities (~7.6 min), asmr-pack, challenge-ladder. Scripts: `generate-longform-brief.mjs` (episode planner) + `render-longform.mjs` (render runner). 3 npm scripts: `generate:longform`, `render:longform`, `render:longform:dry`.
+
+**Commit:** c3e54e8 | pushed main
+
+**Next:** `npm run generate:longform` on ep02 story → fill activity folders → first render.

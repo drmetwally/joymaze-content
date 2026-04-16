@@ -357,7 +357,7 @@ npm run x:generate
 npm run analytics
 npm run scorecard
 npm run health-check
-npm run remotion:studio                     # Visual preview + scrubbing
+npm run remotion:studio                     # Visual preview + scrubbing\nnpm run generate:longform                   # Plan long-form episode (episode.json)\nnpm run render:longform -- --episode ep01-slug  # Render ~8min video\nnpm run render:longform:dry -- --episode ep01-slug  # Dry-run (check props only)
 ```
 
 ---

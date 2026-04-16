@@ -710,3 +710,7 @@ Audited full npm run daily output (prompts, X posts, story, ASMR brief, carousel
 ---
 **2026-04-16 — GitHub Actions fix + backfill flag**
 Fixed post-media workflow exit code 128 (bash glob expansion failure on empty queue). Added `--backfill` flag to track-output.mjs for manual-post days. Unignored daily-output-log.json from .gitignore. Upgraded Actions Node.js to 22. Backfilled 2026-04-15: 10 images + 4 X posts. Daily audit clean. Pushed 8488d81, 1da6ec1.
+
+---
+**2026-04-16 — Viral psychology + long-form engine**
+Two-part ultrathink session. Part 1: 7 viral psychology triggers researched and injected into generate-prompts.mjs + generate-captions.mjs; config/psychology-triggers.json created; 7 new hooks in hooks-library.json; docs/VIRAL_PSYCHOLOGY.md as reference. Part 2: Full long-form Remotion pipeline built (5 components + LongFormEpisode composition + generate-longform-brief.mjs + render-longform.mjs); targets ~8 min videos; reuses all existing reveal components. Committed c3e54e8.
