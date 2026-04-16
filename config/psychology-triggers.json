@@ -1,0 +1,146 @@
+{
+  "_meta": {
+    "version": 1,
+    "description": "7 viral psychological triggers for JoyMaze content. Every piece of content targets exactly ONE primary trigger. Trigger determines the image composition, caption arc, and hook selection.",
+    "research_basis": "Journal of Consumer Psychology 2024: 72% of shares are emotion-driven. Pinterest: >2% 24hr save rate = viral. Multiple emotional peaks outperform single peak. Saves today = traffic in 2-3 months.",
+    "rule": "A trigger is only valid if a parent would FEEL it from the image ALONE — without reading any text. If the trigger requires the caption to work, the image has failed."
+  },
+  "triggers": {
+    "IDENTITY_MIRROR": {
+      "label": "Identity Mirror",
+      "description": "Parent shares because it reflects who they ARE or aspire to be. The share is a public identity statement: 'I am the kind of parent who chooses this.'",
+      "psychology": "Social identity theory — we broadcast content that confirms our self-concept. Sharing = identity assertion. For parents: 'I am intentional, screen-conscious, engaged.'",
+      "activation_condition": "Must show a parent CHOICE, not just an activity. The deliberate, quiet decision to do something better.",
+      "image_rule": "Parent visible in scene, at the edge of frame — watching from doorway or sideline. Quiet pride, not performed joy. The choice is already made. No uncertainty in the body language.",
+      "caption_structure": "recognition_statement → identity_affirmation",
+      "caption_opener_examples": [
+        "This is what it looks like when a parent says no to the easy thing.",
+        "Some parents Google 'screen time guilt' at 11pm. She stopped searching.",
+        "The kind of afternoon she'll never remember. The kind she'll always remember feeling."
+      ],
+      "platform_best": ["instagram", "pinterest"],
+      "archetype_fit": ["ARCHETYPE_2", "ARCHETYPE_7", "IDENTITY"]
+    },
+    "SCREEN_RELIEF": {
+      "label": "Screen-Time Relief",
+      "description": "Opens the #1 parenting anxiety (screen-time guilt), then delivers exact relief. The emotional distance between tension and release IS the share trigger.",
+      "psychology": "Loss aversion + relief activation. Parents carry pre-loaded screen-time guilt from cultural messaging. Content that names that anxiety and resolves it with a specific, real moment = save reflex.",
+      "activation_condition": "Must first ACKNOWLEDGE the anxiety (without preaching), then RESOLVE it with a concrete, specific moment. The relief must feel earned, not told.",
+      "image_rule": "Tablet face-down, TV remote pushed aside — the abandoned alternative MUST be visible. Child absorbed in printed activity. The discarded screen IS the message. No text needed.",
+      "caption_structure": "tension_acknowledgment → relief_arrival",
+      "caption_opener_examples": [
+        "Forty-five minutes passed. She never looked up. The guilt didn't come.",
+        "The screen is right there. She hasn't touched it.",
+        "I waited for her to get bored. She never did."
+      ],
+      "platform_best": ["tiktok", "instagram", "pinterest"],
+      "archetype_fit": ["ARCHETYPE_1", "ARCHETYPE_4", "QUIET-MOMENT"]
+    },
+    "CURIOSITY_GAP": {
+      "label": "Curiosity Gap",
+      "description": "Creates an unresolved information tension the brain cannot ignore. The viewer is physiologically unable to scroll past without resolving it.",
+      "psychology": "Loewenstein's information gap theory: the gap between what we know and want to know creates irresolvable tension. Resolution requires engagement. Brains are wired to seek closure.",
+      "activation_condition": "Something surprising, counterintuitive, or visually incomplete must appear. The resolution must be WITHHELD — hinted at but not given.",
+      "image_rule": "Show activity at 30-60% completion. The shape is emerging, the path half-traced. Visual incompleteness IS the trigger — the brain mentally completes it and gets the dopamine.",
+      "caption_structure": "surprising_premise → withheld_resolution",
+      "caption_opener_examples": [
+        "He figured out the answer before I did. I'm still thinking about why.",
+        "This maze stumped 3 out of 4 adults. Kids under 7 solved it in under 2 minutes.",
+        "There's one hidden word in here nobody finds on the first try."
+      ],
+      "platform_best": ["tiktok", "x", "youtube"],
+      "archetype_fit": ["ACTIVITY_DOTDOT", "ACTIVITY_MATCHING", "PRINTABLE-TEASE"]
+    },
+    "CHALLENGE": {
+      "label": "Challenge Activation",
+      "description": "Activates competitive ego simultaneously in parent ('my kid is smart') and child ('I want to beat this'). Comments become scorecards. Sharing = social currency.",
+      "psychology": "Achievement motivation + social comparison. Challenge language activates effort investment. Comment bait is organic — 'Mine got it in 45 seconds!' Everyone wants to show up.",
+      "activation_condition": "Must present a specific challenge with a difficulty signal. Success must feel possible but not guaranteed. The child must be SEEN trying — not having already won.",
+      "image_rule": "Child at PEAK ENGAGEMENT — brow furrowed, pencil moving, body leaning in. NO finished puzzles. The challenge must be LIVE in the frame.",
+      "caption_structure": "challenge_invitation → difficulty_signal → implicit_comment_bait",
+      "caption_opener_examples": [
+        "Can your kid solve this in under 2 minutes?",
+        "1 in 5 kids gets this right on the first try. Is yours one of them?",
+        "This took our 5-year-old 3 minutes. It took me 6. Drop yours below."
+      ],
+      "platform_best": ["tiktok", "instagram", "x"],
+      "archetype_fit": ["ACTIVITY_MAZE", "ACTIVITY_WORDSEARCH", "ACTIVITY_SUDOKU", "ACTIVITY-CHALLENGE"]
+    },
+    "NOSTALGIA": {
+      "label": "Nostalgia Reframe",
+      "description": "Connects a childhood memory to the present moment. Nostalgia is the highest-intensity emotional trigger — limbic system activation. Shared as a gift: 'you need to feel this too.'",
+      "psychology": "Nostalgia is self-relevant and bittersweet — it increases social connectedness and meaning-making. Shared nostalgia becomes communal identity. Viral because it feels like a gift, not content.",
+      "activation_condition": "Must reference a specific, sensory memory parents of 4-8 year olds (ages 25-40) would recognize. Saturday mornings. A box of crayons. Grandmother's house. The smell of paper.",
+      "image_rule": "Warm, golden, slightly imperfect lighting — NOT Instagram-polished. The activity (crayons, puzzle, pencil) should look analog, worn, timeless. Like something that has always existed.",
+      "caption_structure": "childhood_memory_fragment → present_moment_echo",
+      "caption_opener_examples": [
+        "Somewhere in your memory, there's a quiet Saturday morning. This felt like that.",
+        "Remember when a box of crayons felt like the whole world?",
+        "My grandmother had a drawer full of activity books. Hours went soft in that drawer."
+      ],
+      "platform_best": ["pinterest", "instagram"],
+      "archetype_fit": ["ARCHETYPE_3", "ARCHETYPE_1"]
+    },
+    "DEV_FOMO": {
+      "label": "Developmental FOMO",
+      "description": "Fear of missing a developmental window. Content gets saved because it has DEFERRED VALUE — 'I need to do this with my kid. Not now, but this weekend.' That save IS the conversion.",
+      "psychology": "Loss aversion applied to parenting. Parents feel responsible for developmental windows. 'Meaty enough to need again later' = Pinterest's #1 save trigger. Specific skill names activate the FOMO reflex.",
+      "activation_condition": "Must name a specific developmental skill (fine motor, spatial reasoning, executive function, phonemic awareness) with a genuine, non-fabricated connection to the activity.",
+      "image_rule": "The ACTIVITY is the visual hero — well-lit, beautiful, clearly visible. It should look like something worth printing and using TODAY. Child engaged but secondary. The printable IS the product.",
+      "caption_structure": "skill_connection → deferred_value_statement → save_invitation",
+      "caption_opener_examples": [
+        "The 10-minute activity that builds the skill reading specialists actually recommend.",
+        "Fine motor development doesn't need a class. It needs a pencil and a good puzzle.",
+        "They're not just coloring. They're building the hand control that makes writing easier."
+      ],
+      "platform_best": ["pinterest", "youtube", "instagram"],
+      "archetype_fit": ["ARCHETYPE_6", "FACT-CARD", "PRINTABLE-TEASE", "ACTIVITY_TRACING"]
+    },
+    "COMPLETION_SATISFACTION": {
+      "label": "Completion Satisfaction",
+      "description": "The visceral dopamine of watching something become complete. Mirror neurons fire. No cognitive effort required. Addictive by design — the reward comes from the act of witnessing completion.",
+      "psychology": "Zeigarnik reversed: completing the incomplete triggers disproportionate reward. ASMR research: satisfying completion videos achieve 78% average watch time. The brain NEEDS to see it finish.",
+      "activation_condition": "Must show OR strongly imply a satisfying completion arc. Progression (blank → finished) OR near-completion where the viewer mentally completes it.",
+      "image_rule": "For static images: 80-90% complete state — the finish line visible, the viewer's brain crosses it automatically. For video: the reveal IS the content. Never show blank, never show mid-frustration.",
+      "caption_structure": "state_before → transformation_hint → satisfaction_invitation",
+      "caption_opener_examples": [
+        "Blank page. Pencil in hand. Twenty minutes later — something that was nothing.",
+        "Watch what happens when they connect the last dot.",
+        "She held it up. 'I made this,' she said. She had."
+      ],
+      "platform_best": ["tiktok", "youtube", "instagram"],
+      "archetype_fit": ["ARCHETYPE_5", "ARCHETYPE_8", "ARCHETYPE_9", "ACTIVITY_COLORING", "ASMR"]
+    }
+  },
+  "archetype_trigger_map": {
+    "ARCHETYPE_1": "SCREEN_RELIEF",
+    "ARCHETYPE_2": "IDENTITY_MIRROR",
+    "ARCHETYPE_3": "NOSTALGIA",
+    "ARCHETYPE_4": "SCREEN_RELIEF",
+    "ARCHETYPE_5": "COMPLETION_SATISFACTION",
+    "ARCHETYPE_6": "DEV_FOMO",
+    "ARCHETYPE_7": "IDENTITY_MIRROR",
+    "ARCHETYPE_8": "COMPLETION_SATISFACTION",
+    "ARCHETYPE_9": "COMPLETION_SATISFACTION",
+    "FACT-CARD": "DEV_FOMO",
+    "ACTIVITY-CHALLENGE": "CHALLENGE",
+    "QUIET-MOMENT": "SCREEN_RELIEF",
+    "PRINTABLE-TEASE": "DEV_FOMO",
+    "IDENTITY": "IDENTITY_MIRROR",
+    "ASMR": "COMPLETION_SATISFACTION",
+    "ACTIVITY_MAZE": "CHALLENGE",
+    "ACTIVITY_WORDSEARCH": "CHALLENGE",
+    "ACTIVITY_COLORING": "COMPLETION_SATISFACTION",
+    "ACTIVITY_TRACING": "DEV_FOMO",
+    "ACTIVITY_DOTDOT": "CURIOSITY_GAP",
+    "ACTIVITY_SUDOKU": "CHALLENGE",
+    "ACTIVITY_MATCHING": "CURIOSITY_GAP"
+  },
+  "platform_primary_trigger": {
+    "pinterest": "DEV_FOMO",
+    "instagram": "IDENTITY_MIRROR",
+    "tiktok": "COMPLETION_SATISFACTION",
+    "youtube": "CHALLENGE",
+    "x": "CURIOSITY_GAP"
+  }
+}

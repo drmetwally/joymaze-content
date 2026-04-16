@@ -53,6 +53,12 @@ try {
   dynamicCtas = raw.ctas || {};
 } catch {}
 
+// Load psychology triggers — used to inject platform+slot-specific trigger guidance per caption
+let psychTriggers = null;
+try {
+  psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
+} catch {}
+
 let dynamicHookSupplement = '';
 try {
   const raw = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8'));
@@ -466,10 +472,30 @@ async function generateCaptionsForContent(metadata) {
           .replace('{{activityType}}', activityType)
           .replace('{{difficulty}}', difficulty);
 
-        // Full prompt: style guide + intelligence context + template (for Gemini and Groq — large context models)
+        // Build psychology trigger context for this specific content + platform
+        let triggerContext = '';
+        if (psychTriggers) {
+          // Map category → trigger key (category uses 'activity-maze', triggers use 'ACTIVITY_MAZE')
+          const catKey = (metadata.category || '').replace('activity-', 'ACTIVITY_').replace(/-/g, '_').toUpperCase();
+          const slotKey = (metadata.slot || metadata.contentSlot || '').toUpperCase();
+          const triggerName = psychTriggers.archetype_trigger_map[catKey]
+            || psychTriggers.archetype_trigger_map[slotKey]
+            || psychTriggers.platform_primary_trigger[platform]
+            || null;
+          if (triggerName && psychTriggers.triggers[triggerName]) {
+            const t = psychTriggers.triggers[triggerName];
+            const openers = (t.caption_opener_examples || []).slice(0, 2).join(' | ');
+            triggerContext = `\n\n## PSYCHOLOGY TRIGGER — ${triggerName}: "${t.label}"\n`
+              + `${t.description}\n`
+              + `Caption structure: ${t.caption_structure}\n`
+              + `Proven opener styles (use the STRUCTURE, not verbatim): ${openers}`;
+          }
+        }
+
+        // Full prompt: style guide + intelligence context + trigger context + template (for Gemini and Groq — large context models)
         const fullPrompt = writingStyleGuide
-          ? `${writingStyleGuide}${dynamicHookSupplement}${intelligenceContext}\n\n---\n\n${templatePrompt}`
-          : `${intelligenceContext}\n\n---\n\n${templatePrompt}`;
+          ? `${writingStyleGuide}${dynamicHookSupplement}${intelligenceContext}${triggerContext}\n\n---\n\n${templatePrompt}`
+          : `${intelligenceContext}${triggerContext}\n\n---\n\n${templatePrompt}`;
 
         // Short prompt: template only (for Ollama — llama3.2:3b has limited context)
         const shortPrompt = templatePrompt;

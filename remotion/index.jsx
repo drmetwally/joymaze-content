@@ -4,6 +4,7 @@ import { AsmrReveal,          asmrRevealSchema }          from './compositions/A
 import { HookIntro,           hookIntroSchema }           from './compositions/HookIntro.jsx';
 import { AnimatedFactCard,    animatedFactCardSchema }    from './compositions/AnimatedFactCard.jsx';
 import { ActivityChallenge,   activityChallengeSchema }   from './compositions/ActivityChallenge.jsx';
+import { LongFormEpisode,     longFormEpisodeSchema }     from './compositions/LongFormEpisode.jsx';
 
 // ─── Composition Registry ────────────────────────────────────────────────────
 // durationInFrames here is the default shown in Remotion Studio.
@@ -64,6 +65,16 @@ const Root = () => (
       width={1080}
       height={1920}
       defaultProps={activityChallengeSchema}
+    />
+    {/* ── Long-form episode: 7-8 min story + activity pack ────────── */}
+    <Composition
+      id="LongFormEpisode"
+      component={LongFormEpisode}
+      durationInFrames={13650}  // 455s default @ 30fps (overridden by render-longform.mjs)
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={longFormEpisodeSchema}
     />
   </>
 );

@@ -100,6 +100,9 @@
     "animate:asmr:remotion:dry": "node scripts/generate-asmr-video.mjs --remotion --dry-run",
     "output:track": "node scripts/track-output.mjs",
     "output:report": "node scripts/track-output.mjs --report",
+    "generate:longform": "node scripts/generate-longform-brief.mjs",
+    "render:longform": "node scripts/render-longform.mjs",
+    "render:longform:dry": "node scripts/render-longform.mjs --dry-run",
     "remotion:studio": "npx remotion studio remotion/index.jsx"
   },
   "dependencies": {

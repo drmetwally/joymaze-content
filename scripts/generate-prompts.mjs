@@ -810,7 +810,32 @@ function extractEssentials(styleGuide) {
   return extracted.join('\n');
 }
 
-function buildSystemPrompt(styleGuide, archetypes, hookExamples = [], auditLessons = [], compIntel = null) {
+function buildPsychologyLayer(pt) {
+  const triggerList = Object.entries(pt.triggers)
+    .map(([k, v]) => `  **${k}** — ${v.description.split('.')[0]}.`)
+    .join('\n');
+  const slotMap = Object.entries(pt.archetype_trigger_map)
+    .map(([slot, trigger]) => `  ${slot} → ${trigger}`)
+    .join('\n');
+  return `
+
+## PSYCHOLOGY LAYER — MANDATORY TRIGGER TARGETING
+
+Research: 72% of content shares are emotional. Pinterest >2% 24hr save rate = viral. Every piece of content must target ONE primary trigger. Mixed triggers dilute both.
+
+THE 7 TRIGGERS:
+${triggerList}
+
+SLOT → TRIGGER MAP (mandatory — follow exactly):
+${slotMap}
+
+GOLDEN RULE: A trigger is only valid if the parent FEELS it from the IMAGE ALONE — without reading any text. If the trigger requires the caption to activate, the image has failed.
+
+Add this field to EVERY prompt output:
+**Primary trigger:** [TRIGGER_NAME — one sentence on exactly which visual element activates it without text]`;
+}
+
+function buildSystemPrompt(styleGuide, archetypes, hookExamples = [], auditLessons = [], compIntel = null, psychTriggers = null) {
   const essentials = extractEssentials(styleGuide);
 
   return `You are JoyMaze's creative director and image prompt engineer.
@@ -909,6 +934,7 @@ For STORY prompts:
 ### Prompt [N] — [Archetype Name] ([Beat 1/2/3])
 **Type:** Story
 **Emotional target:** [The feeling this image should trigger in a scrolling parent]
+**Primary trigger:** [TRIGGER_NAME — one sentence on which visual element activates it without text]
 **Activity shown:** [Which JoyMaze activity type]
 **Hook type:** [Which of the 8 hook types this uses]
 **Skill shown:** [What developmental skill this activity builds]
@@ -1230,6 +1256,8 @@ WINNING HOOK STRUCTURES: ${(compIntel.winning_hooks || []).map(h => `"${h}"`).jo
 VIRAL THEMES RIGHT NOW: ${(compIntel.viral_themes || []).join(' | ')}
 CONTENT GAPS (opportunities): ${(compIntel.content_gaps || []).join(' | ')}
 SCROLL STOPPER FORMULAS: ${(compIntel.scroll_stopper_formulas || []).join(' | ')}` : ''
+}${
+  psychTriggers ? buildPsychologyLayer(psychTriggers) : ''
 }`;
 }
 
@@ -2141,7 +2169,14 @@ async function main() {
   console.log(`  Story settings: ${assignedStorySettings.map(s => s.location.split(',')[0]).join(' | ')}`);
 
   // Build prompts
-  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, dynamicPools.hookExamples, auditLessons, compIntel);
+  // Load psychology triggers — injected into system prompt as mandatory trigger layer
+  let psychTriggers = null;
+  try {
+    psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
+    console.log(`  Psychology layer: ${Object.keys(psychTriggers.triggers).length} triggers loaded`);
+  } catch { /* optional — pipeline works without it */ }
+
+  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, dynamicPools.hookExamples, auditLessons, compIntel, psychTriggers);
   const userPrompt = buildUserPrompt(mix, count, (performanceContext || '') + trendSignals + recentThemesData, assignedThemes, assignedStorySettings);
 
   if (DRY_RUN) {

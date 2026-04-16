@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-13",
+    "last_updated": "2026-04-16",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_type": 12,
     "description": "Winning hook patterns with real performance scores. Injected into generate-prompts.mjs system prompt and generate-captions.mjs as additional examples."
@@ -406,6 +406,141 @@
       "decay_weeks": 0,
       "brand_safe": true,
       "archetype_fit": []
+    },
+    {
+      "id": "hook_comp_20260416_000",
+      "hook_type": "save_hook",
+      "text": "You're going to want to save this.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_psych_identity_001",
+      "hook_type": "identity_hook",
+      "primary_trigger": "IDENTITY_MIRROR",
+      "text": "This is what it looks like when a parent says no to the easy thing.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "ARCHETYPE_7",
+        "IDENTITY"
+      ]
+    },
+    {
+      "id": "hook_psych_screen_relief_001",
+      "hook_type": "relief_hook",
+      "primary_trigger": "SCREEN_RELIEF",
+      "text": "Forty-five minutes passed. She never looked up. The guilt didn't come.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "ARCHETYPE_1",
+        "ARCHETYPE_4",
+        "QUIET-MOMENT"
+      ]
+    },
+    {
+      "id": "hook_psych_curiosity_001",
+      "hook_type": "curiosity_gap",
+      "primary_trigger": "CURIOSITY_GAP",
+      "text": "He figured out the answer before I did. I'm still thinking about why.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "ARCHETYPE_5",
+        "ACTIVITY_DOTDOT"
+      ]
+    },
+    {
+      "id": "hook_psych_challenge_001",
+      "hook_type": "engagement_question",
+      "primary_trigger": "CHALLENGE",
+      "text": "1 in 5 kids gets this right on the first try. Is yours one of them?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "ACTIVITY_MAZE",
+        "ACTIVITY_WORDSEARCH",
+        "ACTIVITY-CHALLENGE"
+      ]
+    },
+    {
+      "id": "hook_psych_nostalgia_001",
+      "hook_type": "emotional_mirror",
+      "primary_trigger": "NOSTALGIA",
+      "text": "Somewhere in your memory, there's a quiet Saturday morning. This felt like that.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "ARCHETYPE_3"
+      ]
+    },
+    {
+      "id": "hook_psych_dev_fomo_001",
+      "hook_type": "insight",
+      "primary_trigger": "DEV_FOMO",
+      "text": "The 10-minute activity that builds the skill reading specialists actually recommend.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "FACT-CARD",
+        "PRINTABLE-TEASE",
+        "ARCHETYPE_6"
+      ]
+    },
+    {
+      "id": "hook_psych_completion_001",
+      "hook_type": "transformation_hint",
+      "primary_trigger": "COMPLETION_SATISFACTION",
+      "text": "Blank page. Pencil in hand. Twenty minutes later — something that was nothing.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "psychology_framework",
+      "added_week": "2026-04-16",
+      "times_used": 0,
+      "decay_weeks": 4,
+      "brand_safe": true,
+      "archetype_fit": [
+        "ARCHETYPE_5",
+        "ACTIVITY_COLORING",
+        "ASMR"
+      ]
     }
   ],
   "hook_type_index": {
@@ -457,7 +592,8 @@
       "hook_comp_20260412_000"
     ],
     "save_hook": [
-      "hook_comp_20260413_001"
+      "hook_comp_20260413_001",
+      "hook_comp_20260416_000"
     ]
   }
 }
