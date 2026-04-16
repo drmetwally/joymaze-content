@@ -714,3 +714,7 @@ Fixed post-media workflow exit code 128 (bash glob expansion failure on empty qu
 ---
 **2026-04-16 — Viral psychology + long-form engine**
 Two-part ultrathink session. Part 1: 7 viral psychology triggers researched and injected into generate-prompts.mjs + generate-captions.mjs; config/psychology-triggers.json created; 7 new hooks in hooks-library.json; docs/VIRAL_PSYCHOLOGY.md as reference. Part 2: Full long-form Remotion pipeline built (5 components + LongFormEpisode composition + generate-longform-brief.mjs + render-longform.mjs); targets ~8 min videos; reuses all existing reveal components. Committed c3e54e8.
+
+---
+**2026-04-16 — Psychology trigger full-system wiring**
+Audited all LLM-calling scripts. Found 4 uninjectd: generate-x-posts, generate-story-ideas, generate-asmr-brief, generate-challenge-brief. Wired all 4 with per-type trigger guidance. Committed 15eb63b. Ran npm run daily — trigger activation confirmed in X post copy, story narration, ASMR hook, challenge hook. All 6 content scripts now fully wired to psychology-triggers.json.

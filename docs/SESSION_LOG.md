@@ -1540,3 +1540,26 @@ Added 7 psychologically-engineered hooks to `hooks-library.json`. Created `docs/
 **Commit:** c3e54e8 | pushed main
 
 **Next:** `npm run generate:longform` on ep02 story → fill activity folders → first render.
+
+---
+**2026-04-16 — Psychology trigger full-system wiring**
+
+Audited all LLM-calling scripts. Found 4 missing injection points. Wired psychology-triggers.json into:
+- `generate-x-posts.mjs`: PSYCHOLOGY_PATH constant; per-type trigger map (story→NOSTALGIA, puzzle→CURIOSITY_GAP, insight→DEV_FOMO, identity→IDENTITY_MIRROR) in system prompt
+- `generate-story-ideas.mjs`: psychTriggers loaded in loadStyleContext(); NOSTALGIA + IDENTITY_MIRROR section appended to buildSystemPrompt
+- `generate-asmr-brief.mjs`: psychTriggers in loadContext(); COMPLETION_SATISFACTION block in buildPrompt (hookText activation)
+- `generate-challenge-brief.mjs`: CHALLENGE trigger block with fraction phrasing + ctaText guidance
+
+`generate-prompts.mjs` and `generate-captions.mjs` were already wired from previous session. All 6 content scripts now fully connected.
+
+Committed 15eb63b, pushed. Ran `npm run daily` — verified trigger activation in output:
+- X post 1 (NOSTALGIA): "Saturday morning. No plans. The crayon rolls under the couch. And they find it."
+- X post 2 (CURIOSITY_GAP): "I am always coming but never arrive. What am I?"
+- X post 3 (DEV_FOMO): "Most kids solve a maze faster on their second attempt than any adult on their first."
+- X post 4 (IDENTITY_MIRROR): "You pause the show because you hear 'wait, I almost have it.'"
+- Story ep03: NOSTALGIA anchor on slide 1, IDENTITY_MIRROR resolution
+- ASMR hook: "Watch it come alive" (COMPLETION_SATISFACTION)
+- Challenge hook: "Can your kid slay this in 60 seconds?" (CHALLENGE)
+- Prompts: 10/10 PASS · avg 9
+
+**Next:** Generate images in Gemini for today's prompts → import:raw → captions → push queue.
