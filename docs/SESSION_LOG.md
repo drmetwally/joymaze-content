@@ -1563,3 +1563,72 @@ Committed 15eb63b, pushed. Ran `npm run daily` — verified trigger activation i
 - Prompts: 10/10 PASS · avg 9
 
 **Next:** Generate images in Gemini for today's prompts → import:raw → captions → push queue.
+
+---
+**2026-04-16 — Long-form story engine Phases 1–7 complete (Codex build)**
+
+Audited all Codex output for the new story long-form pipeline. All 7 phases passed dry-run and bundle validation.
+
+**Files added:**
+- `scripts/generate-story-longform-brief.mjs` (Phase 1 — Groq episode planner)
+- `scripts/generate-suno-pool.mjs` (Phase 2 — Suno prompt pool)
+- `config/suno-prompt-pool.json` (Phase 2 — 5 pool types, empty initial)
+- `scripts/generate-narration.mjs` (Phase 3 — Coqui TTS shell-out)
+- `scripts/animate-scenes.mjs` (Phase 4 — SVD + RunwayML fallback)
+- `scripts/setup/install-coqui.sh` + `scripts/setup/run-svd.py` (Phase 13 partial)
+- `remotion/components/longform/story/` — 5 components (Phase 5)
+- `remotion/compositions/StoryLongFormEpisode.jsx` (Phase 6 — Series master)
+- `scripts/render-story-longform.mjs` (Phase 7 — render orchestrator)
+
+**`remotion/index.jsx`** updated: `StoryLongFormEpisode` registered, bundle-validated.
+
+**Next:** Phase 8 — `generate-animal-facts-brief.mjs`
+
+---
+**2026-04-16 — Long-form engine Phases 8+9 complete (Codex build)**
+
+Phase 8: `scripts/generate-animal-facts-brief.mjs` — Groq planner for animal facts track. Same loadContext/callGroq/validateBrief/buildEpisodeJson/buildBriefMd/incrementPoolUsage pattern as Phase 1. format: 'animal-facts', output to `output/longform/animal/`. Psychology map hardcoded (CURIOSITY_GAP hook, NOSTALGIA habitat, COMPLETION_SATISFACTION funFact). Dry-run + live preview both pass.
+
+Phase 9: 6 components under `remotion/components/longform/animal/`. AnimalHookScene (hookFact curiosity-gap framing, appends ...? if missing), AnimalNameReveal (Ken Burns + scale-in name reveal), AnimalFactScene (label pill top + caption bar bottom), AnimalSungRecap (warm brown gradient, 6 note particles, line-by-line lyrics at 60fps cadence). AnimalActivityScene + AnimalOutroScene are single-line re-exports of story equivalents. Remotion bundle validation: all 7 compositions intact, exit 0.
+
+**Next:** Phase 10 — `AnimalFactsEpisode.jsx` master composition + index registration
+
+---
+**2026-04-16 — Long-form engine Phases 10–12 complete. Full build done.**
+
+Phase 10: `remotion/compositions/AnimalFactsEpisode.jsx` — Series composition for animal facts track. 8 segments (hook 300f, name reveal 450f, habitat/diet/funFact fact scenes, sung recap 900f, optional activity 900f, outro 450f). Browser-safe resolveEpisodeAsset copied from StoryLongFormEpisode. Bundle validation: 8 compositions, exit 0.
+
+Phase 11: `scripts/generate-puzzle-compilation.mjs` — no Groq, pure file scanner. Scans output/asmr/ for folders with both blank.png + solved.png. Fisher-Yates shuffle, --count/--type/--save/--dry-run flags. Falls back to hardcoded Suno prompt when puzzle_compilation_bgm pool empty. Dry-run + preview exit 0.
+
+Phase 12: `remotion/compositions/PuzzleCompilation.jsx` — imports AsmrReveal directly. Inline ChapterTitleCard (yellow pill, spring scale-in). React.Fragment key per chapter pair. revealType mapping (coloring→ttb, others→ltr). showJoyo=false. Bundle validation: 9 compositions, exit 0.
+
+**All 12 spec phases complete. TASKS.md updated with 7-step E2E test plan for tomorrow morning.**
+
+**Next:** Generate images in Gemini for today's prompts → import:raw → captions → push queue.
+
+---
+**2026-04-17 — Longform brief generator: art style pool + intelligence full wiring**
+
+Two upgrades to `generate-story-longform-brief.mjs`:
+
+**1. Art direction system**
+- Added 28-style `ART_STYLES` pool + 5 `CHILD_PROFILES` (same pools as generate-prompts.mjs)
+- `pickEpisodeStyle(episodeNumber)` + `pickEpisodeCharacter(episodeNumber)` — deterministic rotation by episode number so each episode has a unique, consistent visual identity
+- `imagePromptHint` upgraded from a 1-liner to a full 40-60 word Gemini-ready prompt: art style woven in, named protagonist, specific scene composition, lighting/mood, varied shot types (close-up/mid-shot/wide)
+- `artStyle` + `character` now stored in `episode.json` for use by the renderer
+- `brief.md` now opens with "Episode visual style" block — art style + protagonist prominently at the top before scene list
+- `GROQ_MAX_TOKENS` raised 1200 → 3500 (full prompts required more output budget)
+
+**2. Intelligence engine wiring**
+Previously missing from `loadContext()`:
+- `content-intelligence.json` → `new_themes` (fresh intelligence themes, confidence ≥0.75) + `new_hooks` (story hook inspiration) — both injected as separate blocks in the prompt
+- `cta-library.json` → `app`/`both` CTAs across platforms injected as ctaText inspiration
+- `audit-learnings.json` → critical/high lessons injected as hard story rules
+
+Result visible in ep02-bennys-big-spring-help: theme "Kindness-Garden" drawn directly from content-intelligence new_themes; hook uses identity-mirror pattern from intelligence hooks; background prompt is real (not echoed instruction text).
+
+Also fixed: Groq echo-detection guard in `buildEpisodeJson` — when returned sunoBackground matches /generate|suno background prompt for/, fallback to `"Gentle ambient music for ... theme, soft piano, no lyrics"`.
+
+**ep01-test and all intermediate test episodes deleted. ep02-bennys-big-spring-help is the canonical E2E test episode.**
+
+**Next:** Step 2 — Generate 12 Gemini images from brief.md, save as scene-01.png…scene-12.png into ep02 folder.

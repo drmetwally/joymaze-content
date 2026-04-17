@@ -5,6 +5,9 @@ import { HookIntro,           hookIntroSchema }           from './compositions/H
 import { AnimatedFactCard,    animatedFactCardSchema }    from './compositions/AnimatedFactCard.jsx';
 import { ActivityChallenge,   activityChallengeSchema }   from './compositions/ActivityChallenge.jsx';
 import { LongFormEpisode,     longFormEpisodeSchema }     from './compositions/LongFormEpisode.jsx';
+import { StoryLongFormEpisode, storyLongFormEpisodeSchema } from './compositions/StoryLongFormEpisode.jsx';
+import { AnimalFactsEpisode, animalFactsEpisodeSchema } from './compositions/AnimalFactsEpisode.jsx';
+import { PuzzleCompilation, puzzleCompilationSchema } from './compositions/PuzzleCompilation.jsx';
 
 // ─── Composition Registry ────────────────────────────────────────────────────
 // durationInFrames here is the default shown in Remotion Studio.
@@ -75,6 +78,36 @@ const Root = () => (
       width={1080}
       height={1920}
       defaultProps={longFormEpisodeSchema}
+    />
+    {/* ── Story long-form episode: ~5-7 min story + optional activity ── */}
+    <Composition
+      id="StoryLongFormEpisode"
+      component={StoryLongFormEpisode}
+      durationInFrames={9750}   // 325s default @ 30fps (overridden by render-story-longform.mjs)
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={storyLongFormEpisodeSchema}
+    />
+    {/* ── Animal facts episode: ~3-5 min educational animal format ────── */}
+    <Composition
+      id="AnimalFactsEpisode"
+      component={AnimalFactsEpisode}
+      durationInFrames={5400}   // 180s default @ 30fps (overridden at render time)
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={animalFactsEpisodeSchema}
+    />
+    {/* ── Puzzle compilation: ~60 min puzzle marathon ─────────────────── */}
+    <Composition
+      id="PuzzleCompilation"
+      component={PuzzleCompilation}
+      durationInFrames={108000}   // 3600s = 60 min @ 30fps (overridden by render script)
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={puzzleCompilationSchema}
     />
   </>
 );

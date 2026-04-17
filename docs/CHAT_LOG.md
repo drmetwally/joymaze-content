@@ -718,3 +718,28 @@ Two-part ultrathink session. Part 1: 7 viral psychology triggers researched and 
 ---
 **2026-04-16 — Psychology trigger full-system wiring**
 Audited all LLM-calling scripts. Found 4 uninjectd: generate-x-posts, generate-story-ideas, generate-asmr-brief, generate-challenge-brief. Wired all 4 with per-type trigger guidance. Committed 15eb63b. Ran npm run daily — trigger activation confirmed in X post copy, story narration, ASMR hook, challenge hook. All 6 content scripts now fully wired to psychology-triggers.json.
+
+---
+**2026-04-16 — Long-form engine Phases 10–12 complete. Full build done.**
+Phase 10: AnimalFactsEpisode.jsx wired all 8 animal segments with correct frame counts. resolveEpisodeAsset copied verbatim from StoryLongFormEpisode (browser-safe, no Node path import). Phase 11: puzzle compilation planner — pure scanner, no Groq, Fisher-Yates shuffle, graceful empty-state. Phase 12: PuzzleCompilation.jsx imports AsmrReveal directly from same dir; React.Fragment key solves adjacent-sibling key issue; all 3 bundle validations passed. Full 9-composition registry confirmed. No more coding — tomorrow is E2E test day (7-step plan in TASKS.md).
+
+---
+**2026-04-16 — Long-form engine Phases 8+9 complete**
+Phase 8: animal facts Groq planner mirrors Phase 1 exactly — same function layout, same 8 config loads, same pool usage tracking. Key diff: episode.json has flat habitat/diet/funFact objects (not acts/scenes), plus sungRecapLyrics + jingleDropPaths for 4 MP3s. Pool used: animal_background_ambient (currently empty → falls back to Groq-generated prompt until expanded). Phase 9: 4 new animal components + 2 single-line re-exports. AnimalSungRecap notable: line-by-line lyrics advance every 2s (60 frames), floating note particles. Bundle intact after Phase 9.
+
+---
+**2026-04-16 — Long-form story engine Phases 1–7 complete**
+Codex built all 7 story-track phases; Claude audited each via codex-log.md + dry-run verification. Key decisions: (1) Phase 4 `animate-scenes.mjs` uses `--frames 25 --fps 8` SVD + RunwayML polling fallback with 120s timeout — confirmed no fire-and-forget bug. (2) Phase 6 `StoryLongFormEpisode.jsx` uses browser-safe path joining (no Node `path` import) after Codex caught webpack 5 polyfill failure during bundle validation. (3) Phase 7 readline confirmation gate fires only on WARNINGS (missing required assets), not on INFO (missing animatedClip = expected Ken Burns fallback). Full story pipeline runnable: plan → narrate → animate → render. Phases 8–12 (animal facts + puzzle compilation) remain.
+
+---
+**2026-04-17 — Longform brief gen: art direction + intelligence wiring**
+
+Reviewed generate-story-longform-brief.mjs against generate-prompts.mjs. imagePromptHints were short 1-liners — not Gemini-ready. Fixed by adding 28-style ART_STYLES pool + 5 CHILD_PROFILES, picked deterministically per episode. Groq now writes full 40-60 word image prompts with art style, consistent protagonist, varied compositions, 1080×1920, bottom 15% clear.
+
+Intelligence wiring gap found: content-intelligence.json, cta-library.json, and audit-learnings.json were all missing from loadContext(). All three wired in. Intelligence themes (new_themes, confidence ≥0.75) + new_hooks now injected into the story prompt. cta-library app/both CTAs injected as ctaText inspiration. GROQ_MAX_TOKENS raised 1200 → 3500 to handle expanded output.
+
+Fixes: Groq echo guard added for sunoBackground (was echoing the instruction text back). CTA fallback added.
+
+Scripts index memory file created (all 48 scripts documented). Warmup pipeline memory corrected (npm run brief already handles it — no new script needed). Pinterest board strategy saved to memory (10 boards, age-specific strategy explained).
+
+Pending: Step 2 E2E test — Ahmed generates 12 Gemini images for ep02-bennys-big-spring-help.

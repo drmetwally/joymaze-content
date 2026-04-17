@@ -203,6 +203,70 @@ Signal meaning: pattern-interrupt outperforms story → expand educational insig
 
 ---
 
+---
+
+## LONG-FORM VIDEO ENGINE (approved 2026-04-16 — parallel track, does not block Phase 0)
+
+> Full spec at `docs/LONGFORM_SPEC.md`. Claude architects, Codex implements.
+> 3 tracks: Story (~5-7 min) → Animal Facts (~3-5 min) → Puzzle Compilations (~60 min)
+> Tool stack: Remotion + Coqui TTS (local) + Stable Video Diffusion (local) + Suno AI (manual drop-in)
+
+### ✅ Phases 1–3 + 5–6 — ALL CODEX BUILD PHASES COMPLETE (2026-04-16)
+All 12 spec phases done. 9 Remotion compositions registered. Bundle validated.
+See codex-log.md (Steps 1–65) for full audit trail.
+
+### Phase 4 — FIRST E2E TEST (START HERE TOMORROW MORNING)
+
+> No coding required. This is a manual + pipeline test run.
+
+**Step 1 — Generate episode plan**
+- [ ] Run `npm run longform:story:plan:save`
+- [ ] Confirm `output/longform/story/ep01-{slug}/episode.json` + `brief.md` created
+- [ ] Open `brief.md` — read the 12 imagePromptHints
+
+**Step 2 — Generate scene images in Gemini (manual)**
+- [ ] Open Gemini, generate each imagePromptHint as a vertical portrait (1080×1920)
+- [ ] Save as `scene-01.png` through `scene-12.png` into the ep01 folder
+- [ ] Optionally use the 4 simplest prompts first to test pipeline quickly
+
+**Step 3 — Expand Suno pool first (required)**
+- [ ] Run `npm run suno:pool:expand` — fills all 5 pool types with 5 prompts each
+- [ ] Check `config/suno-prompt-pool.json` — confirm story_background_ambient has entries
+
+**Step 4 — Generate Suno tracks (manual drop-in)**
+- [ ] Open suno.ai — generate track using `episode.sunoPrompts.background` prompt
+- [ ] Save as `background.mp3` → drop into ep01 folder
+- [ ] Generate or reuse existing hook jingle → `hook-jingle.mp3`
+- [ ] Generate or reuse existing outro jingle → `outro-jingle.mp3`
+
+**Step 5 — Generate narration**
+- [ ] Run `npm run longform:story:narrate -- --episode output/longform/story/ep01-{slug}`
+- [ ] Confirm 12 `narration-scene-*.wav` files created
+- [ ] ⚠️ Requires Python + Coqui TTS installed. If not installed: `npm run longform:setup` first
+
+**Step 6 — Animate scenes (optional for first test)**
+- [ ] Skip SVD if no GPU available — Ken Burns fallback will be used automatically
+- [ ] If GPU available: `npm run longform:story:animate -- --episode output/longform/story/ep01-{slug}`
+
+**Step 7 — Render**
+- [ ] Run `npm run longform:story:render -- --episode output/longform/story/ep01-{slug} --dry-run` first
+- [ ] Confirm validation output + frame count looks right
+- [ ] Run without `--dry-run` to produce final MP4
+- [ ] Upload to YouTube as unlisted → check quality
+
+### Phase 5 — Animal Facts First Episode (after Phase 4 passes)
+- [ ] `npm run longform:animal:plan:save` → generate animal ep01
+- [ ] Generate 4 images (habitat, diet, funfact, namereveal) in Gemini
+- [ ] Drop 4 MP3s (background, sung-recap, hook-jingle, outro-jingle)
+- [ ] Narrate + render → check YouTube
+
+### Phase 6 — Puzzle Compilation First Test (after ASMR folders have images)
+- [ ] Generate at least 5 complete ASMR activities (blank.png + solved.png present)
+- [ ] `npm run longform:puzzle:compile -- --save` → generates compilation.json
+- [ ] Drop `background.mp3` → render → check YouTube
+
+---
+
 ## PHASE 1 — QUEUED (do not start until Phase 0 gate is cleared)
 
 - [ ] Pinterest analytics: set up weekly saves tracking in a simple log

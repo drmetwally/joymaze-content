@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-13",
+    "last_updated": "2026-04-16",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_platform_per_type": 8,
     "description": "Winning CTA patterns by platform and content type. Merged with hardcoded CTAS in generate-captions.mjs."
@@ -17,7 +17,18 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-07",
           "times_used": 0,
-          "decay_weeks": 3,
+          "decay_weeks": 4,
+          "brand_safe": true
+        },
+        {
+          "id": "cta_pinterest_app_20260416_001",
+          "text": "Pin this for later: Your quiet afternoon starts with a single tap.",
+          "performance_score": null,
+          "outbound_click_rate_pct": null,
+          "source": "competitor_analysis",
+          "added_week": "2026-04-16",
+          "times_used": 0,
+          "decay_weeks": 0,
           "brand_safe": true
         }
       ],
@@ -30,7 +41,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-12",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         }
       ],
@@ -40,15 +51,52 @@
     "instagram": {
       "app": [],
       "both": [],
-      "books": []
+      "books": [],
+      "engagement": [
+        {
+          "id": "cta_instagram_engagement_20260416_000",
+          "text": "Share their focused moments with us! Tag @JoyMazeApp and inspire other parents.",
+          "performance_score": null,
+          "outbound_click_rate_pct": null,
+          "source": "competitor_analysis",
+          "added_week": "2026-04-16",
+          "times_used": 0,
+          "decay_weeks": 0,
+          "brand_safe": true
+        }
+      ]
     },
     "tiktok": {
       "app": [],
-      "viral": []
+      "viral": [
+        {
+          "id": "cta_tiktok_viral_20260416_003",
+          "text": "Watch them transform boredom into brilliance. Link in bio for the printable magic!",
+          "performance_score": null,
+          "outbound_click_rate_pct": null,
+          "source": "intelligence_refresh",
+          "added_week": "2026-04-16",
+          "times_used": 0,
+          "decay_weeks": 0,
+          "brand_safe": true
+        }
+      ]
     },
     "x": {
       "app": [],
-      "engagement": []
+      "engagement": [
+        {
+          "id": "cta_x_engagement_20260416_002",
+          "text": "What's one small win you had today turning screen time into discovery time? Share your moment.",
+          "performance_score": null,
+          "outbound_click_rate_pct": null,
+          "source": "intelligence_refresh",
+          "added_week": "2026-04-16",
+          "times_used": 0,
+          "decay_weeks": 0,
+          "brand_safe": true
+        }
+      ]
     },
     "youtube": {
       "app": [],
