@@ -1632,3 +1632,10 @@ Also fixed: Groq echo-detection guard in `buildEpisodeJson` — when returned su
 **ep01-test and all intermediate test episodes deleted. ep02-bennys-big-spring-help is the canonical E2E test episode.**
 
 **Next:** Step 2 — Generate 12 Gemini images from brief.md, save as scene-01.png…scene-12.png into ep02 folder.
+
+---
+**2026-04-17 — Session end**
+
+TASKS.md updated: Phase 4 Step 1 marked done, ep02-bennys-big-spring-help set as active episode, Step 2 is next action for next session.
+Memory files created/updated: project_scripts_index.md (48 scripts), project_pinterest_boards.md (10-board strategy), project_longform_story_engine.md (brief upgrades logged), project_warmup_pipeline.md (corrected — npm run brief already covers it).
+Committed: 6e764e0 — 39 files, full longform engine + brief generator intelligence wiring.

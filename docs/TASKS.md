@@ -215,19 +215,21 @@ Signal meaning: pattern-interrupt outperforms story → expand educational insig
 All 12 spec phases done. 9 Remotion compositions registered. Bundle validated.
 See codex-log.md (Steps 1–65) for full audit trail.
 
-### Phase 4 — FIRST E2E TEST (START HERE TOMORROW MORNING)
+### Phase 4 — FIRST E2E TEST
 
 > No coding required. This is a manual + pipeline test run.
+> Active episode: `output/longform/story/ep02-bennys-big-spring-help`
+> Brief at: `output/longform/story/ep02-bennys-big-spring-help/brief.md`
 
-**Step 1 — Generate episode plan**
-- [ ] Run `npm run longform:story:plan:save`
-- [ ] Confirm `output/longform/story/ep01-{slug}/episode.json` + `brief.md` created
-- [ ] Open `brief.md` — read the 12 imagePromptHints
+**Step 1 — Generate episode plan** ✅ DONE (2026-04-17)
+- [x] Run `npm run longform:story:plan:save`
+- [x] Confirm episode.json + brief.md created — ep02-bennys-big-spring-help
+- [x] brief.md has full 40-60 word Gemini prompts per scene + art style + protagonist at top
 
-**Step 2 — Generate scene images in Gemini (manual)**
-- [ ] Open Gemini, generate each imagePromptHint as a vertical portrait (1080×1920)
-- [ ] Save as `scene-01.png` through `scene-12.png` into the ep01 folder
-- [ ] Optionally use the 4 simplest prompts first to test pipeline quickly
+**Step 2 — Generate scene images in Gemini (manual)** ← NEXT
+- [ ] Open brief.md — read "Episode visual style" block at top (art style + protagonist) — paste into Gemini as session context
+- [ ] Generate each scene prompt as a vertical portrait (1080×1920)
+- [ ] Save as `scene-01.png` through `scene-12.png` into ep02 folder
 
 **Step 3 — Expand Suno pool first (required)**
 - [ ] Run `npm run suno:pool:expand` — fills all 5 pool types with 5 prompts each
