@@ -33,11 +33,12 @@ No new pipelines until this threshold is hit consistently for 30 days.
 
 X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
-- [ ] **Create new X account** — use joymaze.pp@gmail.com, sign up on mobile data (not home WiFi)
-- [ ] **Apply for X Developer access** on new account — needed before automation can resume
-- [ ] **2-week manual warmup** — post 2-3 times/day manually using warmup pipeline output; no automation
-- [ ] **Create new Pinterest account** — use joymaze.pp@gmail.com
-- [ ] **Disable `x-posts.yml` GitHub Actions workflow** — comment out or set `if: false` until new credentials are ready
+- [x] **Create new X account** — @playjoymaze (repurposed fit-clinic). API keys live. Manual warmup until 2026-04-26.
+- [x] **Apply for X Developer access** — done. Keys in .env + GitHub Secrets.
+- [~] **2-week manual warmup** — in progress. Cooldown until 2026-04-26. Post via `npm run brief`.
+- [x] **Create new Pinterest account** — joymaze.pp@gmail.com. Manual posting only. No API yet.
+- [x] **Disable `x-posts.yml` GitHub Actions workflow** — `if: false` set + pushed.
+- [x] **Create Instagram account** — joymaze.pp@gmail.com. Manual posting only. No API yet.
 - [ ] **Update GitHub Secrets** — replace X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET with new account credentials after developer access approved
 - [ ] **Build warmup pipeline** — read-only display layer over `output/queue/`; shows caption + hook + CTA + image URL per post, copy-paste ready; includes warmup timer flag (same pattern as posting-cooldown.json); activates automation when timer expires
 
@@ -226,35 +227,61 @@ See codex-log.md (Steps 1–65) for full audit trail.
 - [x] Confirm episode.json + brief.md created — ep02-bennys-big-spring-help
 - [x] brief.md has full 40-60 word Gemini prompts per scene + art style + protagonist at top
 
-**Step 2 — Generate scene images in Gemini (manual)** ← NEXT
-- [ ] Open brief.md — read "Episode visual style" block at top (art style + protagonist) — paste into Gemini as session context
-- [ ] Generate each scene prompt as a vertical portrait (1080×1920)
-- [ ] Save as `scene-01.png` through `scene-12.png` into ep02 folder
+**Step 2 — Generate scene images in Gemini (manual)** ✅ DONE (2026-04-17)
+- [x] 12 images generated in Gemini, named 01.png–12.png, dropped into ep02 folder
 
-**Step 3 — Expand Suno pool first (required)**
+**Step 3 — Expand Suno pool first**
 - [ ] Run `npm run suno:pool:expand` — fills all 5 pool types with 5 prompts each
 - [ ] Check `config/suno-prompt-pool.json` — confirm story_background_ambient has entries
 
-**Step 4 — Generate Suno tracks (manual drop-in)**
-- [ ] Open suno.ai — generate track using `episode.sunoPrompts.background` prompt
-- [ ] Save as `background.mp3` → drop into ep01 folder
-- [ ] Generate or reuse existing hook jingle → `hook-jingle.mp3`
-- [ ] Generate or reuse existing outro jingle → `outro-jingle.mp3`
+**Step 4 — Generate Suno tracks (manual drop-in)** ✅ DONE (2026-04-17)
+- [x] background.mp3 + hook-jingle.mp3 + outro-jingle.mp3 dropped into ep02 folder
 
-**Step 5 — Generate narration**
-- [ ] Run `npm run longform:story:narrate -- --episode output/longform/story/ep01-{slug}`
-- [ ] Confirm 12 `narration-scene-*.wav` files created
-- [ ] ⚠️ Requires Python + Coqui TTS installed. If not installed: `npm run longform:setup` first
+**Step 5 — Generate narration** ✅ DONE (2026-04-17)
+- [x] Run `npm run longform:story:narrate -- --episode output/longform/story/ep02-bennys-big-spring-help`
+- [x] 12 `narration-scene-*.mp3` files created (edge-tts, not Coqui — durationSec auto-set from audio)
+- NOTE: TTS tool is now edge-tts (`python -m edge_tts`). Coqui not used. OpenAI TTS switch planned after animation phase.
 
-**Step 6 — Animate scenes (optional for first test)**
-- [ ] Skip SVD if no GPU available — Ken Burns fallback will be used automatically
-- [ ] If GPU available: `npm run longform:story:animate -- --episode output/longform/story/ep01-{slug}`
+**Step 6 — Animate scenes** ✅ DONE (2026-04-17)
+- [x] Skipped GPU SVD — Ken Burns 6-direction fallback active in StoryActScene.jsx
 
-**Step 7 — Render**
-- [ ] Run `npm run longform:story:render -- --episode output/longform/story/ep01-{slug} --dry-run` first
-- [ ] Confirm validation output + frame count looks right
-- [ ] Run without `--dry-run` to produce final MP4
-- [ ] Upload to YouTube as unlisted → check quality
+**Step 7 — Render** ✅ DONE (2026-04-18 ep03 v3 APPROVED)
+- [x] ep03-lilys-little-garden_h.mp4 — 6441 frames, 3.6 min. Ahmed: "perfect, perfect, perfect."
+- [x] Render is programmatic API (not CLI) — EPERM-safe on Windows
+- [ ] Upload ep03 to YouTube as unlisted → check quality
+
+### Phase 4.6 — Brief Generator: 24 scenes + storyboard directives — DONE (2026-04-18)
+- [x] Scene count: 12 → 24 (8 scenes per act)
+- [x] 3 new fields per scene in episode.json + brief.md: `shotType`, `compositionNote`, `psychologyBeat`
+- [x] shotType rules enforced in prompt: ESTABLISHING | MEDIUM | CLOSE-UP | ACTION | POV; no 2 consecutive same type; Act 1 scene 1 = ESTABLISHING; scene 24 = CLOSE-UP
+- [x] compositionNote: 1-sentence artist framing direction (foreground, background, lighting, posture)
+- [x] psychologyBeat: 3-6 word emotional label per scene tied to act trigger
+- [x] brief.md shows all 3 fields before each image prompt — Ahmed pastes into Gemini with full context
+- [x] GROQ_MAX_TOKENS raised 3500 → 5500
+- [x] validateBrief and buildEpisodeJson updated to use SCENES_PER_ACT / TOTAL_SCENES constants
+- NOTE: ep03 will be first episode with 24 scenes. ep02 stays at 12 scenes (already rendered).
+
+### Phase 4.5 — Animation Quality Build (Codex — spec at docs/CODEX_ANIMATION_BRIEF.md)
+
+> Video rules locked: 4s per image window (retention-optimized — faster cuts = better watch time); narration can be longer (7-8-10s); images cycle automatically from episode pool; no manual episode.json edits needed.
+> Build in 2 tiers. Discuss before starting.
+
+**Animation + engine — ALL LOCKED (2026-04-18, ep03 v3 approved):**
+- [x] Hard cut transitions (no cross-dissolve — removed after causing image flash artifacts)
+- [x] Ken Burns over full scene duration (no image cycling — removed, caused 2-image flash on cut)
+- [x] Typewriter caption at 5 fps/word (cumulative reveal)
+- [x] Music ducking: 0.22 → 0.06 during narration
+- [x] Psychology overlays: NOSTALGIA/IDENTITY_MIRROR/COMPLETION_SATISFACTION all live
+- [x] Flash-forward hook fills full 7s (Ken Burns pull-in, typewriter hook question, no Joyo)
+- [x] Heartbeat pulse on Act 3 climax (0.02 amplitude — subtle)
+- [x] Horizontal blurred background for vertical images in 1920×1080 render
+- [x] Shared audio pool from assets/audio/ (no per-episode copies needed)
+- [x] OpenAI TTS: `shimmer` voice, `tts-1-hd` model, min 7s scenes
+
+**Pending — ep02 re-narration:**
+- [ ] Delete old edge-tts MP3s: `del output\longform\story\ep02-bennys-big-spring-help\narration-scene-*.mp3`
+- [ ] Clear narrationFile + durationSec in episode.json, re-run: `npm run longform:story:narrate -- --episode output/longform/story/ep02-bennys-big-spring-help`
+- [ ] Re-render ep02 with shimmer voice
 
 ### Phase 5 — Animal Facts First Episode (after Phase 4 passes)
 - [ ] `npm run longform:animal:plan:save` → generate animal ep01
