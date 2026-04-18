@@ -4,6 +4,40 @@
 
 ---
 
+### 2026-04-18 — Brief generator upgrade: 24 scenes + storyboard + OpenAI TTS
+
+- **24 scenes (8 per act):** Doubles story depth and video length. With activity segment: ~4.8 min YouTube. Without: ~3.3 min. For full 5-7 min, use activity segment on every episode.
+- **Storyboard baked into brief:** 3 new fields per scene — `shotType` (camera distance), `compositionNote` (artist framing), `psychologyBeat` (emotional label). Ahmed pastes all 3 into Gemini with each prompt = visual continuity + shot variety without a separate storyboard step.
+- **OpenAI TTS live:** `tts-1-hd` / `nova` voice. Warmer, more engaging than edge-tts. Delete old edge-tts MP3s before re-running narrate on ep02.
+- **Codex animation brief written:** `docs/CODEX_ANIMATION_BRIEF.md`. Tier 1 = 5 animation items. Tier 2 = psychology color treatments + flash-forward hook. Image cycling auto-resolves from episode image pool — no manual episode.json edits.
+- **Video rules finalized:** 4s image windows, images cycle from full episode pool, narration can be 7-10s.
+- **YouTube virality principles locked in:** CTR = hook redesign (Tier 2). Watch time = 4s cycling + phrase-sync captions + cross-fades (Tier 1).
+
+---
+
+### 2026-04-17 — Longform story E2E pipeline: full run, render success, quality gaps identified
+
+- **Pipeline run:** 12 Gemini images (01.png–12.png) + 3 Suno MP3s dropped → narration → render. Completed twice in one session.
+- **TTS switch:** Coqui TTS (no Python model available) → `edge-tts` (cloud, free, voice en-US-AriaNeural). Output .mp3 not .wav. `music-metadata` probes audio duration after each generation → `durationSec = audioDuration + 2.0s` auto-written to episode.json.
+- **Render rewrite:** `npx remotion render` CLI → programmatic API (`@remotion/bundler` + `@remotion/renderer`). Root cause: Windows EPERM on symlinks in CLI temp dir. `.remotion-public` copy pattern (no symlinks) fixed it.
+- **Remotion ID fix:** Underscore not allowed in composition IDs. All `_H` suffixes renamed to `H` (e.g., `StoryLongFormEpisodeH`).
+- **Fixes landed:** ACT badge removed, KB_MOVES (6 directional Ken Burns), music volume 0.22, joyo path fixed, brief engine adds hook-jingle + outro-jingle Suno prompts.
+- **Video rules locked:** Max 5s per image. Narration can be longer (7-8-10s). Images can be reused across scenes.
+- **Render v2 result:** ep02-bennys-big-spring-help_h.mp4, 1.6 min, clean, no scene gaps.
+- **Quality gaps confirmed:** No cross-fade transitions, no animation beyond Ken Burns, hook not viral (just Joyo waving), narration copy needs psychology-per-trigger rules + writing-style voice.
+- **Next:** Write CODEX_ANIMATION_BRIEF.md for Codex animation build (Tier 1: cross-fade, image cycling, scene entrance, phrase-sync text, music ducking). Discuss animation plan. Switch TTS to OpenAI after animation phase.
+
+---
+
+### 2026-04-16 — Longform story engine full build + intelligence wiring
+
+- **12 Codex build phases complete.** All 9 Remotion compositions registered. Bundle validated.
+- **Brief generator fully wired:** loads intelligence system (themes/hooks/CTAs/audit learnings), 28-style ART_STYLES pool, 5 CHILD_PROFILES, full 40-60 word Gemini-ready scene prompts.
+- **Episode #1 decision:** ep01 test deprecated. ep02-bennys-big-spring-help is the canonical first test episode.
+- **Pending:** E2E test (Phase 4 — next session)
+
+---
+
 ### 2026-04-14 — Audio swap + activity video overlay + cheatsheet cleanup
 
 - **Audio:** All ASMR and activity videos now use Twinkle soft music instead of crayon.mp3. Crayon sound didn't fit coloring wipe or static puzzle videos.
@@ -743,3 +777,18 @@ Fixes: Groq echo guard added for sunoBackground (was echoing the instruction tex
 Scripts index memory file created (all 48 scripts documented). Warmup pipeline memory corrected (npm run brief already handles it — no new script needed). Pinterest board strategy saved to memory (10 boards, age-specific strategy explained).
 
 Pending: Step 2 E2E test — Ahmed generates 12 Gemini images for ep02-bennys-big-spring-help.
+
+---
+**2026-04-17 — Longform dual orientation + render auto-fill**
+Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizontal `_H` compositions (1920×1080) alongside vertical (1080×1920). Render script gets `--orientation` flag, brief generator gets same. Auto-fill added to render script — drops need for manual `node -e` episode.json patch. Image naming convention: `01.png`…`12.png`. ep02 images ready; pending MP3s + narration + render.
+
+---
+
+### 2026-04-18 — Animation complete + strategic focus locked
+
+- **Tier 1 + Tier 2 animation both complete.** Cross-fades, image cycling, phrase-sync captions, psychology color overlays, flash-forward hook, heartbeat pulse all built and dry-run validated.
+- **Video quality assessment:** Narration improved (OpenAI nova). Transitions still produce dark flash (Series limitation — not fixable without overlapping Sequence rewrite). Hook still weak until ep03 re-narrated.
+- **GPU research:** GTX 1650 4GB — no local video gen possible. Kling API = separate from subscription, $0.28/clip (V1.6 Standard 5s). Decision: Ken Burns permanent default, optional manual Kling/Flow clips dropped as XX.mp4 into episode folder, auto-detected by render script.
+- **Strategic direction locked:** Psychology + viral elements (hooks, narration copy, story arc) are the priority — not animation or art. No new tech until workflow is stable.
+- **Memory updated:** project_longform_story_engine.md, project_pipeline_status.md, project_warmup_pipeline.md. New feedback memories: update-memory-after-every-task, psychology-over-animation.
+- **ep03 v3 final render:** HOOK_FRAMES 270→210 (7s) to eliminate 2s dead air at hook end. Render clean: 6441 frames, 3.6 min. Engine locked — production-ready.

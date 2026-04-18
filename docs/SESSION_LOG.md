@@ -4,6 +4,93 @@
 
 ---
 
+## 2026-04-18 — [Agent: Claude] — Brief generator: 24 scenes + storyboard + OpenAI TTS + Codex animation brief
+
+**Files changed:** `scripts/generate-story-longform-brief.mjs`, `scripts/generate-narration.mjs`, `docs/CODEX_ANIMATION_BRIEF.md` (new), `docs/TASKS.md`, memory files
+
+**generate-story-longform-brief.mjs — 24-scene + storyboard upgrade:**
+- Scene count: 12 → 24 (8 per act). Constants `SCENES_PER_ACT = 8`, `TOTAL_SCENES = 24`.
+- 3 new fields per scene: `shotType` (ESTABLISHING/MEDIUM/CLOSE-UP/ACTION/POV), `compositionNote` (1-sentence artist framing direction), `psychologyBeat` (3-6 word emotional label)
+- shotType rules: Act 1 scene 1 = ESTABLISHING; scene 24 = CLOSE-UP; no 2 consecutive same type; each act uses ≥4 different types
+- brief.md scene rows now show all 3 fields before image prompt — full context for Gemini session
+- `GROQ_MAX_TOKENS` raised 3500 → 5500
+- validateBrief + buildEpisodeJson updated to use constants
+
+**generate-narration.mjs — OpenAI TTS switch:**
+- Replaced edge-tts (python subprocess) with openai SDK (`tts-1-hd`, voice `nova`)
+- Removed `execSync`, `quoteShellArg`. Added `generateNarration()` async function.
+- All skip/reuse/duration logic unchanged
+
+**docs/CODEX_ANIMATION_BRIEF.md — new file:**
+- Full Codex context for animation Tier 1+2 build
+- Tier 1 build order: 4.3 phrase-sync → 4.2 ducking → 4.1 entrance → 4.4 image cycling → 4.5 cross-fade
+- Image cycling: auto (no episode.json edits) — all episode images in flat array, cycles by sceneIndex
+- 4s image windows (retention-optimized per YouTube data)
+- Tier 2: per-act color treatments, flash-forward hook, heartbeat pulse
+
+---
+
+## 2026-04-17 — [Agent: Claude] — Longform story E2E test: full pipeline run + render v2 clean
+
+**Files changed:** `scripts/generate-narration.mjs`, `scripts/render-story-longform.mjs`, `scripts/generate-story-longform-brief.mjs`, `remotion/index.jsx`, `remotion/compositions/StoryLongFormEpisode.jsx`, `remotion/components/longform/story/StoryActScene.jsx`, `output/longform/story/ep02-bennys-big-spring-help/brief.md`
+
+**Narration engine overhaul (`generate-narration.mjs`):**
+- Replaced Coqui TTS (Python local model, required install) with `edge-tts` (`python -m edge_tts --voice en-US-AriaNeural`)
+- Output changed `.wav` → `.mp3`; installed via `python -m pip install edge-tts`
+- Added `getAudioDurationSec()` using `music-metadata` npm package — probes actual audio length
+- `scene.durationSec` now set from real audio: `audioDuration + 2.0s` (2s tail); eliminates scene gaps
+- "Skip" path also probes + writes durationSec when field is still 15 (default)
+
+**Render script full rewrite (`render-story-longform.mjs`):**
+- Replaced `npx remotion render` CLI with programmatic API (`@remotion/bundler` + `@remotion/renderer`)
+- Root cause: Windows EPERM on symlinks in CLI temp bundle dir. Programmatic API with `.remotion-public` copy pattern avoids it (same as render-video.mjs)
+- Added `preparePublicDir()`: copies `assets/` + episode folder into `.remotion-public/` (no symlinks)
+- Output: `epNN-slug_h.mp4` (horizontal, 1920×1080) or `epNN-slug_v.mp4` (vertical, 1080×1920)
+- Composition IDs: `StoryLongFormEpisodeH` (horizontal), `StoryLongFormEpisode` (vertical)
+
+**Remotion composition fixes:**
+- `remotion/index.jsx`: Renamed all 3 `_H` compositions to remove underscore (Remotion ID rule: a-z A-Z 0-9 and `-` only)
+  - `StoryLongFormEpisode_H` → `StoryLongFormEpisodeH`
+  - `AnimalFactsEpisode_H` → `AnimalFactsEpisodeH`
+  - `PuzzleCompilation_H` → `PuzzleCompilationH`
+- `StoryLongFormEpisode.jsx`: Fixed joyo path `assets/joyo_waving.png` → `assets/mascot/joyo_waving.png` (3 places)
+- `StoryActScene.jsx`:
+  - Removed ACT badge entirely (was visible in rendered video)
+  - Added `KB_MOVES` array — 6 directional Ken Burns patterns cycling by `sceneIndex % 6`; scale 1.0→1.16/1.18
+  - Background music volume lowered 0.30 → 0.22
+
+**Brief engine upgrades (`generate-story-longform-brief.mjs`):**
+- Added `hookJingle` + `outroJingle` to `sunoPrompts` (theme-aware fallbacks)
+- `buildBriefMd()` now shows all 3 Suno prompts (background + hook-jingle + outro-jingle)
+- Orientation flag added; brief.md shows render target
+- Narration instructions overhauled: max 12 words, psychology-per-trigger rules (NOSTALGIA/IDENTITY_MIRROR/COMPLETION_SATISFACTION), bad/good examples inline, hookQuestion = open loop with stakes
+
+**E2E test results:**
+- Render v1: 3.7 min, scene gaps visible (durationSec: 15 hardcoded)
+- Render v2: ep02-bennys-big-spring-help_h.mp4, 2964 frames, 1.6 min, no scene gaps, no act labels
+- Issues identified: animation (no cross-fade, static KB), hook quality, narration copy quality
+
+**Video rules locked:**
+- Max 5s per image/illustration per scene window
+- Narration audio can exceed 5s (7-8-10s) — images cycle while narration plays
+- Scene images can be reused from earlier scenes (establishing shot pattern)
+
+---
+
+## 2026-04-16 — [Agent: Claude] — Longform story engine full build (12 Codex phases) + brief generator intelligence wiring
+
+**Files changed:** `scripts/generate-story-longform-brief.mjs`, `remotion/compositions/StoryLongFormEpisode.jsx`, all 5 StoryLongFormEpisode sub-components, `scripts/generate-narration.mjs`, `scripts/render-story-longform.mjs`, `remotion/index.jsx`, `package.json`, `docs/LONGFORM_SPEC.md`
+
+- All 12 longform build phases complete (Steps 1–65 in codex-log.md)
+- 9 Remotion compositions registered and bundle-validated
+- Brief generator wired to intelligence system: loads `content-intelligence.json`, `cta-library.json`, `audit-learnings.json`
+- `ART_STYLES` pool (28 entries) + `CHILD_PROFILES` (5 entries) — deterministic per episode number
+- `imagePromptHint` now full 40-60 word Gemini-ready prompt
+- `sunoBackground` Groq echo guard added; `GROQ_MAX_TOKENS` raised 1200 → 3500
+- Full pipeline commands documented in memory + TASKS.md
+
+---
+
 ## 2026-04-14 — [Agent: Claude] — Audio swap + activity video yellow pill overlay + cheatsheet restructure
 
 **Files changed:** `scripts/render-video.mjs`, `scripts/generate-activity-video.mjs`, `remotion/compositions/AsmrReveal.jsx`, `docs/DAILY_CHEATSHEET.md`
@@ -1639,3 +1726,83 @@ Also fixed: Groq echo-detection guard in `buildEpisodeJson` — when returned su
 TASKS.md updated: Phase 4 Step 1 marked done, ep02-bennys-big-spring-help set as active episode, Step 2 is next action for next session.
 Memory files created/updated: project_scripts_index.md (48 scripts), project_pinterest_boards.md (10-board strategy), project_longform_story_engine.md (brief upgrades logged), project_warmup_pipeline.md (corrected — npm run brief already covers it).
 Committed: 6e764e0 — 39 files, full longform engine + brief generator intelligence wiring.
+
+---
+**2026-04-17 — Longform engine: dual orientation + render auto-fill**
+
+Fixed longform video engine aspect ratio:
+- `remotion/index.jsx`: added `_H` (1920×1080 horizontal) variants for all 3 longform tracks: `StoryLongFormEpisode_H`, `AnimalFactsEpisode_H`, `PuzzleCompilation_H`. Original vertical compositions kept for TikTok Series. No component rewrites needed — all use `AbsoluteFill` + `objectFit: cover` so portrait images center-crop to 16:9 automatically.
+- `scripts/render-story-longform.mjs`: added `--orientation horizontal|vertical` flag (default: `horizontal`). Selects correct composition ID + suffixes output `_h.mp4` / `_v.mp4`.
+- `scripts/generate-story-longform-brief.mjs`: added `--orientation` flag (default: `horizontal`); brief.md now shows render target (YouTube vs TikTok), correct image format note, and `--orientation` flag in Step 5 render command. Scene image prompt section header updated to show correct naming convention.
+- `scripts/render-story-longform.mjs`: added `autoFillImagePaths()` — before validation, scans episode folder for `01.png`…`12.png` (primary) or `scene-01.png`…`scene-12.png` (legacy fallback), auto-fills empty `imagePath` fields in episode.json. Eliminates manual episode.json editing step.
+
+Image naming convention going forward: `01.png`, `02.png` … `12.png` (drop directly into episode folder before render).
+
+ep02-bennys-big-spring-help: images generated and ready. Step 2 (images) complete. Next: drop 3 MP3s (background, hook-jingle, outro-jingle) → narrate → render.
+
+---
+**2026-04-18 — E2E render complete + animation diagnosis + narration quality fixes**
+
+ep02-bennys-big-spring-help: full pipeline run completed (first successful render).
+Issues found and fixed during live testing:
+
+**Pipeline fixes:**
+- `@remotion/cli` was missing → installed 4.0.448 to match remotion version
+- render script was CLI-based (npx) → rewrote to programmatic API (`@remotion/bundler` + `@remotion/renderer`) — avoids Windows EPERM symlink error on temp bundle
+- `_H` composition IDs had underscores (forbidden by Remotion) → renamed `StoryLongFormEpisode_H` → `StoryLongFormEpisodeH`, same for Animal/Puzzle
+- Joyo path was `assets/joyo_waving.png` → fixed to `assets/mascot/joyo_waving.png`
+- Coqui TTS not installed → switched to `edge-tts` (Microsoft neural TTS, cloud, free, excellent quality). `generate-narration.mjs` now uses `edge-tts` with voice `en-US-AriaNeural`, output `.mp3` not `.wav`
+- `music-metadata` installed → narration script now probes actual audio duration after each generate and writes `scene.durationSec = audioDuration + 2.0s buffer` to episode.json. Scene gaps eliminated.
+- `generate-story-longform-brief.mjs`: default durationSec stays 15 as fallback; narration script overwrites after audio is generated
+
+**ep02 render v2 (post-diagnosis):**
+- Act labels removed from `StoryActScene.jsx`
+- Ken Burns upgraded: 6 directional patterns (pan+zoom, zoom-out, vertical) cycling by sceneIndex. Scale range 1.0→1.16 (was 1.0→1.06)
+- Background music volume lowered 0.3 → 0.22 during scene play
+- Scene durations now driven by audio: 4.3–5.3s per scene (was 15s flat). Total video: 1.6 min
+- Brief generator narration instructions overhauled: 12-word max, psychology-per-trigger rules (NOSTALGIA/IDENTITY_MIRROR/COMPLETION_SATISFACTION), hypnotic writing pillars, hooks-within-scenes examples
+
+**Next build: Codex animation Phase 1**
+Spec written to `docs/CODEX_ANIMATION_BRIEF.md`.
+Target: cross-fade transitions, image cycling (max 5s/image), scene entrance, phrase-sync text, music ducking, flash-forward hook.
+
+---
+**2026-04-18 — Animation Tier 1 + Tier 2 complete + GPU/Kling research + strategic focus locked**
+
+**Tier 1 animation built (StoryActScene.jsx + StoryLongFormEpisode.jsx):**
+- 4.1 Scene entrance: scale 0.96→1.0 + opacity fade over 12 frames
+- 4.2 Music ducking: 0.22→0.06 during narration, rises back at end
+- 4.3 Phrase-sync captions: split on punctuation, one phrase at a time (replaces word-drip)
+- 4.4 Image cycling: 4s (120-frame) windows, cycles full episode image pool, different KB direction per window
+- 4.5 Cross-fade: root AbsoluteFill sceneFadeOpacity envelope (12-frame fade in/out)
+- Bug fix: allEpisodeImages indexOf mismatch (raw path vs resolveAssetSrc-wrapped path) — fixed by comparing scene.imagePath directly
+
+**Tier 2 animation built:**
+- 5.1 Psychology color overlays: NOSTALGIA=warm amber (multiply 0.08), IDENTITY_MIRROR=vignette (radial gradient 0.12), CURIOSITY_GAP=cool blue (screen 0.05), COMPLETION_SATISFACTION=brightness pulse
+- 5.2 Flash-forward hook: at frame 30, Act 3 climax image flashes for 9 frames (CURIOSITY_GAP open loop)
+- 5.3 Heartbeat pulse: Act 3 climax scene scale oscillates at 1.1 beats/sec
+
+**Animated clip auto-detect added (render-story-longform.mjs):**
+- `autoFillAnimatedClips()` — detects `01.mp4`, `02.mp4` etc., sets animatedClip in episode.json
+- Workflow: drop Kling/Flow clip as `01.mp4` into episode folder → auto-detected → Ken Burns for rest
+
+**GPU + Kling research:**
+- GTX 1650 4GB VRAM — SVD-XT (14GB req) and AnimateDiff (6GB req) both impossible locally
+- Kling API = separate pay-per-use product from subscription. V1.6 Standard 5s = $0.28/clip
+- Decision: Ken Burns as permanent default. Optional manual Kling/Google Flow clips via web UI (drop as XX.mp4)
+- No blind API automation — human review required (storybook art → AI generates realistic humans)
+
+**Strategic focus locked:**
+- Priority: psychology + viral (hooks, narration copy, story arc, thumbnails) over animation/art
+- Ken Burns = permanent default. No new animation tech until stable workflow established.
+
+**Next:** Re-narrate ep02 with OpenAI TTS → re-render. Generate ep03 (24 scenes).
+
+---
+**Session 2026-04-18 (continued) — ep03 v3 final render**
+- Reverted HOOK_FRAMES 450→270→210 (7s), OUTRO_FRAMES 450→240 (8s), removed SCENE_FADE_FRAMES entirely
+- Hard cut transitions restored (sequential Sequences, no overlap)
+- ep03 v2: Ahmed rated "fantastic improvement" — 5 priority issues identified and fixed
+- ep03 v3: HOOK_FRAMES trimmed 270→210 to cut 2s dead air at hook end — final render confirmed clean (6441 frames, 3.6 min)
+- Ahmed: "perfect, perfect, perfect. EVERYTHING CHECKS. I fucking love it."
+- Engine is now locked and production-ready for future episodes
