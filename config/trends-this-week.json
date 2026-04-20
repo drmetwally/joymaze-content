@@ -1,25 +1,34 @@
 {
-  "generated": "2026-04-13",
-  "valid_until": "2026-04-20",
+  "generated": "2026-04-20",
+  "valid_until": "2026-04-27",
   "sources": [
+    "google_trends",
     "seasonal_calendar"
   ],
   "trending_themes": [
     {
       "theme": "Garden/Flowers",
-      "score": 110
+      "score": 180
     },
     {
       "theme": "Ocean/Underwater",
-      "score": 80
+      "score": 150
     },
     {
       "theme": "Forest/Woodland",
-      "score": 80
+      "score": 150
     },
     {
       "theme": "Bugs/Insects",
-      "score": 80
+      "score": 150
+    },
+    {
+      "theme": "Sports and Games",
+      "score": 70
+    },
+    {
+      "theme": "Food and Cooking",
+      "score": 50
     },
     {
       "theme": "Pets/Home",
@@ -35,24 +44,28 @@
     "Ocean/Underwater",
     "Forest/Woodland",
     "Bugs/Insects",
-    "Pets/Home"
+    "Sports and Games"
   ],
   "rising_searches": [
-    "earth day activities for kids",
-    "nature printables",
-    "mothers day printables",
-    "mothers day activities for kids"
+    "army coloring pages for kids",
+    "earth day coloring pages for kids",
+    "lds coloring pages for kids",
+    "free summer coloring pages for kids",
+    "sports coloring pages for kids",
+    "summer coloring pages for kids",
+    "food coloring pages for kids",
+    "print coloring pages for kids"
   ],
   "upcoming_moments": [
     {
       "event": "Earth Day",
-      "date": "2026-04-21",
-      "days_away": 9
+      "date": "2026-04-22",
+      "days_away": 2
     },
     {
       "event": "Mother's Day",
-      "date": "2026-05-10",
-      "days_away": 28
+      "date": "2026-05-11",
+      "days_away": 21
     }
   ],
   "caption_keywords": [

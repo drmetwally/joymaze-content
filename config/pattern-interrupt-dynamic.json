@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-16",
+    "last_updated": "2026-04-20",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries": 20,
     "description": "Dynamic extension of PATTERN_INTERRUPT_POOL in generate-prompts.mjs. Entry shape matches hardcoded pool exactly — only lifecycle fields added."
@@ -17,7 +17,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Directly confronts parental screen time guilt by distinguishing between types of screen engagement, offering permission and understanding."
     },
@@ -31,51 +31,9 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Highlights a lesser-known but crucial benefit of JoyMaze activities, connecting physical engagement to academic success, appealing to parents' desire for their child's development."
-    },
-    {
-      "subtype": "edutainment",
-      "topic": "day in the life or how we use this lifestyle content for printables",
-      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
-      "added_week": "2026-04-11",
-      "source": "competitor_analysis",
-      "confidence": 0.7,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Content gap from competitor analysis"
-    },
-    {
-      "subtype": "edutainment",
-      "topic": "behind-the-scenes of printable creation",
-      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
-      "added_week": "2026-04-11",
-      "source": "competitor_analysis",
-      "confidence": 0.7,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Content gap from competitor analysis"
-    },
-    {
-      "subtype": "edutainment",
-      "topic": "Interactive Digital Printables",
-      "visual": "Bold educational layout showing the contrast between what competitors offer and what parents actually need",
-      "added_week": "2026-04-12",
-      "source": "competitor_analysis",
-      "confidence": 0.7,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Content gap from competitor analysis"
     },
     {
       "subtype": "surprising-stat",
@@ -87,7 +45,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Highlights the profound, long-term cognitive benefits of creative play, appealing to parents who want to foster their child's future success."
     },
@@ -101,7 +59,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Relieves pressure on parents to create elaborate experiences for Earth Day/nature themes, offering an accessible, low-prep solution that aligns with competitor trends."
     },
@@ -115,7 +73,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -129,7 +87,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Directly addresses screen time guilt by validating digital activities as effective for skill development."
     },
@@ -143,7 +101,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Provides a surprising, specific cognitive benefit of a core JoyMaze activity, appealing to parents seeking learning outcomes."
     },
@@ -157,7 +115,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Connects trending nature themes to educational benefits in a surprising, visually appealing way, ideal for coloring content."
     },
@@ -171,7 +129,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -185,7 +143,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -199,7 +157,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -213,7 +171,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -227,7 +185,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -241,7 +199,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Addresses parental pressure regarding toy complexity, highlighting the value of simple, accessible tools for development."
     },
@@ -255,7 +213,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Connects printable activities to tangible academic benefits, addressing parental desire for effective learning tools."
     },
@@ -269,7 +227,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Offers a manageable solution to screen time guilt with a quantifiable, surprising benefit."
     },
@@ -283,7 +241,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Challenges a common parental instinct to 'help' immediately, promoting deeper learning and character development."
     },
@@ -297,7 +255,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -311,9 +269,51 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
+    },
+    {
+      "subtype": "did-you-know",
+      "topic": "Did you know that children who regularly engage in hands-on activities like mazes and tracing show a 30% improvement in problem-solving skills by age 7?",
+      "visual": "Image of a child deeply focused on a maze or tracing activity, with a subtle brain graphic overlay.",
+      "added_week": "2026-04-20",
+      "source": "intelligence_refresh",
+      "confidence": 0.9,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Provides a specific, data-backed benefit that directly addresses parental desires for developmental growth."
+    },
+    {
+      "subtype": "surprising-stat",
+      "topic": "Surprising Stat: Over 70% of parents report feeling less stressed when their child is engaged in focused, independent play with educational printables.",
+      "visual": "Graphic showing a percentage (70%+) with an illustration of a calm parent and a focused child.",
+      "added_week": "2026-04-20",
+      "source": "intelligence_refresh",
+      "confidence": 0.9,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Connects directly to the parent's inner world of stress and desire for calm, offering a compelling benefit."
+    },
+    {
+      "subtype": "edutainment",
+      "topic": "Did you know that some plants 'talk' to each other through underground networks? Exploring nature's hidden connections sparks curiosity and critical thinking in young minds.",
+      "visual": "Illustration of interconnected plant roots with subtle 'speech bubbles' or glowing pathways, and a child looking curious.",
+      "added_week": "2026-04-20",
+      "source": "competitor_analysis",
+      "confidence": 0.8,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Ties into the Earth Day and nature themes, offering an intriguing fact that promotes curiosity and learning."
     }
   ]
 }
