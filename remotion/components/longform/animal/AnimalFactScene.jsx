@@ -2,114 +2,75 @@ import {
   AbsoluteFill,
   Audio,
   Img,
-  Video,
   interpolate,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
 
-const PILL_BG = 'rgba(255,210,0,0.93)';
-const PILL_TEXT = '#1a1a1a';
-const PILL_RX = 22;
 const FONT_FAMILY = 'Nunito, Fredoka One, sans-serif';
+const CREAM = '#fff6db';
 
 const resolveAssetSrc = (src) => {
-  if (!src) {
-    return '';
-  }
-
-  if (src.startsWith('http') || src.startsWith('data:') || src.includes(':\\') || src.startsWith('/')) {
-    return src;
-  }
-
+  if (!src) return '';
+  if (src.startsWith('http') || src.startsWith('data:') || src.includes(':\\') || src.startsWith('/')) return src;
   return staticFile(src);
 };
 
-const PillCaption = ({ text }) => {
-  const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const words = text ? text.split(/\s+/).filter(Boolean) : [];
-  const visibleWords = words.slice(0, Math.min(words.length, Math.floor(frame / 4) + 1));
-  const opacity = interpolate(
-    frame,
-    [0, 8, durationInFrames - 12, durationInFrames],
-    [0, 1, 1, 0],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-  );
-  const y = interpolate(frame, [0, 12], [50, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+const CAMERA_POINTS = [
+  { at: 0,    scale: 1.00, x: 0,   y: 0 },
+  { at: 0.25, scale: 1.05, x: -12, y: -4 },
+  { at: 0.5,  scale: 1.10, x: 10,  y: 2 },
+  { at: 0.75, scale: 1.14, x: -8,  y: -10 },
+  { at: 1,    scale: 1.16, x: 0,   y: 0 },
+];
 
-  return (
-    <AbsoluteFill
-      style={{
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        padding: '0 36px 92px',
-        pointerEvents: 'none',
-      }}
-    >
-      <div
-        style={{
-          opacity,
-          transform: `translateY(${y}px)`,
-          backgroundColor: PILL_BG,
-          borderRadius: PILL_RX,
-          padding: '20px 28px',
-          maxWidth: '92%',
-          boxShadow: '0 16px 30px rgba(0,0,0,0.18)',
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            color: PILL_TEXT,
-            fontFamily: FONT_FAMILY,
-            fontSize: 36,
-            fontWeight: 700,
-            textAlign: 'center',
-            lineHeight: 1.32,
-          }}
-        >
-          {visibleWords.join(' ')}
-        </p>
-      </div>
-    </AbsoluteFill>
-  );
-};
+const DOODLE_PRESETS = [
+  { icon: '?', top: 72, left: 72, size: 88, rotate: -8, color: 'rgba(255,210,0,0.92)' },
+  { icon: '✦', top: 90, right: 92, size: 70, rotate: 10, color: 'rgba(255,245,196,0.95)' },
+  { icon: '↗', top: 190, right: 120, size: 72, rotate: 8, color: 'rgba(255,210,0,0.88)' },
+  { icon: '◎', top: 120, left: 110, size: 82, rotate: -4, color: 'rgba(255,245,196,0.92)' },
+];
 
 export const AnimalFactScene = ({
-  label = '',
-  description = '',
   imagePath = '',
-  animatedClip = '',
   narrationPath = '',
+  narration = '',
   backgroundMusicPath = '',
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const clipSrc = resolveAssetSrc(animatedClip);
+
   const imageSrc = resolveAssetSrc(imagePath);
-  const scale = interpolate(frame, [0, durationInFrames], [1, 1.08], {
+  const lines = narration ? narration.split('\n').map((line) => line.trim()).filter(Boolean) : [];
+  const segments = lines.length > 0 ? lines : [''];
+  const lineFrames = Math.max(1, durationInFrames / segments.length);
+  const lineIndex = Math.min(Math.floor(frame / lineFrames), segments.length - 1);
+
+  const cameraFrames = CAMERA_POINTS.map((point) => Math.round(point.at * durationInFrames));
+  const scale = interpolate(frame, cameraFrames, CAMERA_POINTS.map((point) => point.scale), {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
-  const x = interpolate(frame, [0, durationInFrames], [0, -28], {
+  const x = interpolate(frame, cameraFrames, CAMERA_POINTS.map((point) => point.x), {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
+  const y = interpolate(frame, cameraFrames, CAMERA_POINTS.map((point) => point.y), {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+  const captionText = segments[lineIndex] || '';
+  const captionPulse = 1 + (0.018 * Math.sin((frame - (lineIndex * lineFrames)) * 0.18));
+  const beatFlash = Math.max(0, 1 - Math.abs(((frame - (lineIndex * lineFrames)) / 8) - 1));
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000' }}>
-      {clipSrc ? (
-        <Video src={clipSrc} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : imageSrc ? (
+      {imageSrc ? (
         <AbsoluteFill
           style={{
             overflow: 'hidden',
-            transform: `translateX(${x}px) scale(${scale})`,
+            transform: `translate(${x}px, ${y}px) scale(${scale})`,
             transformOrigin: 'center center',
           }}
         >
@@ -119,42 +80,83 @@ export const AnimalFactScene = ({
         <AbsoluteFill style={{ backgroundColor: '#1a1a1a' }} />
       )}
 
+      <AbsoluteFill style={{ backgroundColor: 'rgba(0,0,0,0.18)' }} />
+
+      <AbsoluteFill
+        style={{
+          background: `radial-gradient(circle at 50% 44%, rgba(255,230,160,${0.08 + (beatFlash * 0.08)}) 0%, transparent 48%)`,
+        }}
+      />
+
+      {DOODLE_PRESETS.map((preset, index) => {
+        const active = index === (lineIndex % DOODLE_PRESETS.length);
+        const pulse = 1 + (active ? 0.08 * Math.sin(frame * 0.22) : 0.03 * Math.sin((frame * 0.16) + index));
+        const opacity = active ? 0.92 : 0.24;
+        const translateY = active ? (-6 * Math.sin(frame * 0.18)) : 0;
+        return (
+          <div
+            key={`${preset.icon}-${index}`}
+            style={{
+              position: 'absolute',
+              top: preset.top,
+              left: preset.left,
+              right: preset.right,
+              color: preset.color,
+              fontFamily: FONT_FAMILY,
+              fontSize: preset.size,
+              fontWeight: 900,
+              transform: `translateY(${translateY}px) rotate(${preset.rotate}deg) scale(${pulse})`,
+              transformOrigin: 'center center',
+              opacity,
+              textShadow: '0 8px 26px rgba(0,0,0,0.28)',
+            }}
+          >
+            {preset.icon}
+          </div>
+        );
+      })}
+
       {narrationPath ? <Audio src={resolveAssetSrc(narrationPath)} /> : null}
       {backgroundMusicPath ? <Audio src={resolveAssetSrc(backgroundMusicPath)} volume={0.25} /> : null}
 
       <AbsoluteFill
         style={{
+          justifyContent: 'flex-end',
           alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingTop: 34,
+          padding: '0 34px 34px',
           pointerEvents: 'none',
         }}
       >
-        <div
-          style={{
-            backgroundColor: PILL_BG,
-            borderRadius: PILL_RX,
-            padding: '12px 22px',
-            boxShadow: '0 10px 24px rgba(0,0,0,0.18)',
-          }}
-        >
-          <p
+        {captionText ? (
+          <div
             style={{
-              margin: 0,
-              color: PILL_TEXT,
-              fontFamily: FONT_FAMILY,
-              fontSize: 28,
-              fontWeight: 800,
-              letterSpacing: 1,
-              textAlign: 'center',
+              transform: `scale(${captionPulse})`,
+              backgroundColor: 'rgba(0,0,0,0.76)',
+              borderRadius: 18,
+              padding: '16px 28px',
+              maxWidth: '78%',
+              boxShadow: '0 14px 36px rgba(0,0,0,0.36)',
+              border: `2px solid ${lineIndex % 2 === 0 ? 'rgba(255,210,0,0.58)' : 'rgba(255,255,255,0.18)'}`,
             }}
           >
-            {label}
-          </p>
-        </div>
+            <p
+              style={{
+                margin: 0,
+                color: CREAM,
+                fontFamily: FONT_FAMILY,
+                fontSize: 34,
+                fontWeight: 800,
+                textAlign: 'center',
+                lineHeight: 1.32,
+                letterSpacing: 0.2,
+              }}
+            >
+              {captionText}
+            </p>
+          </div>
+        ) : null}
       </AbsoluteFill>
 
-      <PillCaption text={description} />
     </AbsoluteFill>
   );
 };

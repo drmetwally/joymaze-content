@@ -4,6 +4,101 @@
 
 ---
 
+## 2026-04-22 — [Agent: OpenClaw] — Hedgehog rerender pass 2: audio balance + smoother motion
+
+**Files changed:** `remotion/components/longform/animal/AnimalNameReveal.jsx`, `remotion/components/longform/animal/AnimalOutroScene.jsx`, `remotion/components/longform/animal/AnimalFactScene.jsx`, `output/longform/animal/ep03-hedgehog/episode.json`
+
+**Fixes applied from render review:**
+- Lowered reveal and outro jingle levels so narration reads clearly.
+- Delayed reveal/outro narration slightly so the jingle attack does not mask the spoken line.
+- Reworked fact-scene camera movement from per-segment reset motion into a continuous move across the scene to reduce same-image jump/jitter.
+- Re-rendered `ep03-hedgehog_h.mp4` after the fixes.
+
+**User review state after prior pass:** drastic improvement overall, roughly 7/10, with song still the strongest segment.
+
+---
+
+## 2026-04-22 — [Agent: OpenClaw] — Animal facts engine polish: motion-graphics format + VO overhaul
+
+**Files changed:** `remotion/components/longform/animal/AnimalFactScene.jsx`, `remotion/components/longform/animal/AnimalHookScene.jsx`, `remotion/components/longform/animal/AnimalNameReveal.jsx`, `remotion/components/longform/animal/AnimalSungRecap.jsx`, `remotion/components/longform/animal/AnimalOutroScene.jsx`, `remotion/compositions/AnimalFactsEpisode.jsx`, `scripts/generate-animal-narration.mjs`, `scripts/generate-animal-facts-brief.mjs`
+
+**Animal facts visual format decisions (locked for future episodes unless review changes them):**
+- Hook format: mystery question only, no animal name in hook, with silhouette-style visual treatment before reveal.
+- Fact scenes: no stock-style B-roll dependency; default to still-image motion plus light sketch/motion-graphics overlays and always-visible captions.
+- Sung recap: keep as a signature strength. Cycle episode fact images during the song and show lyric captions on screen for sing-along feel.
+- Cleaner fact visuals preferred: removed the top fact tag from fact scenes.
+
+**VO / narration engine decisions:**
+- Animal facts should sound like an excited kids-video host, not a teacher or encyclopedia.
+- Fact structure stays 4 beats, but now maps to: surprise line → why/how → vivid real detail/stat → child-world landing.
+- TTS pacing increased for energy: facts now target 1.05 speed; hook/reveal faster; outro slightly faster.
+- OpenAI animal-facts voice changed from `shimmer` to `nova`.
+- Upstream brief descriptions were loosened so fact source copy is less mechanically rigid and rewrites into spoken VO more naturally.
+
+**Planned future direction:**
+- Level 1 + Level 2 motion graphics are now the default direction for animal facts.
+- Level 3 character animation is reserved for Joyo as a future unified narrator/brand-mascot layer, not for generic animal episodes yet.
+
+---
+
+## 2026-04-19 — [Agent: Claude] — Track B engine complete: render, narration, art style pool
+
+**Files changed:** `scripts/render-story-longform.mjs`, `scripts/generate-animal-narration.mjs` (new), `scripts/generate-animal-facts-brief.mjs`, `scripts/generate-story-longform-brief.mjs`, `package.json`, `output/longform/animal/ep02-sea-otter/episode.json`, `output/longform/animal/ep02-sea-otter/brief.md`
+
+**Image format locked to horizontal for all longform:**
+- Both brief generators (story + animal) updated: `vertical portrait, 1080×1920` → `horizontal landscape, 1920×1080`
+- Decision: native horizontal images = no blurred sides, full-bleed quality. Story engine uses blurred-bg wrapper for horizontal from vertical — rejected for production quality.
+- ep02 episode.json + brief.md updated to match.
+
+**Animal render engine built (`render-story-longform.mjs --format animal`):**
+- Removed early `format !== 'story'` exit
+- `resolveEpisodeDir` now format-aware → routes to `output/longform/animal/`
+- `validateAssetsAnimal()`: checks 4 images + 3 narration wavs + background/sung-recap + shared jingles
+- `calculateTotalFramesAnimal()`: fixed 4500 frames (2.5 min), matching `AnimalFactsEpisode.jsx` constants
+- Composition routing: `AnimalFactsEpisode` (vertical) / `AnimalFactsEpisodeH` (horizontal)
+- `cropToVertical()`: FFmpeg center-crop 1920×1080 → 1080×1920 via `--crop-vertical` flag
+
+**`generate-animal-narration.mjs` — new script (full intelligence stack):**
+- Groq generates 2-3 sentence narration copy per segment (habitat, diet, funFact)
+- System message: `config/writing-style.md` (locked rule)
+- Psychology: full trigger HOW-to descriptions per segment from `psychology-triggers.json`
+- Intelligence: `content-intelligence.json` trending themes + hooks injected as optional context
+- Each segment uses its `psychologyMap` trigger + `psychologyBeat` from episode.json
+- OpenAI tts-1-hd / shimmer → `narration-habitat.wav`, `narration-diet.wav`, `narration-funfact.wav`
+- Writes `segment.narration`, `segment.narrationFile`, `segment.durationSec` back to episode.json
+- Idempotent: skips existing files unless `--force`
+
+**`ANIMAL_ART_STYLES` pool added to animal brief generator:**
+- 12 nature/documentary illustration styles (NatGeo, watercolor wildlife, Ghibli-inspired, etc.)
+- `pickEpisodeStyle(n)` deterministic rotation by episode number
+- Injected into `visualStyleBlock` as hard directive to Groq: "use EXACTLY this style across ALL 4 images"
+- `artStyle` stored in episode.json + shown at TOP of brief.md before any image prompts
+- ep02 art style: "NatGeo Kids editorial illustration, clean linework, vibrant natural palette, flat digital painterly"
+
+**Next:** Generate 4 images in Gemini for ep02 (open brief.md, set art style first) → drop audio → `npm run longform:animal:narrate` → `npm run longform:animal:render`
+
+---
+
+## 2026-04-18 — [Agent: Claude] — Session close: memory audit + longform testing plan
+
+**Files changed:** `docs/TASKS.md`, memory files (project_longform_story_engine.md)
+
+**Audit findings:**
+- Intelligence pools claim ("never ran live, still empty") was a hallucination in prior session recommendation — all 5 dynamic pools confirmed populated, last updated 2026-04-16. Memory was correct; the bad info was in the session summary only.
+- Longform build phases: all 13 Codex phases are DONE (not "at phase 4"). User clarified: phases were built by Codex, hit code issues during Track A E2E testing, fixed them, now running E2E validation across all 3 tracks.
+
+**Decisions logged:**
+- ep02 re-narrate: SKIPPED — Ahmed decision, not worth the effort
+- ep04: deferred to 2026-04-19 session
+- X warmup: underway, autopilot until 2026-04-26, nothing to do
+
+**Longform testing plan locked:**
+- Track A (Story): ✅ validated — ep03 approved, engine locked
+- Track B (Animal Facts): next E2E test — `npm run longform:animal:plan:save` first step
+- Track C (Puzzle Compilations): blocked until ASMR live test produces 5+ folders with solved.png
+
+---
+
 ## 2026-04-18 — [Agent: Claude] — Brief generator: 24 scenes + storyboard + OpenAI TTS + Codex animation brief
 
 **Files changed:** `scripts/generate-story-longform-brief.mjs`, `scripts/generate-narration.mjs`, `docs/CODEX_ANIMATION_BRIEF.md` (new), `docs/TASKS.md`, memory files
@@ -1806,3 +1901,190 @@ Target: cross-fade transitions, image cycling (max 5s/image), scene entrance, ph
 - ep03 v3: HOOK_FRAMES trimmed 270→210 to cut 2s dead air at hook end — final render confirmed clean (6441 frames, 3.6 min)
 - Ahmed: "perfect, perfect, perfect. EVERYTHING CHECKS. I fucking love it."
 - Engine is now locked and production-ready for future episodes
+
+---
+**2026-04-19 — Daily pipeline audit + CLAUDE.md learning system**
+
+CLAUDE.md upgrades: 4 new sections added (Locked Decisions table, Pre-Task Checklists, Mistake→Rule Protocol, Mandatory Post-Task Update Protocol).
+
+Pipeline audit (`npm run daily`) found and fixed 3 bugs:
+1. `intelligence-refresh.mjs` — competitor analysis ignored `--monday-only` when `--competitor-only` also set (`!COMPETITOR_ONLY` removed from gate condition)
+2. `generate-x-posts.mjs` — no idempotency check; was calling Groq + overwriting posted files on every run. Fixed: existence check at top of main() before any API call; `--force` flag added
+3. `archive-queue.mjs` — x-text files (arrays) parsed as queue metadata objects → `Skip: undefined (today — unknown)` log noise. Fixed: early skip for `x-text-*` prefix
+
+All 3 fixes added as rows to CLAUDE.md Locked Decisions table.
+Pipeline otherwise clean: 10 prompts all pass quality gate (8–9/10), story ideas generated, ASMR brief + challenge brief generated, X posts generated.
+
+---
+**2026-04-19 — Animal facts brief generator upgraded (5 gaps fixed)**
+
+`generate-animal-facts-brief.mjs` now fully wired to psychology, writing style, and storyboarding:
+1. GROQ_MAX_TOKENS raised 1200 → 4000
+2. `psychTriggers` now injected into buildPrompt() with HOW-to descriptions per segment (was loaded but unused)
+3. `nameReveal` section added to JSON schema, validateBrief, buildEpisodeJson, buildBriefMd — generates `namereveal.png` prompt
+4. Image prompts upgraded to 50-70 words with shotType + compositionNote + psychologyBeat per image, bottom fade + format spec mandatory
+5. Visual style block + psychology color cues injected (CURIOSITY_GAP = dramatic contrast, NOSTALGIA = warm amber, COMPLETION_SATISFACTION = vibrant)
+
+ep01 (African Lion) was generated with old weak brief — will delete and regenerate.
+ep02 (Sea Otter) is first episode with full brief quality. E2E test proceeds with ep02.
+
+## 2026-04-19 — [Agent: Claude] — Animal facts ep02 render: full engine rebuild + competitor research
+
+**Files changed:** `remotion/compositions/AnimalFactsEpisode.jsx`, `remotion/components/longform/animal/AnimalHookScene.jsx`, `remotion/components/longform/animal/AnimalNameReveal.jsx`, `remotion/components/longform/animal/AnimalOutroScene.jsx` (new), `remotion/components/longform/animal/AnimalFactScene.jsx`, `remotion/components/longform/animal/AnimalSungRecap.jsx`, `scripts/generate-animal-narration.mjs`, `output/longform/animal/ep02-sea-otter/episode.json`, `scripts/render-story-longform.mjs`, `docs/TASKS.md`, memory files
+
+**Engine rebuild (multi-round bug fix + viewer feedback iteration):**
+- Hook scene: removed jingle (voice was masked by music) → voice-only at frame 0
+- Name reveal: jingle moved HERE as celebration music; spring pop-in (stiffness:400 damping:14)
+- Dynamic scene durations: `segFrames(episode, key)` reads `durationSec` from narration probe
+- Global background music: single `<Audio loop>` at composition level — no gaps between scenes
+- AnimalOutroScene: new component — funfact.png backdrop, outroCta yellow pill, narration + jingle
+- AnimalSungRecap: imagePath backdrop added (was plain gradient "orange" background)
+- resolveAssetSrc helper added at composition level + staticFile import fixed
+- All brollClip paths guarded: `episode.brollClips?.key ? path : ''` prevents Video 404 crash
+- TTS: `response_format: 'mp3'` explicit; file extension changed to .mp3; music-metadata probe working
+
+**ep02 renders successfully** at 1:18 min (structural redesign deferred — competitor research done first)
+
+**Competitor analyses run (both animal facts + story video genres):**
+- Animal facts (SciShow Kids, Nat Geo Kids, FreeSchool, FactPaw): current engine is 2.5x too short, 3 segments vs. 5 facts, dreamy script vs. clear+factual. Full redesign plan written to Phase 4B in TASKS.md.
+- Story video (Bluey, StoryBots, CoComelon, Little Angel): hard cuts confirmed correct, 7s scenes confirmed, 3-act confirmed. Three gaps found: (1) no repeatable phrase, (2) no adult-layer writing, (3) no YouTube CTA frame. Written to Phase 4C in TASKS.md.
+
+**Next:** Execute Phase 4B (animal facts redesign) and Phase 4C (story engine alignment) — start with brief generator changes.
+
+---
+## 2026-04-20 — Phase 4B + 4C implemented
+
+**Phase 4B — Animal Facts Structural Redesign (DONE)**
+- `generate-animal-facts-brief.mjs`: 3-segment model (habitat/diet/funFact) replaced with 5 numbered facts (fact1–fact5). New fields: numberLabel, comparisonAnchor, 3-sentence description spec. Hook now names animal directly ("Sea otters hold hands… — here's why"). Runtime validator warns if projected narration < 3:20. 6 images (namereveal + fact1-fact5). psychologyMap updated.
+- `generate-animal-narration.mjs`: SEGMENTS replaced, TTS speed added (hook/nameReveal=1.15, facts=0.92), durationSec formula changed to max(audioDuration+7, wordCount/1.5), outroCta now includes parent trust signal.
+- New `AnimalFactTitleCard.jsx`: 45-frame (1.5s) yellow pill title card with spring pop-in, same config as AnimalNameReveal.
+- `AnimalFactsEpisode.jsx`: flatMap loop over fact1–fact5 with title cards, TITLE_CARD_FRAMES=45, segFrames fallback 12→16s.
+
+**Phase 4C — Story Engine Structural Alignment (DONE)**
+- `generate-story-longform-brief.mjs`: Added episodeCatchphrase, catchphraseScenes[N,M], parentLayer to Groq JSON schema + hard rules + buildEpisodeJson + buildBriefMd display. includeCta: false default written to episode.json.
+- New `StoryCtaScene.jsx`: 20s optional YouTube CTA — Joyo left, app icon right, yellow pill narration text fades in at 5s, hard cut.
+- `StoryLongFormEpisode.jsx`: StoryCtaScene wired in as optional Sequence after outro (CTA_FRAMES=600).
+- `render-story-longform.mjs`: CTA_FRAMES added to total duration calculation when includeCta is true.
+
+**Next**: Generate ep03 animal brief (`npm run longform:animal:plan:save`) to validate redesign. Set includeCta:true in a story episode to test YouTube CTA render.
+
+---
+## 2026-04-20 — Phase 4B runtime expansion + Track B E2E prep
+
+**What was done:**
+- Ran `npm run longform:animal:plan:save` — Phase 4B validation passed (5-fact schema, direct hook, 6 images, no errors).
+- Runtime warning fired (127s projected vs 200s target). Root cause: 3-sentence spec (~35w/fact) only produces ~2:53 at render time — short of 3:30-4:00 competitor target.
+- Expanded fact spec to **4 sentences** (~48-55w/fact): S1 12-15w fact, S2 14-18w explanation, S3 10-13w specific detail/stat, S4 10-13w comparison to child's world.
+- Updated both generators: `generate-animal-facts-brief.mjs` (schema + hard rules) + `generate-animal-narration.mjs` (narration prompt).
+- Fixed `validateBrief()` projection formula: was `totalWords/2.0` (ignored +7s render padding) → now `max(wc/2.3+7, wc/1.5)` per fact, matching actual render-time durationSec.
+- Re-ran brief generator — no runtime warning. ep04-butterfly projected 3:46. Test folders cleaned.
+- Updated TASKS.md: Phase 4B fully complete; Track B E2E test now points to ep03 (new format), not ep02-sea-otter (old 3-segment format).
+
+**What was found:**
+- ep02-sea-otter brief uses old habitat/diet/funfact structure — do not use as E2E test template.
+- The validator's `/2.0` TPS rate + missing fixed-segment time (~45s for sungRecap+outro+titleCards) was making runtimes look much shorter than actual.
+
+**Next:** Track B E2E test — `npm run longform:animal:plan:save` → ep03 → Gemini images → narrate → render → review AnimalFactsEpisode output.
+
+---
+## 2026-04-20 — Phase 4D: B-Roll Automation (Pexels API)
+
+**What was done:**
+- Recovered agreed-but-unbuilt Phase 2 B-roll plan from April 19 chat log (context had expired before build).
+- Built `scripts/download-broll.mjs`: Groq → keywords per fact → Pexels Video API → HD clip downloaded; writes `episode.brollClips` to episode.json; idempotent + per-fact error recovery.
+- Updated `AnimalFactScene.jsx`: 90-frame (3s) illustrated image (Ken Burns) → hard cut to B-roll (looped, muted). 3s based on competitor data: YouTube kids cuts every 3-8s.
+- Fixed stale `funfact.png` reference in `AnimalFactsEpisode.jsx` outro → `namereveal.png`.
+- Added `longform:animal:broll` + `longform:animal:broll:dry` npm aliases.
+- Added `PEXELS_API_KEY` to `.env`.
+- Live tested ep03-hedgehog: 5/5 clips downloaded, 4K sources (24s–97s).
+
+- Wired B-roll auto-download into `render-story-longform.mjs`: spawns `download-broll.mjs` automatically before validation if `episode.brollClips` is empty; reloads episode.json after. B-roll now zero-touch in normal render flow.
+- Fixed stale animal constants in render script: ANIMAL_IMAGES/NARRATION updated to fact1-5; calculateTotalFramesAnimal now uses ANIMAL_FACT_KEYS loop + TITLE_CARD_FRAMES (45); segFrames fallback 12→16s.
+
+**Next:** Generate 6 Gemini images for ep03-hedgehog → drop background.mp3 + sung-recap.mp3 → narrate → render.
+
+---
+## 2026-04-21 — Task Scheduler fix + daily audit + ep03 identical image root cause + brief generator upgrade
+
+**Task Scheduler fix:**
+- `\Joymaze Daily` task was failing silently (error -2147024894 = FILE_NOT_FOUND). Root cause: task pointed to `C:\nvm4w\nodejs\node.exe` which no longer exists (node moved to `D:\node\node.exe`). Deleted + recreated via bash `schtasks //create ...` double-slash syntax. Next run: 4/22 9:00 AM. No hardcoded old path anywhere in repo (grep confirmed).
+- 3 other disabled JoyMaze tasks still have old path — will fix when re-enabling.
+
+**npm run daily (manual run, 2026-04-21):**
+- 10 image prompts generated (avg 9.3/10, 10 pass, 0 flagged). Prompts 4 (stained glass tracing) and 8 (Pixar quiz) flagged as watch-and-regen-if-needed.
+- 4 X posts generated — all SHIP (no hashtags, no brand name, no URLs, soft CTAs).
+- Story ep04-the-hedgehog-who-tended-the-secret-garden scaffolded (8 slides, watercolor).
+- ASMR wordsearch-butterfly-garden scaffolded.
+- Today is facts-carousel-coloring day — 5 slides needed: `output/raw/facts-carousel-coloring-2026-04-21/`.
+
+**ep03-hedgehog identical images root cause found:**
+- Groq generated ~20-word imagePromptHints (spec: 50-70). All 6 prompts were template-like "A hedgehog in [setting]…" at the same framing distance.
+- nameReveal and fact1 both ESTABLISHING shot type → near-identical wide meadow compositions.
+- Psychology color cues (CURIOSITY_GAP = dramatic contrast; NOSTALGIA = amber haze) were not present in generated prompts.
+
+**`generate-animal-facts-brief.mjs` upgrades:**
+1. `content-intelligence.json` wired: `intelligence_summary.recommended_focus_shift` + `new_themes` (brand-safe, top 4) injected as emerging themes block — biases animal/environment selection toward weekly signals.
+2. `pattern-interrupt-dynamic.json` wired: top 3 brand-safe non-edutainment interrupts injected as hook pattern references — informs hookFact structure.
+3. `validateBrief()` now enforces minimum 40 words per imagePromptHint (target 50-70). Script throws with clear message if Groq produces a lazy short prompt.
+4. 2 new rules added to CLAUDE.md Locked Decisions table.
+
+**ep03 corrected prompts:**
+All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
+- nameReveal: wide meadow, bright golden morning, hedgehog small at center
+- fact1: dark forest, backlit spines glowing like amber needle crown, dramatic chiaroscuro
+- fact2: medium shot, nose-sniffing mushrooms at log base, crescent moon, amber twilight
+- fact3: action, mid-climb on tree bark, claws gripping, motion blur, rim lighting
+- fact4: extreme close-up, spine sunburst pattern, vibrant saturated sunlit tones
+- fact5: medium, in child's cupped hands, warm rose/amber window light, intimate
+
+**Next:** Ahmed drops images + audio → `npm run longform:animal:narrate` → `npm run longform:animal:render`.
+
+## 2026-04-22 — [Agent: Claude] — ep03-hedgehog Animal Facts render SUCCESS
+
+**What was done:**
+- All assets confirmed in place: 6 Gemini images, 5 Pexels B-roll clips, background.mp3, sung-recap.mp3
+- Narration generated: 8 files (hook, namereveal, fact1–fact5, outro-cta) via `generate-animal-narration.mjs` — shimmer TTS, all scenes ≥7s
+- First render attempt FAILED at frame 3668 — Remotion timeout (33s exceeded) caused by 4K Pexels source clips (43–107MB) being decoded in headless browser
+- Fix: transcoded all 5 B-roll clips to 1920×1080 H.264 CRF 23 using FFmpeg (22–32MB each); updated episode.json brollClips to -tc.mp4 names
+- Second render SUCCESS — 5325 frames, 3.0 min, 230MB, exit code 0
+- `download-broll.mjs` patched: now auto-transcodes every downloaded clip to 1920×1080 (download to -raw.mp4, transcode to final .mp4, delete raw) — this bug can't recur on future episodes
+
+**Bug added to CLAUDE.md locked decisions:** Pexels 4K clips must be transcoded to 1920×1080 before Remotion render — raw downloads cause browser timeout at frame ~3500+
+
+**Next:** Ahmed reviews ep03-hedgehog_h.mp4 — if approved, Track B is validated and production-ready
+
+## 2026-04-22 — [Claude] — Animal Facts engine: 9-bug review fix
+
+**What was done (ep03-hedgehog 2/10 review):**
+- Bug 1 (hook reveals animal): brief prompt changed — hookFact must be mystery question, no animal name
+- Bug 2 (7s dead air): `generate-animal-narration.mjs` buffer changed from `dur+7.0` to `dur+1.5`; HOOK_FRAMES + OUTRO_FRAMES now audio-driven from episode.json
+- Bug 3 (wrong animals B-roll): `download-broll.mjs` rewritten — Pixabay (cartoon/animated, primary) + Pexels (live, fallback); 5-pass search strategy; PIXABAY_API_KEY added to .env placeholder
+- Bug 5 (nonsense stats): removed ellipsis-stats instruction from narration prompt; added "NEVER fabricate statistics" rule in both brief and narration scripts
+- Bug 6 (full-scene text overlay): removed PillCaption from AnimalFactScene — VO carries the content
+- Bug 7 (jittery B-roll): ffmpeg transcode now includes `-r 30` to force 30fps CFR
+- Bug 8 (lyrics don't match song): AnimalSungRecap redesigned — drops broken karaoke, shows animal name + ♪ Fun Facts Song ♪ + floating notes
+- Bug 9 (CTA cut off): `outroCtaDurationSec` now written to episode.json; OUTRO_FRAMES audio-driven (min 8s floor)
+- ep03-hedgehog episode.json: all durationSec corrected (was dur+7s, now dur+1.5s); hookNarrationDurationSec + outroCtaDurationSec added
+
+**Still open (hedgehog ep):**
+- Hook audio still reveals animal name — needs `npm run longform:animal:narrate -- --episode ep03-hedgehog --force` to regenerate with mystery-question hook
+- Pixabay API key needs to be added to .env before B-roll re-download
+- VO monotony (Bug 4) — deferred, separate tuning pass
+
+**Next:** Add PIXABAY_API_KEY to .env → re-download B-roll → re-narrate hook → re-render hedgehog ep
+
+## 2026-04-22 — [Claude] — ep03-hedgehog full re-pipeline: B-roll + narration + render
+
+**What was done:**
+- Added `PIXABAY_API_KEY=10942117-bc547e32547ddd60908e1525d` to `.env`
+- Fixed `findFfmpeg()` in `download-broll.mjs` — was always returning `'ffmpeg'` (not in PATH); now checks `existsSync` and resolves to Remotion's bundled `ffmpeg.exe`
+- Fixed FFmpeg transcode command — Remotion's bundled FFmpeg has `pad` and `force_original_aspect_ratio` disabled; replaced `scale=W:H:force_original_aspect_ratio=decrease,pad=...` with `copy -an` (fast path) + `scale=1920:1080` fallback
+- B-roll re-downloaded: 5/5 Pixabay cartoon hedgehog clips (75s each, 1920×1080, H.264 30fps CFR)
+- Hook text fixed in episode.json: `hookFact` + `hookNarration` changed to `"What tiny spiky animal can sleep for 6 whole months without eating?"` (mystery question, no animal name)
+- Narration fully regenerated (`--force`): hook + all 5 facts + outro CTA re-generated with new hook text
+- Found new bug: `readGuard = wordCount / 1.5` in `generate-animal-narration.mjs` was overriding `durationSec` (1.5 wps assumption vs actual 2.5 wps TTS) → causing 5-10s dead air per fact. Removed readGuard entirely; script now uses `dur + 1.5` only.
+- Manually patched episode.json durationSec: fact1→17.0, fact2→15.3, fact3→16.4, fact4→13.9, fact5→18.9
+- Re-rendered clean: 4110 frames (2.3 min) → `ep03-hedgehog_h.mp4`
+- 2 new locked rules added to CLAUDE.md (FFmpeg filter incompatibility, readGuard dead air bug)
+
+**What's next:** Review ep03-hedgehog_h.mp4. If approved, proceed to ep04.

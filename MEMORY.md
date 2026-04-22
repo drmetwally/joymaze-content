@@ -55,6 +55,30 @@ Report: `npm run output:report`
 
 ---
 
+## 2.5 LONGFORM ANIMAL FACTS FORMAT (LOCKED 2026-04-22)
+
+**Track B direction updated:** animal facts episodes should feel like lively kids edutainment, not mini documentaries.
+
+### Visual rules
+- Hook = mystery question only, no animal name spoken or shown before reveal.
+- Hook visual should use silhouette-style treatment before the name reveal payoff.
+- Fact scenes should default to still-image motion + light sketch/motion-graphics overlays + visible captions, not depend on generic stock B-roll.
+- Sung recap is a format strength. Keep it, cycle episode images during the song, and show lyric captions on screen.
+- Cleaner fact scenes beat clutter. Avoid unnecessary top tags on the fact visuals.
+
+### VO rules
+- Animal facts narration should sound like an excited kids-video host, not a classroom teacher.
+- Permanent 4-beat spoken structure: surprise line → why/how → vivid real detail/stat → child-world comparison/payoff.
+- Prefer lively, performable spoken copy over rigid textbook phrasing.
+- OpenAI default voice for animal facts: `nova`.
+- `shimmer` remains better suited for softer story narration, not the animal-facts format.
+
+### Future direction
+- Level 1 and Level 2 motion graphics are the default build direction for animal facts now.
+- Level 3 character animation should be saved for Joyo as a future unified narrator/brand-mascot layer.
+
+---
+
 ## 3. PLATFORM ACCOUNT STATUS (last updated: 2026-04-13)
 
 | Platform | Account | Handle | API in .env | GitHub Secrets | Status |
