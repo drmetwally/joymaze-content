@@ -74,7 +74,7 @@ export const AnimalNameReveal = ({
       <AbsoluteFill style={{ backgroundColor: `rgba(255,255,255,${flashOpacity})` }} />
 
       {/* Audio — keep the jingle under the voice and delay narration slightly past the jingle attack */}
-      {hookJinglePath ? <Audio src={resolveAssetSrc(hookJinglePath)} volume={0.2} /> : null}
+      {hookJinglePath ? <Audio src={resolveAssetSrc(hookJinglePath)} volume={0.1} /> : null}
       {narrationPath ? (
         <Sequence from={8}>
           <Audio src={resolveAssetSrc(narrationPath)} volume={1.0} />

@@ -92,7 +92,7 @@ export const AnimalFactsEpisode = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000' }}>
-      {bgMusicSrc ? <Audio src={resolveAssetSrc(bgMusicSrc)} volume={0.18} loop /> : null}
+      {bgMusicSrc ? <Audio src={resolveAssetSrc(bgMusicSrc)} volume={0.08} loop /> : null}
 
       <Series>
         {/* HOOK — question only, voice is hero, no jingle conflict */}

@@ -54,7 +54,7 @@ export const AnimalOutroScene = ({
         }}
       />
 
-      {outroJinglePath ? <Audio src={resolveAssetSrc(outroJinglePath)} volume={0.18} /> : null}
+      {outroJinglePath ? <Audio src={resolveAssetSrc(outroJinglePath)} volume={0.09} /> : null}
       {outroCtaNarrationPath ? (
         <Sequence from={10}>
           <Audio src={resolveAssetSrc(outroCtaNarrationPath)} volume={1.0} />

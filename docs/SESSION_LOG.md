@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-04-22 — [Agent: OpenClaw] — Hedgehog rerender pass 3: quieter music mix
+
+**Files changed:** `remotion/compositions/AnimalFactsEpisode.jsx`, `remotion/components/longform/animal/AnimalNameReveal.jsx`, `remotion/components/longform/animal/AnimalOutroScene.jsx`
+
+**Mix changes applied from review:**
+- Lowered looping background music level in animal episodes so VO stays clearly on top.
+- Lowered reveal jingle further under narration.
+- Lowered outro jingle further under narration.
+- Re-rendered `ep03-hedgehog_h.mp4` with the quieter mix.
+
+---
+
 ## 2026-04-22 — [Agent: OpenClaw] — Hedgehog rerender pass 2: audio balance + smoother motion
 
 **Files changed:** `remotion/components/longform/animal/AnimalNameReveal.jsx`, `remotion/components/longform/animal/AnimalOutroScene.jsx`, `remotion/components/longform/animal/AnimalFactScene.jsx`, `output/longform/animal/ep03-hedgehog/episode.json`
