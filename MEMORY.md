@@ -76,6 +76,7 @@ Report: `npm run output:report`
 ### Future direction
 - Level 1 and Level 2 motion graphics are the default build direction for animal facts now.
 - Level 3 character animation should be saved for Joyo as a future unified narrator/brand-mascot layer.
+- Hedgehog (ep03) was accepted on 2026-04-22 as the new Track B baseline after multiple rerender passes. Remaining gains are mostly in content richness: more scenes, better hook-specific art, and longer/more varied fact coverage.
 
 ---
 

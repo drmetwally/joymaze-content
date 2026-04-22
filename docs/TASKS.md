@@ -278,21 +278,146 @@ See codex-log.md (Steps 1–65) for full audit trail.
 - [x] Shared audio pool from assets/audio/ (no per-episode copies needed)
 - [x] OpenAI TTS: `shimmer` voice, `tts-1-hd` model, min 7s scenes
 
-**Pending — ep02 re-narration:**
-- [ ] Delete old edge-tts MP3s: `del output\longform\story\ep02-bennys-big-spring-help\narration-scene-*.mp3`
-- [ ] Clear narrationFile + durationSec in episode.json, re-run: `npm run longform:story:narrate -- --episode output/longform/story/ep02-bennys-big-spring-help`
-- [ ] Re-render ep02 with shimmer voice
+**ep02 re-narration: SKIPPED (2026-04-18 — Ahmed decision, not worth the effort)**
 
-### Phase 5 — Animal Facts First Episode (after Phase 4 passes)
-- [ ] `npm run longform:animal:plan:save` → generate animal ep01
-- [ ] Generate 4 images (habitat, diet, funfact, namereveal) in Gemini
-- [ ] Drop 4 MP3s (background, sung-recap, hook-jingle, outro-jingle)
-- [ ] Narrate + render → check YouTube
+---
 
-### Phase 6 — Puzzle Compilation First Test (after ASMR folders have images)
-- [ ] Generate at least 5 complete ASMR activities (blank.png + solved.png present)
-- [ ] `npm run longform:puzzle:compile -- --save` → generates compilation.json
-- [ ] Drop `background.mp3` → render → check YouTube
+## LONGFORM E2E TESTING — ALL 3 TRACKS (active sprint as of 2026-04-18)
+
+> Engine is fully built. Goal: validate Track B + Track C work end-to-end the same way Track A (story) was validated.
+> Track A Story is the proven baseline. Fix any bugs found in B + C before producing real content.
+
+### Track A — Story Long-Form ✅ VALIDATED
+- [x] ep03 approved ("perfect, perfect, perfect") — engine locked, production-ready
+- [x] ep04 planned for next content session (2026-04-19+)
+
+### Track B — Animal Facts (~3-5 min) [~] IN PROGRESS
+> ep02-sea-otter is the test episode (ep01-african-lion deleted — generated with old weak brief, no images)
+> Engine complete as of 2026-04-19: render + narration + art style pool all built
+
+- [x] Brief generator upgraded: psychology, storyboarding, 50-70 word image prompts, GROQ_MAX_TOKENS 4000
+- [x] `ANIMAL_ART_STYLES` pool (12 styles) added — deterministic per episode, injected into Groq + brief.md
+- [x] Animal render engine built: `render-story-longform.mjs --format animal` → `AnimalFactsEpisodeH`
+- [x] `generate-animal-narration.mjs` built: Groq copy + OpenAI TTS shimmer, full intelligence stack
+- [x] Both brief generators (story + animal) updated to horizontal 1920×1080 image prompts
+- [x] ep02 brief.md updated: art style header + horizontal prompts
+- [~] ep02-sea-otter brief EXISTS but uses OLD 3-segment format (habitat/diet/funfact) — do NOT use as template or E2E test
+- [x] **E2E TEST: Generate ep03 brief** → `npm run longform:animal:plan:save` — ep03-hedgehog generated (2026-04-20)
+- [x] **Brief generator upgraded (2026-04-21):** content-intelligence.json + pattern-interrupt-dynamic.json wired into loadContext() + buildPrompt(). imagePromptHint word count validation added to validateBrief() (min 40 words — rejects lazy ~20w Groq outputs that produce identical images).
+- [~] **Generate 6 images in Gemini** — ep03 brief prompts rewritten (2026-04-21): all 6 now 50-70w with distinct framing, lighting, and psychology color cues. Ahmed generating now. Drop: namereveal.png, fact1.png–fact5.png
+- [~] **Drop audio** into ep03 folder: background.mp3 (Suno ambient), sung-recap.mp3 (Suno sung recap). Ahmed generating now.
+- [x] `npm run longform:animal:narrate -- --episode output/longform/animal/ep03-hedgehog` → narrate (2026-04-22)
+- [x] `npm run longform:animal:render -- --episode output/longform/animal/ep03-hedgehog` → render (2026-04-22) — 230MB, 3.0 min, exit 0. Bug found+fixed: Pexels 4K clips → Remotion timeout; fixed by FFmpeg transcode to 1920×1080 before render. download-broll.mjs patched to auto-transcode.
+- [x] Ahmed reviewed ep03-hedgehog_h.mp4 (2026-04-22) — accepted as the new baseline. Current quality is roughly 8/10, with transitions and song called out as standout strengths. Future gains are from richer scenes, better hook-specific creative, and more runtime/variety, not rescue fixes.
+
+### Track C — Puzzle Compilations (~60 min) [ ] BLOCKED
+**Blocker:** Needs at least 5 ASMR folders each containing `blank.png` + `solved.png` (or `maze.png` + `solved.png`).
+These come from the ASMR pipeline — Track C cannot be tested until ASMR live test runs first.
+- [ ] **Prerequisite:** Complete ASMR live test (see ASMR Pipeline section above)
+- [ ] `npm run longform:puzzle:compile -- --save` → generates compilation.json, confirm chapter list
+- [ ] Drop `background.mp3` → `npm run longform:puzzle:render` → render
+- [ ] Review output — flag any bugs in PuzzleCompilation.jsx
+
+---
+
+## Phase 4B — Animal Facts Structural Redesign (competitor-data-driven, execute 2026-04-20)
+
+> Source: competitor analysis (SciShow Kids, Nat Geo Kids, FreeSchool, FactPaw) run 2026-04-19.
+> Root problem: current engine is 1:18 vs. 3:30-4:00 target. 3 segments vs. 5 facts. Script is dreamy, not clear.
+> Do NOT touch AnimalFactsEpisode.jsx frame constants until brief + narration redesign is validated first.
+
+### 1. Brief Generator (`generate-animal-facts-brief.mjs`) ✅ DONE (2026-04-20)
+- [x] Replace 3 category segments (habitat/diet/funFact) with **5 numbered facts** (fact1–fact5)
+- [x] Each fact: **4-sentence structure** (expanded 2026-04-20 to hit 3:30-4:00 target) — (1) Fact 12-15w, (2) Explanation 14-18w, (3) Specific detail/stat 10-13w, (4) Comparison to child's world 10-13w. ~48-55 words per fact = projected 3:46 runtime.
+- [x] Hook: direct open with animal name — "Sea otters hold hands while sleeping — here's why."
+- [x] `comparisonAnchor` field per fact
+- [x] `numberLabel` field: "FACT 1" … "FACT 5"
+- [x] outroCta: "Ask a grown-up to help you write your answer in the comments!"
+- [x] Runtime validator: warns if projected narration < 200s (3:20)
+
+### 2. Narration Script (`generate-animal-narration.mjs`) ✅ DONE (updated 2026-04-22)
+- [x] SEGMENTS array: fact1–fact5 replacing habitat/diet/funFact
+- [x] **4-beat spoken formula** enforced in Groq prompt: surprise line → why/how → vivid real detail/stat → child-world landing
+- [x] TTS speed tuned for energy: hook/nameReveal = 1.18, facts = 1.05, outro = 1.08
+- [x] OpenAI animal-facts voice switched to `nova`
+- [x] durationSec now tuned around tighter audio-led pacing instead of the older long silent tail behavior
+- [x] Fabricated/ellipsis stat behavior removed from prompt
+
+### 3. Fact Title Card Component ✅ DONE (2026-04-20)
+- [x] `AnimalFactTitleCard.jsx` created — 45 frames (1.5s), yellow pill, spring pop-in
+
+### 4. Composition Update (`AnimalFactsEpisode.jsx`) ✅ DONE (2026-04-20)
+- [x] fact1–fact5 flatMap loop + title card between each
+- [x] segFrames fallback: 12s → 16s
+- [x] Label uses `episode[factKey].numberLabel`
+
+### 5. Image Specs ✅ DONE (2026-04-20)
+- [x] 6 images: namereveal.png + fact1.png–fact5.png
+- [x] 3-second visual rule added to prompt
+- [x] comparisonAnchor injected into imagePromptHint instructions
+
+### 6. Target Runtime ✅ DONE (2026-04-20)
+- [x] segFrames fallback updated to 16s; runtime validator in validateBrief — formula fixed to match render-time durationSec: max(wc/2.3+7, wc/1.5)
+- [x] **VALIDATED** (2026-04-20): Brief generator runs clean, 4-sentence output, no runtime warning, projected 3:46
+
+---
+
+## Phase 4D — B-Roll Automation (Pexels API) ✅ DONE (2026-04-20, later deprioritized 2026-04-22)
+
+> Agreed 2026-04-19 after ep02 render passed. Context expired before build. Recovered from chat log 2026-04-20.
+> Data: YouTube kids content cuts every 3-8s; 1 image per 32s fact scene = retention cliff.
+> **Update 2026-04-22:** default animal-facts direction is now still-image motion + light motion graphics + captions. Stock B-roll remains available, but is no longer the preferred visual strategy.
+
+- [x] `scripts/download-broll.mjs` — Groq generates keywords per fact → Pexels search → HD clip downloaded
+- [x] `AnimalFactScene.jsx` — 3s illustrated image (Ken Burns) → hard cut to B-roll (looped, muted)
+- [x] `AnimalFactsEpisode.jsx` — fixed stale `funfact.png` reference → `namereveal.png` in outro
+- [x] `package.json` — `longform:animal:broll` + `longform:animal:broll:dry` aliases added
+- [x] `.env` — `PEXELS_API_KEY` added
+- [x] **LIVE TESTED** — ep03-hedgehog: 5/5 clips downloaded (24s–97s, 3840–4096px 4K sources)
+- [x] `render-story-longform.mjs` — B-roll auto-wired: spawns download-broll.mjs automatically if `episode.brollClips` empty; reloads episode.json after download
+- [x] `render-story-longform.mjs` — fixed stale animal constants: ANIMAL_IMAGES/NARRATION updated to fact1-5 keys; calculateTotalFramesAnimal updated to fact1-5 + TITLE_CARD_FRAMES; segFrames fallback 12→16s
+
+Updated workflow:
+```
+npm run longform:animal:plan:save
+[manual: 6 Gemini images]
+[manual: background.mp3 + sung-recap.mp3]
+npm run longform:animal:narrate -- --episode output/longform/animal/ep03-...
+npm run longform:animal:broll  -- --episode output/longform/animal/ep03-...
+npm run longform:animal:render -- --episode output/longform/animal/ep03-...
+```
+
+**NEXT**: Use the locked animal-facts engine on the next episode and focus on richer scene count, stronger hook-specific creative, and longer/more varied fact coverage.
+
+---
+
+## Phase 4C — Story Engine Structural Alignment (competitor-data-driven, execute 2026-04-20)
+
+> Source: competitor analysis (Bluey, StoryBots, CoComelon, Little Angel) run 2026-04-19.
+> Current engine: approved and production-ready. These are targeted upgrades, not rebuilds.
+> Priority order: (1) repeatable phrase, (2) brief generator dual-layer, (3) CTA frame for YouTube.
+
+### 1. Repeatable Phrase Per Episode ✅ DONE (2026-04-20)
+- [x] `episodeCatchphrase` + `catchphraseScenes: [N, M]` added to Groq prompt schema and hard rules
+- [x] `catchphrase` + `catchphraseScenes` + `parentLayer` written to episode.json via `buildEpisodeJson()`
+- [x] brief.md displays catchphrase + parent layer above the visual style section
+
+### 2. Brief Generator — Dual-Layer Writing ✅ DONE (2026-04-20)
+- [x] `parentLayer` field added to Groq schema + hard rule
+- [x] Written to episode.json, displayed in brief.md
+
+### 3. CTA Frame for YouTube Long-Form ✅ DONE (2026-04-20)
+- [x] `StoryCtaScene.jsx` created — Joyo left, app icon right, narration pill at 5s, hard cut
+- [x] `includeCta: false` default in `buildEpisodeJson()` — manual opt-in per episode
+- [x] `StoryLongFormEpisode.jsx` wired: CTA_FRAMES=600, optional Sequence after outro
+- [x] `render-story-longform.mjs` updated: CTA_FRAMES added to total calculation
+- [ ] **NEXT**: Set `includeCta: true` in an episode.json to test the full YouTube CTA render
+
+### 4. Scene Length — CONFIRMED (2026-04-20)
+- [x] 7s minimum, 12-18 word narration = correct (Bluey: 7-12s average). No change needed.
+
+### 5. Hook Validation — CONFIRMED (2026-04-20)
+- [x] Flash-forward 7s with typewriter hook = structurally correct for format. No change needed.
 
 ---
 
@@ -302,6 +427,17 @@ See codex-log.md (Steps 1–65) for full audit trail.
 - [ ] Identify top 3 performing post categories by save rate (after 30 days of data)
 - [ ] Add "best-of" repost logic for Sunday slot (pull top-saved posts from prior week)
 - [ ] Evaluate Seedance 1.5 Pro trial results — decide if worth $118/year subscription
+
+### Pipeline Hardening (sourced from planning review 2026-04-21)
+
+- [ ] **Run logger utility** — `scripts/run-logger.mjs`: shared `logRun(stepName, fn)` wrapper used by every daily step. Appends to `output/run-log.json` with `{ step, status, duration_ms, timestamp, error }`. Failed steps log error and continue — pipeline never throws. Keep last 30 days of entries.
+- [ ] **Harden daily orchestrator** — rewrite `daily-scheduler.mjs` to wrap every step with `logRun()`. Print a summary at the end: `Daily run complete: 12/13 steps succeeded. 1 failed: collect-trends. See output/run-log.json.`
+- [ ] **Status command upgrade** — extend `scripts/status.mjs` to show: last daily run timestamp + step pass rate, cooldown state, queue depth, last post per platform, analytics freshness, longform queue depth. All data sourced from existing output files — no new API calls.
+- [ ] **Queue review gate** — add `--review` flag to `post-content.mjs`: prints `output/queue-preview.json` listing what would be posted (platform, type, caption preview), then prompts `Post this content? (y/n)`. Only proceeds on `y`. Remove prompt once warmup ends.
+- [ ] **Health check improvements** — upgrade `scripts/health-check.mjs`: test each API key with a lightweight call, verify FFmpeg is available, check output dirs are writable, check disk space (warn if <2GB free), check platform token expiry. Exit codes: 0 = healthy, 1 = degraded, 2 = broken.
+- [ ] **Auto-cooldown on platform errors** — if a platform returns an auth error or 429 three times in a row, auto-set a platform-specific cooldown. Auto-clear after the specified time without manual intervention. Log all cooldown events to `output/cooldown-history.json`.
+- [ ] **Post history tracking** — add posted URL/ID to `output/post-history.json` for every successful post. Include: platform, content type, post ID/URL, timestamp. Currently only queue files track this — centralized history enables de-dup and analytics.
+- [ ] **Caption de-dup** — maintain `output/caption-history.json`. Before saving a generated caption, check for ≥80% similarity against recent entries. Reject + regenerate if too similar. Prevents repetitive captions accumulating in queue over weeks.
 
 ---
 

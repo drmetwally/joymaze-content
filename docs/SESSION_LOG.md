@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-04-22 — [Agent: OpenClaw] — Hedgehog accepted as Track B baseline
+
+**Outcome:** Ahmed passed the latest hedgehog render after the quieter mix pass. Current state is treated as the new animal-facts baseline, roughly 8/10 overall, with transitions and the sung recap called out as standout strengths.
+
+**Remaining improvement direction (not blockers):** add more scenes within facts, use real hook-specific silhouette art instead of temporary black placeholder, and extend runtime/variety through richer fact coverage.
+
+---
+
 ## 2026-04-22 — [Agent: OpenClaw] — Hedgehog rerender pass 3: quieter music mix
 
 **Files changed:** `remotion/compositions/AnimalFactsEpisode.jsx`, `remotion/components/longform/animal/AnimalNameReveal.jsx`, `remotion/components/longform/animal/AnimalOutroScene.jsx`
