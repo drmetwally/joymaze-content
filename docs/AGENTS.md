@@ -32,6 +32,13 @@ Both agents write to the same files. Follow this protocol exactly so neither bre
 
 Do NOT read `docs/ACTIVE_SPRINT.md` — stale. `docs/TASKS.md` is the live anchor.
 
+**OpenClaw task sessions:** when Claude assigns a spec from `docs/tasks/`, OpenClaw should treat this startup bundle as mandatory and minimal:
+1. `MEMORY.md`
+2. `docs/AGENT_LOG.md`
+3. The single assigned task file in `docs/tasks/`
+
+Then OpenClaw implements the task, appends one `docs/AGENT_LOG.md` entry, and stops for Claude review.
+
 **Codex only:** Read `docs/SYSTEM_INDEX.md` before starting any new script — it maps every existing script's inputs/outputs and config ownership so you don't duplicate or conflict with live pipelines.
 
 ### What to write at session end (both agents)
@@ -88,6 +95,11 @@ Example: `- [Codex] generate-x-posts.mjs — built, 7-10 posts per day, Groq, sc
 When Codex finishes and hands back to Claude:
 - Leave a `[CODEX DONE — needs Claude review]` comment in SESSION_LOG if the output needs judgment (brand check, architecture decision, wiring into existing pipeline)
 - Leave nothing if the task was self-contained and verified
+
+When OpenClaw finishes a scoped task:
+- Append the required `docs/AGENT_LOG.md` entry with `Review status: PENDING CLAUDE REVIEW`
+- Do not self-upgrade that entry to verified
+- Claude reviews the diff and marks it `VERIFIED` or `REJECTED`
 
 When Claude scopes a task for Codex:
 - Claude writes the spec into `docs/TASKS.md` under the agent's section with full file paths, input/output contracts, env vars, and any "see X for pattern" pointers

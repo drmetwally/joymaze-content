@@ -79,7 +79,7 @@ const Root = () => (
       height={1920}
       defaultProps={longFormEpisodeSchema}
     />
-    {/* ── Story long-form episode: ~5-7 min story + optional activity ── */}
+    {/* ── Story long-form episode: ~5-7 min — 9:16 vertical (TikTok Series) ── */}
     <Composition
       id="StoryLongFormEpisode"
       component={StoryLongFormEpisode}
@@ -89,7 +89,17 @@ const Root = () => (
       height={1920}
       defaultProps={storyLongFormEpisodeSchema}
     />
-    {/* ── Animal facts episode: ~3-5 min educational animal format ────── */}
+    {/* ── Story long-form episode: ~5-7 min — 16:9 horizontal (YouTube) ──── */}
+    <Composition
+      id="StoryLongFormEpisodeH"
+      component={StoryLongFormEpisode}
+      durationInFrames={9750}
+      fps={30}
+      width={1920}
+      height={1080}
+      defaultProps={storyLongFormEpisodeSchema}
+    />
+    {/* ── Animal facts episode: ~3-5 min — 9:16 vertical (TikTok Series) ─── */}
     <Composition
       id="AnimalFactsEpisode"
       component={AnimalFactsEpisode}
@@ -99,7 +109,17 @@ const Root = () => (
       height={1920}
       defaultProps={animalFactsEpisodeSchema}
     />
-    {/* ── Puzzle compilation: ~60 min puzzle marathon ─────────────────── */}
+    {/* ── Animal facts episode: ~3-5 min — 16:9 horizontal (YouTube) ──────── */}
+    <Composition
+      id="AnimalFactsEpisodeH"
+      component={AnimalFactsEpisode}
+      durationInFrames={5400}
+      fps={30}
+      width={1920}
+      height={1080}
+      defaultProps={animalFactsEpisodeSchema}
+    />
+    {/* ── Puzzle compilation: ~60 min — 9:16 vertical (TikTok) ────────────── */}
     <Composition
       id="PuzzleCompilation"
       component={PuzzleCompilation}
@@ -107,6 +127,16 @@ const Root = () => (
       fps={30}
       width={1080}
       height={1920}
+      defaultProps={puzzleCompilationSchema}
+    />
+    {/* ── Puzzle compilation: ~60 min — 16:9 horizontal (YouTube) ─────────── */}
+    <Composition
+      id="PuzzleCompilationH"
+      component={PuzzleCompilation}
+      durationInFrames={108000}
+      fps={30}
+      width={1920}
+      height={1080}
       defaultProps={puzzleCompilationSchema}
     />
   </>

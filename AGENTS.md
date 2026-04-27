@@ -16,6 +16,24 @@
 - If the task is ambiguous, ask before writing code.
 - Do not bundle unrelated fixes into one patch.
 
+## 2.5 OpenClaw + Claude supervision flow
+
+When OpenClaw starts a new work session in `D:\Joymaze-Content`, it must do this before editing code:
+- Read `MEMORY.md`
+- Read `docs/AGENT_LOG.md`
+- Read the relevant task spec in `docs/tasks/`
+
+Then:
+- Implement only that task's requested diff
+- Append a new entry to `docs/AGENT_LOG.md` using the required template
+- Stop and hand the diff to Claude for review
+
+Claude is the reviewer for OpenClaw task entries in this repo:
+- `VERIFIED` = diff accepted
+- `REJECTED` = diff must be revised before the task counts as complete
+
+OpenClaw must not mark its own repo task as verified unless Claude explicitly delegated that review.
+
 ## 3. Touch Only Requested Files
 
 - If the task says "fix X in file Y", only edit file Y.

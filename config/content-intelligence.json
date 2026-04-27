@@ -1,13 +1,13 @@
 {
   "_meta": {
     "schema_version": 1,
-    "generated_at": "2026-04-27T07:37:31.801Z",
-    "week_of": "2026-04-27",
+    "generated_at": "2026-04-20T09:23:07.416Z",
+    "week_of": "2026-04-20",
     "status": "applied",
-    "applied_at": "2026-04-27T07:37:31.886Z",
+    "applied_at": "2026-04-20T09:23:07.710Z",
     "entropy_score": 2,
     "inputs_summary": {
-      "analytics_posts_analyzed": 0,
+      "analytics_posts_analyzed": 179,
       "posts_with_analytics": 0,
       "competitor_searches_performed": 6,
       "trends_boost_themes": [
@@ -15,209 +15,219 @@
         "Ocean/Underwater",
         "Forest/Woodland",
         "Bugs/Insects",
-        "Sports and Games"
+        "Pets/Home"
       ],
-      "rising_searches_count": 8
+      "rising_searches_count": 4
     }
   },
   "new_themes": [
     {
-      "name": "Community Helpers & Professions",
+      "name": "Backyard Micro-Exploration",
       "confidence": 0.9,
       "brand_safe": true,
       "source": "competitor_analysis",
-      "rationale": "This theme offers rich opportunities for role-playing and learning about the world, identified as a gap in competitor content."
+      "rationale": "This expands on nature themes by focusing on 'tiny worlds' and small creatures, offering a novel angle for discovery beyond general outdoor play."
     },
     {
-      "name": "Transportation & Travel Adventures",
-      "confidence": 0.85,
-      "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "A perennially popular topic for this age group, providing diverse visual and activity options not currently in dynamic pools."
-    },
-    {
-      "name": "Dinosaurs & Prehistoric World",
+      "name": "Mother's Day Keepsakes",
       "confidence": 0.95,
       "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Dinosaurs consistently captivate children's imaginations and are a strong, untapped theme for printable activities."
+      "source": "trend_analysis",
+      "rationale": "Mother's Day is a strong upcoming moment, and printables for handmade gifts or cards are a direct response to rising searches."
     },
     {
-      "name": "Outer Space & Astronomy Explorers",
-      "confidence": 0.88,
+      "name": "Insect Architects",
+      "confidence": 0.85,
       "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Offers a sense of wonder and learning about planets, stars, and rockets, distinct from existing nature or seasonal themes."
+      "source": "trend_analysis",
+      "rationale": "Bugs/Insects are trending, and focusing on their structures (nests, webs, homes) offers a unique, educational, and creative theme."
     },
     {
-      "name": "Farm Life & Animal Friends",
+      "name": "Rainy Day Adventures",
       "confidence": 0.8,
       "brand_safe": true,
       "source": "competitor_analysis",
-      "rationale": "While 'Baking Adventures' exists, a broader 'Farm Life' theme allows for animal identification, chores, and storytelling printables."
+      "rationale": "Building on 'Weather Wonders' from competitor analysis, this theme provides specific indoor activities for spring weather, addressing a common parent need.",
+      "_review_reason": "may be seen as promoting screen time, but addresses a common parent need"
+    },
+    {
+      "name": "Forest Fairy Homes",
+      "confidence": 0.8,
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "rationale": "This blends the trending 'Forest/Woodland' theme with a touch of fantasy, encouraging imaginative design and creative play distinct from just animals."
     }
   ],
   "new_hooks": [
     {
-      "hook_type": "identity_hook",
-      "text": "The kind of parent who sees a blank page and knows it's an invitation, not just empty space.",
-      "brand_safe": true,
-      "source": "intelligence_refresh",
-      "archetype_fit": [
-        "identity"
-      ],
-      "rationale": "Directly addresses the parent's desire to make good choices and shifts their identity from guilt to proactive engagement.",
-      "_review_reason": "appeals to parents, but may not be directly related to the app's content"
-    },
-    {
-      "hook_type": "emotional_mirror",
-      "text": "That quiet sigh when you realize they're just... scrolling again, not truly engaged.",
-      "brand_safe": true,
-      "source": "intelligence_refresh",
-      "archetype_fit": [
-        "emotional_mirror",
-        "relief_hook"
-      ],
-      "rationale": "Acknowledges the parent's inner guilt about screen time, creating immediate emotional resonance and setting up a solution.",
-      "_review_reason": "appeals to parents, but may not be directly related to the app's content"
-    },
-    {
-      "hook_type": "relief_hook",
-      "text": "Imagine 15 minutes of genuine, focused quiet. Without a single 'Mom, I'm bored.'",
-      "brand_safe": true,
-      "source": "intelligence_refresh",
-      "archetype_fit": [
-        "relief_hook"
-      ],
-      "rationale": "Speaks directly to the parent's desire for sustained engagement and a moment of peace, offering a tangible outcome.",
-      "_review_reason": "appeals to parents, but may not be directly related to the app's content"
-    },
-    {
-      "hook_type": "transformation_hint",
-      "text": "What if 'screen time' became 'skill time' — moments that build, not just distract?",
+      "hook_type": "sensory_hook",
+      "text": "The quiet hum of concentration. That's the sound of a mind at work.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
         "transformation_hint",
-        "identity_hook"
+        "relief_hook"
       ],
-      "rationale": "Offers a powerful reframe for screen time guilt, positioning JoyMaze as a tool for positive transformation.",
-      "_review_reason": "appeals to parents, but may not be directly related to the app's content"
+      "rationale": "Leverages sensory detail to evoke a desired emotional state for parents, connecting sound to meaningful engagement.",
+      "_review_reason": "may be seen as promoting guilt over screen time"
     },
     {
-      "hook_type": "sensory_hook",
-      "text": "The soft rustle of paper. The focused hum of a child creating something all their own.",
+      "hook_type": "emotional_mirror",
+      "text": "You know that flicker of guilt? The one about screen time?",
+      "brand_safe": false,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "relief_hook",
+        "identity_hook"
+      ],
+      "rationale": "Directly addresses the core parental guilt point, creating immediate emotional resonance and setting up a solution.",
+      "_reject_reason": "promotes guilt over screen time"
+    },
+    {
+      "hook_type": "imagery",
+      "text": "Imagine their face, lit up, creating something just for *her*.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
-        "sensory_hook",
+        "emotional_mirror",
         "identity_hook"
       ],
-      "rationale": "Paints a vivid, desirable picture of engaged play, appealing to the parent's longing for meaningful activity.",
-      "_review_reason": "appeals to parents, but may not be directly related to the app's content"
+      "rationale": "Paints a vivid picture of a child's joy and purpose, especially relevant for timely themes like Mother's Day."
     },
     {
-      "hook_type": "secret_insider",
-      "text": "They don't need another distraction. They need a discovery.",
+      "hook_type": "identity_hook",
+      "text": "This isn't just an activity. It's proof you made the right choice.",
+      "brand_safe": false,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "transformation_hint",
+        "relief_hook"
+      ],
+      "rationale": "Directly reinforces the brand's core promise, shifting the parent's identity from guilt to confidence.",
+      "_reject_reason": "promotes guilt over screen time"
+    },
+    {
+      "hook_type": "transformation_hint",
+      "text": "The world outside their window? It's a classroom waiting.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
-        "secret_insider",
+        "imagery",
         "identity_hook"
       ],
-      "rationale": "Positions JoyMaze as the 'right choice' for parents seeking more than just entertainment, validating their intuition.",
-      "_review_reason": "appeals to parents, but may not be directly related to the app's content"
+      "rationale": "Connects to nature-based trends and reframes everyday environments as learning opportunities, aligning with the transformation goal."
+    },
+    {
+      "hook_type": "relief_hook",
+      "text": "Twenty minutes of calm. Twenty minutes of connection. You deserve that.",
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "emotional_mirror",
+        "identity_hook"
+      ],
+      "rationale": "Focuses on the parent's immediate need for peace and quality time, offering permission and understanding.",
+      "_review_reason": "may be seen as promoting screen time, but addresses a common parent need"
+    },
+    {
+      "hook_type": "transformation_hint",
+      "text": "They're not just playing. They're building the brain that will change the world.",
+      "brand_safe": false,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "identity_hook",
+        "emotional_mirror"
+      ],
+      "rationale": "Elevates the perceived value of the activity, linking it to long-term developmental benefits and parental pride.",
+      "_reject_reason": "promotes guilt over screen time"
     }
   ],
   "new_ctas": [
     {
       "platform": "instagram",
-      "type": "both",
-      "text": "Give them the gift of focused play. Tap the link in bio for their next adventure.",
-      "brand_safe": true,
+      "type": "app",
+      "text": "Tap the link in bio for their next screen-free adventure.",
+      "brand_safe": false,
       "source": "competitor_analysis",
-      "rationale": "Leverages competitor pattern of benefit-driven CTAs, encouraging exploration of both app and printables.",
-      "_review_reason": "appears to be a promotional call-to-action"
+      "rationale": "Direct and benefit-oriented, leveraging the 'screen-free' solution highlighted in competitor patterns.",
+      "_reject_reason": "competitor mention"
     },
     {
       "platform": "pinterest",
       "type": "seasonal",
-      "text": "Pin this for Earth Day inspiration that actually sticks, long after the day is done.",
+      "text": "Pin this idea for a Mother's Day surprise they'll cherish.",
       "brand_safe": true,
       "source": "competitor_analysis",
-      "rationale": "Directly uses competitor's 'Pin this' pattern, combined with seasonal relevance and a benefit-driven promise.",
-      "_review_reason": "appears to be a promotional call-to-action"
+      "rationale": "Utilizes Pinterest's save functionality for timely, seasonal content, aligning with Mother's Day trends."
     },
     {
       "platform": "x",
       "type": "engagement",
-      "text": "What's one small win you've had today that made you feel like a parenting superhero? Share below!",
+      "text": "Share their masterpiece with #JoyMazeMoments. We love seeing their joy!",
       "brand_safe": false,
       "source": "intelligence_refresh",
-      "rationale": "Creates an engagement opportunity on X by inviting parents to share positive experiences, reinforcing their identity.",
-      "_reject_reason": "appears to be a social media engagement prompt"
+      "rationale": "Fills the specific request for an 'x' platform engagement CTA, encouraging user-generated content and community.",
+      "_reject_reason": "competitor mention"
     },
     {
-      "platform": "instagram",
-      "type": "app",
-      "text": "Ready to transform those 'just distracted' moments into meaningful learning? Our app link is waiting.",
-      "brand_safe": true,
+      "platform": "tiktok",
+      "type": "viral",
+      "text": "Watch them transform screen time into discovery. Link in bio to start.",
+      "brand_safe": false,
       "source": "competitor_analysis",
-      "rationale": "Combines competitor's 'addressing pain points' with a clear call to action for the app, emphasizing transformation.",
-      "_review_reason": "appears to be a promotional call-to-action"
+      "rationale": "Appeals to the transformation narrative and positions the app as a solution, suitable for short-form video platforms.",
+      "_reject_reason": "competitor mention"
     }
   ],
   "new_pattern_interrupts": [
     {
       "subtype": "surprising-stat",
-      "topic": "Children who regularly engage in spatial reasoning puzzles (like mazes) before age 7 show significantly improved math scores in later grades.",
-      "visual": "A child intensely focused on a maze, perhaps with subtle, abstract lines suggesting brain activity or connections.",
+      "topic": "Children who regularly engage in nature-based play show significantly higher scores in creativity and problem-solving.",
+      "visual": "Child observing an ant hill with a magnifying glass, looking deeply engaged.",
       "confidence": 0.9,
       "brand_safe": true,
-      "source": "intelligence_refresh",
-      "rationale": "Connects a common activity (mazes) to a surprising, long-term academic benefit, validating parents' choices."
-    },
-    {
-      "subtype": "myth-bust",
-      "topic": "Myth: Kids only learn through formal lessons. Fact: Unstructured, self-directed play (like choosing their own coloring page) is crucial for developing problem-solving and independence.",
-      "visual": "A child making a choice from several activity options, looking empowered and engaged in their decision.",
-      "confidence": 0.85,
-      "brand_safe": true,
-      "source": "intelligence_refresh",
-      "rationale": "Empowers parents by reframing 'play' as essential learning, easing guilt about less structured activities."
+      "source": "trend_analysis",
+      "rationale": "Connects to trending nature themes and provides a compelling, data-backed benefit that parents value."
     },
     {
       "subtype": "did-you-know",
-      "topic": "Did you know? The act of coloring within lines helps develop impulse control and patience, skills vital for school readiness and social interactions.",
-      "visual": "Close-up of a child's hand carefully coloring, showing concentration and the precise movement of the crayon or pencil.",
-      "confidence": 0.88,
+      "topic": "The simple act of coloring can reduce anxiety in children as effectively as meditation, by focusing their attention.",
+      "visual": "Child deeply focused on coloring a detailed nature scene, looking calm and centered.",
+      "confidence": 0.85,
       "brand_safe": true,
-      "source": "intelligence_refresh",
-      "rationale": "Highlights hidden developmental benefits of a simple activity, providing parents with specific 'why' behind their choices."
+      "source": "competitor_analysis",
+      "rationale": "Highlights the often-underestimated mental health benefits of a core activity, resonating with parents seeking calm for their children."
+    },
+    {
+      "subtype": "myth-bust",
+      "topic": "Myth: Kids need constant novel stimulation to stay engaged. Fact: Focused, repetitive activities like mazes build sustained attention and executive function.",
+      "visual": "Child completing a maze, looking calm and focused, with a subtle contrast to a chaotic, overstimulating scene.",
+      "confidence": 0.85,
+      "brand_safe": true,
+      "source": "competitor_analysis",
+      "rationale": "Addresses a common parenting belief and reframes the value of JoyMaze's core activities in terms of crucial developmental skills."
     },
     {
       "subtype": "counterintuitive",
-      "topic": "Counterintuitive: The best way to boost a child's creativity isn't to give them a blank canvas, but to provide a structured starting point (like a partially drawn scene) that sparks imagination without overwhelming them.",
-      "visual": "A child adding details and imaginative elements to a partially completed drawing, looking inspired rather than daunted.",
+      "topic": "Giving a child a 'boring' activity can spark more creativity than a highly structured one, as they invent their own rules and stories.",
+      "visual": "Child with a simple, open-ended printable, surrounded by imaginative drawings or stories they've added to it.",
       "confidence": 0.8,
       "brand_safe": true,
       "source": "intelligence_refresh",
-      "rationale": "Offers a practical, surprising insight into fostering creativity, guiding parents towards effective engagement strategies."
+      "rationale": "Challenges a common parenting assumption, offering permission to simplify and trust in a child's innate creativity, aligning with the brand's 'less is more' approach."
     }
   ],
   "intelligence_summary": {
-    "top_performing_archetype_this_week": "No data yet",
-    "weakest_archetype_this_week": "No data yet",
-    "recommended_focus_shift": "Prioritize creating engaging, standalone printable puzzles (mazes, coloring, word searches) that can go viral outside of specific seasonal or skill-development themes, while also leveraging the current Earth Day and fine motor skill trends.",
+    "top_performing_archetype_this_week": "No data available this week.",
+    "weakest_archetype_this_week": "No data available this week.",
+    "recommended_focus_shift": "Shift focus towards timely, nature-inspired activities that offer tangible skill development and position JoyMaze as the go-to screen-free solution for engaged learning, leveraging upcoming moments like Mother's Day and Earth Day.",
     "competitor_patterns_detected": [
-      "Themed Activity Calendars (seasonal, daily activities)",
-      "Earth Day Focus (nature, sustainability, recycling)",
-      "Fine Motor Skill Development (tracing, cutting, mazes, pencil control)",
-      "Interactive & Hands-On Formats (foldable crafts, scavenger hunts, cut & paste)",
-      "Benefit-Oriented Language in captions",
-      "Addressing Parental Pain Points (screen time) in hooks"
+      "Themed Activity Calendars",
+      "Nature-Based and Eco-Conscious Content",
+      "Skill-Building Printables",
+      "Problem/Solution Framing (Screen-Free)"
     ],
-    "hook_gap_identified": "Identity hooks and emotional mirror hooks that specifically address the parent's inner guilt and desire for good choices are underrepresented in the dynamic pool.",
+    "hook_gap_identified": "Emotional Mirror and Identity Hook (specifically linking to the parent's desired identity and emotional needs).",
     "cta_fatigue_detected": false
   }
 }

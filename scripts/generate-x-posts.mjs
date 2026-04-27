@@ -25,6 +25,7 @@ const PSYCHOLOGY_PATH        = path.join(ROOT, 'config', 'psychology-triggers.js
 
 const args      = process.argv.slice(2);
 const DRY_RUN   = args.includes('--dry-run');
+const FORCE     = args.includes('--force');
 const VERBOSE   = args.includes('--verbose');
 
 const POST_COUNT  = 4;
@@ -774,6 +775,17 @@ async function main() {
 
   log('=== JoyMaze X Text Post Generator ===');
   log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'} | Date: ${date}`);
+
+  // ── Idempotency check — skip before any API calls ──
+  if (!DRY_RUN && !FORCE) {
+    try {
+      await fs.access(outputPath);
+      log(`X posts already generated for today — skipping. Use --force to regenerate.`);
+      return;
+    } catch {
+      // file doesn't exist — proceed
+    }
+  }
 
   // ── Load all context in parallel ──
   const [writingStyle, trends, hooks, themePool, ctaLib, perfWeights, xTopics, competitor, recentFingerprints, psychTriggers] = await Promise.all([

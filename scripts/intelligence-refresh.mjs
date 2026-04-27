@@ -989,8 +989,8 @@ async function main() {
   log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}`);
   log(`Date: ${new Date().toISOString().slice(0, 10)}\n`);
 
-  // Monday-only gate
-  if (MONDAY_ONLY_INTEL && !COMPETITOR_ONLY) {
+  // Monday-only gate — applies to BOTH full refresh and competitor-only modes
+  if (MONDAY_ONLY_INTEL) {
     const day = new Date().getDay(); // 0=Sun, 1=Mon
     const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][day];
     if (day !== 1) {

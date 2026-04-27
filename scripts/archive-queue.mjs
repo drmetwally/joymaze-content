@@ -83,6 +83,13 @@ async function main() {
   let skipped = 0;
 
   for (const file of queueFiles) {
+    // x-text files are arrays managed by post-x-scheduled.mjs (posted flags per entry)
+    if (file.startsWith('x-text-')) {
+      console.log(`  Skip: ${file} (x-text — managed by post-x-scheduled.mjs)`);
+      skipped++;
+      continue;
+    }
+
     const filePath = path.join(QUEUE_DIR, file);
     let metadata;
     try {

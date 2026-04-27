@@ -4,6 +4,16 @@
 
 ---
 
+### 2026-04-18 — Session close: memory audit + longform E2E testing plan
+
+- **Intelligence pools audit:** Prior session recommendation falsely stated pools "never ran live, still empty." Confirmed all 5 dynamic pools are fully populated (last updated 2026-04-16). Memory was already accurate — the error was only in the recommendation text.
+- **Longform phases clarified:** All 13 Codex build phases are complete. User confirmed: Codex built them, code issues were hit and fixed during Track A E2E testing (ep03 approved). Now in E2E validation phase across all 3 tracks.
+- **ep02:** Ahmed decided to skip the re-narrate entirely. Not worth the effort.
+- **Testing plan:** Track A done. Track B (Animal Facts, `npm run longform:animal:plan:save`) is the immediate next test. Track C (Puzzle Compilations) blocked until ASMR pipeline runs live and produces 5+ folders.
+- **Tomorrow:** Animal Facts E2E test or ep04 Story — Ahmed's call at session start.
+
+---
+
 ### 2026-04-18 — Brief generator upgrade: 24 scenes + storyboard + OpenAI TTS
 
 - **24 scenes (8 per act):** Doubles story depth and video length. With activity segment: ~4.8 min YouTube. Without: ~3.3 min. For full 5-7 min, use activity segment on every episode.
@@ -792,3 +802,43 @@ Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizonta
 - **Strategic direction locked:** Psychology + viral elements (hooks, narration copy, story arc) are the priority — not animation or art. No new tech until workflow is stable.
 - **Memory updated:** project_longform_story_engine.md, project_pipeline_status.md, project_warmup_pipeline.md. New feedback memories: update-memory-after-every-task, psychology-over-animation.
 - **ep03 v3 final render:** HOOK_FRAMES 270→210 (7s) to eliminate 2s dead air at hook end. Render clean: 6441 frames, 3.6 min. Engine locked — production-ready.
+
+### 2026-04-20 — Phase 4B runtime fix + Phase 4D B-roll automation
+
+- **4-sentence spec enforcement:** Groq was writing 25-38w per fact (ignoring word counts). Fixed by adding a concrete 51-word example directly in the brief generator hard rules + explicit `MINIMUM 48 words` + full word-count spec repeated on fact2–5 (not just "same as fact1"). Re-ran brief generator — avg 56w/fact, projected 4:18, no warning.
+- **Validator formula fixed:** `validateBrief()` was using `totalWords/2.0` with no per-fact +7s render padding. Rewritten to `max(wc/2.3+7, wc/1.5)` per fact — now matches actual render-time durationSec formula exactly.
+- **Phase 4D — B-roll automation built:** Recovered from April 19 chat log (plan was agreed but context expired before build). New `scripts/download-broll.mjs`: Groq generates keywords per fact → Pexels Video API (free, CC0) → downloads best HD/4K clip. Live tested ep03-hedgehog: 5/5 clips, 4K sources.
+- **Scene timing decision:** 3s illustrated image → hard cut to B-roll. Based on competitor data: YouTube kids content cuts every 3-8s; 3s establishes brand identity without stalling.
+- **Auto-wired into render:** `render-story-longform.mjs` now spawns B-roll download automatically before rendering if `episode.brollClips` is empty. Zero manual steps in normal flow.
+- **Render script stale constants fixed:** ANIMAL_IMAGES/NARRATION updated to fact1-5 keys; `calculateTotalFramesAnimal` now includes TITLE_CARD_FRAMES × 5; segFrames fallback 12→16s.
+- **ep03-hedgehog ready:** Brief generated (hedgehog, watercolor style), B-roll downloaded (5/5). Awaiting Gemini images + audio → narrate → render.
+
+### 2026-04-19 — ep02 render test + full competitor research + redesign plan
+
+- **Goal:** Run ep02 sea-otter render, fix bugs, then research competitor channels before building more.
+- **Render bugs fixed (multi-round):** Hook jingle masked voice → moved jingle to name reveal. Background music ending mid-video → added `loop`. brollClip Video crash → guarded with optional chaining. resolveAssetSrc missing from composition → added with staticFile. AnimalOutroScene created new (reused layout from AnimalNameReveal). All 6 narration files generated (hook, namereveal, habitat, diet, funfact, outroCta) via Groq+OpenAI shimmer.
+- **ep02 outcome:** Renders successfully (1:18 min). Not uploaded — structural redesign needed first.
+- **Animal facts competitor analysis:** SciShow Kids, Nat Geo Kids, FreeSchool, FactPaw — data shows we need 5 numbered facts (not 3 thematic), clear 3-sentence formula per fact (not dreamy/sensory), direct hook that names the animal at 0:00 (no mystery delay for ages 4-8), TTS speed tuning (name reveal 1.15, facts 0.92), title card scenes ("FACT 1") between segments.
+- **Story video competitor analysis:** Bluey, StoryBots, CoComelon, Little Angel — hard cuts confirmed, 7-12s scenes confirmed, 3:30 runtime confirmed. Three gaps identified: no repeatable phrase per episode (highest leverage — drives rewatch), no adult-layer writing (drives parent shares), no YouTube CTA frame (20s baked-in for long-form only).
+- **Plan written:** Phase 4B (animal facts redesign) + Phase 4C (story alignment) in TASKS.md. Both memory files updated.
+- **Decision:** Stop building without data. Run competitor analysis first. Both analyses done. Execute tomorrow.
+
+---
+### 2026-04-21 — Task Scheduler fix + daily audit + animal brief generator upgrade
+- **Task Scheduler:** `\Joymaze Daily` was silently failing (FILE_NOT_FOUND — old `C:\nvm4w\nodejs\node.exe`). Fixed: recreated with `D:\node\node.exe`. Next auto-run: 4/22/2026 9:00 AM.
+- **Daily audit:** 10 prompts (9.3/10 avg, all pass), 4 X posts (all SHIP). Prompts 4 + 8 flagged as watch-and-regen-if-needed. facts-carousel-coloring day: 5 slides needed.
+- **ep03 identical image root cause:** Groq generated ~20w imagePromptHints (spec: 50-70). nameReveal + fact1 both ESTABLISHING shot = identical wide scenes. Psychology color cues absent from prompts.
+- **Brief generator upgrades:** content-intelligence.json + pattern-interrupt-dynamic.json now wired. imagePromptHint word count validation added (min 40w — throws on lazy Groq output). 2 new rules in CLAUDE.md Locked Decisions.
+- **ep03 corrected prompts:** All 6 rewritten with full differentiation (distinct framing, lighting, psychology color cues per image). Ahmed generating now.
+- **Next:** Ahmed drops ep03 assets → narrate → render.
+
+---
+### 2026-04-22 — ep03-hedgehog full re-pipeline (B-roll + narration + render)
+
+- **Context:** Continued from previous session where 9 bugs were fixed in code but ep03 still needed re-pipeline. Ahmed provided Pixabay API key to unblock B-roll download.
+- **New bugs discovered and fixed:**
+  - `findFfmpeg()` always returned `'ffmpeg'` (plain string, never threw) → fixed with `existsSync` check → now routes to Remotion's bundled `ffmpeg.exe`
+  - Remotion's FFmpeg build has `pad` and `force_original_aspect_ratio` filters disabled → `download-broll.mjs` transcode was failing silently for all 5 clips; fixed with `copy -an` → `scale=1920:1080` fallback strategy
+  - `readGuard = wordCount / 1.5` in narration script set a floor of ~23s for 35-word narrations, overriding the actual 14-16s audio duration; removed entirely
+- **ep03 outcome:** Clean render, 2.3 min, all fixes in. Awaiting Ahmed review.
+- **Locked rules added (CLAUDE.md):** FFmpeg filter incompatibility (pad disabled in Remotion build), narration readGuard dead air bug.

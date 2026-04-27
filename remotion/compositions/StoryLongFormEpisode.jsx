@@ -4,6 +4,7 @@ import { StoryActScene } from '../components/longform/story/StoryActScene.jsx';
 import { StoryBridgeCard } from '../components/longform/story/StoryBridgeCard.jsx';
 import { StoryActivityScene } from '../components/longform/story/StoryActivityScene.jsx';
 import { StoryOutroScene } from '../components/longform/story/StoryOutroScene.jsx';
+import { StoryCtaScene } from '../components/longform/story/StoryCtaScene.jsx';
 
 export const storyLongFormEpisodeSchema = {
   episodeFolder: '',
@@ -15,6 +16,7 @@ const HOOK_FRAMES = 210;   // 7s — jingle + typewriter fill ~7s
 const BRIDGE_FRAMES = 450;
 const ACTIVITY_FRAMES = 2700;
 const OUTRO_FRAMES = 240;  // 8s
+const CTA_FRAMES = 600;    // 20s — optional YouTube CTA (episode.includeCta)
 const DEFAULT_SCENE_FRAMES = 180; // 6s minimum default
 const WARM_BG = '#0f0a06'; // warm very dark brown — global background
 
@@ -182,6 +184,19 @@ export const StoryLongFormEpisode = ({
           nextEpisodeTeaser={episode.nextEpisodeTeaser || 'New episode every week!'}
         />
       </Sequence>
+
+      {/* Optional YouTube CTA — 20s, only when episode.includeCta is true */}
+      {episode.includeCta ? (
+        <Sequence from={outroFrom + OUTRO_FRAMES} durationInFrames={CTA_FRAMES}>
+          <StoryCtaScene
+            joyoImagePath="assets/mascot/joyo_waving.png"
+            appIconPath="assets/logos/joymaze-icon.png"
+            narrationPath={resolveEpisodeAsset(episodeFolder, 'narration-cta.mp3')}
+            jinglePath={resolveEpisodeAsset(episodeFolder, 'hook-jingle.mp3')}
+            narrationText="Play with Joyo in the JoyMaze app!"
+          />
+        </Sequence>
+      ) : null}
     </AbsoluteFill>
   );
 };

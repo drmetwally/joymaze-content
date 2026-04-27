@@ -29,10 +29,15 @@ const resolveAssetSrc = (src) => {
 export const StoryOutroScene = ({
   joyo_png_path = '',
   outroJinglePath = '',
+  backgroundMusicPath = '',
   nextEpisodeTeaser = '',
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
+  const bgVolume = interpolate(frame, [0, 20], [0, 0.12], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
   const localFrame = frame % Math.max(1, Math.round(fps * 1.6));
   const waveSpring = spring({
     frame: localFrame,
@@ -52,7 +57,10 @@ export const StoryOutroScene = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0e1026' }}>
-      {outroJinglePath ? <Audio src={resolveAssetSrc(outroJinglePath)} /> : null}
+      {backgroundMusicPath ? (
+        <Audio src={resolveAssetSrc(backgroundMusicPath)} volume={bgVolume} />
+      ) : null}
+      {outroJinglePath ? <Audio src={resolveAssetSrc(outroJinglePath)} volume={0.85} /> : null}
 
       <AbsoluteFill
         style={{

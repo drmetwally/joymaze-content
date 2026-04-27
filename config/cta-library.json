@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-27",
+    "last_updated": "2026-04-20",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_platform_per_type": 8,
     "description": "Winning CTA patterns by platform and content type. Merged with hardcoded CTAS in generate-captions.mjs."
@@ -17,7 +17,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-07",
           "times_used": 0,
-          "decay_weeks": 6,
+          "decay_weeks": 5,
           "brand_safe": true
         },
         {
@@ -28,7 +28,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ],
@@ -41,19 +41,19 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-12",
           "times_used": 0,
-          "decay_weeks": 4,
+          "decay_weeks": 3,
           "brand_safe": true
         }
       ],
       "books": [],
       "seasonal": [
         {
-          "id": "cta_pinterest_seasonal_20260427_001",
-          "text": "Pin this for Earth Day inspiration that actually sticks, long after the day is done.",
+          "id": "cta_pinterest_seasonal_20260420_000",
+          "text": "Pin this idea for a Mother's Day surprise they'll cherish.",
           "performance_score": null,
           "outbound_click_rate_pct": null,
           "source": "competitor_analysis",
-          "added_week": "2026-04-27",
+          "added_week": "2026-04-20",
           "times_used": 0,
           "decay_weeks": 0,
           "brand_safe": true
@@ -61,32 +61,8 @@
       ]
     },
     "instagram": {
-      "app": [
-        {
-          "id": "cta_instagram_app_20260427_002",
-          "text": "Ready to transform those 'just distracted' moments into meaningful learning? Our app link is waiting.",
-          "performance_score": null,
-          "outbound_click_rate_pct": null,
-          "source": "competitor_analysis",
-          "added_week": "2026-04-27",
-          "times_used": 0,
-          "decay_weeks": 0,
-          "brand_safe": true
-        }
-      ],
-      "both": [
-        {
-          "id": "cta_instagram_both_20260427_000",
-          "text": "Give them the gift of focused play. Tap the link in bio for their next adventure.",
-          "performance_score": null,
-          "outbound_click_rate_pct": null,
-          "source": "competitor_analysis",
-          "added_week": "2026-04-27",
-          "times_used": 0,
-          "decay_weeks": 0,
-          "brand_safe": true
-        }
-      ],
+      "app": [],
+      "both": [],
       "books": [],
       "engagement": [
         {
@@ -97,7 +73,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ]
@@ -113,7 +89,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ]
@@ -129,7 +105,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ]
