@@ -150,3 +150,18 @@
 **Next:** Claude should audit the single-file `scripts/render-video.mjs` patch. After `blank.png` / `solved.png` plus the extracted solver JSON files are present in a challenge folder, the animated solve reveal should activate with no further code changes.
 
 ---
+
+### 2026-04-27 | OpenClaw | ROADMAP-REELS-001 | Lock reels roadmap + queue scheduler parity task for tomorrow
+**Files changed:**
+- `MEMORY.md` — added the locked short-form roadmap for Story Reel V2, Animal Facts Song Short, and scheduler integration order
+- `docs/TASKS.md` — queued the 2026-04-28 reels polish sprint and daily-automation follow-up order
+- `docs/SESSION_LOG.md` — appended the session handoff note for tomorrow's reel build sprint
+- `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md` — captured Claude's scheduler parity fix as an execution-safe task spec
+- `docs/AGENT_LOG.md` — appended this planning handoff entry for Claude
+**What was done:** I reviewed the current short-form story and animal code paths against the longform engines and locked the next build direction in docs before ending the session. The repo now explicitly records that story reels should move to a dedicated longform-derived short format, animal facts shorts should become a dedicated song-led format rather than a crude cutdown, and TASK-OC-005 should bring `scripts/daily-scheduler.mjs` into parity with the already-existing challenge-brief step in `npm run daily`.
+**Test command:** `Select-String -Path package.json,scripts/daily-scheduler.mjs -Pattern "generate-challenge-brief|generate-asmr-brief|totalSteps"`
+**Test output summary:** `package.json` already contains `node scripts/generate-challenge-brief.mjs --save` in `npm run daily`, while `scripts/daily-scheduler.mjs` still shows the ASMR brief block and a `totalSteps` base count of `3`, confirming the queued OC-005 scheduler-only fix is real and correctly scoped.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Tomorrow, implement `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md` first, then build Story Reel V2, then build Animal Facts Song Short, and only after those pass review, wire the new reel formats into the daily automation flow.
+
+---

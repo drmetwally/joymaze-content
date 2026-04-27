@@ -110,6 +110,29 @@ First replace that lane with a stronger repeatable short-form unit: the **Puzzle
 - Word-search was validated only at the challenge-lane / fallback-solve level because archive data did not include `solved.png` or `wordsearch.json`.
 - Important Windows rule: large Remotion prop payloads must be passed by file, not giant inline CLI JSON. `render-video.mjs` now supports `--props-file` for this reason.
 
+## 2.7 SHORT-FORM REELS ROADMAP (LOCKED 2026-04-27)
+
+**Near-term production goal:** get four short-form lanes genuinely ready to generate every day: **ASMR, Puzzle Challenge, Story, and Animal Facts**.
+
+### What stays stable
+- ASMR short lane stays on the current reveal engine unless a real render exposes a blocker.
+- Puzzle Challenge remains the active puzzle reel format. Keep polishing this lane rather than reviving the old static puzzle short.
+
+### Story reel direction
+- Do **not** keep polishing `remotion/compositions/StoryEpisode.jsx` as the primary story short format.
+- The next story short should inherit the **grammar** of the longform story engine: flash-forward hook, stronger hook scene, better scene motion, better caption treatment, music ducking under narration, and a cleaner emotional landing.
+- Preferred implementation direction: build a dedicated story reel composition derived from the longform components and keep the older simple story composition as legacy/fallback until the new reel passes review.
+
+### Animal facts short direction
+- Do **not** ship animal shorts as crude trims of the existing longform episode.
+- The right short-form version is a **song-led vertical short** that reuses the longform animal rules: mystery hook first, no early animal-name reveal, lively kids-edutainment tone, and visual rhythm driven by the strongest longform component, the sung recap.
+- Treat the song / lyric structure as the primary narration spine for the short, not as an afterthought layered onto spoken narration.
+
+### Scheduler / daily automation note
+- `package.json` already includes `generate-challenge-brief.mjs --save` in `npm run daily`.
+- `scripts/daily-scheduler.mjs` does **not** yet mirror that challenge brief step, so scheduler parity is now a queued task: **TASK-OC-005**.
+- After the new story reel and animal short formats are built and accepted, wire their planning/generation steps into the daily automation flow as a follow-up rather than guessing the integration path in advance.
+
 ## 3. PLATFORM ACCOUNT STATUS (last updated: 2026-04-13)
 
 | Platform | Account | Handle | API in .env | GitHub Secrets | Status |
@@ -235,7 +258,7 @@ GitHub Actions reads queue from repo — no push = no 4AM posting.
 
 ### Cooldown
 - `output/posting-cooldown.json` tracked in git. Must push after setting for Actions to respect it.
-- Current cooldown: until **2026-04-26** (X manual warmup)
+- Current cooldown: until **2026-05-07** (X manual warmup extended after inactivity gap)
 - `npm run cooldown:clear` auto-pushes removal
 
 ---

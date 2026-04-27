@@ -2179,3 +2179,16 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 **Intelligence linkage gap documented:** All generators read pool files correctly via `apply-intelligence`. The only under-linked generator is `generate-activity-video.mjs` (TASK-OC-002).
 
 **Next session entry point:** Hand TASK-OC-001, TASK-OC-002, TASK-OC-003 specs to OpenClaw. Claude reviews diffs + AGENT_LOG entries when returned.
+
+---
+
+## 2026-04-27 — [Agent: OpenClaw] — Reel roadmap locked for 2026-04-28 build sprint
+
+**What was reviewed:** Current short story rendering still routes through the simpler `StoryEpisode` composition, while the longform story stack already has the stronger hook / scene / outro grammar. Animal facts longform also already contains the strongest short-form ingredient in the sung recap lane.
+
+**Roadmap locked for next session:**
+- Story reels should move to a dedicated short-form build that inherits longform story grammar rather than continuing to polish the legacy simple slide-show composition.
+- Animal facts shorts should become a dedicated **song-led** vertical format built from the longform animal rules (mystery hook, delayed name reveal, lively kid-edutainment tone), not a crude trim of the existing longform episode.
+- Scheduler parity task captured as `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md`: `package.json` already includes `generate-challenge-brief.mjs --save` in `npm run daily`, but `scripts/daily-scheduler.mjs` still lacks the mirrored challenge step.
+
+**Next build order:** 1) implement TASK-OC-005, 2) build Story Reel V2, 3) build Animal Facts Song Short, 4) only after both pass review, wire the new reel lanes into the daily automation flow.

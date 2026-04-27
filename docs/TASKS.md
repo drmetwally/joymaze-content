@@ -1,5 +1,5 @@
 # JoyMaze — Persistent Task Board
-Last updated: 2026-04-05
+Last updated: 2026-04-27
 
 > This file is the single source of truth for in-progress and queued work.
 > Claude reads this at session start and updates status as tasks complete.
@@ -61,6 +61,13 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
   - `output/videos/2026-04-23-activity-word-search-archive-test-yt-short.mp4`
 - [ ] **Tune Puzzle Challenge Reel based on render review** — likely focus areas: title size/weight, countdown prominence, transition cue feel, audio balance, and per-type pacing.
 - [ ] **True word-search solve validation** — run once a sample exists with real `solved.png` and `wordsearch.json` so the solve phase can be fully tested, not just fallback static solve.
+
+## NEXT SESSION — REELS POLISH SPRINT (2026-04-28)
+
+- [ ] **TASK-OC-005 — Daily scheduler challenge brief parity** — add the missing challenge-brief block to `scripts/daily-scheduler.mjs` using `generate-challenge-brief.mjs`, and update `totalSteps` so scheduler behavior matches the existing `npm run daily` chain.
+- [ ] **Story Reel V2** — build a dedicated short-form story composition that inherits the longform story grammar (flash-forward hook, stronger caption style, better scene motion, cleaner ending) instead of continuing to treat legacy `StoryEpisode.jsx` as the primary reel format.
+- [ ] **Animal Facts Song Short** — build a dedicated vertical short based on the longform animal rules, with the song / sung-recap energy as the main structure rather than cutting down the existing longform episode.
+- [ ] **Daily automation follow-up after reel builds pass review** — once Story Reel V2 and Animal Facts Song Short are rendering cleanly, add their planning/generation steps into `scripts/daily-scheduler.mjs` / `npm run daily` so the short-form stack can consistently cover ASMR + Challenge + Story + Animal reels.
 
 ## PHASE 0 — PIPELINE STABILIZATION
 
