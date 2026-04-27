@@ -506,11 +506,31 @@ function isSimilarEntry(a, b, threshold = 0.75) {
   return union > 0 && (intersection / union) >= threshold;
 }
 
+async function atomicWriteJson(filePath, data) {
+  const tmp = filePath + '.tmp';
+  try {
+    const serialized = JSON.stringify(data, null, 2) + '\n';
+    JSON.parse(serialized);
+    await fs.writeFile(tmp, serialized, 'utf-8');
+    const readBack = await fs.readFile(tmp, 'utf-8');
+    JSON.parse(readBack);
+    await fs.rename(tmp, filePath);
+  } catch (err) {
+    await fs.rm(tmp, { force: true }).catch(() => {});
+    log(`  Warning: atomic write aborted for ${path.basename(filePath)}: ${err.message}`);
+    throw err;
+  }
+}
+
 async function applyCompetitorFindings(structured, date) {
   if (!structured) return;
   const today = date || new Date().toISOString().slice(0, 10);
   const weekOf = today;
   let hooksAdded = 0, themesAdded = 0, interruptsAdded = 0;
+
+  for (const f of [HOOKS_FILE, THEMES_DYNAMIC_FILE, INTERRUPTS_DYNAMIC_FILE]) {
+    await fs.rm(f + '.tmp', { force: true }).catch(() => {});
+  }
 
   // ── 1. Winning hooks → hooks-library.json ──
   try {
@@ -536,7 +556,7 @@ async function applyCompetitorFindings(structured, date) {
       hooksAdded++;
     }
     if (hooksAdded > 0 && !DRY_RUN) {
-      await fs.writeFile(HOOKS_FILE, JSON.stringify(lib, null, 2) + '\n', 'utf-8');
+      await atomicWriteJson(HOOKS_FILE, lib);
     }
     log(`  Hooks: +${hooksAdded} competitor hooks added (${toAdd.length} passed brand filter)`);
   } catch (err) { log(`  Hooks apply failed: ${err.message}`); }
@@ -560,7 +580,7 @@ async function applyCompetitorFindings(structured, date) {
       themesAdded++;
     }
     if (themesAdded > 0 && !DRY_RUN) {
-      await fs.writeFile(THEMES_DYNAMIC_FILE, JSON.stringify(pool, null, 2) + '\n', 'utf-8');
+      await atomicWriteJson(THEMES_DYNAMIC_FILE, pool);
     }
     log(`  Themes: +${themesAdded} competitor themes added`);
   } catch (err) { log(`  Themes apply failed: ${err.message}`); }
@@ -598,7 +618,7 @@ async function applyCompetitorFindings(structured, date) {
       interruptsAdded++;
     }
     if ((interruptsAdded > 0 || cleaned > 0) && !DRY_RUN) {
-      await fs.writeFile(INTERRUPTS_DYNAMIC_FILE, JSON.stringify(pool, null, 2) + '\n', 'utf-8');
+      await atomicWriteJson(INTERRUPTS_DYNAMIC_FILE, pool);
     }
     log(`  Interrupts: +${interruptsAdded} gap opportunities added`);
   } catch (err) { log(`  Interrupts apply failed: ${err.message}`); }

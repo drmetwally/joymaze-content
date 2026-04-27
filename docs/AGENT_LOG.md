@@ -70,3 +70,15 @@
 **Next:** Claude should audit commit `4d03721`, confirm the 5-file resolution matrix, and decide whether the extra pre-staged files in that commit stay as-is or should be split into a follow-up cleanup commit.
 
 ---
+
+### 2026-04-27 | OpenClaw | TASK-OC-001 | Fix pool file corruption in intelligence-refresh.mjs
+**Files changed:**
+- `scripts/intelligence-refresh.mjs` — added `atomicWriteJson()`, cleaned leftover `.tmp` files at `applyCompetitorFindings()` start, and replaced the three pool writes with atomic writes
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** The competitor propagation path was still writing hook, theme, and interrupt pool files directly, which left the live file vulnerable if a write or readback went bad during the twice-per-run apply path. I added a single atomic JSON writer that validates before and after writing the temp file, deletes the temp file on failure, and only renames into place on success; then I swapped the three `fs.writeFile` pool writes to use that helper and added startup cleanup for stale `.tmp` files.
+**Test command:** `node scripts/intelligence-refresh.mjs --dry-run` and `node scripts/intelligence-refresh.mjs --skip-competitor`
+**Test output summary:** Dry run exited 0, printed competitor propagation counts with no `Hooks apply failed` / `Themes apply failed` / `Interrupts apply failed` messages, and left no `config/*.tmp` files behind. Live `--skip-competitor` exited 0 and wrote `config/content-intelligence.json`; that generated file was reverted afterward so the task diff stayed scoped to `scripts/intelligence-refresh.mjs`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the single-file patch in `scripts/intelligence-refresh.mjs`. If accepted, OpenClaw should proceed to `TASK-OC-002`.
+
+---
