@@ -11,12 +11,14 @@
  *   node scripts/generate-story-video.mjs --story ep01-fox-and-frozen-river --dry-run
  *   node scripts/generate-story-video.mjs --story ep01-fox-and-frozen-river --no-music
  *   node scripts/generate-story-video.mjs --story ep01-fox-and-frozen-river --tts openai
+ *   node scripts/generate-story-video.mjs --story ep01-fox-and-frozen-river --tts kokoro
  *   node scripts/generate-story-video.mjs --story ep01-fox-and-frozen-river --tts edge
  *   node scripts/generate-story-video.mjs --init "The Fox and the Frozen River" --episode 1
  *
  * TTS Providers:
  *   --tts openai   OpenAI tts-1, voice: nova (~$0.01/story, warm natural quality)
- *   --tts edge     Microsoft Edge TTS, voice: JennyNeural (free, no key needed)
+ *   --tts kokoro   Kokoro-82M, voice: af_bella (free local fallback)
+ *   --tts edge     Microsoft Edge TTS, voice: JennyNeural (last-resort free fallback)
  *   (no flag)      Text overlay only (current default)
  *
  * Story folder structure:
@@ -57,7 +59,7 @@ const INIT_TITLE = INIT_MODE ? args[initTitleIdx + 1] : null;
 const epIdx = args.indexOf('--episode');
 const EPISODE_NUM = epIdx !== -1 ? parseInt(args[epIdx + 1], 10) : 1;
 const ttsIdx = args.indexOf('--tts');
-const TTS_PROVIDER = ttsIdx !== -1 ? args[ttsIdx + 1] : null; // 'openai' | 'edge' | null
+const TTS_PROVIDER = ttsIdx !== -1 ? args[ttsIdx + 1] : null; // 'openai' | 'kokoro' | 'edge' | null
 const speedIdx = args.indexOf('--speed');
 const TTS_SPEED = speedIdx !== -1 ? parseFloat(args[speedIdx + 1]) : 0.75; // 0.25–4.0; 0.75 = slowest natural story pacing
 const WORD_SYNC = args.includes('--word-sync'); // karaoke-style word-by-word text reveal
@@ -691,6 +693,17 @@ async function generateOpenAITTS(text, outputPath, speed = 0.75, voice = 'nova')
  * Generate speech audio via Microsoft Edge TTS (free, no API key)
  * Voice: en-US-JennyNeural (warm, natural female voice)
  */
+async function generateKokoroTTS(text, outputPath, speed = 1.0) {
+  const { KokoroTTS } = await import('kokoro-js');
+  const tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
+    dtype: 'q8',
+    device: 'cpu',
+  });
+  const voice = 'af_bella';
+  const audio = await tts.generate(text, { voice, speed });
+  await audio.save(outputPath);
+}
+
 async function generateEdgeTTS(text, outputPath, speed = 0.9) {
   const { MsEdgeTTS, OUTPUT_FORMAT } = await import('msedge-tts');
   const tts = new MsEdgeTTS();
@@ -762,9 +775,13 @@ async function buildNarrationTrack(storyMeta, storyDir, provider) {
     || OPENAI_VOICE_POOL[(storyMeta.episode - 1) % OPENAI_VOICE_POOL.length];
   const generateFn = provider === 'openai'
     ? (t, p) => generateOpenAITTS(t, p, TTS_SPEED, activeVoice)
+    : provider === 'kokoro'
+    ? (t, p) => generateKokoroTTS(t, p, TTS_SPEED)
     : (t, p) => generateEdgeTTS(t, p, TTS_SPEED);
   const providerLabel = provider === 'openai'
     ? `OpenAI TTS (${activeVoice}, speed ${TTS_SPEED})`
+    : provider === 'kokoro'
+    ? `Kokoro TTS (af_bella, speed ${TTS_SPEED})`
     : `Edge TTS (JennyNeural, speed ${TTS_SPEED})`;
   console.log(`\nGenerating TTS narration with ${providerLabel}...\n`);
 
@@ -1144,15 +1161,15 @@ async function main() {
   if (hasFfmpeg) console.log(`FFmpeg: ${FFMPEG_BIN}`);
 
   // Validate TTS provider flag
-  if (TTS_PROVIDER && !['openai', 'edge'].includes(TTS_PROVIDER)) {
-    console.error(`Unknown TTS provider: "${TTS_PROVIDER}". Use "openai" or "edge".`);
+  if (TTS_PROVIDER && !['openai', 'kokoro', 'edge'].includes(TTS_PROVIDER)) {
+    console.error(`Unknown TTS provider: "${TTS_PROVIDER}". Use "openai", "kokoro", or "edge".`);
     process.exit(1);
   }
   if (TTS_PROVIDER === 'openai') {
     const key = process.env.OPENAI_API_KEY;
     if (!key || key.startsWith('sk-your') || key === 'your-key-here') {
       console.error('OPENAI_API_KEY is not configured in .env (found placeholder value).');
-      console.error('Set a real OpenAI key, or use --tts edge (free, no key needed).');
+      console.error('Set a real OpenAI key, or use --tts kokoro or --tts edge (free fallbacks).');
       process.exit(1);
     }
   }
@@ -1168,7 +1185,7 @@ async function main() {
     } catch (err) {
       console.error(`\nTTS generation failed: ${err.message}`);
       console.error('Video will be generated WITHOUT voiceover.');
-      if (TTS_PROVIDER === 'openai') console.error('Tip: Use --tts edge for free voiceover (no API key needed).');
+      if (TTS_PROVIDER === 'openai') console.error('Tip: Use --tts kokoro or --tts edge for free voiceover (no API key needed).');
       console.error('');
     }
   } else if (TTS_PROVIDER && DRY_RUN) {

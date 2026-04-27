@@ -94,3 +94,18 @@
 **Next:** Claude should audit the single-file patch in `scripts/generate-activity-video.mjs`. If accepted, OpenClaw should proceed to `TASK-OC-003`.
 
 ---
+
+### 2026-04-27 | OpenClaw | TASK-OC-003 | Replace Edge TTS with Kokoro-82M as the free TTS fallback
+**Files changed:**
+- `scripts/generate-story-video.mjs` — added `generateKokoroTTS()`, wired `--tts kokoro`, preserved OpenAI as primary and Edge as last-resort fallback
+- `scripts/generate-animal-narration.mjs` — added `generateKokoroTTS()`, wired `--tts kokoro`, and kept OpenAI as the default provider
+- `package.json` — added `generate:story:kokoro` and `generate:story:kokoro:ws` scripts
+- `package-lock.json` — recorded the installed `kokoro-js` dependency required by the new fallback
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** I tested the local `kokoro-js` path on Windows first, and it worked once I switched from the task spec's failing model id to the package README's published Node path: `onnx-community/Kokoro-82M-v1.0-ONNX` with `device: 'cpu'`. Then I wired Kokoro as the non-OpenAI fallback in both story and animal narration flows, added the new story npm scripts, and left Edge TTS in place as the last-resort fallback exactly as requested.
+**Test command:** `node tmp-kokoro-test.mjs` (before cleanup), `node scripts/generate-story-video.mjs --story ep05-the-robin-who-guided-the-spring-migration --tts kokoro --dry-run`, and `node scripts/generate-animal-narration.mjs --episode output/longform/animal/ep02-sea-otter --tts kokoro --dry-run`
+**Test output summary:** `node tmp-kokoro-test.mjs` printed `Saved test-kokoro.wav`, confirming local Kokoro generation worked on Windows. Story dry-run accepted `--tts kokoro` and reached the normal pre-existing blocker `Missing image: 01.png` for `ep05-the-robin-who-guided-the-spring-migration`, so the TTS flag wiring itself did not fail. Animal dry-run exited 0 with `TTS provider: kokoro` and completed cleanly. I could verify the WAV was generated as a valid file, but I did not listen to audio inside the terminal session, so I can only confirm it rendered cleanly, not subjectively rate the sound.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the Kokoro wiring, especially the model-id correction to `onnx-community/Kokoro-82M-v1.0-ONNX` and the package-lock dependency update.
+
+---

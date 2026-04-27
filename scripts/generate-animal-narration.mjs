@@ -17,6 +17,7 @@
  *
  * Usage:
  *   node scripts/generate-animal-narration.mjs --episode output/longform/animal/ep02-sea-otter
+ *   node scripts/generate-animal-narration.mjs --episode output/longform/animal/ep02-sea-otter --tts kokoro
  *   npm run longform:animal:narrate -- --episode output/longform/animal/ep02-sea-otter
  *   npm run longform:animal:narrate -- --episode output/longform/animal/ep02-sea-otter --dry-run
  *   npm run longform:animal:narrate -- --episode output/longform/animal/ep02-sea-otter --force
@@ -38,6 +39,8 @@ const GROQ_MAX_TOKENS = 400; // narration copy is short — 30-50 words per segm
 const args    = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const FORCE   = args.includes('--force');
+const ttsIdx  = args.indexOf('--tts');
+const TTS_PROVIDER = ttsIdx !== -1 ? args[ttsIdx + 1] : 'openai';
 
 const episodeArg = (() => {
   const i = args.indexOf('--episode');
@@ -45,7 +48,7 @@ const episodeArg = (() => {
 })();
 
 if (!episodeArg) {
-  console.error('Usage: node scripts/generate-animal-narration.mjs --episode output/longform/animal/ep01-slug [--dry-run] [--force]');
+  console.error('Usage: node scripts/generate-animal-narration.mjs --episode output/longform/animal/ep01-slug [--dry-run] [--force] [--tts openai|kokoro]');
   process.exit(1);
 }
 
@@ -176,7 +179,20 @@ async function callGroq(systemPrompt, userPrompt) {
   return response.choices[0]?.message?.content?.trim() || '';
 }
 
-async function generateTTS(text, outputPath, openai, speed = 1.0) {
+async function generateKokoroTTS(text, outputPath, speed = 1.0) {
+  const { KokoroTTS } = await import('kokoro-js');
+  const tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
+    dtype: 'q8',
+    device: 'cpu',
+  });
+  const audio = await tts.generate(text, { voice: 'af_bella', speed });
+  await audio.save(outputPath);
+}
+
+async function generateTTS(text, outputPath, openai, speed = 1.0, provider = 'openai') {
+  if (provider === 'kokoro') {
+    return generateKokoroTTS(text, outputPath, speed);
+  }
   const response = await openai.audio.speech.create({
     model: 'tts-1-hd',
     voice: 'nova',
@@ -189,6 +205,16 @@ async function generateTTS(text, outputPath, openai, speed = 1.0) {
 }
 
 async function main() {
+  if (!['openai', 'kokoro'].includes(TTS_PROVIDER)) {
+    throw new Error(`Unknown TTS provider: ${TTS_PROVIDER}. Use openai or kokoro.`);
+  }
+  if (TTS_PROVIDER === 'openai') {
+    const key = process.env.OPENAI_API_KEY;
+    if (!key || key.startsWith('sk-your') || key === 'your-key-here') {
+      throw new Error('OPENAI_API_KEY is not configured in .env (found placeholder value). Use --tts kokoro or set a real OpenAI key.');
+    }
+  }
+
   const episodeDir  = resolveEpisodeDir(episodeArg);
   const episodePath = path.join(episodeDir, 'episode.json');
 
@@ -201,7 +227,9 @@ async function main() {
   const psychTriggers = psych?.triggers || {};
   const intelContext  = buildIntelligenceContext(intel);
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const openai = TTS_PROVIDER === 'openai'
+    ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    : null;
 
   console.log('\n  JoyMaze Animal Facts Narration Generator');
   console.log(`  Animal: ${episode.animalName}`);
@@ -209,6 +237,7 @@ async function main() {
   console.log(`  Writing style: ${writingStyle ? 'loaded' : 'missing — proceeding without'}`);
   console.log(`  Psychology triggers: ${Object.keys(psychTriggers).length} loaded`);
   console.log(`  Intelligence context: ${intel ? 'loaded' : 'not available'}`);
+  console.log(`  TTS provider: ${TTS_PROVIDER}`);
   console.log();
 
   let episodeDirty = false;
@@ -279,9 +308,9 @@ async function main() {
     }
     console.log(`    "${narrationCopy.substring(0, 100)}${narrationCopy.length > 100 ? '...' : ''}"`);
 
-    // Step 2: TTS via OpenAI shimmer
+    // Step 2: TTS via selected provider
     process.stdout.write('    Generating TTS...');
-    await generateTTS(narrationCopy, outputPath, openai, segDef.speed ?? 1.0);
+    await generateTTS(narrationCopy, outputPath, openai, segDef.speed ?? 1.0, TTS_PROVIDER);
     console.log(' done');
 
     // Step 3: Probe duration + write back to episode.json
