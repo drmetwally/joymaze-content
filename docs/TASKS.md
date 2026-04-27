@@ -21,7 +21,7 @@ No new pipelines until this threshold is hit consistently for 30 days.
 - Phase 3 (8+ months): Revenue-funded expansion (Seedance, paid ads, KDP series)
 
 **KPI Gates:**
-- Phase 0 → 1: 30 consecutive days hitting **10 images + 4 X posts + 1 ASMR + 1 story video/day** (updated 2026-04-27 — old 10+10+10 was stale)
+- Phase 0 → 1: 30 consecutive days hitting **10 images + 4 X posts + 1 ASMR + 1 story video + 1 activity challenge reel/day** (updated 2026-04-27 — reel added after ActivityChallenge pipeline polished)
 - Phase 1 → 2: Pinterest 75K+ impressions/mo AND installs ≥100/mo or KDP ≥20 units/mo
 - Phase 2 → 3: Installs ≥1,000/mo OR KDP ≥150 units/mo for 2 consecutive months
 

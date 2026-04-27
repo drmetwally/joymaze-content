@@ -8,7 +8,7 @@ Joymaze-Content is the content automation engine for the JoyMaze kids activity a
 
 **Goal:** Drive app installs and Amazon KDP book sales through high-volume, branded social media content.
 
-**Daily targets:** 10 image posts + 1 ASMR video + 1 story video + 4 X text posts (Phase 0 gate — see MEMORY.md §2)
+**Daily targets:** 10 image posts + 1 ASMR video + 1 story video + 1 activity challenge reel + 4 X text posts (Phase 0 gate — see MEMORY.md §2)
 
 ## Tech Stack
 
@@ -136,7 +136,7 @@ These decisions were made after deliberation or painful iteration. They are clos
 | Narration scene length | Minimum 7s per scene; 12–18 word narration target | Shorter scenes = jarring pacing; confirmed in ep02 testing |
 | HOOK_FRAMES | 210 frames (7s) — do not adjust without approval | Iterated 450→270→210; 210 confirmed clean in ep03 v3 |
 | OUTRO_FRAMES | 240 frames (8s) — do not adjust without approval | Locked alongside hook after ep03 v3 approval |
-| Phase 0 constraint | No new platforms, no new video tech, no new pipelines until gate clears: 10 images + 4 X posts + 1 ASMR + 1 story video/day for 30 consecutive days | Updated 2026-04-27 — original 10+10+10 target was stale; current pipeline can only reliably produce images, X posts, ASMR briefs, and story briefs daily |
+| Phase 0 constraint | No new platforms, no new video tech, no new pipelines until gate clears: 10 images + 4 X posts + 1 ASMR + 1 story video + 1 activity challenge reel/day for 30 consecutive days | Updated 2026-04-27 (reel added 2026-04-27) — pipeline now covers images, X posts, ASMR, story, and activity challenge reels daily |
 | Caption body | No `joymaze.com` URL, no pipe separators — ever | Reversed 2026-04-12 after caption quality review |
 | X posts | 0 hashtags, no brand name, soft CTAs only, 4 text posts/day max | Post-shadowban anti-spam rules; violations = account suspension |
 | Longform image naming | `01.png`, `02.png` … `NN.png` dropped directly into episode folder | `autoFillImagePaths()` scans for this pattern; `scene-01.png` = legacy fallback only |
@@ -185,7 +185,7 @@ Run the relevant checklist **before writing any code or making any edit**. These
 5. X posts: 0 hashtags, soft CTAs only, no brand name
 
 ### Before suggesting any new tech, tool, or platform:
-1. Check Phase 0 constraint — new tech is blocked until Phase 0 gate clears (10 images + 4 X posts + 1 ASMR + 1 story/day for 30 days)
+1. Check Phase 0 constraint — new tech is blocked until Phase 0 gate clears (10 images + 4 X posts + 1 ASMR + 1 story + 1 activity challenge reel/day for 30 days)
 2. Check if it conflicts with any locked decision (GPU requirements, API key strategy, etc.)
 3. If it genuinely unblocks a blocker, state the case and wait for explicit approval
 
