@@ -51,6 +51,7 @@ const asmrFile = _asmrArgVal
       ? `output/asmr/${_positional}/activity.json`
       : null);
 const propsArg      = getArg('--props');
+const propsFileArg  = getArg('--props-file');
 const outArg        = getArg('--out');
 const dryRun        = hasFlag('--dry-run');
 const verbose       = hasFlag('--verbose');
@@ -288,6 +289,9 @@ async function loadInputProps() {
     if (stat?.isDirectory()) jsonPath = path.join(jsonPath, 'activity.json');
     const activity = JSON.parse(await fs.readFile(jsonPath, 'utf-8'));
     return challengeJsonToProps(activity, path.dirname(jsonPath));
+  }
+  if (propsFileArg) {
+    return JSON.parse(await fs.readFile(path.resolve(ROOT, propsFileArg), 'utf-8'));
   }
   if (propsArg) return JSON.parse(propsArg);
   return {};

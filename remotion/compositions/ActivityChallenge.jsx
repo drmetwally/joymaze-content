@@ -1,343 +1,393 @@
 import {
   AbsoluteFill,
-  Sequence,
+  Audio,
   Img,
+  interpolate,
+  Sequence,
+  spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
-  spring,
-  interpolate,
-  staticFile,
 } from 'remotion';
-import { JoyoWatermark }  from '../components/JoyoWatermark.jsx';
+import { WipeReveal } from '../components/WipeReveal.jsx';
+import { MazeSolverReveal } from '../components/MazeSolverReveal.jsx';
+import { WordSearchReveal } from '../components/WordSearchReveal.jsx';
+import { DotToDoReveal } from '../components/DotToDoReveal.jsx';
+import { JoyoWatermark } from '../components/JoyoWatermark.jsx';
 import { BrandWatermark } from '../components/BrandWatermark.jsx';
 
-// ─── Default props / schema ──────────────────────────────────────────────────
 export const activityChallengeSchema = {
-  imagePath:       '',            // Path to puzzle image (maze, word search, coloring page, etc.)
-  hookText:        'Can your kid solve this? 🧩',
-  ctaText:         'Drop your time below 👇',
-  activityLabel:   'MAZE',        // Short label shown on the puzzle screen (e.g. MAZE, PUZZLE, WORD SEARCH)
-  hookDurationSec: 2.5,           // Duration of the hook screen before puzzle appears
-  countdownSec:    60,            // Timer counts up from 0 to this value
-  holdAfterSec:    2.5,           // Hold on CTA screen before video ends
-  backgroundColor: '#FFF4DC',     // Warm parchment
-  accentColor:     '#FF6B35',     // JoyMaze orange
-  showJoyo:        true,
+  imagePath: '',
+  blankImagePath: '',
+  solvedImagePath: '',
+  hookText: 'Can you solve this maze in 10 seconds?',
+  titleText: '',
+  activityLabel: 'MAZE',
+  puzzleType: 'maze',
+  countdownSec: 10,
+  hookDurationSec: 0.6,
+  holdAfterSec: 12,
+  challengeAudioPath: '',
+  tickAudioPath: '',
+  transitionCueAudioPath: '',
+  solveAudioPath: '',
+  challengeAudioVolume: 0.22,
+  tickAudioVolume: 0.16,
+  transitionCueVolume: 0.2,
+  solveAudioVolume: 0.85,
+  showJoyo: true,
+  showBrandWatermark: true,
+  pathWaypoints: null,
+  pathColor: '#22BB44',
+  wordRects: null,
+  highlightColor: '#FFD700',
+  dotWaypoints: null,
+  dotColor: '#FF6B35',
 };
 
-// ─── ActivityChallenge ────────────────────────────────────────────────────────
-// Timeline:
-//   0 ──── hookDuration ──── hookDuration+countdownDuration ──── +hold ──┤
-//   [Hook screen]            [Puzzle + timer counting up]          [CTA]
-//
-// Total duration = (hookDuration + countdownSec + holdAfterSec) × 30fps
-// render-video.mjs computes this via computeDuration.
+const toSrc = (value) => {
+  if (!value) {
+    return '';
+  }
+  return value.startsWith('http') ? value : staticFile(value);
+};
+
+const formatCountdown = (frame, fps, challengeFrames) => {
+  const secondsLeft = Math.ceil((challengeFrames - frame) / fps);
+  return String(Math.max(0, secondsLeft));
+};
+
+const TitleStrip = ({ title, countdown, visible, pulse }) => {
+  const opacity = visible ? 1 : 0;
+  const y = visible ? 0 : -24;
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 54,
+        left: 40,
+        right: 40,
+        height: 146,
+        padding: '0 40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 32,
+        backgroundColor: 'rgba(18, 20, 27, 0.82)',
+        boxShadow: pulse ? '0 0 40px rgba(255, 255, 255, 0.18)' : '0 16px 40px rgba(0, 0, 0, 0.24)',
+        transform: `translateY(${y}px) scale(${pulse ? 1.015 : 1})`,
+        opacity,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          left: 34,
+          top: 18,
+          bottom: 18,
+          width: 144,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#FFF6E8',
+          fontFamily: 'Arial Black, Arial, sans-serif',
+          fontSize: 88,
+          fontWeight: 900,
+          lineHeight: 1,
+          letterSpacing: '-2px',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {countdown}
+      </div>
+
+      <div
+        style={{
+          width: '100%',
+          textAlign: 'center',
+          color: '#FFFFFF',
+          fontFamily: 'Arial Black, Arial, sans-serif',
+          fontSize: 50,
+          fontWeight: 900,
+          lineHeight: 1.08,
+          padding: '0 80px 0 120px',
+          textShadow: '0 2px 12px rgba(0, 0, 0, 0.25)',
+        }}
+      >
+        {title}
+      </div>
+    </div>
+  );
+};
+
+const StaticSolve = ({ imagePath }) => (
+  <AbsoluteFill style={{ backgroundColor: '#F5F1E8' }}>
+    {imagePath ? (
+      <Img
+        src={toSrc(imagePath)}
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+      />
+    ) : (
+      <AbsoluteFill
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#6B5E51',
+          fontFamily: 'Arial, sans-serif',
+          fontSize: 48,
+        }}
+      >
+        solve preview
+      </AbsoluteFill>
+    )}
+  </AbsoluteFill>
+);
+
+const SolveReveal = ({
+  blankImagePath,
+  solvedImagePath,
+  puzzleType,
+  durationFrames,
+  pathWaypoints,
+  pathColor,
+  wordRects,
+  highlightColor,
+  dotWaypoints,
+  dotColor,
+  fallbackImagePath,
+}) => {
+  const normalizedType = puzzleType === 'spot-the-difference' ? 'matching' : puzzleType;
+
+  if (!blankImagePath || !solvedImagePath) {
+    return <StaticSolve imagePath={fallbackImagePath || blankImagePath || solvedImagePath} />;
+  }
+
+  if (dotWaypoints?.length > 1 || normalizedType === 'dot-to-dot') {
+    return (
+      <DotToDoReveal
+        blankPath={blankImagePath}
+        solvedPath={solvedImagePath}
+        dots={dotWaypoints ?? []}
+        dotColor={dotColor}
+        startFrame={0}
+        durationFrames={durationFrames}
+      />
+    );
+  }
+
+  if (wordRects?.length > 0 || normalizedType === 'word-search') {
+    return (
+      <WordSearchReveal
+        blankPath={blankImagePath}
+        solvedPath={solvedImagePath}
+        rects={wordRects ?? []}
+        highlightColor={highlightColor}
+        startFrame={0}
+        durationFrames={durationFrames}
+      />
+    );
+  }
+
+  if (pathWaypoints?.length > 1 && (normalizedType === 'maze' || normalizedType === 'tracing')) {
+    return (
+      <MazeSolverReveal
+        blankPath={blankImagePath}
+        solvedPath={solvedImagePath}
+        waypoints={pathWaypoints}
+        pathColor={pathColor}
+        startFrame={0}
+        durationFrames={durationFrames}
+      />
+    );
+  }
+
+  return (
+    <WipeReveal
+      blankPath={blankImagePath}
+      solvedPath={solvedImagePath}
+      revealType={normalizedType === 'tracing' ? 'ttb' : 'ltr'}
+      startFrame={0}
+      durationFrames={durationFrames}
+      easing="linear"
+      pathWaypoints={null}
+    />
+  );
+};
 
 export const ActivityChallenge = ({
-  imagePath       = '',
-  hookText        = activityChallengeSchema.hookText,
-  ctaText         = activityChallengeSchema.ctaText,
-  activityLabel   = activityChallengeSchema.activityLabel,
+  imagePath = '',
+  blankImagePath = '',
+  solvedImagePath = '',
+  hookText = activityChallengeSchema.hookText,
+  titleText = '',
+  activityLabel = activityChallengeSchema.activityLabel,
+  puzzleType = activityChallengeSchema.puzzleType,
+  countdownSec = activityChallengeSchema.countdownSec,
   hookDurationSec = activityChallengeSchema.hookDurationSec,
-  countdownSec    = activityChallengeSchema.countdownSec,
-  holdAfterSec    = activityChallengeSchema.holdAfterSec,
-  backgroundColor = activityChallengeSchema.backgroundColor,
-  accentColor     = activityChallengeSchema.accentColor,
-  showJoyo        = true,
+  holdAfterSec = activityChallengeSchema.holdAfterSec,
+  challengeAudioPath = '',
+  tickAudioPath = '',
+  transitionCueAudioPath = '',
+  solveAudioPath = '',
+  challengeAudioVolume = activityChallengeSchema.challengeAudioVolume,
+  tickAudioVolume = activityChallengeSchema.tickAudioVolume,
+  transitionCueVolume = activityChallengeSchema.transitionCueVolume,
+  solveAudioVolume = activityChallengeSchema.solveAudioVolume,
+  showJoyo = true,
+  showBrandWatermark = true,
+  pathWaypoints = null,
+  pathColor = activityChallengeSchema.pathColor,
+  wordRects = null,
+  highlightColor = activityChallengeSchema.highlightColor,
+  dotWaypoints = null,
+  dotColor = activityChallengeSchema.dotColor,
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  const hookFrames      = Math.round(hookDurationSec * fps);
-  const challengeFrames = Math.round(countdownSec * fps);
-  const holdFrames      = Math.round(holdAfterSec * fps);
-  const challengeStart  = hookFrames;
-  const holdStart       = hookFrames + challengeFrames;
-
-  // Global fade-out over last 0.4s
-  const globalFade = interpolate(
-    frame,
-    [durationInFrames - Math.round(fps * 0.4), durationInFrames],
-    [1, 0],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-  );
-
-  return (
-    <AbsoluteFill style={{ backgroundColor, opacity: globalFade }}>
-
-      {/* ── Phase 1: Hook screen ──────────────────────────────────────── */}
-      <Sequence from={0} durationInFrames={hookFrames}>
-        <HookScreen
-          text={hookText}
-          accentColor={accentColor}
-          backgroundColor={backgroundColor}
-          fps={fps}
-          frame={frame}
-        />
-      </Sequence>
-
-      {/* ── Phase 2: Puzzle + timer ───────────────────────────────────── */}
-      <Sequence from={challengeStart} durationInFrames={challengeFrames}>
-        <PuzzleScreen
-          imagePath={imagePath}
-          activityLabel={activityLabel}
-          countdownSec={countdownSec}
-          accentColor={accentColor}
-          fps={fps}
-        />
-      </Sequence>
-
-      {/* ── Phase 3: CTA hold ────────────────────────────────────────── */}
-      <Sequence from={holdStart} durationInFrames={holdFrames}>
-        <CtaScreen
-          text={ctaText}
-          accentColor={accentColor}
-          fps={fps}
-          frame={frame - holdStart}
-        />
-      </Sequence>
-
-      {/* ── Persistent: Joyo + brand ─────────────────────────────────── */}
-      {showJoyo && <JoyoWatermark visible />}
-      <BrandWatermark text="joymaze.com" position="bottom-center" />
-
-    </AbsoluteFill>
-  );
-};
-
-// ─── HookScreen ───────────────────────────────────────────────────────────────
-// Phase 1: Large text springs in on gradient background.
-
-const HookScreen = ({ text, accentColor, backgroundColor, fps, frame }) => {
-  const s = spring({ frame, fps, config: { stiffness: 200, damping: 18, mass: 1 } });
-  const scale = interpolate(s, [0, 1], [0.75, 1]);
-  const opacity = interpolate(s, [0, 1], [0, 1]);
-
-  return (
-    <AbsoluteFill
-      style={{
-        justifyContent: 'center',
-        alignItems:     'center',
-        flexDirection:  'column',
-        gap:            32,
-        padding:        '0 56px',
-        backgroundColor,
-      }}
-    >
-      {/* Accent top bar */}
-      <div
-        style={{
-          position:        'absolute',
-          top:             0,
-          left:            0,
-          right:           0,
-          height:          8,
-          backgroundColor: accentColor,
-        }}
-      />
-
-      <div style={{ transform: `scale(${scale})`, opacity, textAlign: 'center' }}>
-        <p
-          style={{
-            fontSize:      72,
-            fontWeight:    900,
-            fontFamily:    'Arial Black, Arial, sans-serif',
-            color:         '#2D2D2D',
-            margin:        0,
-            lineHeight:    1.2,
-            letterSpacing: '-1px',
-          }}
-        >
-          {text}
-        </p>
-        {/* Accent underline */}
-        <div
-          style={{
-            width:           100,
-            height:          6,
-            backgroundColor: accentColor,
-            borderRadius:    3,
-            margin:          '18px auto 0',
-          }}
-        />
-      </div>
-    </AbsoluteFill>
-  );
-};
-
-// ─── PuzzleScreen ─────────────────────────────────────────────────────────────
-// Phase 2: Puzzle image + counting timer + activity label badge.
-
-const PuzzleScreen = ({ imagePath, activityLabel, countdownSec, accentColor, fps }) => {
-  const frame = useCurrentFrame();
-
-  // Elapsed seconds (integer display, counts up)
-  const elapsedSec = Math.floor(frame / fps);
-  const displaySec = Math.min(elapsedSec, countdownSec);
-  const mm = String(Math.floor(displaySec / 60)).padStart(2, '0');
-  const ss = String(displaySec % 60).padStart(2, '0');
-
-  // Image slides in from bottom on entry
-  const entrySpring = spring({ frame, fps, config: { stiffness: 160, damping: 22 } });
-  const imageY = interpolate(entrySpring, [0, 1], [120, 0]);
-  const imageOp = interpolate(entrySpring, [0, 1], [0, 1]);
-
-  // Timer pulses once per second
-  const secFraction = (frame % fps) / fps;
-  const timerScale = interpolate(secFraction, [0, 0.08, 0.18, 1], [1.12, 1.06, 1, 1], {
+  const title = titleText || hookText || activityLabel;
+  const challengeFrames = Math.max(1, Math.round(countdownSec * fps));
+  const transitionFrames = Math.max(1, Math.round(hookDurationSec * fps));
+  const solveFrames = Math.max(1, Math.round(holdAfterSec * fps));
+  const transitionStart = challengeFrames;
+  const solveStart = challengeFrames + transitionFrames;
+  const sourceImagePath = imagePath || blankImagePath || solvedImagePath;
+  const challengeScale = interpolate(frame, [0, challengeFrames], [1, 1.03], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
-
-  const src = imagePath?.startsWith('http') ? imagePath : staticFile(imagePath ?? '');
+  const transitionPulse = interpolate(
+    frame,
+    [transitionStart, transitionStart + Math.max(1, Math.floor(transitionFrames * 0.35)), solveStart],
+    [1.03, 1.05, 1],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+  const baseScale = frame < solveStart ? (frame < transitionStart ? challengeScale : transitionPulse) : 1;
+  const puzzleBrightness = interpolate(
+    frame,
+    [transitionStart, transitionStart + Math.max(1, Math.floor(transitionFrames * 0.35)), solveStart],
+    [1, 1.08, 1],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+  const stripVisible = frame < solveStart;
+  const pulseStrength = frame >= transitionStart && frame < solveStart;
+  const challengeFrame = Math.min(frame, challengeFrames - 1);
+  const countdownLabel = formatCountdown(challengeFrame, fps, challengeFrames);
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - Math.max(1, Math.round(fps * 0.35)), durationInFrames],
+    [1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+  const tickSequenceFrames = Math.min(Math.max(1, fps), challengeFrames);
+  const tickCount = Math.ceil(challengeFrames / fps);
+  const stripExitSpring = spring({
+    frame: Math.max(0, frame - transitionStart),
+    fps,
+    config: { damping: 18, stiffness: 180, mass: 0.7 },
+  });
+  const stripExitOpacity = stripVisible ? 1 : interpolate(stripExitSpring, [0, 1], [1, 0]);
+  const stripYOffset = stripVisible ? 0 : interpolate(stripExitSpring, [0, 1], [0, -32]);
 
   return (
-    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-
-      {/* Activity label badge */}
-      <div
+    <AbsoluteFill style={{ backgroundColor: '#F5F1E8', opacity: fadeOut }}>
+      <AbsoluteFill
         style={{
-          position:        'absolute',
-          top:             48,
-          left:            0,
-          right:           0,
-          display:         'flex',
-          justifyContent:  'center',
+          transform: `scale(${baseScale})`,
+          filter: `brightness(${puzzleBrightness})`,
         }}
       >
-        <div
-          style={{
-            backgroundColor: accentColor,
-            borderRadius:    999,
-            padding:         '10px 32px',
-          }}
-        >
-          <p
+        {sourceImagePath ? (
+          <Img
+            src={toSrc(sourceImagePath)}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        ) : (
+          <AbsoluteFill
             style={{
-              color:       '#ffffff',
-              fontSize:    32,
-              fontWeight:  900,
-              fontFamily:  'Arial Black, Arial, sans-serif',
-              margin:      0,
-              letterSpacing: '2px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#6B5E51',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: 48,
             }}
           >
-            {activityLabel}
-          </p>
-        </div>
-      </div>
+            puzzle image
+          </AbsoluteFill>
+        )}
+      </AbsoluteFill>
 
-      {/* Puzzle image */}
-      {imagePath ? (
-        <div
-          style={{
-            transform: `translateY(${imageY}px)`,
-            opacity:   imageOp,
-            width:     '88%',
-            aspectRatio: '1 / 1',
-            borderRadius: 28,
-            overflow:    'hidden',
-            boxShadow:   '0 16px 64px rgba(0,0,0,0.18)',
-          }}
-        >
-          <Img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </div>
-      ) : (
-        // Placeholder when no image is provided (dev/preview)
-        <div
-          style={{
-            width:           '88%',
-            aspectRatio:     '1 / 1',
-            borderRadius:    28,
-            backgroundColor: '#e8e8e8',
-            display:         'flex',
-            justifyContent:  'center',
-            alignItems:      'center',
-          }}
-        >
-          <p style={{ color: '#999', fontSize: 40, fontFamily: 'Arial' }}>puzzle image</p>
-        </div>
-      )}
-
-      {/* Timer */}
       <div
         style={{
-          position:  'absolute',
-          bottom:    160,
-          left:      0,
-          right:     0,
-          display:   'flex',
-          justifyContent: 'center',
-          alignItems:     'center',
-          gap:       12,
+          opacity: stripExitOpacity,
+          transform: `translateY(${stripYOffset}px)`,
         }}
       >
-        {/* Clock icon (simple SVG circle) */}
-        <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-          <circle cx="22" cy="22" r="20" stroke={accentColor} strokeWidth="3" />
-          <line x1="22" y1="10" x2="22" y2="22" stroke={accentColor} strokeWidth="3" strokeLinecap="round" />
-          <line x1="22" y1="22" x2="30" y2="27" stroke={accentColor} strokeWidth="3" strokeLinecap="round" />
-        </svg>
-        <p
-          style={{
-            fontSize:    68,
-            fontWeight:  900,
-            fontFamily:  'Arial Black, Arial, sans-serif',
-            color:       '#2D2D2D',
-            margin:      0,
-            transform:   `scale(${timerScale})`,
-            transformOrigin: 'center',
-            letterSpacing: '2px',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {mm}:{ss}
-        </p>
-      </div>
-
-    </AbsoluteFill>
-  );
-};
-
-// ─── CtaScreen ────────────────────────────────────────────────────────────────
-// Phase 3: CTA text springs in. Clean, no countdown.
-
-const CtaScreen = ({ text, accentColor, fps, frame }) => {
-  const s = spring({ frame, fps, config: { stiffness: 220, damping: 20, mass: 0.9 } });
-  const y = interpolate(s, [0, 1], [40, 0]);
-  const op = interpolate(s, [0, 1], [0, 1]);
-
-  return (
-    <AbsoluteFill
-      style={{
-        justifyContent: 'center',
-        alignItems:     'center',
-        padding:        '0 56px',
-      }}
-    >
-      <div style={{ transform: `translateY(${y}px)`, opacity: op, textAlign: 'center' }}>
-        <p
-          style={{
-            fontSize:    62,
-            fontWeight:  800,
-            fontFamily:  'Arial Black, Arial, sans-serif',
-            color:       '#2D2D2D',
-            margin:      0,
-            lineHeight:  1.25,
-          }}
-        >
-          {text}
-        </p>
-        <div
-          style={{
-            width:           80,
-            height:          6,
-            backgroundColor: accentColor,
-            borderRadius:    3,
-            margin:          '20px auto 0',
-          }}
+        <TitleStrip
+          title={title}
+          countdown={countdownLabel}
+          visible={stripVisible}
+          pulse={pulseStrength}
         />
       </div>
+
+      <Sequence from={solveStart} durationInFrames={solveFrames}>
+        <SolveReveal
+          blankImagePath={blankImagePath || imagePath}
+          solvedImagePath={solvedImagePath}
+          puzzleType={puzzleType}
+          durationFrames={solveFrames}
+          pathWaypoints={pathWaypoints}
+          pathColor={pathColor}
+          wordRects={wordRects}
+          highlightColor={highlightColor}
+          dotWaypoints={dotWaypoints}
+          dotColor={dotColor}
+          fallbackImagePath={sourceImagePath}
+        />
+      </Sequence>
+
+      {challengeAudioPath ? (
+        <Audio
+          src={toSrc(challengeAudioPath)}
+          loop
+          volume={(f) => (f < solveStart ? challengeAudioVolume : 0)}
+        />
+      ) : null}
+
+      {tickAudioPath
+        ? Array.from({ length: tickCount }).map((_, index) => {
+            const from = index * fps;
+            if (from >= challengeFrames) {
+              return null;
+            }
+            return (
+              <Sequence key={`tick-${from}`} from={from} durationInFrames={tickSequenceFrames}>
+                <Audio src={toSrc(tickAudioPath)} volume={tickAudioVolume} />
+              </Sequence>
+            );
+          })
+        : null}
+
+      {transitionCueAudioPath ? (
+        <Sequence from={transitionStart} durationInFrames={transitionFrames}>
+          <Audio src={toSrc(transitionCueAudioPath)} volume={transitionCueVolume} />
+        </Sequence>
+      ) : null}
+
+      {solveAudioPath ? (
+        <Sequence from={solveStart} durationInFrames={solveFrames}>
+          <Audio
+            src={toSrc(solveAudioPath)}
+            loop
+            volume={solveAudioVolume}
+          />
+        </Sequence>
+      ) : null}
+
+      {showJoyo ? <JoyoWatermark visible /> : null}
+      {showBrandWatermark ? <BrandWatermark text="joymaze.com" position="bottom-center" /> : null}
     </AbsoluteFill>
   );
 };
