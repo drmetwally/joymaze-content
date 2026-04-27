@@ -138,3 +138,15 @@
 **Next:** Claude should audit commits `bb2e419` and `539d60e` and then handle memory/session/task close-out on the supervision side.
 
 ---
+
+### 2026-04-27 | OpenClaw | TASK-OC-004 | Wire challenge audio + solve reveal props in render-video.mjs
+**Files changed:**
+- `scripts/render-video.mjs` — added `CHALLENGE_SFX_MAP`, resolved challenge SFX/image paths safely, and passed puzzle solve reveal/audio props through `challengeJsonToProps()`
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** The `ActivityChallenge` composition was already wired for multi-phase audio and animated solve reveal, but `challengeJsonToProps()` was only passing the basic image and timing fields, so challenge reels rendered silent and solve fell back to static images. I added the challenge SFX routing map right after `SOFT_MUSIC`, replaced `challengeJsonToProps()` with a safe resolver that validates SFX and optional `blank.png` / `solved.png`, and now pass through `puzzleType`, audio paths/volumes, and extracted `path.json` / `wordsearch.json` / `dots.json` overlay data for automatic reveal activation when those assets exist.
+**Test command:** `node scripts/render-video.mjs --challenge output/challenge/word-search-garden-bugs --dry-run --verbose` and `node scripts/render-video.mjs --challenge output/challenge/word-search-forest-fun --dry-run --verbose`
+**Test output summary:** Both dry runs exited 0 and printed the expected challenge audio props: `challengeAudioPath: "assets/audio/masters/wordsearch_music_loop_01.wav"`, `tickAudioPath: "assets/sfx/countdown/countdown_tick_soft_01.wav"`, `transitionCueAudioPath: "assets/sfx/wordsearch/search_shimmer_01.wav"`, and `solveAudioPath: "assets/audio/Twinkle - The Grey Room _ Density & Time.mp3"`. `blankImagePath` and `solvedImagePath` correctly resolved to `""` with no thrown errors because those files are not present yet in the sample folders.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the single-file `scripts/render-video.mjs` patch. After `blank.png` / `solved.png` plus the extracted solver JSON files are present in a challenge folder, the animated solve reveal should activate with no further code changes.
+
+---

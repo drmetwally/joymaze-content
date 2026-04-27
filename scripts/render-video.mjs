@@ -76,6 +76,33 @@ const AUDIO_MAP = {
   default:    SOFT_MUSIC,
 };
 
+const CHALLENGE_SFX_MAP = {
+  maze: {
+    challengeAudioPath: 'assets/audio/masters/maze_music_loop_01.wav',
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/maze/maze_success_chime_01.wav',
+    solveAudioPath: SOFT_MUSIC,
+  },
+  'word-search': {
+    challengeAudioPath: 'assets/audio/masters/wordsearch_music_loop_01.wav',
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/wordsearch/search_shimmer_01.wav',
+    solveAudioPath: SOFT_MUSIC,
+  },
+  'dot-to-dot': {
+    challengeAudioPath: SOFT_MUSIC,
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/brand/cta_hit_01.wav',
+    solveAudioPath: SOFT_MUSIC,
+  },
+  default: {
+    challengeAudioPath: SOFT_MUSIC,
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/brand/cta_hit_01.wav',
+    solveAudioPath: SOFT_MUSIC,
+  },
+};
+
 async function resolveAudio(type) {
   const rel = AUDIO_MAP[type] ?? AUDIO_MAP.default;
   const abs  = path.join(ROOT, rel);
@@ -259,17 +286,104 @@ async function activityJsonToProps(activity, activityDir) {
 
 // challenge/activity.json → ActivityChallenge props
 async function challengeJsonToProps(activity, activityDir) {
+  const VW = 1080, VH = 1920;
   const toRelative = (filename) =>
     path.relative(ROOT, path.resolve(activityDir, filename)).replace(/\\/g, '/');
+
+  async function resolveSfx(rel) {
+    if (!rel) return '';
+    const exists = await fs.access(path.join(ROOT, rel)).then(() => true).catch(() => false);
+    if (!exists) console.warn(`    [sfx] not found — skipping: ${rel}`);
+    return exists ? rel : '';
+  }
+
+  async function resolveImage(filename) {
+    const abs = path.resolve(activityDir, filename);
+    const exists = await fs.access(abs).then(() => true).catch(() => false);
+    return exists ? toRelative(filename) : '';
+  }
+
+  const sfx = CHALLENGE_SFX_MAP[activity.puzzleType] ?? CHALLENGE_SFX_MAP.default;
+
+  const [challengeAudioPath, tickAudioPath, transitionCueAudioPath, solveAudioPath] =
+    await Promise.all([
+      resolveSfx(activity.challengeAudioPath ?? sfx.challengeAudioPath),
+      resolveSfx(activity.tickAudioPath ?? sfx.tickAudioPath),
+      resolveSfx(activity.transitionCueAudioPath ?? sfx.transitionCueAudioPath),
+      resolveSfx(activity.solveAudioPath ?? sfx.solveAudioPath),
+    ]);
+
+  // Load path.json for maze solve reveal
+  let pathWaypoints = null, pathColor = '#22BB44';
+  try {
+    const pathData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'path.json'), 'utf-8'));
+    const imgAR = (pathData.width ?? VW) / (pathData.height ?? VH);
+    const videoAR = VW / VH;
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAR > videoAR) { renderW = VW; renderH = VW / imgAR; offsetX = 0; offsetY = (VH - renderH) / 2; }
+    else { renderH = VH; renderW = VH * imgAR; offsetX = (VW - renderW) / 2; offsetY = 0; }
+    pathWaypoints = pathData.waypoints.map(p => ({ x: offsetX + p.x * renderW, y: offsetY + p.y * renderH }));
+    if (pathData.pathColor) pathColor = pathData.pathColor;
+  } catch { /* no path.json — solve falls back to static */ }
+
+  // Load wordsearch.json
+  let wordRects = null, highlightColor = '#FFD700';
+  try {
+    const wsData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'wordsearch.json'), 'utf-8'));
+    const imgAR = (wsData.width ?? VW) / (wsData.height ?? VH);
+    const videoAR = VW / VH;
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAR > videoAR) { renderW = VW; renderH = VW / imgAR; offsetX = 0; offsetY = (VH - renderH) / 2; }
+    else { renderH = VH; renderW = VH * imgAR; offsetX = (VW - renderW) / 2; offsetY = 0; }
+    wordRects = wsData.rects.map(r => ({
+      x1: offsetX + r.x1 * renderW,
+      y1: offsetY + r.y1 * renderH,
+      x2: offsetX + r.x2 * renderW,
+      y2: offsetY + r.y2 * renderH,
+    }));
+    if (wsData.highlightColor) highlightColor = wsData.highlightColor;
+  } catch { /* no wordsearch.json */ }
+
+  // Load dots.json
+  let dotWaypoints = null, dotColor = '#FF6B35';
+  try {
+    const dotsData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'dots.json'), 'utf-8'));
+    const imgAR = (dotsData.width ?? VW) / (dotsData.height ?? VH);
+    const videoAR = VW / VH;
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAR > videoAR) { renderW = VW; renderH = VW / imgAR; offsetX = 0; offsetY = (VH - renderH) / 2; }
+    else { renderH = VH; renderW = VH * imgAR; offsetX = (VW - renderW) / 2; offsetY = 0; }
+    dotWaypoints = dotsData.dots.map(d => ({ x: offsetX + d.x * renderW, y: offsetY + d.y * renderH }));
+    if (dotsData.dotColor) dotColor = dotsData.dotColor;
+  } catch { /* no dots.json */ }
+
   return {
-    imagePath:       toRelative(activity.imagePath ?? 'puzzle.png'),
-    hookText:        activity.hookText        ?? 'Can your kid solve this?',
-    ctaText:         activity.ctaText         ?? 'Drop your time below!',
-    activityLabel:   activity.activityLabel   ?? 'PUZZLE',
-    hookDurationSec: activity.hookDurationSec ?? 2.5,
-    countdownSec:    activity.countdownSec    ?? 60,
-    holdAfterSec:    activity.holdAfterSec    ?? 2.5,
-    showJoyo:        activity.showJoyo        ?? true,
+    imagePath: toRelative(activity.imagePath ?? 'puzzle.png'),
+    blankImagePath: await resolveImage(activity.blankImage ?? 'blank.png'),
+    solvedImagePath: await resolveImage(activity.solvedImage ?? 'solved.png'),
+    puzzleType: activity.puzzleType ?? 'maze',
+    hookText: activity.hookText ?? 'Can your kid solve this?',
+    titleText: activity.titleText ?? '',
+    activityLabel: activity.activityLabel ?? 'PUZZLE',
+    countdownSec: activity.countdownSec ?? 10,
+    hookDurationSec: activity.hookDurationSec ?? 0.6,
+    holdAfterSec: activity.holdAfterSec ?? 12,
+    challengeAudioPath,
+    tickAudioPath,
+    transitionCueAudioPath,
+    solveAudioPath,
+    challengeAudioVolume: activity.challengeAudioVolume ?? 0.22,
+    tickAudioVolume: activity.tickAudioVolume ?? 0.16,
+    transitionCueVolume: activity.transitionCueVolume ?? 0.2,
+    solveAudioVolume: activity.solveAudioVolume ?? 0.85,
+    showJoyo: activity.showJoyo ?? true,
+    showBrandWatermark: activity.showBrandWatermark ?? true,
+    pathWaypoints,
+    pathColor: activity.pathColor ?? pathColor,
+    wordRects,
+    highlightColor: activity.highlightColor ?? highlightColor,
+    dotWaypoints,
+    dotColor: activity.dotColor ?? dotColor,
   };
 }
 
