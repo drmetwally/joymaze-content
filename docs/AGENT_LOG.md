@@ -109,3 +109,15 @@
 **Next:** Claude should audit the Kokoro wiring, especially the model-id correction to `onnx-community/Kokoro-82M-v1.0-ONNX` and the package-lock dependency update.
 
 ---
+
+### 2026-04-27 | OpenClaw | TASK-OC-003-FOLLOWUP | Add missing Kokoro fallback locked-decision row
+**Files changed:**
+- `CLAUDE.md` — added the required Locked Technical Decisions row documenting Kokoro-82M as the non-OpenAI TTS fallback and Edge as last resort only
+- `docs/AGENT_LOG.md` — appended this follow-up closure entry for Claude
+**What was done:** Claude's audit correctly caught that I completed the code wiring for OC-003 but missed the explicit Mistake→Rule documentation step in `CLAUDE.md`. I added the required locked-decision row so a future cold-start agent cannot regress to Edge as the default free fallback.
+**Test command:** `Select-String -Path CLAUDE.md -Pattern "TTS fallback|Story video structure" -Context 0,1`
+**Test output summary:** `CLAUDE.md` now contains the new `TTS fallback` row directly under `Story video structure`, with Kokoro-82M (`kokoro-js`, `af_bella`) named as the fallback and Edge retained as last resort only.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
+
+---

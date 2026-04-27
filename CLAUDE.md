@@ -129,13 +129,14 @@ These decisions were made after deliberation or painful iteration. They are clos
 | Scene animation | Ken Burns permanent default — no SVD, AnimateDiff, or Seedance | GTX 1650 (4GB VRAM) cannot run SVD-XT (14GB) or AnimateDiff (6GB) |
 | Video overlays | Yellow pill `rgba(255,210,0,0.93)`, rx=22, dark text, y=48 — never white floating text | Brand standard locked after ep03 approval |
 | Story video structure | No outro, no CTA, no fade — loop-clean hard cut on last frame | Outro = dead air on short-form; platform loop requires clean cut |
+| TTS fallback | Kokoro-82M (`kokoro-js`, `af_bella` voice) replaces Edge TTS as non-OpenAI fallback — Edge TTS remains in code as last resort only | Edge TTS quality rejected for production 2026-04-27 |
 | `writing-style.md` placement | System message only — never user message prefix | User message prefix was ignored in testing; all LLM scripts must follow this |
 | Gemini API key | `VERTEX_API_KEY` is the working key — `GOOGLE_AI_API_KEY` is suspended | Suspended by Google; all Gemini scripts already updated |
 | API key routing | Gemini images = `VERTEX_API_KEY`; text = `GROQ_API_KEY`; TTS = `OPENAI_API_KEY` (`shimmer`, `tts-1-hd`) | No Anthropic key in use; routing locked to minimize cost |
 | Narration scene length | Minimum 7s per scene; 12–18 word narration target | Shorter scenes = jarring pacing; confirmed in ep02 testing |
 | HOOK_FRAMES | 210 frames (7s) — do not adjust without approval | Iterated 450→270→210; 210 confirmed clean in ep03 v3 |
 | OUTRO_FRAMES | 240 frames (8s) — do not adjust without approval | Locked alongside hook after ep03 v3 approval |
-| Phase 0 constraint | No new platforms, no new video tech, no new pipelines until 10+10+10/day for 30 days | Strategy locked 2026-04-04; reopening wastes Phase 0 time |
+| Phase 0 constraint | No new platforms, no new video tech, no new pipelines until gate clears: 10 images + 4 X posts + 1 ASMR + 1 story video/day for 30 consecutive days | Updated 2026-04-27 — original 10+10+10 target was stale; current pipeline can only reliably produce images, X posts, ASMR briefs, and story briefs daily |
 | Caption body | No `joymaze.com` URL, no pipe separators — ever | Reversed 2026-04-12 after caption quality review |
 | X posts | 0 hashtags, no brand name, soft CTAs only, 4 text posts/day max | Post-shadowban anti-spam rules; violations = account suspension |
 | Longform image naming | `01.png`, `02.png` … `NN.png` dropped directly into episode folder | `autoFillImagePaths()` scans for this pattern; `scene-01.png` = legacy fallback only |
@@ -184,7 +185,7 @@ Run the relevant checklist **before writing any code or making any edit**. These
 5. X posts: 0 hashtags, soft CTAs only, no brand name
 
 ### Before suggesting any new tech, tool, or platform:
-1. Check Phase 0 constraint — new tech is blocked until 10+10+10 gate clears
+1. Check Phase 0 constraint — new tech is blocked until Phase 0 gate clears (10 images + 4 X posts + 1 ASMR + 1 story/day for 30 days)
 2. Check if it conflicts with any locked decision (GPU requirements, API key strategy, etc.)
 3. If it genuinely unblocks a blocker, state the case and wait for explicit approval
 
