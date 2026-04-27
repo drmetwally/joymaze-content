@@ -82,3 +82,15 @@
 **Next:** Claude should audit the single-file patch in `scripts/intelligence-refresh.mjs`. If accepted, OpenClaw should proceed to `TASK-OC-002`.
 
 ---
+
+### 2026-04-27 | OpenClaw | TASK-OC-002 | Wire intelligence stack into generate-activity-video.mjs
+**Files changed:**
+- `scripts/generate-activity-video.mjs` — loaded trends/hooks/themes/performance intelligence, built a compact intelligence context block, and added the required dry-run visibility line while preserving the existing local hook-pick flow
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** The current `generate-activity-video.mjs` no longer contains a Gemini/Groq prompt builder, so I implemented the task's intent at the current architecture seam: the script now loads the same missing intelligence files used elsewhere (`trends-this-week`, `hooks-library`, `theme-pool-dynamic`, `performance-weights`) alongside competitor intelligence and builds the requested compact intelligence context block. The local hook selection path now reads from the unified loaded intelligence object, and dry-run mode prints `Intelligence context: [X trends, Y hooks, Z themes loaded]` so Claude can verify the wiring without touching the render pipeline.
+**Test command:** `node scripts/generate-activity-video.mjs --dry-run` and `node scripts/generate-activity-video.mjs --dry-run --activity maze`
+**Test output summary:** Both dry runs exited 0 and printed `Intelligence context: [5 trends, 56 hooks, 30 themes loaded]` before rendering the archive-backed maze and word-search challenge reels. No errors were raised, and the existing Remotion dry-run path remained intact.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the single-file patch in `scripts/generate-activity-video.mjs`. If accepted, OpenClaw should proceed to `TASK-OC-003`.
+
+---

@@ -1,291 +1,415 @@
 #!/usr/bin/env node
 
-/**
- * JoyMaze Content — Activity Puzzle Video Generator
- *
- * Converts activity image posts (maze, matching, quiz, spot-the-difference,
- * dot-to-dot) into 15-second YouTube Shorts. The puzzle image fills the frame,
- * a hook text overlay stays on screen for the full video, background music loops.
- *
- * No CTA. No outro. Clean cut — platform algorithm friendly.
- *
- * Usage:
- *   node scripts/generate-activity-video.mjs             # batch: all eligible queue items
- *   node scripts/generate-activity-video.mjs --id 2026-04-08-activity-maze-02
- *   node scripts/generate-activity-video.mjs --id 2026-04-08-activity-maze-02 --hook "Can you beat this?"
- *   node scripts/generate-activity-video.mjs --dry-run
- *   node scripts/generate-activity-video.mjs --no-music
- *
- * Eligible activity types (puzzle element required):
- *   maze, matching, quiz, dot-to-dot, spot-the-difference
- *
- * Output: output/videos/<id>-activity-short.mp4 + new queue JSON for YouTube
- */
-
 import 'dotenv/config';
-import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { uploadToCloud } from './upload-cloud.mjs';
 import { execSync } from 'child_process';
+import { uploadToCloud } from './upload-cloud.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT       = path.resolve(__dirname, '..');
-const QUEUE_DIR  = path.join(ROOT, 'output', 'queue');
+const ROOT = path.resolve(__dirname, '..');
+const QUEUE_DIR = path.join(ROOT, 'output', 'queue');
 const IMAGES_DIR = path.join(ROOT, 'output', 'images');
 const VIDEOS_DIR = path.join(ROOT, 'output', 'videos');
-const AUDIO_DIR  = path.join(ROOT, 'assets', 'audio');
-const TEMP_DIR   = path.join(ROOT, 'output', '.activity-video-temp');
+const AUDIO_DIR = path.join(ROOT, 'assets', 'audio');
+const SFX_DIR = path.join(ROOT, 'assets', 'sfx');
+const STAGING_ROOT = path.join(ROOT, 'output', 'challenge', 'generated-activity');
 
-// CLI args
-const args     = process.argv.slice(2);
-const DRY_RUN  = args.includes('--dry-run');
+const args = process.argv.slice(2);
+const DRY_RUN = args.includes('--dry-run');
 const NO_MUSIC = args.includes('--no-music');
-const idIdx    = args.indexOf('--id');
+const idIdx = args.indexOf('--id');
 const FILTER_ID = idIdx !== -1 ? args[idIdx + 1] : null;
-const hookIdx  = args.indexOf('--hook');
+const hookIdx = args.indexOf('--hook');
 const HOOK_OVERRIDE = hookIdx !== -1 ? args[hookIdx + 1] : null;
 
-// Video specs
-const VIDEO_WIDTH  = 1080;
-const VIDEO_HEIGHT = 1920;
-const FPS          = 30;
-const DURATION_S   = 15;
-const MUSIC_VOLUME = 0.25;
+const PUZZLE_TYPES = ['maze', 'matching', 'quiz', 'dot-to-dot', 'spot-the-difference', 'tracing', 'word-search'];
 
-// Activity types that have a puzzle element and work as short-form challenge videos
-const PUZZLE_TYPES = ['maze', 'matching', 'quiz', 'dot-to-dot', 'spot-the-difference', 'tracing'];
-
-// Static fallback hook text per activity type — used when intelligence pool is empty
 const STATIC_DEFAULT_HOOKS = {
-  maze:                  'Can you solve this maze?',
-  matching:              'Can you match all pairs?',
-  quiz:                  'Can you answer this?',
-  'dot-to-dot':          "What's hiding in the dots?",
-  'spot-the-difference': 'Spot all the differences!',
-  tracing:               'Can you trace the path?',
+  maze: 'Can you solve this maze in 10 seconds?',
+  matching: 'Can you spot every match in 10 seconds?',
+  quiz: 'Can you solve this before time runs out?',
+  'dot-to-dot': 'Can you guess it before the reveal?',
+  'spot-the-difference': 'Can you spot them all in 10 seconds?',
+  tracing: 'Can you trace this before time runs out?',
+  'word-search': 'Can you find every word before time runs out?',
 };
 
-// Load challenge hooks from intelligence system (silent fallback to static defaults)
-// Looks for hooks with hook_type matching challenge/curiosity patterns — short enough for overlay.
-async function loadIntelligenceHooks() {
+const ACTIVITY_LABELS = {
+  maze: 'MAZE',
+  matching: 'MATCHING',
+  quiz: 'QUIZ',
+  'dot-to-dot': 'DOT TO DOT',
+  'spot-the-difference': 'SPOT THE DIFFERENCE',
+  tracing: 'TRACING',
+  'word-search': 'WORD SEARCH',
+};
+
+const TIMING_DEFAULTS = {
+  maze: { challengeSec: 10, solveSec: 12 },
+  matching: { challengeSec: 10, solveSec: 10 },
+  quiz: { challengeSec: 10, solveSec: 10 },
+  'dot-to-dot': { challengeSec: 8, solveSec: 14 },
+  'spot-the-difference': { challengeSec: 10, solveSec: 10 },
+  tracing: { challengeSec: 8, solveSec: 10 },
+  'word-search': { challengeSec: 12, solveSec: 14 },
+};
+
+const TRANSITION_DURATION_SEC = 0.6;
+
+function log(msg) {
+  console.log(`[activity-video] ${msg}`);
+}
+
+async function loadActivityIntelligence() {
+  let competitor = null;
+  let trends = null;
+  let hooksData = null;
+  let dynamicThemes = null;
+  let perfWeights = null;
+
   try {
-    const raw = JSON.parse(
-      await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8')
+    competitor = JSON.parse(
+      await fs.readFile(path.join(ROOT, 'config', 'competitor-intelligence.json'), 'utf-8')
     );
-    const challengeTypes = new Set(['challenge_hook', 'curiosity_gap', 'pattern_interrupt', 'curiosity_hook']);
-    const candidates = (raw.hooks || [])
-      .filter(h => h.brand_safe !== false && challengeTypes.has(h.hook_type) && h.text)
-      .sort((a, b) => (b.performance_score ?? 0) - (a.performance_score ?? 0))
-      .slice(0, 6)
-      .map(h => h.text)
-      // Activity video hooks must fit on one overlay line — keep under 40 chars
-      .filter(t => t.length <= 40);
-    return candidates.length >= 2 ? candidates : null;
-  } catch {
-    return null;
-  }
-}
-
-// Build DEFAULT_HOOKS: merge intelligence-sourced short challenges with static fallbacks
-const _intelligenceHooks = await loadIntelligenceHooks();
-const DEFAULT_HOOKS = Object.fromEntries(
-  Object.entries(STATIC_DEFAULT_HOOKS).map(([type, staticText]) => {
-    // Use an intelligence hook if available, otherwise keep the static default
-    const pick = _intelligenceHooks
-      ? _intelligenceHooks[Math.floor(Math.random() * _intelligenceHooks.length)]
-      : null;
-    return [type, pick || staticText];
-  })
-);
-
-// FFmpeg binary detection
-const FFMPEG_PATHS = ['ffmpeg', 'D:/Dev/ffmpeg/ffmpeg.exe', 'C:/ffmpeg/bin/ffmpeg.exe'];
-let FFMPEG_BIN = null;
-
-function findFfmpeg() {
-  for (const bin of FFMPEG_PATHS) {
-    try {
-      execSync(`"${bin}" -version`, { stdio: 'pipe' });
-      FFMPEG_BIN = bin;
-      return true;
-    } catch { /* try next */ }
-  }
-  return false;
-}
-
-function log(msg) { console.log(`[activity-video] ${msg}`); }
-
-function escapeXml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-// ── Text overlay (stays full duration) ─────────────────────────────────────
-
-/**
- * Build SVG hook text that sits at the top of the frame.
- * White bold text + heavy drop shadow — readable on any background.
- * Auto-wraps at 20 chars to a second line.
- */
-function buildHookOverlaySvg(text) {
-  // Auto-wrap at 22 chars
-  let lines = [text];
-  if (text.length > 22) {
-    const mid = text.lastIndexOf(' ', Math.floor(text.length / 2));
-    if (mid > 0) lines = [text.slice(0, mid), text.slice(mid + 1)];
-  }
-
-  // Yellow pill geometry — matches ASMR HookText component
-  const fontSize   = 56;
-  const lineH      = 72;
-  const padV       = 28;
-  const pillMargin = 48;
-  const pillTop    = 48;
-  const pillW      = VIDEO_WIDTH - pillMargin * 2;
-  const pillH      = padV * 2 + fontSize + (lines.length - 1) * lineH;
-  const textStartY = pillTop + padV + fontSize / 2;
-
-  const textEls = lines.map((line, i) =>
-    `<text
-      x="${VIDEO_WIDTH / 2}"
-      y="${textStartY + i * lineH}"
-      text-anchor="middle"
-      dominant-baseline="middle"
-      font-family="Arial Black, Arial, sans-serif"
-      font-size="${fontSize}"
-      font-weight="900"
-      fill="#111111"
-    >${escapeXml(line)}</text>`
-  ).join('\n');
-
-  return `<svg width="${VIDEO_WIDTH}" height="${VIDEO_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <filter id="sh" x="-20%" y="-40%" width="140%" height="180%">
-        <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="black" flood-opacity="0.28"/>
-      </filter>
-    </defs>
-    <rect
-      x="${pillMargin}" y="${pillTop}"
-      width="${pillW}" height="${pillH}"
-      rx="22" ry="22"
-      fill="rgba(255,210,0,0.93)"
-      filter="url(#sh)"
-    />
-    ${textEls}
-  </svg>`;
-}
-
-// ── Image prep ──────────────────────────────────────────────────────────────
-
-/**
- * Resize any image to exactly 1080x1920.
- * - TikTok variant is already the right size → pass through.
- * - Portrait/square → white letterbox padding.
- * - Landscape → blurred background fill.
- */
-async function prepareFrame(imagePath) {
-  const { width, height } = await sharp(imagePath).metadata();
-
-  if (width === VIDEO_WIDTH && height === VIDEO_HEIGHT) {
-    return sharp(imagePath).png().toBuffer();
-  }
-
-  const isLandscape = width > height;
-
-  if (isLandscape) {
-    const blurred = await sharp(imagePath)
-      .resize(VIDEO_WIDTH, VIDEO_HEIGHT, { fit: 'cover' })
-      .blur(20)
-      .toBuffer();
-    const scaledH = Math.round((VIDEO_WIDTH * height) / width);
-    const fg = await sharp(imagePath)
-      .resize(VIDEO_WIDTH, scaledH, { fit: 'fill' })
-      .toBuffer();
-    const topOffset = Math.round((VIDEO_HEIGHT - scaledH) / 2);
-    return sharp(blurred)
-      .composite([{ input: fg, top: topOffset, left: 0 }])
-      .png()
-      .toBuffer();
-  }
-
-  return sharp(imagePath)
-    .resize(VIDEO_WIDTH, VIDEO_HEIGHT, {
-      fit: 'contain',
-      background: { r: 255, g: 255, b: 255, alpha: 255 },
-    })
-    .png()
-    .toBuffer();
-}
-
-// ── Audio selection ─────────────────────────────────────────────────────────
-
-async function pickAudio() {
+  } catch {}
   try {
-    const files = await fs.readdir(AUDIO_DIR);
-    const audioFiles = files.filter(f => /\.(mp3|wav|ogg|m4a)$/i.test(f));
-    if (audioFiles.length === 0) return null;
-    // Prefer soft background music; fall back to first available
-    const preferred = audioFiles.find(f => f.includes('Twinkle')) || audioFiles.find(f => !f.includes('crayon'));
-    return path.join(AUDIO_DIR, preferred || audioFiles[0]);
+    trends = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'trends-this-week.json'), 'utf-8'));
+  } catch {}
+  try {
+    hooksData = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'hooks-library.json'), 'utf-8'));
+  } catch {}
+  try {
+    dynamicThemes = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'theme-pool-dynamic.json'), 'utf-8'));
+  } catch {}
+  try {
+    perfWeights = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8'));
+  } catch {}
+
+  const challengeTypes = new Set(['challenge_hook', 'curiosity_gap', 'pattern_interrupt', 'curiosity_hook']);
+  const hookCandidates = (hooksData?.hooks || [])
+    .filter((hook) => hook.brand_safe !== false && challengeTypes.has(hook.hook_type) && hook.text)
+    .sort((a, b) => (b.performance_score ?? 0) - (a.performance_score ?? 0))
+    .slice(0, 8)
+    .map((hook) => hook.text)
+    .filter((text) => text.length <= 70);
+
+  const intelligenceContext = [
+    trends?.boost_themes?.length
+      ? `Trending themes this week: ${trends.boost_themes.slice(0, 3).join(', ')}.`
+      : '',
+    trends?.rising_searches?.length
+      ? `Rising parent searches: ${trends.rising_searches.slice(0, 3).join(', ')}.`
+      : '',
+    hooksData?.hooks?.length
+      ? `Top hooks in pool: ${hooksData.hooks.filter((h) => h.brand_safe).slice(0, 3).map((h) => `"${h.text}"`).join(' | ')}.`
+      : '',
+    dynamicThemes?.themes?.length
+      ? `Active dynamic themes: ${dynamicThemes.themes.slice(0, 3).map((t) => t.name).join(', ')}.`
+      : '',
+  ].filter(Boolean).join('\n');
+
+  return {
+    competitor,
+    trends,
+    hooksData,
+    dynamicThemes,
+    perfWeights,
+    hookCandidates: hookCandidates.length > 0 ? hookCandidates : null,
+    intelligenceContext,
+  };
+}
+
+const activityIntelligence = await loadActivityIntelligence();
+
+function pickHook(activityType, intelligence = activityIntelligence) {
+  if (intelligence?.hookCandidates?.length) {
+    return intelligence.hookCandidates[Math.floor(Math.random() * intelligence.hookCandidates.length)];
+  }
+  return STATIC_DEFAULT_HOOKS[activityType] || 'Can you solve this before time runs out?';
+}
+
+function normalizePuzzleType(activityType) {
+  if (activityType === 'activity-word-search') return 'word-search';
+  return activityType;
+}
+
+function getTimingDefaults(activityType) {
+  return TIMING_DEFAULTS[activityType] || { challengeSec: 10, solveSec: 10 };
+}
+
+async function fileExists(target) {
+  try {
+    await fs.access(target);
+    return true;
   } catch {
-    return null;
+    return false;
   }
 }
 
-// ── FFmpeg video assembly ───────────────────────────────────────────────────
+async function ensureDir(target) {
+  await fs.mkdir(target, { recursive: true });
+}
 
-/**
- * Assemble the final MP4:
- *   - Loop static frame PNG for DURATION_S seconds
- *   - Mix in background audio (looped + volume-lowered) if available
- *   - Encode: H.264 + AAC, yuv420p (platform compatible)
- */
-async function assembleVideo(framePngPath, audioPath, outputPath) {
-  const inputs = [`-loop 1 -framerate ${FPS} -i "${framePngPath}"`];
+async function safeCopyFile(src, dest) {
+  if (!(await fileExists(src))) {
+    return false;
+  }
+  await ensureDir(path.dirname(dest));
+  await fs.copyFile(src, dest);
+  return true;
+}
 
-  let audioFilter = '';
-  if (audioPath && !NO_MUSIC) {
-    inputs.push(`-stream_loop -1 -i "${audioPath}"`);
-    audioFilter = `-filter_complex "[1:a]volume=${MUSIC_VOLUME}[a]" -map 0:v -map "[a]" -c:a aac -b:a 128k`;
+async function findFirstExisting(paths) {
+  for (const candidate of paths) {
+    if (!candidate) {
+      continue;
+    }
+    if (await fileExists(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+async function resolveAudioPaths() {
+  if (NO_MUSIC) {
+    return {
+      challengeAudioPath: '',
+      tickAudioPath: '',
+      transitionCueAudioPath: '',
+      solveAudioPath: '',
+    };
+  }
+
+  const challengeAudio = await findFirstExisting([
+    path.join(AUDIO_DIR, 'background.mp3'),
+    path.join(SFX_DIR, 'nature', 'evening_ambience.mp3'),
+    path.join(SFX_DIR, 'nature', 'garden_ambience.mp3'),
+    path.join(AUDIO_DIR, 'Twinkle - The Grey Room _ Density & Time.mp3'),
+  ]);
+
+  const transitionCue = await findFirstExisting([
+    path.join(SFX_DIR, 'emotional', 'gentle_chime.mp3'),
+    path.join(AUDIO_DIR, 'hook-jingle.mp3'),
+  ]);
+
+  const solveAudio = await findFirstExisting([
+    path.join(AUDIO_DIR, 'crayon.mp3'),
+    path.join(AUDIO_DIR, 'outro-jingle.mp3'),
+  ]);
+
+  return {
+    challengeAudioPath: challengeAudio ? path.relative(ROOT, challengeAudio).replace(/\\/g, '/') : '',
+    tickAudioPath: '',
+    transitionCueAudioPath: transitionCue ? path.relative(ROOT, transitionCue).replace(/\\/g, '/') : '',
+    solveAudioPath: solveAudio ? path.relative(ROOT, solveAudio).replace(/\\/g, '/') : '',
+  };
+}
+
+function mapContainPoint({ x, y, imageWidth, imageHeight, videoWidth = 1080, videoHeight = 1920 }) {
+  const imageAspect = imageWidth / imageHeight;
+  const videoAspect = videoWidth / videoHeight;
+
+  let renderWidth;
+  let renderHeight;
+  let offsetX;
+  let offsetY;
+
+  if (imageAspect > videoAspect) {
+    renderWidth = videoWidth;
+    renderHeight = videoWidth / imageAspect;
+    offsetX = 0;
+    offsetY = (videoHeight - renderHeight) / 2;
   } else {
-    audioFilter = '-an'; // no audio
+    renderHeight = videoHeight;
+    renderWidth = videoHeight * imageAspect;
+    offsetX = (videoWidth - renderWidth) / 2;
+    offsetY = 0;
   }
 
-  const cmd = [
-    `"${FFMPEG_BIN}"`,
-    '-y',
-    ...inputs,
-    `-t ${DURATION_S}`,
-    '-c:v libx264',
-    '-tune stillimage',
-    '-preset fast',
-    '-crf 22',
-    '-pix_fmt yuv420p',
-    audioFilter,
-    `"${outputPath}"`,
-  ].join(' ');
-
-  if (DRY_RUN) {
-    log(`  [dry-run] FFmpeg: ${cmd.slice(0, 120)}...`);
-    return;
-  }
-
-  execSync(cmd, { stdio: 'pipe' });
+  return {
+    x: offsetX + x * renderWidth,
+    y: offsetY + y * renderHeight,
+    renderWidth,
+    renderHeight,
+    offsetX,
+    offsetY,
+  };
 }
 
-// ── Queue JSON ──────────────────────────────────────────────────────────────
+async function loadSolverProps(stageDir) {
+  const solverProps = {
+    pathWaypoints: null,
+    pathColor: undefined,
+    wordRects: null,
+    highlightColor: undefined,
+    dotWaypoints: null,
+    dotColor: undefined,
+  };
 
-/**
- * Write a new queue JSON for the activity Short.
- * Type = "video", platform = youtube only (activity images already cover other platforms).
- */
-async function writeQueueJson(sourceId, sourceMeta, videoFilename, hookText) {
+  const pathJson = path.join(stageDir, 'path.json');
+  if (await fileExists(pathJson)) {
+    try {
+      const data = JSON.parse(await fs.readFile(pathJson, 'utf-8'));
+      solverProps.pathWaypoints = (data.waypoints || []).map((point) => {
+        const mapped = mapContainPoint({
+          x: point.x,
+          y: point.y,
+          imageWidth: data.width ?? 1080,
+          imageHeight: data.height ?? 1920,
+        });
+        return { x: mapped.x, y: mapped.y };
+      });
+      if (data.pathColor) solverProps.pathColor = data.pathColor;
+    } catch {
+      // ignore malformed sidecar, degrade cleanly
+    }
+  }
+
+  const wordsearchJson = path.join(stageDir, 'wordsearch.json');
+  if (await fileExists(wordsearchJson)) {
+    try {
+      const data = JSON.parse(await fs.readFile(wordsearchJson, 'utf-8'));
+      solverProps.wordRects = (data.rects || []).map((rect) => {
+        const start = mapContainPoint({
+          x: rect.x1,
+          y: rect.y1,
+          imageWidth: data.width ?? 1080,
+          imageHeight: data.height ?? 1920,
+        });
+        const end = mapContainPoint({
+          x: rect.x2,
+          y: rect.y2,
+          imageWidth: data.width ?? 1080,
+          imageHeight: data.height ?? 1920,
+        });
+        return { x1: start.x, y1: start.y, x2: end.x, y2: end.y };
+      });
+      if (data.highlightColor) solverProps.highlightColor = data.highlightColor;
+    } catch {
+      // ignore malformed sidecar, degrade cleanly
+    }
+  }
+
+  const dotsJson = path.join(stageDir, 'dots.json');
+  if (await fileExists(dotsJson)) {
+    try {
+      const data = JSON.parse(await fs.readFile(dotsJson, 'utf-8'));
+      solverProps.dotWaypoints = (data.dots || []).map((dot) => {
+        const mapped = mapContainPoint({
+          x: dot.x,
+          y: dot.y,
+          imageWidth: data.width ?? 1080,
+          imageHeight: data.height ?? 1920,
+        });
+        return { x: mapped.x, y: mapped.y };
+      });
+      if (data.dotColor) solverProps.dotColor = data.dotColor;
+    } catch {
+      // ignore malformed sidecar, degrade cleanly
+    }
+  }
+
+  return solverProps;
+}
+
+async function stagePuzzleAssets({ sourceId, imagePath, meta, activityType }) {
+  const stageDir = path.join(STAGING_ROOT, sourceId);
+  await ensureDir(stageDir);
+
+  const stagedPuzzle = path.join(stageDir, 'puzzle.png');
+  const stagedBlank = path.join(stageDir, 'blank.png');
+  await safeCopyFile(imagePath, stagedPuzzle);
+  await safeCopyFile(imagePath, stagedBlank);
+
+  let solvedImagePath = '';
+  const solvedCandidates = [
+    meta.solvedImagePath,
+    meta.outputs?.solved,
+    meta.outputs?.solved_image,
+    meta.outputs?.solvedImage,
+  ]
+    .filter(Boolean)
+    .map((value) => path.isAbsolute(value) ? value : path.join(IMAGES_DIR, value));
+
+  const solvedSource = await findFirstExisting(solvedCandidates);
+  if (solvedSource) {
+    const stagedSolved = path.join(stageDir, 'solved.png');
+    await safeCopyFile(solvedSource, stagedSolved);
+    solvedImagePath = path.relative(ROOT, stagedSolved).replace(/\\/g, '/');
+  }
+
+  const sidecarCandidates = [
+    meta.pathJsonPath ? { src: meta.pathJsonPath, dest: 'path.json' } : null,
+    meta.wordsearchJsonPath ? { src: meta.wordsearchJsonPath, dest: 'wordsearch.json' } : null,
+    meta.dotsJsonPath ? { src: meta.dotsJsonPath, dest: 'dots.json' } : null,
+  ].filter(Boolean);
+
+  for (const sidecar of sidecarCandidates) {
+    const src = path.isAbsolute(sidecar.src) ? sidecar.src : path.join(ROOT, sidecar.src);
+    await safeCopyFile(src, path.join(stageDir, sidecar.dest));
+  }
+
+  const relStage = path.relative(ROOT, stageDir).replace(/\\/g, '/');
+  const relPuzzle = `${relStage}/puzzle.png`;
+  const relBlank = `${relStage}/blank.png`;
+  const solverProps = await loadSolverProps(stageDir);
+
+  return {
+    stageDir,
+    imagePath: relPuzzle,
+    blankImagePath: relBlank,
+    solvedImagePath,
+    activityLabel: ACTIVITY_LABELS[activityType] || activityType.toUpperCase(),
+    ...solverProps,
+  };
+}
+
+function buildRenderProps({ meta, sourceId, activityType, stagedAssets, hookText, audioPaths }) {
+  const timing = getTimingDefaults(activityType);
+
+  return {
+    imagePath: stagedAssets.imagePath,
+    blankImagePath: stagedAssets.blankImagePath,
+    solvedImagePath: stagedAssets.solvedImagePath,
+    hookText,
+    titleText: hookText,
+    activityLabel: stagedAssets.activityLabel,
+    puzzleType: activityType,
+    countdownSec: meta.countdownSec ?? timing.challengeSec,
+    hookDurationSec: meta.transitionDurationSec ?? TRANSITION_DURATION_SEC,
+    holdAfterSec: meta.solveDurationSec ?? timing.solveSec,
+    challengeAudioPath: audioPaths.challengeAudioPath,
+    tickAudioPath: audioPaths.tickAudioPath,
+    transitionCueAudioPath: audioPaths.transitionCueAudioPath,
+    solveAudioPath: audioPaths.solveAudioPath,
+    showJoyo: meta.showJoyo ?? true,
+    showBrandWatermark: meta.showBrandWatermark ?? true,
+    pathWaypoints: stagedAssets.pathWaypoints,
+    pathColor: stagedAssets.pathColor,
+    wordRects: stagedAssets.wordRects,
+    highlightColor: stagedAssets.highlightColor,
+    dotWaypoints: stagedAssets.dotWaypoints,
+    dotColor: stagedAssets.dotColor,
+  };
+}
+
+async function renderActivityVideo(outputPath, inputProps, sourceId) {
+  const renderScript = path.join(ROOT, 'scripts', 'render-video.mjs');
+  const propsFile = path.join(STAGING_ROOT, `${sourceId}-props.json`);
+  await ensureDir(path.dirname(propsFile));
+  await fs.writeFile(propsFile, JSON.stringify(inputProps, null, 2));
+  const cmd = `node "${renderScript}" --comp ActivityChallenge --props-file "${propsFile}" --out "${outputPath}"${DRY_RUN ? ' --dry-run' : ''}`;
+  try {
+    execSync(cmd, { stdio: 'inherit', cwd: ROOT });
+  } finally {
+    await fs.unlink(propsFile).catch(() => {});
+  }
+}
+
+async function writeQueueJson(sourceId, sourceMeta, videoFilename, hookText, renderer = 'remotion') {
   const videoId = `${sourceId}-yt-short`;
   const queuePath = path.join(QUEUE_DIR, `${videoId}.json`);
 
@@ -300,6 +424,7 @@ async function writeQueueJson(sourceId, sourceMeta, videoFilename, hookText) {
     hookText,
     generatedAt: new Date().toISOString(),
     dryRun: DRY_RUN,
+    renderer,
     outputs: {
       youtube: videoFilename,
     },
@@ -313,124 +438,89 @@ async function writeQueueJson(sourceId, sourceMeta, videoFilename, hookText) {
 
   if (!DRY_RUN) {
     await fs.writeFile(queuePath, JSON.stringify(entry, null, 2));
-    // Upload to Cloudinary for GitHub Actions posting
     try {
-      const videoPath = path.join(ROOT, 'output', 'videos', videoFilename);
+      const videoPath = path.join(VIDEOS_DIR, videoFilename);
       entry.cloudUrl = await uploadToCloud(videoPath, 'joymaze/videos');
       await fs.writeFile(queuePath, JSON.stringify(entry, null, 2));
-      console.log(`  Cloudinary: ${entry.cloudUrl}`);
+      log(`  Cloudinary: ${entry.cloudUrl}`);
     } catch (err) {
       console.warn(`  Cloudinary upload failed (local posting still works): ${err.message}`);
     }
   }
+
   return entry;
 }
 
-// ── Main processing ─────────────────────────────────────────────────────────
-
 async function processItem(meta, sourceId) {
-  // Determine activity type from category (e.g. "activity-maze" → "maze")
-  const activityType = meta.category?.replace('activity-', '') || '';
+  const activityType = normalizePuzzleType(meta.category?.replace('activity-', '') || '');
 
   if (!PUZZLE_TYPES.includes(activityType)) {
-    log(`  Skipping ${sourceId} — type "${activityType}" is not a puzzle type`);
+    log(`  Skipping ${sourceId} - type "${activityType}" is not a supported puzzle type`);
     return false;
   }
 
-  // Check if video already generated for this item
-  const videoId       = `${sourceId}-yt-short`;
+  const videoId = `${sourceId}-yt-short`;
   const videoFilename = `${videoId}.mp4`;
-  const videoPath     = path.join(VIDEOS_DIR, videoFilename);
-  const queuePath     = path.join(QUEUE_DIR, `${videoId}.json`);
+  const videoPath = path.join(VIDEOS_DIR, videoFilename);
+  const queuePath = path.join(QUEUE_DIR, `${videoId}.json`);
 
-  try {
-    await fs.access(queuePath);
-    log(`  Skipping ${sourceId} — video already generated`);
-    return false;
-  } catch { /* not yet generated — proceed */ }
-
-  // Resolve source image: prefer TikTok variant (already 1080x1920)
-  const ttFilename = meta.outputs?.tiktok || meta.outputs?.instagram_portrait;
-  if (!ttFilename) {
-    log(`  Skipping ${sourceId} — no suitable source image found`);
+  if (await fileExists(queuePath)) {
+    log(`  Skipping ${sourceId} - video already generated`);
     return false;
   }
 
-  const imagePath = path.join(IMAGES_DIR, ttFilename);
-  try {
-    await fs.access(imagePath);
-  } catch {
-    log(`  Skipping ${sourceId} — image file not found: ${ttFilename}`);
+  const sourceFilename = meta.outputs?.tiktok || meta.outputs?.instagram_portrait;
+  if (!sourceFilename) {
+    log(`  Skipping ${sourceId} - no suitable source image found`);
     return false;
   }
 
-  // Resolve hook text: CLI override > queue JSON > type default > generic
-  const hookText = HOOK_OVERRIDE
-    || meta.hookText
-    || DEFAULT_HOOKS[activityType]
-    || 'Can you solve this?';
+  const imagePath = path.join(IMAGES_DIR, sourceFilename);
+  if (!(await fileExists(imagePath))) {
+    log(`  Skipping ${sourceId} - image file not found: ${sourceFilename}`);
+    return false;
+  }
+
+  const hookText = HOOK_OVERRIDE || meta.hookText || pickHook(activityType, activityIntelligence);
+  const audioPaths = await resolveAudioPaths();
+  const stagedAssets = await stagePuzzleAssets({ sourceId, imagePath, meta, activityType });
+  const inputProps = buildRenderProps({
+    meta,
+    sourceId,
+    activityType,
+    stagedAssets,
+    hookText,
+    audioPaths,
+  });
 
   log(`Processing: ${sourceId}`);
-  log(`  Type: ${activityType} | Hook: "${hookText}"`);
-  log(`  Source image: ${ttFilename}`);
+  log(`  Type: ${activityType}`);
+  log(`  Hook: "${hookText}"`);
+  log(`  Source image: ${sourceFilename}`);
+  log(`  Stage dir: ${path.relative(ROOT, stagedAssets.stageDir).replace(/\\/g, '/')}`);
+  log(`  Render: Remotion ActivityChallenge`);
 
   if (DRY_RUN) {
+    await renderActivityVideo(videoPath, inputProps, sourceId);
     log(`  [dry-run] Would write: ${videoFilename}`);
     return true;
   }
 
-  // Ensure temp and output dirs exist
-  await fs.mkdir(TEMP_DIR,  { recursive: true });
-  await fs.mkdir(VIDEOS_DIR, { recursive: true });
+  await ensureDir(VIDEOS_DIR);
+  await renderActivityVideo(videoPath, inputProps, sourceId);
 
-  // 1. Prepare the frame (resize to 1080x1920 if needed)
-  log('  Preparing frame...');
-  const frameBuffer = await prepareFrame(imagePath);
-
-  // 2. Composite hook text overlay
-  log('  Compositing hook text overlay...');
-  const svgOverlay   = buildHookOverlaySvg(hookText);
-  const framedBuffer = await sharp(frameBuffer)
-    .composite([{ input: Buffer.from(svgOverlay), top: 0, left: 0 }])
-    .png()
-    .toBuffer();
-
-  // 3. Write composited frame to temp file
-  const tempFramePath = path.join(TEMP_DIR, `${sourceId}-frame.png`);
-  await fs.writeFile(tempFramePath, framedBuffer);
-
-  // 4. Pick audio
-  const audioPath = await pickAudio();
-  if (audioPath) log(`  Audio: ${path.basename(audioPath)}`);
-  else           log('  Audio: none found — generating silent video');
-
-  // 5. Assemble video
-  log('  Running FFmpeg...');
-  await assembleVideo(tempFramePath, audioPath, videoPath);
-
-  // 6. Cleanup temp frame
-  await fs.unlink(tempFramePath).catch(() => {});
-
-  // 7. Write queue JSON
   const queueEntry = await writeQueueJson(sourceId, meta, videoFilename, hookText);
-
   log(`  Done: ${videoFilename}`);
   log(`  Queue: ${queueEntry.id}`);
   return true;
 }
 
-// ── Entry point ─────────────────────────────────────────────────────────────
-
 async function main() {
   log(`Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}${NO_MUSIC ? ' | no music' : ''}`);
-
-  if (!findFfmpeg()) {
-    console.error('[activity-video] ERROR: FFmpeg not found. Install it or add to PATH.');
-    process.exit(1);
+  if (DRY_RUN) {
+    log(`Intelligence context: [${activityIntelligence.trends?.boost_themes?.length || 0} trends, ${activityIntelligence.hooksData?.hooks?.length || 0} hooks, ${activityIntelligence.dynamicThemes?.themes?.length || 0} themes loaded]`);
   }
-  log(`FFmpeg: ${FFMPEG_BIN}`);
 
-  // Load queue items
   let queueFiles;
   try {
     queueFiles = await fs.readdir(QUEUE_DIR);
@@ -439,11 +529,10 @@ async function main() {
     process.exit(1);
   }
 
-  // Filter to activity posts only (not existing video queue entries)
-  const candidates = queueFiles.filter(f =>
-    f.endsWith('.json') &&
-    f.includes('-activity-') &&
-    !f.includes('-yt-short')
+  const candidates = queueFiles.filter((file) =>
+    file.endsWith('.json') &&
+    file.includes('-activity-') &&
+    !file.includes('-yt-short')
   );
 
   if (candidates.length === 0) {
@@ -451,9 +540,8 @@ async function main() {
     return;
   }
 
-  // Apply --id filter
   const toProcess = FILTER_ID
-    ? candidates.filter(f => f.startsWith(FILTER_ID))
+    ? candidates.filter((file) => file.startsWith(FILTER_ID))
     : candidates;
 
   if (toProcess.length === 0) {
@@ -464,14 +552,14 @@ async function main() {
   log(`Found ${toProcess.length} candidate(s)${FILTER_ID ? ` (filtered to: ${FILTER_ID})` : ''}`);
 
   let generated = 0;
-  let skipped   = 0;
+  let skipped = 0;
 
   for (const filename of toProcess) {
     const sourceId = filename.replace('.json', '');
     let meta;
+
     try {
-      const raw = await fs.readFile(path.join(QUEUE_DIR, filename), 'utf-8');
-      meta = JSON.parse(raw);
+      meta = JSON.parse(await fs.readFile(path.join(QUEUE_DIR, filename), 'utf-8'));
     } catch (err) {
       log(`  Error reading ${filename}: ${err.message}`);
       skipped++;
@@ -479,19 +567,22 @@ async function main() {
     }
 
     const ok = await processItem(meta, sourceId);
-    if (ok) generated++;
-    else    skipped++;
+    if (ok) {
+      generated++;
+    } else {
+      skipped++;
+    }
   }
 
-  log(`\nComplete: ${generated} video(s) generated, ${skipped} skipped.`);
+  log(`Complete: ${generated} video(s) generated, ${skipped} skipped.`);
   if (generated > 0 && !DRY_RUN) {
-    log(`Videos: output/videos/`);
-    log(`Queue:  output/queue/*-yt-short.json`);
-    log(`Post:   node scripts/post-content.mjs --platform youtube`);
+    log('Videos: output/videos/');
+    log('Queue: output/queue/*-yt-short.json');
+    log('Post: node scripts/post-content.mjs --platform youtube');
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(`[activity-video] FATAL: ${err.message}`);
   process.exit(1);
 });
