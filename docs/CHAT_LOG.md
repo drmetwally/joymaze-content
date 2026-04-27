@@ -842,3 +842,24 @@ Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizonta
   - `readGuard = wordCount / 1.5` in narration script set a floor of ~23s for 35-word narrations, overriding the actual 14-16s audio duration; removed entirely
 - **ep03 outcome:** Clean render, 2.3 min, all fixes in. Awaiting Ahmed review.
 - **Locked rules added (CLAUDE.md):** FFmpeg filter incompatibility (pad disabled in Remotion build), narration readGuard dead air bug.
+
+---
+### 2026-04-23 — Puzzle Challenge Reel direction locked + first archive-backed renders complete
+
+- **Strategic decision:** Do not build the 1-hour puzzle longform from current still-image puzzle/activity shorts. First replace that lane with a stronger short-form unit, the **Puzzle Challenge Reel**.
+- **Format locked with Ahmed:** title stays top-center above the safe puzzle area, countdown is digit-based and sits in the same top strip, title stays until solve starts, title + countdown disappear together, transition should be short and functional, subtle push-in during countdown is preferred, and timing varies by puzzle type.
+- **Planning docs written in-repo:** operating map, puzzle compilation readiness, reel format spec, and implementation spec all added on 2026-04-23.
+- **Implementation direction:** move the activity video lane off the old static FFmpeg overlay approach and onto Remotion, using `ActivityChallenge.jsx` as the real challenge-to-solve composition.
+- **Coding pass completed:** `ActivityChallenge.jsx` rewritten toward challenge -> countdown -> transition -> solve. `generate-activity-video.mjs` rewritten to render through Remotion while preserving queue JSON + Cloudinary behavior. Optional solver sidecars now stage and load when present.
+- **Real bug found during validation:** Windows command line length broke when huge solver props were passed inline. Fixed by adding `--props-file` support to `render-video.mjs` and switching the generator to use props files.
+- **Validation results:**
+  - Maze archive test succeeded using `output/archive/asmr/maze-butterfly-garden/` with real `maze.png`, `solved.png`, and `path.json` (400 waypoint solver active).
+  - Word-search archive creative test also succeeded, but only as a challenge-lane / fallback-solve validation because the archive lacked `solved.png` and `wordsearch.json`.
+- **Tomorrow's starting point:** watch and test the rendered videos first, then tune title size, countdown weight, transition feel, audio balance, and per-type pacing before more building.
+
+---
+
+**2026-04-27 — Claude supervision session**
+- Topics: ok-skills/HyperFrames repo eval (skip for app, skip for content — Remotion already does what HyperFrames does); daily audit after 6-day gap; scheduler root-cause (blank WorkingDirectory); pool file corruption root-cause (double call to applyCompetitorFindings with raw Gemini data); intelligence force-applied after file restore; Phase 0 gate updated (10+10+10 → real numbers); X cooldown extended to May 7.
+- Decisions: AGENT_LOG.md introduced as universal collaboration audit trail; 3 OpenClaw tasks specced (OC-001 atomic writes, OC-002 intelligence linkage, OC-003 Kokoro TTS); Vertex API key confirmed Gemini-only (cannot do TTS); Kokoro-82M chosen as Edge TTS replacement.
+- Pending: OpenClaw to implement OC-001/002/003 in next session; Claude to verify AGENT_LOG entries before marking complete.

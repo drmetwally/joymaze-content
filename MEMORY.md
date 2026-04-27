@@ -33,7 +33,7 @@ Ahmed is the sole operator of JoyMaze — a kids activity app + Amazon KDP activ
 
 **Hold existing pipeline. No new video generation technology until Phase 0 gate is cleared.**
 
-### Phase 0 Gate (current phase — updated 2026-04-13)
+### Phase 0 Gate (current phase — updated 2026-04-27)
 30 consecutive days meeting ALL of:
 - ≥10 image posts generated
 - ≥1 ASMR video generated
@@ -42,6 +42,8 @@ Ahmed is the sole operator of JoyMaze — a kids activity app + Amazon KDP activ
 
 Tracked by: `scripts/track-output.mjs` → `output/daily-output-log.json`
 Report: `npm run output:report`
+
+> Previous "10+10+10" shorthand retired 2026-04-27 — it implied 10 story + 10 ASMR which the current pipeline cannot produce daily. Gate above is the authoritative definition.
 
 ### Phase Roadmap
 | Phase | Duration | Gate to next |
@@ -80,11 +82,39 @@ Report: `npm run output:report`
 
 ---
 
+## 2.6 PUZZLE CHALLENGE REEL FORMAT (LOCKED 2026-04-23)
+
+**Do not build puzzle longform from the old still-image activity short lane.**
+First replace that lane with a stronger repeatable short-form unit: the **Puzzle Challenge Reel**.
+
+### Format rules
+- Puzzle is visible immediately.
+- Title or hook sits top-center in a dark strip above the main puzzle viewing area.
+- Countdown is digit-based and sits on the left side of the same strip.
+- Title stays visible until solve starts.
+- Title and countdown disappear together.
+- Transition should be brief and functional: countdown ends, UI exits, short pulse or glow or zoom cue, then solve begins.
+- Use subtle push-in during the challenge window, not dramatic camera motion.
+- Timing should vary by puzzle type rather than forcing one universal duration.
+
+### Strategic role
+- This new reel format is the correct building block for future puzzle compilation longform.
+- Do **not** try to stitch the previous static 15-second puzzle shorts into a 1-hour YouTube video.
+- First prove the challenge reel in short-form, then use it as the chapter unit for compilation.
+
+### Implementation state as of 2026-04-23
+- `remotion/compositions/ActivityChallenge.jsx` was rebuilt toward the challenge-to-solve format.
+- `scripts/generate-activity-video.mjs` was rewritten to render activity videos through Remotion instead of the old static FFmpeg overlay path.
+- Optional solver sidecars can now be staged and consumed when present (`path.json`, `wordsearch.json`, `dots.json`).
+- Real archive-backed validation succeeded for a maze sample (`maze-butterfly-garden`) with live solver data.
+- Word-search was validated only at the challenge-lane / fallback-solve level because archive data did not include `solved.png` or `wordsearch.json`.
+- Important Windows rule: large Remotion prop payloads must be passed by file, not giant inline CLI JSON. `render-video.mjs` now supports `--props-file` for this reason.
+
 ## 3. PLATFORM ACCOUNT STATUS (last updated: 2026-04-13)
 
 | Platform | Account | Handle | API in .env | GitHub Secrets | Status |
 |----------|---------|--------|-------------|----------------|--------|
-| X | @playjoymaze (repurposed fit-clinic, ~3yr old account) | @playjoymaze | ✓ New keys | ✓ Pushed 2026-04-11 | **Manual warmup until 2026-04-26.** x-posts.yml disabled (if:false). **Manual posting started 2026-04-12.** 4 text posts + replies posted daily from queue JSON. |
+| X | @playjoymaze (repurposed fit-clinic, ~3yr old account) | @playjoymaze | ✓ New keys | ✓ Pushed 2026-04-11 | **Cooldown extended to 2026-05-07** (no activity Apr 17–27 due to personal reasons — extended warmup). x-posts.yml disabled (if:false). Resume manual posting from queue JSON. |
 | Pinterest | New account | joymaze.pp@gmail.com | ✗ Old keys | ✗ Old keys | **Paused.** No new Developer App yet. |
 | Instagram | New account | joymaze.pp@gmail.com | ✗ None | ✗ | **Paused.** No API credentials. |
 | TikTok | Not created yet | — | ✗ | ✗ | **Not started.** |
@@ -93,7 +123,7 @@ Report: `npm run output:report`
 **Previous X account permanently suspended 2026-04-11 for spam/automation.** Decision: do NOT appeal.
 **Warmup protocol:** Post manually for 2 weeks minimum before enabling automation on any new account.
 
-**To re-enable X automation (2026-04-26+):**
+**To re-enable X automation (2026-05-07+):**
 1. Remove `if: false` from `.github/workflows/x-posts.yml`
 2. `npm run cooldown:clear`
 3. `git add . && git commit && git push`
@@ -333,11 +363,16 @@ First render: ~54–60s cold bundle. Subsequent renders in same process: instant
 
 ## 13. PENDING — IN PRIORITY ORDER
 
+### Agent Tasks (OpenClaw — queued, specs in docs/tasks/)
+- [ ] **TASK-OC-001** — Fix pool file corruption in `intelligence-refresh.mjs` — atomic writes in `applyCompetitorFindings()`
+- [ ] **TASK-OC-002** — Wire full intelligence stack into `generate-activity-video.mjs` (currently only reads competitor-intel)
+- [ ] **TASK-OC-003** — Replace Edge TTS with Kokoro-82M as fallback in `generate-story-video.mjs` + `generate-animal-narration.mjs`
+
 ### Blockers (must close to enable posting)
 - [ ] Pinterest — new Developer App under joymaze.pp@gmail.com → update .env + GitHub Secrets
 - [ ] Instagram — new Meta Developer App → update .env + GitHub Secrets
 - [ ] TikTok — create account, then Developer App
-- [ ] X — re-enable 2026-04-26: remove `if:false` from x-posts.yml + `npm run cooldown:clear` + push
+- [ ] X — re-enable 2026-05-07: remove `if:false` from x-posts.yml + `npm run cooldown:clear` + push
 
 ### Content Quick Wins (next slow session)
 - [ ] "FREE Printable" badge — small corner ribbon in brand frame margin only (NOT over activity content — that was tried and rejected 2026-04-12). Sharp composite, no AI.
@@ -356,17 +391,21 @@ First render: ~54–60s cold bundle. Subsequent renders in same process: instant
 
 ## 14. MULTI-AGENT PROTOCOL
 
-All agents (Claude, Codex, any future agent) MUST complete the **end-of-session ritual** before closing:
+All agents (Claude, Codex, OpenClaw, any future agent) MUST complete the **end-of-session ritual** before closing:
 1. Mark `[x]` in `docs/TASKS.md` on completed tasks
-2. Append structured entry to `docs/SESSION_LOG.md`
-3. Append one line to `docs/CHAT_LOG.md`
-4. If architecture decision made: append to `docs/DECISIONS.md`
+2. **Append structured entry to `docs/AGENT_LOG.md`** — this is the primary supervisor audit trail (NEW 2026-04-27)
+3. Append structured entry to `docs/SESSION_LOG.md`
+4. Append one line to `docs/CHAT_LOG.md`
+5. If architecture decision made: append to `docs/DECISIONS.md`
 
 **Skipping this ritual = next session starts cold with wrong context.**
 
+**`docs/AGENT_LOG.md`** — collaborative log where every agent records completed work. Claude reads this to audit all agent output before marking tasks verified. Template and format are inside that file.
+
 Handoff signals:
-- Codex → Claude: `[CODEX DONE — needs Claude review]` in SESSION_LOG
-- Claude → Codex: full spec in TASKS.md (file paths, I/O contracts, env vars)
+- Any agent → Claude: `[NEEDS CLAUDE REVIEW]` in AGENT_LOG entry review status field
+- Claude → agent: full spec in `docs/tasks/TASK-XX-NNN-name.md` (file paths, I/O contracts, exact line numbers)
+- Claude verifies: marks AGENT_LOG entry as `VERIFIED by Claude [date]` or `REJECTED — [reason]`
 
 Protection rules:
 - Never rename a function used in more than 1 file (cross-file refactor → route to Claude)
@@ -387,4 +426,4 @@ Protection rules:
 
 ---
 
-*Last updated: 2026-04-13 s3 — all Remotion layers complete, pushed (a284e5a). Next: AsmrReveal live test.*
+*Last updated: 2026-04-27 — Phase 0 gate updated, X cooldown extended to 2026-05-07, AGENT_LOG.md introduced, 3 OpenClaw tasks queued (OC-001/002/003), pool file corruption root-caused and specced for fix.*

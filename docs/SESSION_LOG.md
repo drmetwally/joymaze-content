@@ -2108,3 +2108,74 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - 2 new locked rules added to CLAUDE.md (FFmpeg filter incompatibility, readGuard dead air bug)
 
 **What's next:** Review ep03-hedgehog_h.mp4. If approved, proceed to ep04.
+
+## 2026-04-23 — [Agent: OpenClaw] — Puzzle Challenge Reel planning, implementation pass, and archive-backed validation
+
+**Files changed:** `docs/OPERATING_MAP_2026-04-23.md`, `docs/PUZZLE_COMPILATION_READINESS_2026-04-23.md`, `docs/PUZZLE_CHALLENGE_REEL_SPEC_2026-04-23.md`, `docs/PUZZLE_CHALLENGE_REEL_IMPLEMENTATION_SPEC_2026-04-23.md`, `remotion/compositions/ActivityChallenge.jsx`, `scripts/generate-activity-video.mjs`, `scripts/render-video.mjs`
+
+**Planning decisions locked with Ahmed:**
+- Do **not** build the 1-hour puzzle longform from the existing still-image activity shorts.
+- First replace the still-image activity short lane with a new **Puzzle Challenge Reel** format.
+- Format shape: puzzle visible immediately, title top-center in a dark strip, digit countdown on the left, brief transition cue at zero, then ASMR-style solve.
+- Title stays visible until solve starts. Countdown is digit-based and prominent. Title and countdown disappear together. Transition should be short and functional, not flashy.
+- Timing should vary by puzzle type. Maze and word-search were treated as distinct pacing cases.
+
+**Implementation work completed:**
+- `ActivityChallenge.jsx` was rebuilt from the old hook/timer/CTA flow into the new challenge-to-solve reel format.
+- `generate-activity-video.mjs` was rewritten away from the old static FFmpeg frame-overlay path and now renders the activity lane through Remotion.
+- Optional solver sidecars are now staged and used when present (`path.json`, `wordsearch.json`, `dots.json`).
+- Fixed a real Windows production issue by adding `--props-file` support to `render-video.mjs`, then switching `generate-activity-video.mjs` to pass large Remotion props through JSON files instead of inline CLI JSON.
+
+**Validation completed today:**
+- Preview render of `ActivityChallenge` succeeded after early tool/quoting/preview-asset false starts.
+- Full archive-backed maze validation succeeded using `output/archive/asmr/maze-butterfly-garden/` with real `maze.png`, `solved.png`, and `path.json` (400 waypoint solver path active).
+- Archive-backed word-search creative validation also succeeded using archived activity art. This proved the new challenge UI/timing/audio/render lane for word-search visuals, but the solve phase fell back to static because the archive did not include `solved.png` or `wordsearch.json`.
+- Queue JSON creation and Cloudinary upload both worked in the new lane.
+
+**State at session close:**
+- New puzzle activity lane is proven for maze with live solver data.
+- Word-search is proven only at the challenge-lane / fallback-solve level.
+- Next session should begin with **video testing / visual review** of the rendered outputs, then tune title size, countdown styling, transition feel, audio balance, and per-type pacing before further expansion.
+
+---
+
+## 2026-04-27 — [Claude] — Daily audit + 3 fixes
+
+**Scheduler check:** Task ran at 9:20 AM but failed (0x800710E0 — blank WorkingDirectory, relative script path unresolvable from System32). Last successful auto-run was 2026-04-21. Gap: machine was likely off Apr 22–26.
+
+**Manual daily run:** All 9 steps completed successfully.
+- Pinterest token refreshed (next due ~May 20)
+- Trends: Mother's Day in 14 days, Memorial Day in 29. Boost themes: Weather/Seasons, Pets/Home, Garden/Flowers
+- Intelligence: entropy_blocked (8.0) — competitor propagation caused JSON corruption in 3 pool files
+- 10 image prompts generated (all PASS, avg 8.9/10) — CAROUSEL DAY (camping-outdoors)
+- Story ep05 scaffolded: "The Robin Who Guided the Spring Migration"
+- ASMR brief: wordsearch-cloud-kingdom
+- 4 X posts (avg score 0.75)
+
+**Fixes applied:**
+1. Task Scheduler WorkingDirectory set to `D:\Joymaze-Content` — will auto-run correctly tomorrow
+2. Pool files restored (theme-pool-dynamic, hooks-library, pattern-interrupt-dynamic corrupted by intelligence-refresh competitor propagation bug) — restored from commit dc5b9ce
+3. Intelligence force-applied: +5 themes, +7 hooks, +4 CTAs, +4 interrupts
+4. X cooldown extended to 2026-05-07 (account had no activity Apr 17–27 due to personal reasons — extended warmup before automation resumes)
+
+**Next:** Generate images for today's 10 prompts → import:raw → generate:captions
+
+---
+
+## 2026-04-27 — [Claude] — Architecture session: agent log, 3 OpenClaw task specs, MEMORY/gate updates
+
+**What was done:**
+- Created `docs/AGENT_LOG.md` — universal collaboration log for all AI agents; template + Claude's own entry from today's audit
+- Specced 3 OpenClaw tasks in `docs/tasks/`:
+  - TASK-OC-001: atomic writes fix for `applyCompetitorFindings()` in `intelligence-refresh.mjs`
+  - TASK-OC-002: wire full intelligence stack (trends, hooks, themes, perf-weights) into `generate-activity-video.mjs`
+  - TASK-OC-003: Kokoro-82M TTS fallback replacing Edge TTS in story + animal narration pipelines
+- Updated `MEMORY.md`: Phase 0 gate clarified (10+10+10 retired), X cooldown → 2026-05-07, multi-agent protocol updated with AGENT_LOG reference, all 3 tasks added to pending
+- Updated `CLAUDE.md`: Phase 0 constraint row updated, two references to 10+10+10 replaced
+- Updated `docs/TASKS.md`: Phase 0 gate KPI and decisions log updated
+
+**Root cause documented:** `applyCompetitorFindings()` calls twice per run → first call writes pool files from raw Gemini response (may contain control chars) → second call fails JSON.parse → silent catch leaves corrupt file on disk. Fix: atomic write (serialize → validate → temp file → rename).
+
+**Intelligence linkage gap documented:** All generators read pool files correctly via `apply-intelligence`. The only under-linked generator is `generate-activity-video.mjs` (TASK-OC-002).
+
+**Next session entry point:** Hand TASK-OC-001, TASK-OC-002, TASK-OC-003 specs to OpenClaw. Claude reviews diffs + AGENT_LOG entries when returned.

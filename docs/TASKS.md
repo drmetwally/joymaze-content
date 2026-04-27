@@ -21,7 +21,7 @@ No new pipelines until this threshold is hit consistently for 30 days.
 - Phase 3 (8+ months): Revenue-funded expansion (Seedance, paid ads, KDP series)
 
 **KPI Gates:**
-- Phase 0 → 1: 30 consecutive days ≥10 posts/day
+- Phase 0 → 1: 30 consecutive days hitting **10 images + 4 X posts + 1 ASMR + 1 story video/day** (updated 2026-04-27 — old 10+10+10 was stale)
 - Phase 1 → 2: Pinterest 75K+ impressions/mo AND installs ≥100/mo or KDP ≥20 units/mo
 - Phase 2 → 3: Installs ≥1,000/mo OR KDP ≥150 units/mo for 2 consecutive months
 
@@ -53,6 +53,14 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [x] **Carousel Format 3 — Activity Progression carousel** — DONE (2026-04-11). `progress-carousel-*` folder prefix auto-detected by import-raw.mjs. generate-prompts.mjs triggers on doy%9===6 (next: 2026-04-15). 3 slides: 01-blank.png → 02-half.png → 03-done.png. Ahmed generates all 3 in same Gemini chat for visual consistency.
 
 ---
+
+## NEXT SESSION — START HERE (2026-04-24)
+
+- [~] **Puzzle Challenge Reel video testing** — first task tomorrow. Watch and review the two 2026-04-23 validation renders before more coding:
+  - `output/videos/2026-04-23-activity-maze-archive-test-yt-short.mp4`
+  - `output/videos/2026-04-23-activity-word-search-archive-test-yt-short.mp4`
+- [ ] **Tune Puzzle Challenge Reel based on render review** — likely focus areas: title size/weight, countdown prominence, transition cue feel, audio balance, and per-type pacing.
+- [ ] **True word-search solve validation** — run once a sample exists with real `solved.png` and `wordsearch.json` so the solve phase can be fully tested, not just fallback static solve.
 
 ## PHASE 0 — PIPELINE STABILIZATION
 
@@ -454,7 +462,7 @@ npm run longform:animal:render -- --episode output/longform/animal/ep03-...
 
 | Date | Decision | Reason |
 |------|----------|--------|
-| 2026-04-04 | Hold existing pipeline, no new video tech | Optimize to 10+10+10 threshold first |
+| 2026-04-04 | Hold existing pipeline, no new video tech | Optimize to Phase 0 gate first (updated 2026-04-27: 10 images + 4 X posts + 1 ASMR + 1 story/day) |
 | 2026-04-04 | Adopt tasks.md as persistent session anchor | Eliminate cold-start context waste per session |
 | 2026-04-04 | Skip spec-kit tool install | Already have equivalent docs; only gap was tasks.md |
 | 2026-04-04 | Seedance sub on hold | Test free tier first; evaluate after Joyo pose test |
