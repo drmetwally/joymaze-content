@@ -469,6 +469,12 @@ function buildEpisodeJson(brief, context, artStyle) {
     fact4: brief.fact4,
     fact5: brief.fact5,
     sungRecapLyrics: brief.sungRecapLyrics,
+    sungRecapShortDurationSec: 17,
+    outroCtaShort: '',
+    outroCtaShortFile: '',
+    outroCtaShortDurationSec: 3.5,
+    hookNarrationShortTargetSec: 4,
+    nameRevealShortTargetSec: 2.5,
     sunoPrompts: {
       sungRecap: brief.sungRecapSunoPrompt,
       background: selectedBackground?.prompt || brief.backgroundSunoPrompt,
@@ -549,6 +555,14 @@ ${factDescriptions}
 \`\`\`
 ${episode.sungRecapLyrics}
 \`\`\`
+
+## Short-Form Reel Contract
+- Hook target: ~${episode.hookNarrationShortTargetSec}s
+- Name reveal target: ~${episode.nameRevealShortTargetSec}s
+- Sung recap target: ~${episode.sungRecapShortDurationSec}s
+- Outro CTA target: ~${episode.outroCtaShortDurationSec}s
+- Required reel images: \`namereveal.png\`, \`fact1.png\`, \`fact2.png\`, \`fact3.png\`, \`fact4.png\`, \`fact5.png\`
+- B-roll: optional later, not required for v1 reel
 
 ## Suno Drop Instructions
 Drop these MP3 files into the episode folder with exact filenames:

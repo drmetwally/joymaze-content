@@ -53,14 +53,15 @@ if (!episodeArg) {
 }
 
 const SEGMENTS = [
-  { key: 'hook',       label: 'HOOK',        file: 'narration-hook.mp3',       isHook: true,       speed: 1.18 },
-  { key: 'nameReveal', label: 'NAME REVEAL', file: 'narration-namereveal.mp3', isNameReveal: true, speed: 1.18 },
-  { key: 'fact1',      label: 'FACT 1',      file: 'narration-fact1.mp3',                          speed: 1.05 },
-  { key: 'fact2',      label: 'FACT 2',      file: 'narration-fact2.mp3',                          speed: 1.05 },
-  { key: 'fact3',      label: 'FACT 3',      file: 'narration-fact3.mp3',                          speed: 1.05 },
-  { key: 'fact4',      label: 'FACT 4',      file: 'narration-fact4.mp3',                          speed: 1.05 },
-  { key: 'fact5',      label: 'FACT 5',      file: 'narration-fact5.mp3',                          speed: 1.05 },
-  { key: 'outroCta',   label: 'OUTRO CTA',   file: 'narration-outro-cta.mp3',  isOutroCta: true,   speed: 1.08 },
+  { key: 'hook',          label: 'HOOK',             file: 'narration-hook.mp3',             isHook: true,          speed: 1.18 },
+  { key: 'nameReveal',    label: 'NAME REVEAL',      file: 'narration-namereveal.mp3',       isNameReveal: true,    speed: 1.18 },
+  { key: 'fact1',         label: 'FACT 1',           file: 'narration-fact1.mp3',                                   speed: 1.05 },
+  { key: 'fact2',         label: 'FACT 2',           file: 'narration-fact2.mp3',                                   speed: 1.05 },
+  { key: 'fact3',         label: 'FACT 3',           file: 'narration-fact3.mp3',                                   speed: 1.05 },
+  { key: 'fact4',         label: 'FACT 4',           file: 'narration-fact4.mp3',                                   speed: 1.05 },
+  { key: 'fact5',         label: 'FACT 5',           file: 'narration-fact5.mp3',                                   speed: 1.05 },
+  { key: 'outroCta',      label: 'OUTRO CTA',        file: 'narration-outro-cta.mp3',        isOutroCta: true,      speed: 1.08 },
+  { key: 'outroCtaShort', label: 'OUTRO CTA SHORT',  file: 'narration-outro-cta-short.mp3',  isOutroCtaShort: true, speed: 1.14 },
 ];
 
 function resolveEpisodeDir(arg) {
@@ -125,6 +126,17 @@ function buildOutroCTAPrompt(episode) {
 - Reference the coolest idea from the episode
 - End with exactly: "Ask a grown-up to help you write your answer in the comments!"
 - Avoid bland classroom wording
+- Output ONLY the text — no labels, no quotes`;
+}
+
+function buildShortOutroCTAPrompt(episode) {
+  return `Write ONE ultra-short engagement line for a vertical kids reel about ${episode.animalName}.
+- Max 10 words
+- Must be easy to say in under 3 seconds
+- Sound playful and curiosity-driven
+- Refer to the coolest idea from the episode
+- Must be a question or direct challenge
+- No mention of grown-ups, comments, likes, or subscribing
 - Output ONLY the text — no labels, no quotes`;
 }
 
@@ -243,13 +255,14 @@ async function main() {
   let episodeDirty = false;
 
   for (const segDef of SEGMENTS) {
-    const isHook       = segDef.isHook === true;
-    const isNameReveal = segDef.isNameReveal === true;
-    const isOutroCta   = segDef.isOutroCta === true;
-    // Hook/nameReveal/outroCta read from top-level; others read episode[key]
-    const segment = (isHook || isNameReveal || isOutroCta) ? episode : episode[segDef.key];
+    const isHook          = segDef.isHook === true;
+    const isNameReveal    = segDef.isNameReveal === true;
+    const isOutroCta      = segDef.isOutroCta === true;
+    const isOutroCtaShort = segDef.isOutroCtaShort === true;
+    // Hook/nameReveal/outroCta variants read from top-level; others read episode[key]
+    const segment = (isHook || isNameReveal || isOutroCta || isOutroCtaShort) ? episode : episode[segDef.key];
 
-    if (!segment && !isHook && !isNameReveal && !isOutroCta) {
+    if (!segment && !isHook && !isNameReveal && !isOutroCta && !isOutroCtaShort) {
       console.log(`  Skip: ${segDef.key} — not found in episode.json`);
       continue;
     }
@@ -260,7 +273,19 @@ async function main() {
     if (alreadyExists && !FORCE) {
       if (isHook && !episode.hookNarration && !DRY_RUN) {
         // re-probe only — can't easily write back for hook without full regen
-      } else if (!isHook && !segment.durationSec && !DRY_RUN) {
+      } else if (isOutroCta && !episode.outroCtaDurationSec && !DRY_RUN) {
+        const dur = await getAudioDuration(outputPath);
+        if (dur > 0) {
+          episode.outroCtaDurationSec = Math.round((dur + 2.0) * 10) / 10;
+          episodeDirty = true;
+        }
+      } else if (isOutroCtaShort && !episode.outroCtaShortDurationSec && !DRY_RUN) {
+        const dur = await getAudioDuration(outputPath);
+        if (dur > 0) {
+          episode.outroCtaShortDurationSec = Math.round((dur + 0.8) * 10) / 10;
+          episodeDirty = true;
+        }
+      } else if (!isHook && !isNameReveal && !isOutroCta && !isOutroCtaShort && !segment.durationSec && !DRY_RUN) {
         const dur = await getAudioDuration(outputPath);
         if (dur > 0) {
           segment.durationSec = Math.max(7.0, Math.round((dur + 2.5) * 10) / 10);
@@ -275,7 +300,7 @@ async function main() {
     const triggerBlock = buildTriggerBlock(triggerKey, psychTriggers);
 
     console.log(`  ${segDef.label}`);
-    if (!isHook && !isNameReveal && !isOutroCta) {
+    if (!isHook && !isNameReveal && !isOutroCta && !isOutroCtaShort) {
       console.log(`    Trigger: ${triggerKey} | Beat: "${segment.psychologyBeat || '—'}"`);
     }
 
@@ -295,6 +320,10 @@ async function main() {
     } else if (isOutroCta) {
       process.stdout.write('    Generating copy...');
       narrationCopy = await callGroq(writingStyle, buildOutroCTAPrompt(episode));
+      console.log(` done`);
+    } else if (isOutroCtaShort) {
+      process.stdout.write('    Generating copy...');
+      narrationCopy = await callGroq(writingStyle, buildShortOutroCTAPrompt(episode));
       console.log(` done`);
     } else {
       process.stdout.write('    Generating copy...');
@@ -326,6 +355,10 @@ async function main() {
       episode.outroCta     = narrationCopy;
       episode.outroCtaFile = segDef.file;
       if (dur > 0) episode.outroCtaDurationSec = Math.round((dur + 2.0) * 10) / 10;
+    } else if (isOutroCtaShort) {
+      episode.outroCtaShort = narrationCopy;
+      episode.outroCtaShortFile = segDef.file;
+      if (dur > 0) episode.outroCtaShortDurationSec = Math.round((dur + 0.8) * 10) / 10;
     } else {
       segment.narration     = narrationCopy;
       segment.narrationFile = segDef.file;

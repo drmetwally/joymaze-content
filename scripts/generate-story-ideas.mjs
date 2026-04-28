@@ -444,12 +444,26 @@ function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function buildDefaultReelSlideOrder(slides = []) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= 5) return Array.from({ length: count }, (_, i) => i + 1);
+  const picks = [
+    1,
+    2,
+    Math.max(3, Math.ceil(count / 2)),
+    Math.max(Math.ceil(count / 2) + 1, count - 1),
+    count,
+  ];
+  return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
+}
+
 async function saveStory(story, episodeNum) {
   const folder = `ep${String(episodeNum).padStart(2, '0')}-${slugify(story.title)}`;
   const storyDir = path.join(ROOT, 'output', 'stories', folder);
   await fs.mkdir(storyDir, { recursive: true });
 
   // Write story.json (same format generate-story-video.mjs expects)
+  const reelSlideOrder = buildDefaultReelSlideOrder(story.slides);
   const storyJson = {
     title: story.title,
     episode: story.episode,
@@ -457,6 +471,7 @@ async function saveStory(story, episodeNum) {
     hook: story.hook || null,         // Legacy intro hook
     hookQuestion: story.hookQuestion || story.hook || null,
     outroEcho: story.outroEcho || null,
+    reelSlideOrder,
     slides: story.slides.map(s => ({
       image: s.image,
       act: s.act,
@@ -477,6 +492,8 @@ async function saveStory(story, episodeNum) {
     `Episode ${story.episode} | Art style: ${story.style}`,
     '',
     `**Story:** ${story.theme}`,
+    '',
+    `**Story Reel V2 default cut:** ${reelSlideOrder.map((n) => `Slide ${String(n).padStart(2, '0')}`).join(' → ')}`,
     '',
     story.character ? `**Main character (use this consistently in every image):** ${story.character}` : '',
     '',
@@ -512,6 +529,7 @@ function printStory(story) {
   console.log(`Theme: ${story.theme}`);
   console.log(`Hook: ${story.hookQuestion || story.hook || '(none)'}`);
   console.log(`Outro echo: ${story.outroEcho || '(none)'}`);
+  console.log(`Reel cut: ${buildDefaultReelSlideOrder(story.slides).join(', ')}`);
   console.log(`Style: ${story.style}`);
   console.log('');
 

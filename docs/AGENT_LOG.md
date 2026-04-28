@@ -218,3 +218,19 @@
 **Next:** Claude should audit the 4-file follow-up diff. After approval, either backfill image-backed story folders or update the story-generation path so Story Reel V2 can run end-to-end from fresh `story.json` outputs without fixture props.
 
 ---
+
+### 2026-04-28 | OpenClaw | REELS-003 | Backfill reel-ready generator defaults for story and animal outputs
+**Files changed:**
+- `scripts/generate-story-ideas.mjs` — now stamps a default 5-beat `reelSlideOrder` into each saved `story.json`, echoes that cut in console output, and writes it into `image-prompts.md`
+- `scripts/render-video.mjs` — Story Reel V2 now respects `reelSlideOrder` (or derives the same default cut) so fresh story folders target a shorter 5-beat reel instead of all slides
+- `scripts/generate-animal-facts-brief.mjs` — seeds new animal episodes with explicit short-form reel timing defaults and documents the short-form asset contract in `brief.md`
+- `scripts/generate-animal-narration.mjs` — adds a dedicated `outroCtaShort` narration path (`narration-outro-cta-short.mp3`) for reel-native animal endings
+- `remotion/compositions/AnimalFactsSongShort.jsx` — prefers the short CTA text/audio when present and falls back cleanly to the existing long CTA path
+- `docs/AGENT_LOG.md` — appended this handoff entry for Claude
+**What was done:** The next bottleneck was that the short-form comps were getting smarter faster than the generators feeding them. I pushed reel-specific defaults up into generation so new story outputs now carry a default 5-beat cut and new animal briefs now carry explicit short-form timing targets; then I added a dedicated short CTA narration path so animal reels can stop borrowing the longform ending voiceover. I also locally backfilled existing untracked output artifacts for validation, which let me verify the new story cut shrinks the missing-asset surface from 8 required PNGs to the intended 5-beat set.
+**Test command:** `node --check scripts/generate-story-ideas.mjs`, `node --check scripts/generate-animal-facts-brief.mjs`, `node --check scripts/generate-animal-narration.mjs`, `node --check scripts/render-video.mjs`, `node scripts/generate-animal-facts-brief.mjs --dry-run`, `node scripts/generate-animal-narration.mjs --episode output\longform\animal\ep03-hedgehog --dry-run`, `node scripts/generate-animal-narration.mjs --episode output\longform\animal\ep03-hedgehog`, `node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output\longform\animal\ep03-hedgehog --dry-run --verbose`, and `node scripts/render-video.mjs --comp StoryReelV2 --story output\stories\ep05-the-robin-who-guided-the-spring-migration --dry-run`
+**Test output summary:** All four modified `.mjs` files passed `node --check`. Animal brief dry-run printed the new short-form reel contract block. Animal narration dry-run showed a new `OUTRO CTA SHORT` step, and the live run generated `narration-outro-cta-short.mp3` with `"Can you find Hedgehog's hidden food?"`; the follow-up song-short dry-run resolved `outroCtaShort`, `outroCtaShortFile`, and `outroCtaShortDurationSec: 2.6` cleanly. Direct Story Reel V2 dry-run on a real story folder now fails with the tighter 5-beat requirement only: `StoryReelV2 missing required image assets: 08.png, 01.png, 02.png, 04.png, 07.png`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit this generator-layer reel pass. After approval, the remaining story blocker is content-side: actually generating or backfilling the selected 5 slide PNGs in each story folder so Story Reel V2 can render from real story artifacts with no fixtures.
+
+---

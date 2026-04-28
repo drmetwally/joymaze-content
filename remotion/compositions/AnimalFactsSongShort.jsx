@@ -89,8 +89,10 @@ export const AnimalFactsSongShort = ({
       <Sequence from={hookFrames + NAME_REVEAL_FRAMES + sungRecapFrames} durationInFrames={outroFrames || DEFAULT_OUTRO_FRAMES}>
         <AnimalOutroScene
           imagePath={resolveEpisodeAsset(episodeFolder, 'namereveal.png')}
-          outroCta={episode.outroCta || `What was your favorite ${episode.animalName || 'animal'} fact?`}
-          outroCtaNarrationPath={resolveEpisodeAsset(episodeFolder, 'narration-outro-cta.mp3')}
+          outroCta={episode.outroCtaShort || episode.outroCta || `What was your favorite ${episode.animalName || 'animal'} fact?`}
+          outroCtaNarrationPath={episode.outroCtaShortFile
+            ? resolveEpisodeAsset(episodeFolder, episode.outroCtaShortFile)
+            : resolveEpisodeAsset(episodeFolder, 'narration-outro-cta.mp3')}
           outroJinglePath={resolveEpisodeAsset(episodeFolder, 'outro-jingle.mp3')}
         />
       </Sequence>
