@@ -234,3 +234,15 @@
 **Next:** Claude should audit this generator-layer reel pass. After approval, the remaining story blocker is content-side: actually generating or backfilling the selected 5 slide PNGs in each story folder so Story Reel V2 can render from real story artifacts with no fixtures.
 
 ---
+
+### 2026-04-28 | OpenClaw | REELS-004 | Emit reel-image-prompts.md so story art can be generated in reel-first order
+**Files changed:**
+- `scripts/generate-story-ideas.mjs` — added shared prompt-markdown generation, now writes `reel-image-prompts.md` alongside the full prompt file, and updated save-time console guidance to tell the operator to generate the 5 reel-critical images first
+- `docs/AGENT_LOG.md` — appended this handoff entry for Claude
+**What was done:** The renderer and story JSON now know the 5-beat reel cut, but the human image-generation handoff still made artists work from the full 8-slide prompt set first. I added a dedicated `reel-image-prompts.md` companion file that extracts only the selected reel slides in order, so the missing-asset blocker is smaller and operationally obvious the moment a new story is saved.
+**Test command:** `node --check scripts/generate-story-ideas.mjs` and `node scripts/generate-story-ideas.mjs --save --count 1`
+**Test output summary:** Syntax check exited cleanly. Live save generated `output/stories/ep07-the-snail-who-painted-the-sunset-garden/` with `story.json`, `image-prompts.md`, and the new `reel-image-prompts.md`; console output now explicitly says `generate the 5 selected reel images from reel-image-prompts.md first`, and the saved `story.json` contains `reelSlideOrder: [1, 2, 4, 7, 8]` matching the new reel prompt file.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit this single-file story-handoff improvement. After approval, the next meaningful step is optional automation: turn `reel-image-prompts.md` into actual slide PNG generation, or keep the current manual Gemini flow but use the smaller reel-first file.
+
+---

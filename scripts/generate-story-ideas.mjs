@@ -457,6 +457,36 @@ function buildDefaultReelSlideOrder(slides = []) {
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 
+function buildPromptMarkdown(story, reelSlideOrder, slides, title) {
+  const lines = [
+    `# ${title} — ${story.title}`,
+    `Episode ${story.episode} | Art style: ${story.style}`,
+    '',
+    `**Story:** ${story.theme}`,
+    '',
+    `**Story Reel V2 default cut:** ${reelSlideOrder.map((n) => `Slide ${String(n).padStart(2, '0')}`).join(' → ')}`,
+    '',
+    story.character ? `**Main character (use this consistently in every image):** ${story.character}` : '',
+    '',
+    '---',
+    '',
+  ];
+
+  for (const slide of slides) {
+    lines.push(`## Slide ${slide.image.replace('.png', '')} (ACT ${slide.act})`);
+    lines.push('');
+    lines.push(`**Narration:** "${slide.narration}"`);
+    lines.push('');
+    lines.push('**Image prompt:**');
+    lines.push(slide.image_prompt);
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
 async function saveStory(story, episodeNum) {
   const folder = `ep${String(episodeNum).padStart(2, '0')}-${slugify(story.title)}`;
   const storyDir = path.join(ROOT, 'output', 'stories', folder);
@@ -487,35 +517,18 @@ async function saveStory(story, episodeNum) {
   );
 
   // Write image-prompts.md for manual Gemini generation
-  const lines = [
-    `# Image Prompts — ${story.title}`,
-    `Episode ${story.episode} | Art style: ${story.style}`,
-    '',
-    `**Story:** ${story.theme}`,
-    '',
-    `**Story Reel V2 default cut:** ${reelSlideOrder.map((n) => `Slide ${String(n).padStart(2, '0')}`).join(' → ')}`,
-    '',
-    story.character ? `**Main character (use this consistently in every image):** ${story.character}` : '',
-    '',
-    '---',
-    '',
-  ];
-
-  for (const slide of story.slides) {
-    lines.push(`## Slide ${slide.image.replace('.png', '')} (ACT ${slide.act})`);
-    lines.push('');
-    lines.push(`**Narration:** "${slide.narration}"`);
-    lines.push('');
-    lines.push('**Image prompt:**');
-    lines.push(slide.image_prompt);
-    lines.push('');
-    lines.push('---');
-    lines.push('');
-  }
-
   await fs.writeFile(
     path.join(storyDir, 'image-prompts.md'),
-    lines.join('\n'),
+    buildPromptMarkdown(story, reelSlideOrder, story.slides, 'Image Prompts'),
+    'utf-8'
+  );
+
+  const reelSlides = reelSlideOrder
+    .map((n) => story.slides[n - 1])
+    .filter(Boolean);
+  await fs.writeFile(
+    path.join(storyDir, 'reel-image-prompts.md'),
+    buildPromptMarkdown(story, reelSlideOrder, reelSlides, 'Reel Image Prompts'),
     'utf-8'
   );
 
@@ -640,12 +653,13 @@ async function main() {
       const saved = await saveStory(story, story.episode);
       console.log(`\nSaved: ${saved}`);
       console.log('  → story.json (ready for generate-story-video.mjs)');
-      console.log('  → image-prompts.md (prompts for Gemini/ChatGPT)');
-      console.log(`\nNext: generate images 01.png–${String(story.slides.length).padStart(2,'0')}.png in Gemini, drop into that folder.`);
+      console.log('  → image-prompts.md (full prompt set for Gemini/ChatGPT)');
+      console.log('  → reel-image-prompts.md (generate these 5 slides first for StoryReelV2)');
+      console.log(`\nNext: generate the 5 selected reel images from reel-image-prompts.md first, then backfill the rest if needed.`);
       console.log(`Then: npm run generate:story:openai -- --story ${path.basename(saved)}`);
     }
   } else {
-    console.log('\nRun with --save to scaffold story folder + save story.json + image-prompts.md');
+    console.log('\nRun with --save to scaffold story folder + save story.json + image-prompts.md + reel-image-prompts.md');
   }
 }
 
