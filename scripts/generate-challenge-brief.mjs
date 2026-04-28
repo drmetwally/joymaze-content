@@ -144,7 +144,7 @@ function buildPrompt(type, context) {
     : '';
 
   const trendsStr = trends?.trending_themes?.length
-    ? `\nTRENDING THIS WEEK — bias toward one of these if it fits:\n`
+    ? `\nTRENDING THIS WEEK — bias your theme toward one of these if it fits naturally:\n`
       + trends.trending_themes.slice(0, 5).map(t => `- ${t.theme} (score: ${t.score})`).join('\n')
       + (trends.upcoming_moments?.length
         ? `\nUpcoming: ${trends.upcoming_moments.filter(e => e.days_away >= 0 && e.days_away <= 21).map(e => `${e.event} in ${e.days_away} days`).join(', ')}`
@@ -178,6 +178,19 @@ function buildPrompt(type, context) {
           .join('\n')
     : '';
 
+  // Performance weights: which activity types are resonating most
+  const perfStr = perfWeights?.weights
+    ? (() => {
+        const w = perfWeights.weights;
+        const top = Object.entries(w)
+          .filter(([, v]) => typeof v === 'object' && v.weight > 1.0)
+          .sort(([, a], [, b]) => (b.weight ?? 0) - (a.weight ?? 0))
+          .slice(0, 2)
+          .map(([k]) => k);
+        return top.length ? `\nHigh-resonance activity types this week (prefer if choosing between options): ${top.join(', ')}` : '';
+      })()
+    : '';
+
   // Puzzle type image description guide
   const imageGuide = {
     'maze':        'a clear, kid-friendly maze with Start and Finish labels, moderate difficulty (4-8 year olds can solve in ~45s), black lines on white background',
@@ -194,13 +207,15 @@ You are creating a "Challenge" video brief for JoyMaze — a kids activity app f
 
 The video format: a ${activityLabel} puzzle is shown with a counting timer running. Parents share it to challenge their kids and each other.
 Video length: ${countdownSec + 5} seconds total (${countdownSec}s timer + 5s hook/CTA).
-${trendsStr}${activeThemesStr}${competitorStr}${hookLibraryStr}${recentStr}${psychTriggers ? `
+${trendsStr}${activeThemesStr}${perfStr}${competitorStr}${hookLibraryStr}${recentStr}${psychTriggers ? `
 
-## PSYCHOLOGY TRIGGER — CHALLENGE
-This format's viral mechanic is competitive activation. Wire it into every output field:
-- **hookText**: Direct challenge with implicit social proof. Use fraction phrasing ("1 in 5 kids...") or clock urgency ("Can you beat ${countdownSec}s?"). Never a generic question.
-- **ctaText**: Make the viewer want to prove themselves or compare — time drops, family tags, repost-to-challenge formats.
-- The CHALLENGE trigger works best when failure feels possible. Make the puzzle look just hard enough.` : ''}
+## PSYCHOLOGY TRIGGER — CHALLENGE_HOOK
+This challenge brief's viral mechanic is the trigger: pose a challenge the viewer believes
+their child can beat.
+- hookText must activate competitive curiosity — the viewer should feel the itch to try.
+- Hook style: imply a skill gap or surprising difficulty ("Most kids miss this", "Can you beat the clock?")
+- Puzzle difficulty and visual complexity must feel achievable, not frustrating.
+- Caption writers will get this trigger context separately — your job is to encode it into hookText.` : ''}
 
 Today's puzzle type: **${type}** — ${activityLabel}
 

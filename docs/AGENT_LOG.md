@@ -179,3 +179,14 @@
 **Next:** Hand TASK-OC-006 to OpenClaw. Scope: wire trends + perf-weights + psych-triggers into `generate-challenge-brief.mjs` to match the other 5 daily generators.
 
 ---
+
+### 2026-04-28 | OpenClaw | TASK-OC-006 | Wire missing intelligence signals into generate-challenge-brief.mjs
+**Files changed:**
+- `scripts/generate-challenge-brief.mjs` — standardised `trendsStr` label to match ASMR reference; added `perfStr` derivation from `performance-weights.json`; replaced generic `CHALLENGE` trigger copy with spec-required `PSYCHOLOGY TRIGGER — CHALLENGE_HOOK` block; injected all three in correct order (after active themes, before schema)
+**What was done:** Challenge brief was missing `perfStr` (genuinely new) and had a weaker trigger label and copy than the spec required. All three signals now match the ASMR reference pattern. Clean-omit behaviour confirmed: `perfStr` omits correctly when `performance-weights.json` has no usable weights (`"No analytics data yet"`).
+**Test command:** `node scripts/generate-challenge-brief.mjs --dry-run` then `node scripts/generate-challenge-brief.mjs`
+**Test output summary:** Dry-run prompt contains `TRENDING THIS WEEK` and `PSYCHOLOGY TRIGGER — CHALLENGE_HOOK`. Performance section omitted cleanly. Live run returned valid JSON: theme `Forest Friends`, hook `Beat the forest timer now`, CTA `Drop your solve time below`.
+**Review status:** APPROVED by Claude — diff scoped to single file, all three spec requirements met, injection order correct.
+**Next:** Story Reel V2 build — short story output moves from legacy `StoryEpisode` to a dedicated composition that inherits longform story grammar.
+
+---
