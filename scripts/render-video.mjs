@@ -3,15 +3,19 @@
  *
  * Usage:
  *   node scripts/render-video.mjs --comp StoryEpisode --story output/stories/my-story/story.json
+ *   node scripts/render-video.mjs --comp StoryReelV2 --story output/stories/my-story/story.json
+ *   node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/ep03-hedgehog
  *   node scripts/render-video.mjs --comp AsmrReveal   --asmr  output/asmr/maze-slug/activity.json
  *   node scripts/render-video.mjs --comp HookIntro    --props '{"headline":"Can your kid solve this?","subline":"Screen-free fun for ages 4-8"}'
  *   node scripts/render-video.mjs --comp StoryEpisode --props '{"slides":[...]}'  --out output/videos/ep01.mp4
  *   node scripts/render-video.mjs --comp StoryEpisode --dry-run --verbose
  *
  * Compositions:
- *   StoryEpisode  — multi-slide story video (slides, hookText, music)
- *   AsmrReveal    — progressive wipe reveal  (blankImagePath, solvedImagePath, revealType)
- *   HookIntro     — short 3-5s hook clip     (headline, subline, backgroundPath)
+ *   StoryEpisode          — legacy multi-slide story video (slides, hookText, music)
+ *   StoryReelV2           — flash-forward hook + longform-style short story reel
+ *   AnimalFactsSongShort  — mystery hook + reveal + sung recap animal reel
+ *   AsmrReveal            — progressive wipe reveal  (blankImagePath, solvedImagePath, revealType)
+ *   HookIntro             — short 3-5s hook clip     (headline, subline, backgroundPath)
  */
 
 import { bundle }                                      from '@remotion/bundler';
@@ -32,11 +36,13 @@ const hasFlag = (f) => args.includes(f);
 const _compArg = getArg('--comp');
 const compositionId = _compArg
   ?? (args.includes('--challenge') ? 'ActivityChallenge'
+    : args.includes('--animal-episode') ? 'AnimalFactsSongShort'
     : args.includes('--asmr')      ? 'AsmrReveal'
     : args.includes('--story')     ? 'StoryEpisode'
     : 'StoryEpisode');
 const storyFile     = getArg('--story');
 const challengeFile = getArg('--challenge');
+const animalEpisodeArg = getArg('--animal-episode');
 
 // --asmr can be used as a flag (value comes from positional slug) or as a key-value pair.
 // Positional slug: first non-flag arg that isn't already consumed as a --comp value.
@@ -150,6 +156,54 @@ async function storyJsonToProps(story, storyDir) {
     showJoyo:          story.showJoyo ?? true,
     typewriterCaptions: story.typewriterCaptions ?? true,  // default on for Remotion renders
     peakSlideIndex,
+  };
+}
+
+async function storyJsonToReelV2Props(story, storyDir) {
+  const fps = 30;
+  const rawSlides = story.slides ?? [];
+  const slides = rawSlides.map((slide, index) => {
+    const rawImageRef = slide.imagePath ?? slide.image ?? '';
+    const imagePath = rawImageRef
+      ? path.relative(ROOT, path.resolve(storyDir, rawImageRef)).replace(/\\/g, '/')
+      : '';
+    const durationSec = slide.durationSec ?? slide.duration ?? 4;
+    const act = slide.act ?? (index < 2 ? 1 : index < rawSlides.length - 2 ? 2 : 3);
+    return {
+      sceneIndex: index + 1,
+      imagePath,
+      captionText: slide.narration ?? slide.caption ?? '',
+      durationFrames: Math.round(durationSec * fps),
+      psychologyTrigger: act === 1 ? 'CURIOSITY_GAP' : act === 2 ? 'IDENTITY_MIRROR' : 'COMPLETION_SATISFACTION',
+      isClimaxScene: index === rawSlides.length - 2,
+    };
+  });
+
+  const flashForwardSlide = rawSlides[rawSlides.length - 1] ?? rawSlides[rawSlides.length - 2] ?? rawSlides[0] ?? null;
+  const flashForwardImagePath = flashForwardSlide
+    ? path.relative(ROOT, path.resolve(storyDir, flashForwardSlide.imagePath ?? flashForwardSlide.image ?? '')).replace(/\\/g, '/')
+    : '';
+  const flashForwardCaption = flashForwardSlide?.narration ?? flashForwardSlide?.caption ?? '';
+  const hookQuestion = story.hookQuestion ?? story.hook ?? flashForwardCaption ?? 'What happens next?';
+  const musicPath = story.musicPath !== undefined
+    ? story.musicPath
+    : await resolveAudio('story');
+
+  return {
+    slides,
+    hookQuestion,
+    flashForwardImagePath,
+    backgroundMusicPath: musicPath,
+    outroTeaser: story.outroEcho ?? story.outroTeaser ?? story.title ?? 'New episode every week!',
+    hookDurationFrames: story.hookDurationFrames ?? Math.round(5 * fps),
+    outroDurationFrames: story.outroDurationFrames ?? Math.round(4 * fps),
+  };
+}
+
+async function animalEpisodeToSongShortProps(episode, episodeDir) {
+  return {
+    episodeFolder: path.relative(ROOT, episodeDir).replace(/\\/g, '/'),
+    episode,
   };
 }
 
@@ -389,8 +443,21 @@ async function challengeJsonToProps(activity, activityDir) {
 
 async function loadInputProps() {
   if (storyFile) {
-    const story = JSON.parse(await fs.readFile(path.resolve(ROOT, storyFile), 'utf-8'));
-    return storyJsonToProps(story, path.dirname(path.resolve(ROOT, storyFile)));
+    let jsonPath = path.resolve(ROOT, storyFile);
+    const stat = await fs.stat(jsonPath).catch(() => null);
+    if (stat?.isDirectory()) jsonPath = path.join(jsonPath, 'story.json');
+    const story = JSON.parse(await fs.readFile(jsonPath, 'utf-8'));
+    if (compositionId === 'StoryReelV2') {
+      return storyJsonToReelV2Props(story, path.dirname(jsonPath));
+    }
+    return storyJsonToProps(story, path.dirname(jsonPath));
+  }
+  if (animalEpisodeArg) {
+    let episodePath = path.resolve(ROOT, animalEpisodeArg);
+    const stat = await fs.stat(episodePath).catch(() => null);
+    if (stat?.isDirectory()) episodePath = path.join(episodePath, 'episode.json');
+    const episode = JSON.parse(await fs.readFile(episodePath, 'utf-8'));
+    return animalEpisodeToSongShortProps(episode, path.dirname(episodePath));
   }
   if (asmrFile) {
     const activity = JSON.parse(await fs.readFile(path.resolve(ROOT, asmrFile), 'utf-8'));
@@ -417,6 +484,19 @@ function computeDuration(inputProps, compId) {
   if (compId === 'StoryEpisode') {
     if (!inputProps.slides?.length) return fps * 30;
     return inputProps.slides.reduce((s, sl) => s + (sl.durationFrames ?? fps * 4), 0);
+  }
+  if (compId === 'StoryReelV2') {
+    const hookFrames = inputProps.hookDurationFrames ?? fps * 5;
+    const outroFrames = inputProps.outroDurationFrames ?? fps * 4;
+    const slideFrames = inputProps.slides?.reduce((s, sl) => s + (sl.durationFrames ?? fps * 4), 0) ?? fps * 16;
+    return hookFrames + slideFrames + outroFrames;
+  }
+  if (compId === 'AnimalFactsSongShort') {
+    const hookFrames = Math.round(Math.max(inputProps.episode?.hookNarrationDurationSec || 6, 5) * fps);
+    const revealFrames = Math.round(3.5 * fps);
+    const songFrames = 900;
+    const outroFrames = Math.round(Math.min(Math.max(inputProps.episode?.outroCtaDurationSec || 4, 4), 6) * fps);
+    return hookFrames + revealFrames + songFrames + outroFrames;
   }
   if (compId === 'AsmrReveal') {
     const totalSec = inputProps._totalSec
@@ -460,6 +540,7 @@ async function getBundle() {
     [path.join(ROOT, 'output', 'asmr'),        path.join(publicDir, 'output', 'asmr')],
     [path.join(ROOT, 'output', 'stories'),     path.join(publicDir, 'output', 'stories')],
     [path.join(ROOT, 'output', 'challenge'),   path.join(publicDir, 'output', 'challenge')],
+    [path.join(ROOT, 'output', 'longform', 'animal'), path.join(publicDir, 'output', 'longform', 'animal')],
   ];
   async function copyDir(src, dst) {
     await fs.mkdir(dst, { recursive: true });

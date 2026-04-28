@@ -1,5 +1,6 @@
 import { registerRoot, Composition } from 'remotion';
 import { StoryEpisode,        storyEpisodeSchema }        from './compositions/StoryEpisode.jsx';
+import { StoryReelV2,         storyReelV2Schema }         from './compositions/StoryReelV2.jsx';
 import { AsmrReveal,          asmrRevealSchema }          from './compositions/AsmrReveal.jsx';
 import { HookIntro,           hookIntroSchema }           from './compositions/HookIntro.jsx';
 import { AnimatedFactCard,    animatedFactCardSchema }    from './compositions/AnimatedFactCard.jsx';
@@ -7,6 +8,7 @@ import { ActivityChallenge,   activityChallengeSchema }   from './compositions/A
 import { LongFormEpisode,     longFormEpisodeSchema }     from './compositions/LongFormEpisode.jsx';
 import { StoryLongFormEpisode, storyLongFormEpisodeSchema } from './compositions/StoryLongFormEpisode.jsx';
 import { AnimalFactsEpisode, animalFactsEpisodeSchema } from './compositions/AnimalFactsEpisode.jsx';
+import { AnimalFactsSongShort, animalFactsSongShortSchema } from './compositions/AnimalFactsSongShort.jsx';
 import { PuzzleCompilation, puzzleCompilationSchema } from './compositions/PuzzleCompilation.jsx';
 
 // ─── Composition Registry ────────────────────────────────────────────────────
@@ -24,6 +26,17 @@ const Root = () => (
       width={1080}
       height={1920}
       defaultProps={storyEpisodeSchema}
+    />
+
+    {/* ── Story Reel V2: flash-forward hook + longform-style scenes ─── */}
+    <Composition
+      id="StoryReelV2"
+      component={StoryReelV2}
+      durationInFrames={750}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={storyReelV2Schema}
     />
 
     {/* ── ASMR progressive reveal: wipe + sparkles + brand ─────────── */}
@@ -119,6 +132,17 @@ const Root = () => (
       height={1080}
       defaultProps={animalFactsEpisodeSchema}
     />
+    {/* ── Animal song short: mystery hook + reveal + sung recap ────── */}
+    <Composition
+      id="AnimalFactsSongShort"
+      component={AnimalFactsSongShort}
+      durationInFrames={1305}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={animalFactsSongShortSchema}
+    />
+
     {/* ── Puzzle compilation: ~60 min — 9:16 vertical (TikTok) ────────────── */}
     <Composition
       id="PuzzleCompilation"

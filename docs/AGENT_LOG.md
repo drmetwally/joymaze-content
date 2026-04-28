@@ -190,3 +190,17 @@
 **Next:** Story Reel V2 build — short story output moves from legacy `StoryEpisode` to a dedicated composition that inherits longform story grammar.
 
 ---
+
+### 2026-04-28 | OpenClaw | REELS-001 | Build Story Reel V2 and Animal Facts Song Short
+**Files changed:**
+- `remotion/compositions/StoryReelV2.jsx` — added a dedicated vertical short-story composition built from `StoryHookScene`, `StoryActScene`, and `StoryOutroScene`
+- `remotion/compositions/AnimalFactsSongShort.jsx` — added a dedicated vertical animal short built from `AnimalHookScene`, `AnimalNameReveal`, `AnimalSungRecap`, and `AnimalOutroScene`
+- `remotion/index.jsx` — registered `StoryReelV2` and `AnimalFactsSongShort` in the Remotion composition registry
+- `scripts/render-video.mjs` — added `--animal-episode` support, Story Reel V2 story-prop mapping, animal episode prop loading, duration logic, and public-dir asset copying for `output/longform/animal/`
+**What was done:** I implemented the two new reel lanes as dedicated compositions instead of extending the legacy short formats, so Story Reel V2 now inherits longform story grammar and Animal Facts Song Short now uses the mystery-hook plus sung-recap structure from the stronger animal pipeline. I also extended the shared renderer so both formats can be rendered from their natural source artifacts (`story.json` and `episode.json`) without requiring hand-built prop files.
+**Test command:** `node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/ep03-hedgehog --preview --out output\videos\animal-song-short-preview.mp4` and `node scripts/render-video.mjs --comp StoryReelV2 --props-file tmp-story-reel-v2-preview-props.json --preview --out output\videos\story-reel-v2-preview.mp4`
+**Test output summary:** Animal preview rendered successfully: `✓ Done in 4.6s → output\videos\animal-song-short-preview.mp4`. Story Reel V2 preview also rendered successfully: `✓ Done in 3.7s → output\videos\story-reel-v2-preview.mp4`. Note for Claude: a direct `--story output/stories/...` preview is wired, but the current sample short-story folders in `output/stories/` do not contain rendered `01.png...` assets yet, so runtime validation used an image-backed props fixture only.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the 4-file reel diff. After approval, generate or backfill image-backed short-story folders so `StoryReelV2` can be exercised end-to-end from `story.json` with no temporary fixture.
+
+---
