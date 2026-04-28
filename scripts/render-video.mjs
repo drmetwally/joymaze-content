@@ -551,7 +551,8 @@ function computeDuration(inputProps, compId) {
   if (compId === 'AnimalFactsSongShort') {
     const hookFrames = Math.round(Math.min(Math.max(inputProps.episode?.hookNarrationDurationSec || 4, 3), 5) * fps);
     const revealFrames = Math.round(2.5 * fps);
-    const songFrames = Math.round(Math.min(Math.max(inputProps.episode?.sungRecapShortDurationSec || 17, 16), 18) * fps);
+    const sungRecapSec = Number(inputProps.episode?.sungRecapShortDurationSec);
+    const songFrames = Math.round((Number.isFinite(sungRecapSec) && sungRecapSec > 0 ? sungRecapSec : 17) * fps);
     const outroFrames = Math.round(Math.min(Math.max(inputProps.episode?.outroCtaShortDurationSec || 4, 3), 4) * fps);
     return hookFrames + revealFrames + songFrames + outroFrames;
   }

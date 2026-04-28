@@ -2,7 +2,7 @@
 
 > Follow top to bottom. Every day.
 
-Last updated: 2026-04-27
+Last updated: 2026-04-28
 
 ---
 
@@ -10,21 +10,24 @@ Last updated: 2026-04-27
 
 | Step | What | Time | Command |
 |------|------|------|---------|
-| 1 | Archive yesterday + generate today's briefs | 2 min | `npm run daily` |
+| 1 | Archive + briefs + Story Reel V2 auto-render | 3–5 min | `npm run daily` |
 | 2A | Inspiration images (5) | 10–15 min | Gemini → `output/raw/<slot>/` |
 | 2B | Activity puzzle images (5) | 15–20 min | Gemini → `output/raw/<type>/` |
 | 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
 | 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
 | 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
+| 2F | Animal song: 6 Gemini images | 10 min | Gemini → `output/longform/animal/[folder]/` |
 | 3 | ASMR video | 1–2 min | Coloring: 1 cmd · Maze/Wordsearch/Dot-to-dot: 2 cmds |
 | 3B | Challenge video | 1 min | `npm run animate:challenge` |
-| 4 | Story video (optional) | 1 min | `npm run generate:story:remotion` |
+| 3C | Story Reel V2 | **auto** | Auto-rendered by Step 1 — review `output/videos/` |
+| 3D | Animal Song Short | 3 min | Drop Suno audio → narrate → render (see below) |
+| 4 | Story video (optional longform) | 1 min | `npm run generate:story:remotion` |
 | 5 | Import + brand images | 1 min | `npm run import:raw` |
 | 6 | Activity puzzle videos | 1 min | `npm run generate:activity:video` (runs after import) |
 | 7 | AI captions | 2–3 min | `npm run generate:captions` |
 | 8 | Push queue ⚠️ | 1 min | `git add output/queue/ && git commit -m "queue: date" && git push` |
 
-**Total: ~42–48 min/day**
+**Total: ~55–65 min/day**
 
 ---
 
@@ -48,14 +51,15 @@ Automatically:
 1. Archives yesterday's queue → `output/archive/YYYY-MM-DD/`
 2. Tracks today's output count (Phase 0 gate)
 3. Generates 10 image prompts → `output/prompts/prompts-YYYY-MM-DD.md`
-4. Generates story idea → `output/stories/`
-5. Generates ASMR brief → `output/asmr/` (rotation: coloring → maze → coloring → wordsearch → dotdot → maze)
-6. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
-7. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
+4. Generates story idea → `output/stories/` (intelligence: trends + hooks + themes + virality contract)
+5. **Generates Story Reel V2** → Imagen images + Remotion render → `output/videos/StoryReelV2-*.mp4` (skip with `--no-story-reel`)
+6. Generates ASMR brief → `output/asmr/` (rotation: coloring → maze → coloring → wordsearch → dotdot → maze)
+7. Generates challenge brief → `output/challenge/`
+8. **Generates animal facts brief** → `output/longform/animal/` (intelligence: all 9 config files + virality contract) (skip with `--no-animal-brief`)
+9. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
+10. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
 
-> **Note:** Challenge brief is NOT auto-generated yet — run `npm run brief:challenge` manually, or see TASK-OC-005.
-
-**Check:** Open `output/prompts/prompts-YYYY-MM-DD.md`
+**Check:** Open `output/prompts/prompts-YYYY-MM-DD.md` · Check `output/videos/` for new Story Reel V2 · Check `output/longform/animal/` for new animal brief
 
 **Series days:** Mon = Maze Monday · Wed = Puzzle Power Wednesday · Fri = Fine Motor Friday (auto-injected into prompts)
 
@@ -116,11 +120,34 @@ Naming: `fact-dinosaurs.png`, `challenge-ocean.png`, `quiet-rainy-day.png`, etc.
 > `puzzle.png` and `blank.png` can be the same image — generate once, copy + rename.
 > Without `blank.png` + `solved.png`, the solve phase shows a static image (still valid for posting).
 
-### 2E — Story Slides (7, optional)
+### 2E — Story Slides (7, optional — longform only)
 
 1. Open `output/stories/epNN-[title]/image-prompts.md`
 2. Generate each slide in Gemini (same chat)
 3. Save as `01.png` through `07.png` in the story folder
+
+> **Story Reel V2 images are auto-generated** by `npm run daily` via Imagen (5 slides only, from `reel-image-prompts.md`). Only do 2E if you need the full longform story video.
+
+### 2F — Animal Song Short: 6 Images
+
+> Done after Step 1 generates today's animal brief. The brief in `output/longform/animal/[folder]/brief.md` has the 6 Gemini prompts.
+
+1. Open `output/longform/animal/[folder]/brief.md`
+2. Generate all 6 images **in the same Gemini chat** for art-style consistency
+3. Save to the episode folder:
+
+| File | What |
+|------|------|
+| `namereveal.png` | Mystery reveal image + animal name styled text |
+| `fact1.png` | Scene for Fact 1 |
+| `fact2.png` | Scene for Fact 2 |
+| `fact3.png` | Scene for Fact 3 |
+| `fact4.png` | Scene for Fact 4 |
+| `fact5.png` | Scene for Fact 5 |
+
+4. Also drop Suno audio into the same folder:
+   - `background.mp3` — ambient loop (30–60s)
+   - `sung-recap.mp3` — sung facts recap (20–35s)
 
 ### Carousel Days
 
@@ -209,7 +236,47 @@ npm run animate:challenge:dry -- --challenge output/challenge/[folder]/
 
 ---
 
-## STEP 4 — Story Video (optional, 1 min)
+## STEP 3C — Story Reel V2 (auto — review + post)
+
+Story Reel V2 is **automatically rendered** by `npm run daily` (Step 1). Nothing to run.
+
+**To review:** Check `output/videos/` for `StoryReelV2-*.mp4` + thumbnail.
+
+**To regenerate manually** (e.g. after changing images):
+```bash
+npm run generate:story:reel-images -- --story output/stories/epNN-[title]
+node scripts/render-video.mjs --comp StoryReelV2 --story output/stories/epNN-[title]
+```
+
+**To force-regenerate images** (overwrites existing):
+```bash
+npm run generate:story:reel-images -- --story output/stories/epNN-[title] --force
+```
+
+---
+
+## STEP 3D — Animal Song Short (3 min, after 2F)
+
+> Requires all 6 images + both Suno audio files to be in the episode folder first (Step 2F).
+
+```bash
+# 1. Generate all narration files (hook, name reveal, facts, outro CTA short)
+npm run longform:animal:narrate -- --episode output/longform/animal/[folder]
+
+# 2. Render the song short
+node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/[folder]
+```
+
+Output: `output/videos/AnimalFactsSongShort-*.mp4` + thumbnail
+
+**Dry-run first** to confirm assets resolve:
+```bash
+node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/[folder] --dry-run --verbose
+```
+
+---
+
+## STEP 4 — Story Video (optional longform, 1 min)
 
 ```bash
 npm run generate:story:remotion -- --story epNN-[title]
@@ -376,6 +443,12 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | Challenge audio is silent | Run dry-run — look for `[sfx] not found` warnings; check file names match exactly |
 | Challenge: no path drawn in solve | `extract:path` not run yet, or `blank.png` missing |
 | Challenge: no word highlights in solve | `extract:wordsearch` not run yet, or `solved.png` has low-contrast highlights |
+| Story Reel V2 not rendered after Step 1 | Check scheduler log — Imagen may have failed. Run manually: `npm run generate:story:reel-images -- --story <folder>` |
+| Story Reel V2: images look identical | Use `--force` to regenerate; check `reel-image-prompts.md` prompts are ≥40 words |
+| Story Reel V2: missing image error | Reel-image-prompts.md prompts matched wrong slide numbers — check `reelSlideOrder` in `story.json` |
+| Animal Song Short: narration dry-run OK but render fails | Confirm `narration-hook.mp3`, `narration-namereveal.mp3`, `narration-outro-cta-short.mp3` exist in episode folder |
+| Animal Song Short: song recap too short / wrong length | Re-run narration script — it probes `sung-recap.mp3` and writes `sungRecapShortDurationSec` to `episode.json` |
+| Animal Song Short: outro CTA audio missing | Narration script generates `narration-outro-cta-short.mp3` automatically — re-run `npm run longform:animal:narrate` |
 | Story video not generating | Confirm `01.png` through `07.png` all exist in the story folder |
 | Intelligence pools empty | Run `npm run intelligence:full` |
 | YouTube token expired | `node scripts/get-youtube-token.mjs` |
@@ -389,12 +462,21 @@ npm run brief:asmr                          # Extra ASMR brief (auto-rotates typ
 npm run brief:asmr:coloring / :maze / :wordsearch / :dotdot
 npm run brief:challenge
 npm run brief:challenge -- --type word-search
-npm run generate:story:idea
+npm run generate:story:idea                 # Generate story idea only (no reel images)
+npm run generate:story:reel-images:dry -- --story output/stories/epNN-slug   # Dry-run reel image gen
+npm run generate:story:reel-images -- --story output/stories/epNN-slug        # Generate reel images
+npm run longform:animal:plan:save           # Generate animal facts brief (new episode)
+npm run longform:animal:narrate -- --episode output/longform/animal/epNN-slug # Generate narration
+node scripts/render-video.mjs --comp StoryReelV2 --story output/stories/epNN-slug          # Render story reel
+node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/epNN-slug  # Render animal song short
 npm run x:generate
 npm run analytics
 npm run scorecard
 npm run health-check
-npm run remotion:studio                     # Visual preview + scrubbing\nnpm run generate:longform                   # Plan long-form episode (episode.json)\nnpm run render:longform -- --episode ep01-slug  # Render ~8min video\nnpm run render:longform:dry -- --episode ep01-slug  # Dry-run (check props only)
+npm run remotion:studio                     # Visual preview + scrubbing
+npm run generate:longform                   # Plan long-form episode (episode.json)
+npm run render:longform -- --episode ep01-slug   # Render ~8min longform video
+npm run render:longform:dry -- --episode ep01-slug  # Dry-run (check props only)
 ```
 
 ---
@@ -429,12 +511,14 @@ MONDAY AUTOMATIC (npm run daily + GitHub Actions):
     config/pattern-interrupt-dynamic.json
     config/x-post-topics-dynamic.json
 
-DAILY (generate-prompts.mjs reads all of the above):
-  themes     ← trending themes + analytics ranking
-  hooks      ← hooks-library top performers
-  facts      ← pattern-interrupt-dynamic
-  carousel   ← analytics activityRanking
-  series tag ← Mon/Wed/Fri names
+DAILY (all 4 reel lanes run through intelligence):
+  Image prompts  ← generate-prompts.mjs (themes + hooks + pattern-interrupts + series tag)
+  Story Reel V2  ← generate-story-ideas.mjs (trends + perf-weights + competitor + hooks + virality)
+                 → generate-story-reel-images.mjs (Imagen) → render-video.mjs StoryReelV2
+  Animal Song    ← generate-animal-facts-brief.mjs (all 9 config files + virality)
+                 → [manual: Gemini images + Suno audio] → narrate → render AnimalFactsSongShort
+  ASMR           ← generate-asmr-brief.mjs (hooks + competitor + virality)
+  Challenge      ← generate-challenge-brief.mjs (trends + perf-weights + psych-trigger + virality)
 
 POSTED CONTENT → collect-analytics.mjs (next Monday) → feeds back into rankings
 ```
@@ -453,8 +537,8 @@ POSTED CONTENT → collect-analytics.mjs (next Monday) → feeds back into ranki
 
 | Layer | What | Needs PC? |
 |-------|------|-----------|
-| Local — you | Generate + import + caption | Yes |
-| Local — npm run daily | 9 AM: prompts + briefs + tracking | Yes (at 9 AM) |
+| Local — you | Generate + import + caption + animal song short | Yes |
+| Local — npm run daily | 9 AM: prompts + all 4 briefs + Story Reel V2 render + tracking | Yes (at 9 AM) |
 | GitHub Actions — hourly | X text post drip | No |
 | GitHub Actions — 4 AM Cairo | Post all pending media | No |
 | GitHub Actions — Monday 7 AM | Token refresh + intelligence | No |

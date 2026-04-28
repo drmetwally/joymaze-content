@@ -45,13 +45,17 @@ const resolveEpisodeAsset = (episodeFolder, relativePath) => {
 };
 
 const secToFrames = (sec, fallbackSec) => Math.round((sec || fallbackSec) * FPS);
+const positiveSec = (value, fallbackSec) => {
+  const sec = Number(value);
+  return Number.isFinite(sec) && sec > 0 ? sec : fallbackSec;
+};
 
 export const AnimalFactsSongShort = ({
   episodeFolder = '',
   episode = {},
 }) => {
   const hookFrames = secToFrames(Math.min(Math.max(episode.hookNarrationDurationSec || 4, 3), 5), 4);
-  const sungRecapFrames = secToFrames(Math.min(Math.max(episode.sungRecapShortDurationSec || 17, 16), 18), 17);
+  const sungRecapFrames = secToFrames(positiveSec(episode.sungRecapShortDurationSec, 17), 17);
   const outroFrames = secToFrames(Math.min(Math.max(episode.outroCtaShortDurationSec || 4, 3), 4), 4);
 
   return (

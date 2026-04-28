@@ -6,22 +6,33 @@
  * Runs the automated morning workflow at 9:00 AM:
  *   1. Archive yesterday's queue (archive-queue.mjs)
  *   2. Generate today's image prompts (generate-prompts.mjs --save)
- *   3. Generate today's story idea (generate-story-ideas.mjs) [--with-story]
- *   4. Generate today's ASMR brief (generate-asmr-brief.mjs) [--with-asmr]
- *   5. Generate today's X text posts (generate-x-posts.mjs)
- *   6. Collect + report analytics [--with-analytics, or auto every 3 days]
- *   7. Auto-post any captioned items in queue to all live platforms
+ *   3. Generate today's story idea (generate-story-ideas.mjs) [--no-story to skip]
+ *   4. Generate Story Reel V2: Imagen images + Remotion render [--no-story-reel to skip]
+ *   5. Generate today's ASMR brief (generate-asmr-brief.mjs) [--no-asmr to skip]
+ *   6. Generate today's challenge brief (generate-challenge-brief.mjs) [--no-challenge to skip]
+ *   7. Generate animal facts brief (generate-animal-facts-brief.mjs) [--no-animal-brief to skip]
+ *   8. Generate today's X text posts (generate-x-posts.mjs)
+ *   9. Collect + report analytics [--with-analytics, or auto every 3 days]
+ *
+ * Intelligence wiring (both reel lanes):
+ *   Story Reel V2 — generate-story-ideas.mjs loads: trends, perf-weights, competitor-intel,
+ *     hooks-library, theme-pool-dynamic, virality contract (story_reel_v2 block)
+ *   Animal Song Short — generate-animal-facts-brief.mjs loads: writing-style + all 9 config
+ *     files (trends, competitor, hooks, themes, perf-weights, psych-triggers,
+ *     content-intelligence, pattern-interrupts, virality contract animal_song_short block)
  *
  * By the time you open your computer:
  *   - output/prompts/ has today's image prompts ready
+ *   - output/videos/ has a new Story Reel V2 mp4 + thumbnail
+ *   - output/longform/animal/ has a new brief ready for Gemini images + Suno audio
  *   - output/queue/x-text-YYYY-MM-DD.json has 8 text posts queued with hourly schedule
- *   - Any backlogged queue items are already live on all platforms
  *
  * Usage:
  *   node scripts/daily-scheduler.mjs                  # Start scheduler (runs at 9:00 AM daily)
  *   node scripts/daily-scheduler.mjs --now             # Run immediately (test/manual trigger)
- *   node scripts/daily-scheduler.mjs --with-story      # Also generate a story idea
  *   node scripts/daily-scheduler.mjs --with-analytics  # Force analytics run today
+ *   node scripts/daily-scheduler.mjs --no-story-reel   # Skip reel image gen + render
+ *   node scripts/daily-scheduler.mjs --no-animal-brief # Skip animal facts brief
  *
  * To run as a persistent background process:
  *   Windows: Use Task Scheduler to run this script at login
@@ -40,11 +51,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
 const args = process.argv.slice(2);
-const RUN_NOW           = args.includes('--now');
-const WITH_STORY        = !args.includes('--no-story');      // runs by default; skip with --no-story
-const WITH_ASMR_BRIEF   = !args.includes('--no-asmr');       // runs by default; skip with --no-asmr
-const WITH_CHALLENGE    = !args.includes('--no-challenge');  // runs by default; skip with --no-challenge
-const WITH_ANALYTICS    = args.includes('--with-analytics');
+const RUN_NOW            = args.includes('--now');
+const WITH_STORY         = !args.includes('--no-story');         // default on; skip with --no-story
+const WITH_STORY_REEL    = !args.includes('--no-story-reel');    // default on; skip with --no-story-reel
+const WITH_ASMR_BRIEF    = !args.includes('--no-asmr');          // default on; skip with --no-asmr
+const WITH_CHALLENGE     = !args.includes('--no-challenge');     // default on; skip with --no-challenge
+const WITH_ANIMAL_BRIEF  = !args.includes('--no-animal-brief');  // default on; skip with --no-animal-brief
+const WITH_ANALYTICS     = args.includes('--with-analytics');
 
 const ANALYTICS_EVERY_N_DAYS = 3;  // Run analytics automatically every 3 days
 const STATE_FILE = path.join(ROOT, 'output', 'scheduler-state.json');
@@ -82,6 +95,28 @@ async function saveState(updates) {
 function daysSince(isoDateStr) {
   if (!isoDateStr) return Infinity;
   return (Date.now() - new Date(isoDateStr).getTime()) / 86_400_000;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function getLatestStoryFolder() {
+  const storiesDir = path.join(ROOT, 'output', 'stories');
+  try {
+    const entries = await fs.readdir(storiesDir, { withFileTypes: true });
+    const dirs = entries.filter(e => e.isDirectory() && /^ep\d+/.test(e.name));
+    if (dirs.length === 0) return null;
+    const withMtime = await Promise.all(
+      dirs.map(async d => {
+        const full = path.join(storiesDir, d.name);
+        const stat = await fs.stat(full).catch(() => null);
+        return stat ? { full, mtime: stat.mtimeMs } : null;
+      })
+    );
+    const sorted = withMtime.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
+    return sorted[0]?.full ?? null;
+  } catch {
+    return null;
+  }
 }
 
 // ── Script runner ─────────────────────────────────────────────────────────────
@@ -129,9 +164,11 @@ async function runDailyJob() {
   let stepNum = 0;
   const isMonday = new Date().getDay() === 1;
   const totalSteps = 3  // archive + prompts + x-text-posts (always run)
-    + (WITH_STORY      ? 1 : 0)
-    + (WITH_ASMR_BRIEF ? 1 : 0)
-    + (WITH_CHALLENGE  ? 1 : 0)
+    + (WITH_STORY                    ? 1 : 0)
+    + (WITH_STORY && WITH_STORY_REEL ? 1 : 0)
+    + (WITH_ASMR_BRIEF               ? 1 : 0)
+    + (WITH_CHALLENGE                ? 1 : 0)
+    + (WITH_ANIMAL_BRIEF             ? 1 : 0)
     + (WITH_ANALYTICS || daysSince(state.lastAnalyticsRun) >= ANALYTICS_EVERY_N_DAYS ? 1 : 0)
     + (isMonday ? 3 : 0);  // pinterest token refresh + intelligence-refresh + apply-intelligence
   // Posting is excluded from this job — handled by hourly Task Scheduler
@@ -216,6 +253,33 @@ async function runDailyJob() {
     }
   }
 
+  // Story Reel V2 — generate 5 Imagen images then render (runs if story step is enabled)
+  // Intelligence feeds in via generate-story-ideas.mjs (trends, hooks, themes, virality contract)
+  if (WITH_STORY && WITH_STORY_REEL) {
+    const storyFolder = await getLatestStoryFolder();
+    if (storyFolder) {
+      stepNum++;
+      log(`Step ${stepNum}/${totalSteps}: Generating Story Reel V2 (Imagen → Remotion)...`);
+      log(`  Story: ${path.relative(ROOT, storyFolder)}`);
+      const reelImagesOk = await runScript('generate-story-reel-images.mjs', ['--story', storyFolder], 180_000);
+      if (reelImagesOk) {
+        const reelRenderOk = await runScript('render-video.mjs', ['--comp', 'StoryReelV2', '--story', storyFolder], 180_000);
+        if (reelRenderOk) {
+          log('Story Reel V2 rendered → output/videos/');
+          await appendLog('Story Reel V2 render OK');
+        } else {
+          log('Story Reel V2 render failed — run manually: node scripts/render-video.mjs --comp StoryReelV2 --story ' + path.relative(ROOT, storyFolder));
+          await appendLog('Story Reel V2 render FAILED');
+        }
+      } else {
+        log('Story Reel V2 image gen failed — run manually: npm run generate:story:reel-images -- --story ' + path.relative(ROOT, storyFolder));
+        await appendLog('Story Reel V2 image gen FAILED');
+      }
+    } else {
+      log('Story Reel V2: no story folder found — skipping');
+    }
+  }
+
   // Step 4: Generate ASMR brief (default on; skip with --no-asmr)
   if (WITH_ASMR_BRIEF) {
     stepNum++;
@@ -241,6 +305,24 @@ async function runDailyJob() {
     } else {
       log('Challenge brief failed — run manually: npm run brief:challenge');
       await appendLog('Challenge brief FAILED');
+    }
+  }
+
+  // Animal Facts Song Short brief (default on; skip with --no-animal-brief)
+  // Intelligence: generate-animal-facts-brief.mjs loads all 9 config files (trends, competitor,
+  // hooks, themes, perf-weights, psych-triggers, content-intelligence, pattern-interrupts, virality)
+  if (WITH_ANIMAL_BRIEF) {
+    stepNum++;
+    log(`Step ${stepNum}/${totalSteps}: Generating animal facts brief for next song short...`);
+    const animalBriefOk = await runScript('generate-animal-facts-brief.mjs', ['--save'], 120_000);
+    if (animalBriefOk) {
+      log('Animal brief ready in output/longform/animal/ — drop 6 Gemini images + Suno audio, then:');
+      log('  npm run longform:animal:narrate -- --episode <folder>');
+      log('  node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode <folder>');
+      await appendLog('Animal facts brief generated OK');
+    } else {
+      log('Animal brief failed — run manually: npm run longform:animal:plan:save');
+      await appendLog('Animal facts brief FAILED');
     }
   }
 
@@ -296,6 +378,11 @@ async function runDailyJob() {
   log('  4. npm run generate:captions     ← generates captions for all platforms');
   log('  5. Hourly Task Scheduler posts them automatically throughout the day');
   log('  X text posts: dripped hourly via post-x-scheduled.mjs (already running)');
+  log('  Story Reel V2: check output/videos/ — new reel already rendered, review + post');
+  log('  Animal Song Short: check output/longform/animal/ for today\'s brief');
+  log('    → generate 6 Gemini images (namereveal.png, fact1-5.png) + Suno audio (background.mp3, sung-recap.mp3)');
+  log('    → npm run longform:animal:narrate -- --episode <folder>');
+  log('    → node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode <folder>');
   await appendLog('Daily job complete');
 }
 
@@ -331,8 +418,10 @@ if (RUN_NOW) {
   log('JoyMaze Daily Scheduler started.');
   log('Job 1 — 4:00 AM Cairo  : No-op (posting now handled by hourly Task Scheduler runner)');
   log('Job 2 — 9:00 AM Riyadh : Generate prompts, ASMR brief, X posts, analytics');
-  log(`ASMR brief:   ${WITH_ASMR_BRIEF ? 'ON  (skip with --no-asmr)'  : 'OFF (--no-asmr)'}`);
-  log(`Analytics:    auto every ${ANALYTICS_EVERY_N_DAYS} days${WITH_ANALYTICS ? ' + forced today (--with-analytics)' : ''}`);
+  log(`Story Reel V2: ${WITH_STORY && WITH_STORY_REEL ? 'ON  (Imagen images + Remotion render)' : 'OFF'}`);
+  log(`ASMR brief:    ${WITH_ASMR_BRIEF   ? 'ON  (skip with --no-asmr)'         : 'OFF (--no-asmr)'}`);
+  log(`Animal brief:  ${WITH_ANIMAL_BRIEF ? 'ON  (skip with --no-animal-brief)'  : 'OFF (--no-animal-brief)'}`);
+  log(`Analytics:     auto every ${ANALYTICS_EVERY_N_DAYS} days${WITH_ANALYTICS ? ' + forced today (--with-analytics)' : ''}`);
   log('');
   log('POSTING: Handled by hourly Task Scheduler jobs (set up separately):');
   log('  Creative posts: node scripts/post-content.mjs --scheduled --limit 2  (every hour)');

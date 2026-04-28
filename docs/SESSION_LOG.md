@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-04-28 — [Agent: Claude] — Wire Story Reel V2 + Animal Song Short into daily scheduler
+
+**Files changed:** `scripts/daily-scheduler.mjs`, `docs/TASKS.md`
+
+**Story Reel V2 lane (fully automated):** After `generate-story-ideas.mjs --save`, scheduler now: (1) finds latest story folder via `getLatestStoryFolder()`, (2) runs `generate-story-reel-images.mjs --story <folder>` using Imagen/VERTEX_API_KEY for the 5 reel-cut slides, (3) renders `StoryReelV2` via `render-video.mjs`. Skips existing images. Flag: `--no-story-reel` to skip.
+
+**Animal Song Short lane (brief-only automated):** New step runs `generate-animal-facts-brief.mjs --save` so a new episode brief is ready each morning. Render remains manual (requires Gemini images + Suno audio drops → narration → render). Flag: `--no-animal-brief` to skip.
+
+**Intelligence wiring confirmed:** Story lane inherits generate-story-ideas.mjs intelligence (trends, perf-weights, competitor, hooks, themes, virality story_reel_v2 block). Animal lane inherits generate-animal-facts-brief.mjs full 9-config stack (includes psych-triggers, content-intelligence, pattern-interrupts, virality animal_song_short block).
+
+**Step count:** 8 steps non-Monday, 11 steps Monday. Syntax verified.
+
+---
+
+## 2026-04-28 — [Agent: Claude] — Full REELS backlog audit + maze challenge render test
+
+**Audits stamped APPROVED (13 entries):** AUDIT-RESOLVE-001, OC-001, OC-002, OC-003, OC-003-FOLLOWUP, HANDOFF-COMMITS-001, OC-004, ROADMAP-REELS-001 (prior-session approvals logged), REELS-001 through REELS-004 (9/10 each), REELS-006 (9/10). REELS-005 + REELS-005-FOLLOWUP already stamped. All AGENT_LOG entries updated in-place.
+
+**hookQuestion finding:** Already fully implemented in REELS-002. `generate-story-ideas.mjs` line 315 has it in the Groq schema; line 438 has the user prompt instruction; `saveStory()` persists it. No code changes needed.
+
+**Challenge reel animated solve-reveal:** Created `activity.json` for maze test folder. Dry-run confirmed: blank.png + solved.png + path.json (400 waypoints) all auto-resolved by OC-004 props wiring. Full render completed: `ActivityChallenge-1777406858199.mp4` (1500 frames, 50.0s @ 30fps). Animated maze solve fully working end-to-end.
+
+**Next:** Wire Story Reel V2 + Animal Facts Song Short into `daily-scheduler.mjs` (both audits approved, only scheduler wiring remains).
+
+---
+
 ## 2026-04-22 — [Agent: OpenClaw] — Hedgehog accepted as Track B baseline
 
 **Outcome:** Ahmed passed the latest hedgehog render after the quieter mix pass. Current state is treated as the new animal-facts baseline, roughly 8/10 overall, with transitions and the sung recap called out as standout strengths.
@@ -2230,3 +2256,16 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 **Why it matters:** Future short-form prompt tuning can now happen through one shared repo contract instead of relying on session memory or drifting per-script edits.
 
 **Next:** Claude audit the virality-pass commit, then either extend the shared contract to more generators or keep it scoped to the four active short-form lanes.
+
+---
+
+## 2026-04-28 — [Claude] — REELS-005-FOLLOWUP audited and approved
+
+**What was done:**
+- Audited REELS-005-FOLLOWUP (Codex fix: probe `sung-recap.mp3` → persist `sungRecapShortDurationSec` to episode.json). All three audit questions confirmed: duration is now fully audio-driven (clamp removed), narration script is the right persistence seam, composition and renderer logic are in sync. Live validation by OpenClaw confirmed 29.7s recap → 1206 frames / 40.2s render.
+- Stamped REELS-005-FOLLOWUP-AUDIT and REELS-005-FOLLOWUP-VALIDATION as APPROVED (9/10) in AGENT_LOG.
+- Forward note logged: stale `sungRecapShortDurationSec` possible if `sung-recap.mp3` replaced without re-running narration — acceptable trade-off.
+
+**Audit backlog pending (not yet reviewed this session):** REELS-001 through REELS-004 (Story Reel V2 + Animal Song Short compositions), REELS-006 (virality contract), plus the OC-001/002/003 chain from 2026-04-27.
+
+**Next:** Audit REELS-001 through REELS-006 to close the review backlog, then wire Story Reel V2 + Animal Song Short into `daily-scheduler.mjs`. Challenge reel animated solve-reveal needs blank.png + solved.png content assets — content task, not code.

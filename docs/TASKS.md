@@ -56,18 +56,19 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
 ## NEXT SESSION — START HERE (2026-04-24)
 
-- [~] **Puzzle Challenge Reel video testing** — first task tomorrow. Watch and review the two 2026-04-23 validation renders before more coding:
-  - `output/videos/2026-04-23-activity-maze-archive-test-yt-short.mp4`
-  - `output/videos/2026-04-23-activity-word-search-archive-test-yt-short.mp4`
+- [x] **Puzzle Challenge Reel video testing** — animated solve-reveal end-to-end tested 2026-04-28. Created `activity.json` for maze test folder; dry-run confirmed blank.png + solved.png + 400-waypoint path.json all auto-resolved; full render completed: `ActivityChallenge-1777406858199.mp4` (1500 frames, 50.0s @ 30fps). Animated maze solve fully working.
 - [ ] **Tune Puzzle Challenge Reel based on render review** — likely focus areas: title size/weight, countdown prominence, transition cue feel, audio balance, and per-type pacing.
 - [ ] **True word-search solve validation** — run once a sample exists with real `solved.png` and `wordsearch.json` so the solve phase can be fully tested, not just fallback static solve.
 
 ## NEXT SESSION — REELS POLISH SPRINT (2026-04-28)
 
 - [x] **TASK-OC-005 — Daily scheduler challenge brief parity** — add the missing challenge-brief block to `scripts/daily-scheduler.mjs` using `generate-challenge-brief.mjs`, and update `totalSteps` so scheduler behavior matches the existing `npm run daily` chain. DONE 2026-04-28.
-- [ ] **Story Reel V2** — build a dedicated short-form story composition that inherits the longform story grammar (flash-forward hook, stronger caption style, better scene motion, cleaner ending) instead of continuing to treat legacy `StoryEpisode.jsx` as the primary reel format.
-- [ ] **Animal Facts Song Short** — build a dedicated vertical short based on the longform animal rules, with the song / sung-recap energy as the main structure rather than cutting down the existing longform episode.
-- [ ] **Daily automation follow-up after reel builds pass review** — once Story Reel V2 and Animal Facts Song Short are rendering cleanly, add their planning/generation steps into `scripts/daily-scheduler.mjs` / `npm run daily` so the short-form stack can consistently cover ASMR + Challenge + Story + Animal reels.
+- [~] **Story Reel V2** — REELS-001 through REELS-006 audits APPROVED 2026-04-28. `StoryReelV2.jsx` live, `reel-image-prompts.md` emitted, 5-beat slide cut validated with snail preview. Pending: wire into `daily-scheduler.mjs` (see "Daily automation follow-up" task below).
+- [~] **Animal Facts Song Short** — REELS-001 + REELS-005-FOLLOWUP audits APPROVED 2026-04-28. `AnimalFactsSongShort.jsx` live, real sung-recap duration probed and persisted. Pending: wire into `daily-scheduler.mjs` (see "Daily automation follow-up" task below).
+- [x] **Daily automation follow-up after reel builds pass review** — DONE 2026-04-28. Both lanes wired into `daily-scheduler.mjs`:
+  - Story Reel V2: `generate-story-reel-images.mjs` → `render-video.mjs --comp StoryReelV2` fires after story idea step (WITH_STORY_REEL flag, default on)
+  - Animal Song Short: `generate-animal-facts-brief.mjs --save` fires as a dedicated step (WITH_ANIMAL_BRIEF flag, default on); render is manual after Gemini images + Suno audio drops
+  - totalSteps updated (8 steps non-Monday, 11 Monday); both lanes wired to full intelligence apparatus
 
 ## PHASE 0 — PIPELINE STABILIZATION
 

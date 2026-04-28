@@ -64,6 +64,8 @@ const SEGMENTS = [
   { key: 'outroCtaShort', label: 'OUTRO CTA SHORT',  file: 'narration-outro-cta-short.mp3',  isOutroCtaShort: true, speed: 1.14 },
 ];
 
+const SUNG_RECAP_FILE = 'sung-recap.mp3';
+
 function resolveEpisodeDir(arg) {
   if (path.isAbsolute(arg) || arg.startsWith('output/') || arg.startsWith('output\\') || arg.includes(':\\')) {
     return path.resolve(ROOT, arg);
@@ -88,6 +90,10 @@ async function getAudioDuration(p) {
     const meta = await parseAudioFile(p);
     return meta.format.duration ?? 0;
   } catch { return 0; }
+}
+
+function roundDurationSec(sec) {
+  return Math.round(sec * 10) / 10;
 }
 
 function buildIntelligenceContext(intel) {
@@ -254,6 +260,23 @@ async function main() {
 
   let episodeDirty = false;
 
+  const sungRecapPath = path.join(episodeDir, SUNG_RECAP_FILE);
+  if (await fileExists(sungRecapPath)) {
+    const sungRecapDuration = await getAudioDuration(sungRecapPath);
+    if (sungRecapDuration > 0) {
+      const roundedDuration = roundDurationSec(sungRecapDuration);
+      if (episode.sungRecapShortDurationSec !== roundedDuration) {
+        if (!DRY_RUN) {
+          episode.sungRecapShortDurationSec = roundedDuration;
+          episodeDirty = true;
+        }
+        console.log(`  Sung recap: ${SUNG_RECAP_FILE} → ${roundedDuration}s${DRY_RUN ? ' (would update episode.json)' : ''}`);
+      } else {
+        console.log(`  Sung recap: ${SUNG_RECAP_FILE} → ${roundedDuration}s`);
+      }
+    }
+  }
+
   for (const segDef of SEGMENTS) {
     const isHook          = segDef.isHook === true;
     const isNameReveal    = segDef.isNameReveal === true;
@@ -276,19 +299,19 @@ async function main() {
       } else if (isOutroCta && !episode.outroCtaDurationSec && !DRY_RUN) {
         const dur = await getAudioDuration(outputPath);
         if (dur > 0) {
-          episode.outroCtaDurationSec = Math.round((dur + 2.0) * 10) / 10;
+          episode.outroCtaDurationSec = roundDurationSec(dur + 2.0);
           episodeDirty = true;
         }
       } else if (isOutroCtaShort && !episode.outroCtaShortDurationSec && !DRY_RUN) {
         const dur = await getAudioDuration(outputPath);
         if (dur > 0) {
-          episode.outroCtaShortDurationSec = Math.round((dur + 0.8) * 10) / 10;
+          episode.outroCtaShortDurationSec = roundDurationSec(dur + 0.8);
           episodeDirty = true;
         }
       } else if (!isHook && !isNameReveal && !isOutroCta && !isOutroCtaShort && !segment.durationSec && !DRY_RUN) {
         const dur = await getAudioDuration(outputPath);
         if (dur > 0) {
-          segment.durationSec = Math.max(7.0, Math.round((dur + 2.5) * 10) / 10);
+          segment.durationSec = Math.max(7.0, roundDurationSec(dur + 2.5));
           episodeDirty = true;
         }
       }
@@ -347,23 +370,23 @@ async function main() {
     if (isHook) {
       episode.hookNarration     = narrationCopy;
       episode.hookNarrationFile = segDef.file;
-      if (dur > 0) episode.hookNarrationDurationSec = Math.round((dur + 1.5) * 10) / 10;
+      if (dur > 0) episode.hookNarrationDurationSec = roundDurationSec(dur + 1.5);
     } else if (isNameReveal) {
       episode.nameRevealNarration     = narrationCopy;
       episode.nameRevealNarrationFile = segDef.file;
     } else if (isOutroCta) {
       episode.outroCta     = narrationCopy;
       episode.outroCtaFile = segDef.file;
-      if (dur > 0) episode.outroCtaDurationSec = Math.round((dur + 2.0) * 10) / 10;
+      if (dur > 0) episode.outroCtaDurationSec = roundDurationSec(dur + 2.0);
     } else if (isOutroCtaShort) {
       episode.outroCtaShort = narrationCopy;
       episode.outroCtaShortFile = segDef.file;
-      if (dur > 0) episode.outroCtaShortDurationSec = Math.round((dur + 0.8) * 10) / 10;
+      if (dur > 0) episode.outroCtaShortDurationSec = roundDurationSec(dur + 0.8);
     } else {
       segment.narration     = narrationCopy;
       segment.narrationFile = segDef.file;
       if (dur > 0) {
-        segment.durationSec = Math.round((dur + 1.5) * 10) / 10;
+        segment.durationSec = roundDurationSec(dur + 1.5);
       }
     }
     episodeDirty = true;
