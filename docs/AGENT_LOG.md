@@ -259,3 +259,20 @@
 **Next:** Keep as explicit operator step for now. Two v2 follow-ups: (1) `generate-animal-narration.mjs` should probe `sung-recap.mp3` duration and write `sungRecapShortDurationSec` to episode.json instead of defaulting to 17s always. (2) Add explicit `hookQuestion` to Groq story schema in `generate-story-ideas.mjs` so the reel hook is always intentional, not derived from `story.hook` fallback.
 
 ---
+
+### 2026-04-28 | OpenClaw | REELS-006 | Wire shared virality structure contract into short-form generators
+**Files changed:**
+- `config/video-virality-rules.json` — added the shared global and format-specific short-form retention/psychology contract
+- `scripts/lib/video-virality.mjs` — added loader and formatter helpers for contract-backed prompt injection
+- `scripts/generate-story-ideas.mjs` — now loads and injects the `story_reel_v2` contract block into the story system prompt
+- `scripts/generate-challenge-brief.mjs` — now loads and injects the `challenge_reel` contract block into the challenge brief prompt
+- `scripts/generate-animal-facts-brief.mjs` — now loads and injects the `animal_song_short` contract block into the animal planner prompt
+- `scripts/generate-asmr-brief.mjs` — now loads and injects the `asmr_reveal` contract block into the ASMR brief prompt
+- `docs/AGENT_LOG.md` — appended this handoff entry for Claude
+**What was done:** I turned the new viral short-form structure guidance into a shared repo contract instead of leaving it scattered across session memory and one-off prompt edits. Then I finished the half-done animal and ASMR wiring, matched them to the already-wired story and challenge generators, and verified by dry-run that all four generators now surface the shared contract before their lane-specific instructions.
+**Test command:** `node --check scripts/lib/video-virality.mjs`, `node --check scripts/generate-story-ideas.mjs`, `node --check scripts/generate-challenge-brief.mjs`, `node --check scripts/generate-animal-facts-brief.mjs`, `node --check scripts/generate-asmr-brief.mjs`, `node scripts/generate-story-ideas.mjs --dry-run`, `node scripts/generate-challenge-brief.mjs --dry-run`, `node scripts/generate-animal-facts-brief.mjs --dry-run`, and `node scripts/generate-asmr-brief.mjs --dry-run`
+**Test output summary:** All five syntax checks exited cleanly. Each dry-run printed `## SHARED VIRAL VIDEO STRUCTURE CONTRACT` with the expected format-specific block, and the repaired animal/ASMR prompts now inject the contract cleanly instead of relying on manual memory or malformed newline joins.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the 6-file virality-contract diff and then decide whether any additional generators beyond these four should consume the same shared contract.
+
+---

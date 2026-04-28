@@ -130,8 +130,28 @@ First replace that lane with a stronger repeatable short-form unit: the **Puzzle
 
 ### Scheduler / daily automation note
 - `package.json` already includes `generate-challenge-brief.mjs --save` in `npm run daily`.
-- `scripts/daily-scheduler.mjs` does **not** yet mirror that challenge brief step, so scheduler parity is now a queued task: **TASK-OC-005**.
+- `scripts/daily-scheduler.mjs` did **not** mirror that challenge brief step when this note was first written; scheduler parity was later completed in **TASK-OC-005**.
 - After the new story reel and animal short formats are built and accepted, wire their planning/generation steps into the daily automation flow as a follow-up rather than guessing the integration path in advance.
+
+## 2.8 SHARED SHORT-FORM VIRALITY CONTRACT (LOCKED 2026-04-28)
+
+**Do not keep short-form retention rules only in session memory.**
+
+### Source of truth
+- Shared rules now live in `config/video-virality-rules.json`.
+- Prompt assembly helper lives in `scripts/lib/video-virality.mjs`.
+- The helper is the required seam for injecting global + format-specific video-structure rules into generators.
+
+### Current wired formats
+- `story_reel_v2` -> `scripts/generate-story-ideas.mjs`
+- `animal_song_short` -> `scripts/generate-animal-facts-brief.mjs`
+- `challenge_reel` -> `scripts/generate-challenge-brief.mjs`
+- `asmr_reveal` -> `scripts/generate-asmr-brief.mjs`
+
+### Usage rule
+- When changing short-form hook, retention, or payoff behavior, update the shared contract first, then let the generators consume it.
+- Keep trend, performance, and psychology inputs as separate layers; the virality contract is the structural layer that sits above them.
+- Prefer one shared edit over drifting lane-specific prompt tweaks unless a format truly needs an exception.
 
 ## 3. PLATFORM ACCOUNT STATUS (last updated: 2026-04-13)
 

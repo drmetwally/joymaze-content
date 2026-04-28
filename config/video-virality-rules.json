@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "version": 1,
+    "description": "Shared structural rules for JoyMaze short-form video generation. Use these as planning constraints before writing hooks, beats, image prompts, or CTA copy.",
+    "principle": "Structure and psychology outrank decoration. A video is strong only if the retention curve, emotional trigger, and payoff logic are obvious before any animation or art polish is added."
+  },
+  "global": {
+    "preflightQuestions": [
+      "What is the first-frame interrupt, and does it create an unresolved question in under 2 seconds?",
+      "What exact psychological trigger is dominant, and would a parent feel it even with the sound off?",
+      "Where does tension rise, and what changes every 2-4 seconds to prevent flat retention?",
+      "What payoff is withheld until late enough to sustain curiosity but early enough to feel rewarding?",
+      "What is the final action impulse: rewatch, comment, save, or loop, and is it earned by the structure rather than begged for?"
+    ],
+    "nonNegotiables": [
+      "Start with interruption, not explanation.",
+      "One dominant trigger per video. Secondary emotions can support it, but never compete with it.",
+      "No dead air, no neutral setup frames, no generic scene-setting before the hook.",
+      "Every segment must either escalate tension, sharpen recognition, or pay off withheld information.",
+      "Reward must feel bigger than the effort required to keep watching.",
+      "Use specific visual change, not abstract narration, to signal progress.",
+      "Avoid generic CTA language unless the lane explicitly needs one. Action impulse should usually be built into the format itself."
+    ],
+    "retentionRules": [
+      "First 0-2 seconds: interrupt or mystery, never explanation.",
+      "By 3-5 seconds: viewer understands the stakes or the challenge.",
+      "At least one noticeable pattern shift every 2-4 seconds: new beat, new visual state, new caption phrase, reveal step, timer pressure, or music/cadence change.",
+      "Midpoint must deepen, not merely continue.",
+      "Final 20-25% must deliver the strongest satisfaction, reveal, or identity payoff.",
+      "Endings should either loop cleanly, land on a screenshot-worthy echo, or trigger a native comment reflex."
+    ],
+    "visualRules": [
+      "The frame should communicate the trigger before text is read.",
+      "Show incomplete information for curiosity-driven formats; show visible progress for satisfaction-driven formats.",
+      "Keep composition legible on a phone at a glance; one focal idea per frame.",
+      "Motion should emphasize the psychological beat, not decorate it."
+    ],
+    "copyRules": [
+      "Hooks must be short, concrete, and open a loop.",
+      "Avoid filler, throat-clearing, and moralizing lines.",
+      "Use child-safe specificity instead of vague hype.",
+      "CTA copy, when used, must feel native to the lane: challenge lanes invite score/status; story lanes prefer emotional echo; loop-first lanes avoid bolted-on asks."
+    ]
+  },
+  "formats": {
+    "story_reel_v2": {
+      "goal": "Earn a rewatch/share by turning a tiny emotional story into a fast, legible 5-beat arc with a screenshot-worthy final echo.",
+      "dominantTrigger": "CURIOSITY_GAP leading into COMPLETION_SATISFACTION",
+      "requiredStructure": [
+        "Beat 1: unresolved flash-forward or high-tension image-question",
+        "Beat 2: concrete stakes, what is lost if the character fails",
+        "Beat 3: escalation or failed attempt that tightens the problem",
+        "Beat 4: transformation/payoff, the character's hidden strength resolves the tension",
+        "Beat 5: emotional echo, one line or image that makes the whole story feel bigger than the plot"
+      ],
+      "rules": [
+        "The hook question must be intentional, not generic.",
+        "Every selected slide should advance the emotional arc; no redundant bridge slides.",
+        "The last line must feel screenshot-worthy or share-worthy without needing explanation.",
+        "Parents should feel one adult-layer truth under the children's plot."
+      ]
+    },
+    "animal_song_short": {
+      "goal": "Create a high-retention mystery-to-reveal kids short where the song carries the memory loop and the reveal feels rewarding.",
+      "dominantTrigger": "CURIOSITY_GAP leading into NOSTALGIA or COMPLETION_SATISFACTION",
+      "requiredStructure": [
+        "Hook: mystery trait question with the animal name withheld",
+        "Reveal: fast payoff naming the animal cleanly",
+        "Recap spine: strongest facts compressed into musical repetition",
+        "Ending: short challenge/question that feels playful, not instructional"
+      ],
+      "rules": [
+        "Do not leak the animal name before the reveal payoff.",
+        "Pick facts that are surprising, visual, and easy to sing or repeat.",
+        "Song cadence matters more than fact quantity.",
+        "Short CTA should feel like a curiosity game, not a classroom prompt."
+      ]
+    },
+    "challenge_reel": {
+      "goal": "Trigger competitive curiosity so the viewer instantly wants to test their child, watch the solve, and compare times.",
+      "dominantTrigger": "CHALLENGE",
+      "requiredStructure": [
+        "Immediate visible puzzle",
+        "Direct challenge hook and timer pressure",
+        "Sustained unsolved tension during the countdown",
+        "Fast solve payoff or resolution cue",
+        "Native engagement impulse: compare time, tag, or retry"
+      ],
+      "rules": [
+        "The puzzle must look solvable, not chaotic.",
+        "Difficulty should feel just above obvious but below frustrating.",
+        "The timer is pressure, not decoration.",
+        "The viewer should imagine saying, 'my kid can beat that.'"
+      ]
+    },
+    "asmr_reveal": {
+      "goal": "Maximize watch-through by making the reveal itself addictive and visually inevitable.",
+      "dominantTrigger": "COMPLETION_SATISFACTION",
+      "requiredStructure": [
+        "Interesting first frame with tactile promise",
+        "Visible progress almost immediately",
+        "No long stalls between reveal states",
+        "A clean final completion that feels better than expected",
+        "Prefer loop-first endings unless the lane explicitly needs a CTA"
+      ],
+      "rules": [
+        "The viewer must feel the completion reward before the video ends.",
+        "Progression should be visually legible even with sound off.",
+        "Keep the image state changing often enough to feel hypnotic, not static.",
+        "Do not bolt on a generic CTA to a loop-native satisfaction format."
+      ]
+    }
+  }
+}

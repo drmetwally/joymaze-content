@@ -25,6 +25,7 @@ import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildVideoViralityBlock, loadVideoViralityRules } from './lib/video-virality.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -111,7 +112,9 @@ async function loadContext() {
     psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers };
+  const videoViralityRules = await loadVideoViralityRules();
+
+  return { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers, videoViralityRules };
 }
 
 // ── Groq call ─────────────────────────────────────────────────────────────────
@@ -135,7 +138,7 @@ async function callGroq(prompt) {
 // ── Prompt builder ────────────────────────────────────────────────────────────
 
 function buildPrompt(type, context) {
-  const { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers } = context;
+  const { styleGuide, archetypes, analyticsContext, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers, videoViralityRules } = context;
 
   const recentStr = recentThemes.length
     ? `\nRecently used themes — pick something different: ${recentThemes.join(', ')}`
@@ -196,6 +199,8 @@ function buildPrompt(type, context) {
       })()
     : '';
 
+  const viralityBlock = buildVideoViralityBlock(videoViralityRules, 'asmr_reveal');
+
   const blankDesc = type === 'coloring'
     ? 'UNCOLORED black line art only — a printable coloring page with zero color applied. Clean black outlines on white background. Every shape interior is white and empty.'
     : type === 'wordsearch'
@@ -223,6 +228,7 @@ ${archetypes}
 You are creating a daily ASMR video brief for JoyMaze — a kids activity app for ages 4-8. Parents are the audience on social media.
 
 Today's ASMR type: **${type}**
+${viralityBlock ? `\n## SHARED VIRAL VIDEO STRUCTURE CONTRACT\n${viralityBlock}\n` : ''}
 The video reveals the activity progressively: ${type === 'coloring'
   ? 'blank coloring page slowly fills with color top-to-bottom'
   : type === 'dotdot'

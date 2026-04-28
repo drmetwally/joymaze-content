@@ -2215,3 +2215,18 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Verified: `--no-story --no-asmr` test run shows Step 3/4 "Generating today's challenge brief..." → `generate-challenge-brief.mjs` exits OK. Step numbering correct.
 - `npm run daily` (via Task Scheduler) is now 100% clean: archive → prompts → story → ASMR → challenge → X posts → (analytics if due) → (Monday intelligence).
 - **Next:** Story Reel V2 build.
+
+
+---
+
+## 2026-04-28 — [Agent: OpenClaw] — Shared virality contract wired across short-form generators
+
+**What was done:**
+- Added a shared short-form structure contract at config/video-virality-rules.json plus helper loader/formatter at scripts/lib/video-virality.mjs.
+- Confirmed generate-story-ideas.mjs and generate-challenge-brief.mjs were already consuming the helper, then finished the missing wiring in generate-animal-facts-brief.mjs and generate-asmr-brief.mjs.
+- Dry-run validated all four lanes so the contract now appears directly in story, challenge, animal, and ASMR prompts before the lane-specific rules.
+- Cleaned the temporary patch files used during mid-session repair.
+
+**Why it matters:** Future short-form prompt tuning can now happen through one shared repo contract instead of relying on session memory or drifting per-script edits.
+
+**Next:** Claude audit the virality-pass commit, then either extend the shared contract to more generators or keep it scoped to the four active short-form lanes.

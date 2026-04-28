@@ -23,6 +23,7 @@ import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildVideoViralityBlock, loadVideoViralityRules } from './lib/video-virality.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -113,7 +114,9 @@ async function loadStyleContext() {
     psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers };
+  const videoViralityRules = await loadVideoViralityRules();
+
+  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers, videoViralityRules };
 }
 
 // Extract only Archetype 8 section from archetypes doc
@@ -154,13 +157,18 @@ function extractVoiceRules(styleGuide) {
   return extracted.join('\n');
 }
 
-function buildSystemPrompt(styleGuide, archetypes, psychTriggers = null) {
+function buildSystemPrompt(styleGuide, archetypes, psychTriggers = null, videoViralityRules = null) {
   const voice = extractVoiceRules(styleGuide);
   const arch8 = extractArchetype8(archetypes);
+  const viralityBlock = buildVideoViralityBlock(videoViralityRules, 'story_reel_v2');
 
   const styleRefCount = SLIDE_COUNT;
 
   return `You are the head writer for "Joyo's Story Corner" — a short-form kids story series by JoyMaze.
+
+${viralityBlock ? `## SHARED VIRAL VIDEO STRUCTURE CONTRACT
+${viralityBlock}
+` : ''}
 
 Your stories are short-form videos for Instagram Reels, TikTok, and YouTube Shorts. They target parents of children aged 4–8. They are pure story — no product mentions, no CTAs, no brand overlays.
 
@@ -560,7 +568,7 @@ async function main() {
   console.log('=== Joyo\'s Story Corner — Idea Generator ===\n');
 
   const episodeNum = await getNextEpisode();
-  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers }] = await Promise.all([
+  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers, videoViralityRules }] = await Promise.all([
     getExistingStories(),
     loadStyleContext(),
   ]);
@@ -572,7 +580,7 @@ async function main() {
   if (dynamicThemes?.themes?.length) console.log(`  Dynamic themes loaded: ${dynamicThemes.themes.length} themes`);
   if (psychTriggers) console.log(`  Psychology triggers loaded: ${Object.keys(psychTriggers.triggers || {}).length} triggers`);
 
-  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, psychTriggers);
+  const systemPrompt = buildSystemPrompt(styleGuide, archetypes, psychTriggers, videoViralityRules);
   const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes);
 
   if (DRY_RUN) {

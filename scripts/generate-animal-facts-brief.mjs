@@ -5,6 +5,7 @@ import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildVideoViralityBlock, loadVideoViralityRules } from './lib/video-virality.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -81,6 +82,8 @@ async function loadContext() {
     psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
   } catch {}
 
+  const videoViralityRules = await loadVideoViralityRules();
+
   try {
     sunoPool = JSON.parse(await fs.readFile(SUNO_POOL_PATH, 'utf-8'));
   } catch {}
@@ -121,6 +124,7 @@ async function loadContext() {
     dynamicThemes,
     perfWeights,
     psychTriggers,
+    videoViralityRules,
     sunoPool,
     contentIntelligence,
     patternInterrupts,
@@ -171,12 +175,15 @@ function buildPrompt(context, artStyle) {
     dynamicThemes,
     perfWeights,
     psychTriggers,
+    videoViralityRules,
     sunoPool,
     contentIntelligence,
     patternInterrupts,
     recentEpisodes,
     nextEpisodeNumber,
   } = context;
+
+  const viralityBlock = buildVideoViralityBlock(videoViralityRules, 'animal_song_short');
 
   const recentEpisodesBlock = recentEpisodes.length
     ? `\nRecent animal episodes to avoid repeating too closely:\n${recentEpisodes.map((episode) => `- ${episode}`).join('\n')}`
@@ -292,7 +299,8 @@ shotType assignments (use these exactly):
 
   return `You are planning a JoyMaze animal facts long-form video episode for kids ages 4-8 and their parents.
 Episode number: ${nextEpisodeNumber}
-Format: hook (mystery question — NO animal name) → name reveal (payoff) → FACT 1 → FACT 2 → FACT 3 → FACT 4 → FACT 5 → sung recap.${recentEpisodesBlock}${trendsBlock}${dynamicThemesBlock}${competitorBlock}${hooksBlock}${perfWeightsBlock}${contentIntelBlock}${patternInterruptBlock}${backgroundRule}
+Format: hook (mystery question — NO animal name) → name reveal (payoff) → FACT 1 → FACT 2 → FACT 3 → FACT 4 → FACT 5 → sung recap.
+${viralityBlock ? `\n## SHARED VIRAL VIDEO STRUCTURE CONTRACT\n${viralityBlock}\n` : ''}${recentEpisodesBlock}${trendsBlock}${dynamicThemesBlock}${competitorBlock}${hooksBlock}${perfWeightsBlock}${contentIntelBlock}${patternInterruptBlock}${backgroundRule}
 ${psychBlock}${visualStyleBlock}
 Return one JSON object with EXACTLY this shape (no extra fields, no missing fields):
 {

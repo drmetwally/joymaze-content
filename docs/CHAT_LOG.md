@@ -863,3 +863,13 @@ Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizonta
 - Topics: ok-skills/HyperFrames repo eval (skip for app, skip for content — Remotion already does what HyperFrames does); daily audit after 6-day gap; scheduler root-cause (blank WorkingDirectory); pool file corruption root-cause (double call to applyCompetitorFindings with raw Gemini data); intelligence force-applied after file restore; Phase 0 gate updated (10+10+10 → real numbers); X cooldown extended to May 7.
 - Decisions: AGENT_LOG.md introduced as universal collaboration audit trail; 3 OpenClaw tasks specced (OC-001 atomic writes, OC-002 intelligence linkage, OC-003 Kokoro TTS); Vertex API key confirmed Gemini-only (cannot do TTS); Kokoro-82M chosen as Edge TTS replacement.
 - Pending: OpenClaw to implement OC-001/002/003 in next session; Claude to verify AGENT_LOG entries before marking complete.
+
+
+---
+### 2026-04-28 — Shared virality contract pass
+
+- Added a shared short-form structure contract in config/video-virality-rules.json plus prompt helper scripts/lib/video-virality.mjs.
+- Finished wiring the contract into all four active short-form generators: story ideas, challenge brief, animal facts brief, and ASMR brief.
+- Dry-run proof showed each generator now prints ## SHARED VIRAL VIDEO STRUCTURE CONTRACT with the correct lane block before its local instructions.
+- Temporary patch helper files used during the repair were deleted before session wrap.
+- Next restart point: Claude audit the virality-pass commit, then decide whether more generators should consume the shared contract or whether the current four-lane scope is enough for now.

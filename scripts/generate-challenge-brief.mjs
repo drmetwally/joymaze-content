@@ -26,6 +26,7 @@ import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildVideoViralityBlock, loadVideoViralityRules } from './lib/video-virality.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -110,7 +111,9 @@ async function loadContext() {
     psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
   } catch {}
 
-  return { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers };
+  const videoViralityRules = await loadVideoViralityRules();
+
+  return { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers, videoViralityRules };
 }
 
 // ── Groq call ─────────────────────────────────────────────────────────────────
@@ -134,7 +137,7 @@ async function callGroq(prompt) {
 // ── Prompt builder ────────────────────────────────────────────────────────────
 
 function buildPrompt(type, context) {
-  const { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers } = context;
+  const { styleGuide, recentThemes, trends, competitor, hooksData, dynamicThemes, perfWeights, psychTriggers, videoViralityRules } = context;
 
   const activityLabel = ACTIVITY_LABEL_MAP[type] ?? type.toUpperCase();
   const countdownSec  = COUNTDOWN_MAP[type] ?? 60;
@@ -192,6 +195,8 @@ function buildPrompt(type, context) {
     : '';
 
   // Puzzle type image description guide
+  const viralityBlock = buildVideoViralityBlock(videoViralityRules, 'challenge_reel');
+
   const imageGuide = {
     'maze':        'a clear, kid-friendly maze with Start and Finish labels, moderate difficulty (4-8 year olds can solve in ~45s), black lines on white background',
     'word-search': 'a word search grid (10×10 or 12×12) with 6-8 hidden words on a theme, clean black letters on white background, word list shown below the grid',
@@ -207,6 +212,7 @@ You are creating a "Challenge" video brief for JoyMaze — a kids activity app f
 
 The video format: a ${activityLabel} puzzle is shown with a counting timer running. Parents share it to challenge their kids and each other.
 Video length: ${countdownSec + 5} seconds total (${countdownSec}s timer + 5s hook/CTA).
+${viralityBlock ? `\n## SHARED VIRAL VIDEO STRUCTURE CONTRACT\n${viralityBlock}\n` : ''}
 ${trendsStr}${activeThemesStr}${perfStr}${competitorStr}${hookLibraryStr}${recentStr}${psychTriggers ? `
 
 ## PSYCHOLOGY TRIGGER — CHALLENGE_HOOK
