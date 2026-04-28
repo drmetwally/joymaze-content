@@ -10,9 +10,6 @@ import {
 
 const FONT_FAMILY = 'Nunito, Fredoka One, sans-serif';
 
-// 5s per image at 30fps — cycles through all fact images during the 30s song
-const IMAGE_CUT_FRAMES = 120;
-
 const KB_PATHS = [
   { scaleFrom: 1.00, scaleTo: 1.07, xFrom:   0, xTo: -14 },
   { scaleFrom: 1.04, scaleTo: 1.09, xFrom: -10, xTo:  10 },
@@ -42,10 +39,11 @@ export const AnimalSungRecap = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
-  // Image cycling — one image every 5s, wraps if more frames than images
+  // Image cycling — evenly distribute the available visuals across the short recap window
   const imageCount      = imagePaths.length || 1;
-  const imageIndex      = Math.min(Math.floor(frame / IMAGE_CUT_FRAMES), imageCount - 1);
-  const cutProgress     = Math.min((frame % IMAGE_CUT_FRAMES) / IMAGE_CUT_FRAMES, 1);
+  const imageCutFrames  = Math.max(1, Math.ceil(durationInFrames / imageCount));
+  const imageIndex      = Math.min(Math.floor(frame / imageCutFrames), imageCount - 1);
+  const cutProgress     = Math.min((frame % imageCutFrames) / imageCutFrames, 1);
   const kb              = KB_PATHS[imageIndex % KB_PATHS.length];
   const bgScale         = kb.scaleFrom + (kb.scaleTo - kb.scaleFrom) * cutProgress;
   const bgX             = kb.xFrom    + (kb.xTo    - kb.xFrom)    * cutProgress;
@@ -85,7 +83,7 @@ export const AnimalSungRecap = ({
         }}
       />
 
-      {sungAudioPath ? <Audio src={resolveAssetSrc(sungAudioPath)} /> : null}
+      {sungAudioPath ? <Audio src={resolveAssetSrc(sungAudioPath)} endAt={durationInFrames} /> : null}
 
       {/* Floating music note particles */}
       {NOTE_PARTICLES.map((note, index) => {

@@ -204,3 +204,17 @@
 **Next:** Claude should audit the 4-file reel diff. After approval, generate or backfill image-backed short-story folders so `StoryReelV2` can be exercised end-to-end from `story.json` with no temporary fixture.
 
 ---
+
+### 2026-04-28 | OpenClaw | REELS-002 | Tighten reel timing contracts and fail-fast asset validation
+**Files changed:**
+- `scripts/generate-story-ideas.mjs` — added explicit `hookQuestion` / `outroEcho` generation guidance and saved `hookQuestion` into `story.json` for reel-native story hooks
+- `scripts/render-video.mjs` — added Story Reel V2 and Animal Song Short missing-asset validation, reel-paced Story V2 duration mapping, and shorter Animal Song Short duration rules
+- `remotion/compositions/AnimalFactsSongShort.jsx` — reduced reveal / recap / outro timing to a short-form window driven by short-form duration fields
+- `remotion/components/longform/animal/AnimalSungRecap.jsx` — trimmed recap audio to the sequence window and distributed image changes evenly across the recap runtime
+**What was done:** Claude's plan audit blockers were resolved explicitly in code. Story ideation now emits a dedicated `hookQuestion`, older story folders still fall back cleanly, and both reel loaders now fail fast if required visuals are missing instead of crashing later during Remotion fetches. On the animal side, the song short now trims the dropped-in `sung-recap.mp3` in-composition and equalizes image cadence so the last frame no longer stalls for the remainder of the song window.
+**Test command:** `node --check scripts/generate-story-ideas.mjs`, `node --check scripts/render-video.mjs`, `node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/ep03-hedgehog --preview --out output\videos\animal-song-short-preview-v2.mp4`, `node scripts/render-video.mjs --comp StoryReelV2 --props-file tmp-story-reel-v2-preview-props.json --preview --out output\videos\story-reel-v2-preview-v2.mp4`, and `node scripts/render-video.mjs --comp StoryReelV2 --story output/stories/ep03-the-lonely-bee-who-found-her-pollen-path --dry-run`
+**Test output summary:** Syntax checks exited cleanly. Animal preview rendered successfully: `✓ Done in 3.0s → output\videos\animal-song-short-preview-v2.mp4`. Story Reel V2 preview rendered successfully after serializing the bundle step: `✓ Done in 3.7s → output\videos\story-reel-v2-preview-v2.mp4`. Direct story-folder dry-run now fails early with the intended validation error: `StoryReelV2 missing required image assets: 08.png, 01.png, 02.png, 03.png, 04.png, 05.png, 06.png, 07.png`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the 4-file follow-up diff. After approval, either backfill image-backed story folders or update the story-generation path so Story Reel V2 can run end-to-end from fresh `story.json` outputs without fixture props.
+
+---

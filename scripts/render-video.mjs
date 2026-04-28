@@ -162,45 +162,81 @@ async function storyJsonToProps(story, storyDir) {
 async function storyJsonToReelV2Props(story, storyDir) {
   const fps = 30;
   const rawSlides = story.slides ?? [];
+  if (rawSlides.length < 5) {
+    throw new Error(`StoryReelV2 requires at least 5 slides, got ${rawSlides.length}.`);
+  }
+
   const slides = rawSlides.map((slide, index) => {
     const rawImageRef = slide.imagePath ?? slide.image ?? '';
     const imagePath = rawImageRef
       ? path.relative(ROOT, path.resolve(storyDir, rawImageRef)).replace(/\\/g, '/')
       : '';
-    const durationSec = slide.durationSec ?? slide.duration ?? 4;
+    const captionText = slide.narration ?? slide.caption ?? '';
+    const wordCount = captionText.split(/\s+/).filter(Boolean).length;
+    const durationFrames = Math.max(75, Math.min(Math.round((2.4 + wordCount * 0.11) * fps), 126));
     const act = slide.act ?? (index < 2 ? 1 : index < rawSlides.length - 2 ? 2 : 3);
     return {
       sceneIndex: index + 1,
+      imageRef: rawImageRef,
       imagePath,
-      captionText: slide.narration ?? slide.caption ?? '',
-      durationFrames: Math.round(durationSec * fps),
+      captionText,
+      durationFrames,
       psychologyTrigger: act === 1 ? 'CURIOSITY_GAP' : act === 2 ? 'IDENTITY_MIRROR' : 'COMPLETION_SATISFACTION',
       isClimaxScene: index === rawSlides.length - 2,
     };
   });
 
   const flashForwardSlide = rawSlides[rawSlides.length - 1] ?? rawSlides[rawSlides.length - 2] ?? rawSlides[0] ?? null;
-  const flashForwardImagePath = flashForwardSlide
-    ? path.relative(ROOT, path.resolve(storyDir, flashForwardSlide.imagePath ?? flashForwardSlide.image ?? '')).replace(/\\/g, '/')
+  const flashForwardRef = flashForwardSlide?.imagePath ?? flashForwardSlide?.image ?? '';
+  const flashForwardImagePath = flashForwardRef
+    ? path.relative(ROOT, path.resolve(storyDir, flashForwardRef)).replace(/\\/g, '/')
     : '';
+  const requiredImages = [...new Set([
+    flashForwardRef,
+    ...slides.map((slide) => slide.imageRef),
+  ].filter(Boolean))];
+  const missingImages = [];
+  for (const relativeFile of requiredImages) {
+    const abs = path.resolve(storyDir, relativeFile);
+    const exists = await fs.access(abs).then(() => true).catch(() => false);
+    if (!exists) missingImages.push(relativeFile);
+  }
+  if (missingImages.length) {
+    throw new Error(`StoryReelV2 missing required image assets: ${missingImages.join(', ')}`);
+  }
+
   const flashForwardCaption = flashForwardSlide?.narration ?? flashForwardSlide?.caption ?? '';
   const hookQuestion = story.hookQuestion ?? story.hook ?? flashForwardCaption ?? 'What happens next?';
+  const hookWordCount = hookQuestion.split(/\s+/).filter(Boolean).length;
+  const outroTeaser = story.outroEcho ?? story.outroTeaser ?? story.title ?? 'Watch for the ending.';
+  const outroWordCount = outroTeaser.split(/\s+/).filter(Boolean).length;
   const musicPath = story.musicPath !== undefined
     ? story.musicPath
     : await resolveAudio('story');
 
   return {
-    slides,
+    slides: slides.map(({ imageRef, ...rest }) => rest),
     hookQuestion,
     flashForwardImagePath,
     backgroundMusicPath: musicPath,
-    outroTeaser: story.outroEcho ?? story.outroTeaser ?? story.title ?? 'New episode every week!',
-    hookDurationFrames: story.hookDurationFrames ?? Math.round(5 * fps),
-    outroDurationFrames: story.outroDurationFrames ?? Math.round(4 * fps),
+    outroTeaser,
+    hookDurationFrames: story.hookDurationFrames ?? Math.max(75, Math.min(Math.round((1.9 + hookWordCount * 0.09) * fps), 105)),
+    outroDurationFrames: story.outroDurationFrames ?? Math.max(60, Math.min(Math.round((1.6 + outroWordCount * 0.07) * fps), 90)),
   };
 }
 
 async function animalEpisodeToSongShortProps(episode, episodeDir) {
+  const requiredImages = ['namereveal.png', 'fact1.png', 'fact2.png', 'fact3.png', 'fact4.png', 'fact5.png'];
+  const missingImages = [];
+  for (const filename of requiredImages) {
+    const abs = path.join(episodeDir, filename);
+    const exists = await fs.access(abs).then(() => true).catch(() => false);
+    if (!exists) missingImages.push(filename);
+  }
+  if (missingImages.length) {
+    throw new Error(`AnimalFactsSongShort missing required image assets: ${missingImages.join(', ')}`);
+  }
+
   return {
     episodeFolder: path.relative(ROOT, episodeDir).replace(/\\/g, '/'),
     episode,
@@ -492,10 +528,10 @@ function computeDuration(inputProps, compId) {
     return hookFrames + slideFrames + outroFrames;
   }
   if (compId === 'AnimalFactsSongShort') {
-    const hookFrames = Math.round(Math.max(inputProps.episode?.hookNarrationDurationSec || 6, 5) * fps);
-    const revealFrames = Math.round(3.5 * fps);
-    const songFrames = 900;
-    const outroFrames = Math.round(Math.min(Math.max(inputProps.episode?.outroCtaDurationSec || 4, 4), 6) * fps);
+    const hookFrames = Math.round(Math.min(Math.max(inputProps.episode?.hookNarrationDurationSec || 4, 3), 5) * fps);
+    const revealFrames = Math.round(2.5 * fps);
+    const songFrames = Math.round(Math.min(Math.max(inputProps.episode?.sungRecapShortDurationSec || 17, 16), 18) * fps);
+    const outroFrames = Math.round(Math.min(Math.max(inputProps.episode?.outroCtaShortDurationSec || 4, 3), 4) * fps);
     return hookFrames + revealFrames + songFrames + outroFrames;
   }
   if (compId === 'AsmrReveal') {

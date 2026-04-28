@@ -10,9 +10,9 @@ export const animalFactsSongShortSchema = {
 };
 
 const FPS = 30;
-const NAME_REVEAL_FRAMES = 105;
-const SUNG_RECAP_FRAMES = 900;
-const OUTRO_FRAMES = 120;
+const NAME_REVEAL_FRAMES = 75;
+const DEFAULT_SUNG_RECAP_FRAMES = 510;
+const DEFAULT_OUTRO_FRAMES = 120;
 
 const normalizeSlashes = (value) => String(value || '').replace(/\\/g, '/');
 const isAbsolutePath = (value) => {
@@ -50,8 +50,9 @@ export const AnimalFactsSongShort = ({
   episodeFolder = '',
   episode = {},
 }) => {
-  const hookFrames = secToFrames(Math.max(episode.hookNarrationDurationSec || 6, 5), 6);
-  const outroFrames = secToFrames(Math.min(Math.max(episode.outroCtaDurationSec || 4, 4), 6), 4);
+  const hookFrames = secToFrames(Math.min(Math.max(episode.hookNarrationDurationSec || 4, 3), 5), 4);
+  const sungRecapFrames = secToFrames(Math.min(Math.max(episode.sungRecapShortDurationSec || 17, 16), 18), 17);
+  const outroFrames = secToFrames(Math.min(Math.max(episode.outroCtaShortDurationSec || 4, 3), 4), 4);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000' }}>
@@ -72,7 +73,7 @@ export const AnimalFactsSongShort = ({
         />
       </Sequence>
 
-      <Sequence from={hookFrames + NAME_REVEAL_FRAMES} durationInFrames={SUNG_RECAP_FRAMES}>
+      <Sequence from={hookFrames + NAME_REVEAL_FRAMES} durationInFrames={sungRecapFrames}>
         <AnimalSungRecap
           imagePaths={[
             resolveEpisodeAsset(episodeFolder, 'namereveal.png'),
@@ -85,7 +86,7 @@ export const AnimalFactsSongShort = ({
         />
       </Sequence>
 
-      <Sequence from={hookFrames + NAME_REVEAL_FRAMES + SUNG_RECAP_FRAMES} durationInFrames={outroFrames || OUTRO_FRAMES}>
+      <Sequence from={hookFrames + NAME_REVEAL_FRAMES + sungRecapFrames} durationInFrames={outroFrames || DEFAULT_OUTRO_FRAMES}>
         <AnimalOutroScene
           imagePath={resolveEpisodeAsset(episodeFolder, 'namereveal.png')}
           outroCta={episode.outroCta || `What was your favorite ${episode.animalName || 'animal'} fact?`}

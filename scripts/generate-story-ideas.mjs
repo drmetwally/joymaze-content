@@ -304,6 +304,8 @@ Return a single JSON object with this exact structure — no extra text:
   "title": "Story Title Here",
   "episode": <number>,
   "theme": "One sentence describing the story and its emotional payoff",
+  "hookQuestion": "A short curiosity-gap question or open-loop line for the reel hook. 8-14 words, answered only by the ending.",
+  "outroEcho": "A very short emotional echo or teaser line for the ending card.",
   "style": "Art style to use consistently across all ${styleRefCount} slides (e.g., 'soft watercolor, wet-on-wet edges, warm pastel palette, visible paper grain')",
   "character": "Consistent physical description of the main character — species, size, color, distinctive markings, eye color/size, any unique feature. This description will be referenced in every image_prompt.",
   "slides": [
@@ -317,7 +319,9 @@ Return a single JSON object with this exact structure — no extra text:
   ]
 }
 
-Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides: 7–8s. Final slide: 8–10s.${psychTriggers ? `
+Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides: 7–8s. Final slide: 8–10s.
+- hookQuestion: must create an open loop with stakes, and must not simply restate slide 1.
+- outroEcho: 4-8 words, warm and memorable, not a CTA.${psychTriggers ? `
 
 ## PSYCHOLOGY LAYER — STORY TRIGGERS
 
@@ -423,6 +427,8 @@ The story must:
 4. Beat 1 narration: ONE sentence. Drop into action. Hook the viewer before they know the character's name.
 5. Beat 8 narration: ONE sentence. The share trigger. Must land without context. Write this last.
 6. End with a payoff that makes parents want to screenshot and share the final slide
+7. Also write a separate hookQuestion for short-form reels. It should be 8-14 words, create a curiosity gap, and be answered only by the final beat.
+8. Also write a separate outroEcho that is only 4-8 words, emotionally resonant, and not a CTA.
 
 Story arcs that travel well for short-form:
 - A small animal solves a big problem through cleverness, not strength
@@ -448,8 +454,9 @@ async function saveStory(story, episodeNum) {
     title: story.title,
     episode: story.episode,
     theme: story.theme,
-    hook: story.hook || null,         // Video intro hook (auto-picked if null)
-    outroEcho: story.outroEcho || null, // Video outro emotional echo (auto-picked if null)
+    hook: story.hook || null,         // Legacy intro hook
+    hookQuestion: story.hookQuestion || story.hook || null,
+    outroEcho: story.outroEcho || null,
     slides: story.slides.map(s => ({
       image: s.image,
       act: s.act,
@@ -503,6 +510,8 @@ function printStory(story) {
   console.log(`  Episode ${story.episode}: ${story.title}`);
   console.log(`${'═'.repeat(60)}`);
   console.log(`Theme: ${story.theme}`);
+  console.log(`Hook: ${story.hookQuestion || story.hook || '(none)'}`);
+  console.log(`Outro echo: ${story.outroEcho || '(none)'}`);
   console.log(`Style: ${story.style}`);
   console.log('');
 
