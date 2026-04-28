@@ -30,6 +30,8 @@
     "generate:story:ideas": "node scripts/generate-story-ideas.mjs",
     "generate:story:idea": "node scripts/generate-story-ideas.mjs --save",
     "generate:story:idea:long": "node scripts/generate-story-ideas.mjs --slides 10 --save",
+    "generate:story:reel-images": "node scripts/generate-story-reel-images.mjs",
+    "generate:story:reel-images:dry": "node scripts/generate-story-reel-images.mjs --dry-run",
     "scheduler": "node scripts/daily-scheduler.mjs",
     "scheduler:now": "node scripts/daily-scheduler.mjs --now",
     "scheduler:post-now": "node scripts/daily-scheduler.mjs --post-now",

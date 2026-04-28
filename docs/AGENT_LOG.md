@@ -246,3 +246,16 @@
 **Next:** Claude should audit this single-file story-handoff improvement. After approval, the next meaningful step is optional automation: turn `reel-image-prompts.md` into actual slide PNG generation, or keep the current manual Gemini flow but use the smaller reel-first file.
 
 ---
+
+### 2026-04-28 | OpenClaw | REELS-005 | Automate reel-first story image generation from saved story folders
+**Files changed:**
+- `scripts/generate-story-reel-images.mjs` — new story-folder image generator that reads `story.json` plus `reel-image-prompts.md`/`image-prompts.md`, generates the selected slide PNGs directly into the story folder, normalizes them to 1080×1920, and logs the run
+- `package.json` — added `generate:story:reel-images` and `generate:story:reel-images:dry` scripts for the new reel-art path
+- `docs/AGENT_LOG.md` — appended this handoff entry for Claude
+**What was done:** The remaining blocker after reel loader/generator work was still manual story art production. I added a dedicated story-folder generator that targets the reel-selected slides first, writes the resulting `01.png`-style assets exactly where `StoryReelV2` expects them, and falls back to the full prompt file for older story folders that do not yet have `reel-image-prompts.md`. I validated it end to end by generating the five reel images for `ep07-the-snail-who-painted-the-sunset-garden` and then rendering Story Reel V2 directly from that real folder with no props fixture.
+**Test command:** `node --check scripts/generate-story-reel-images.mjs`, `node scripts/generate-story-reel-images.mjs --story output\stories\ep07-the-snail-who-painted-the-sunset-garden --dry-run`, `node scripts/generate-story-reel-images.mjs --story output\stories\ep07-the-snail-who-painted-the-sunset-garden`, `npm run generate:story:reel-images:dry -- --story output\stories\ep07-the-snail-who-painted-the-sunset-garden`, `node scripts/render-video.mjs --comp StoryReelV2 --story output\stories\ep07-the-snail-who-painted-the-sunset-garden --dry-run --verbose`, and `node scripts/render-video.mjs --comp StoryReelV2 --story output\stories\ep07-the-snail-who-painted-the-sunset-garden --preview --out output\videos\story-reel-v2-snail-preview.mp4`
+**Test output summary:** Dry-run targeted slides `1, 2, 4, 7, 8` exactly as intended. Live generation saved `01.png`, `02.png`, `04.png`, `07.png`, and `08.png` into the snail story folder and wrote `_reel-image-generation.json`. The follow-up Story Reel V2 dry-run resolved all five images from the real story folder, and the preview render completed successfully: `✓ Done in 5.0s → output\videos\story-reel-v2-snail-preview.mp4`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit this new reel-art automation path. After approval, the next choice is whether to wire `generate-story-reel-images.mjs` into a broader daily/manual flow or keep it as an explicit operator step between story ideation and render.
+
+---
