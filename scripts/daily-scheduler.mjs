@@ -41,8 +41,9 @@ const ROOT = path.resolve(__dirname, '..');
 
 const args = process.argv.slice(2);
 const RUN_NOW           = args.includes('--now');
-const WITH_STORY        = !args.includes('--no-story');   // runs by default; skip with --no-story
-const WITH_ASMR_BRIEF   = !args.includes('--no-asmr');    // runs by default; skip with --no-asmr
+const WITH_STORY        = !args.includes('--no-story');      // runs by default; skip with --no-story
+const WITH_ASMR_BRIEF   = !args.includes('--no-asmr');       // runs by default; skip with --no-asmr
+const WITH_CHALLENGE    = !args.includes('--no-challenge');  // runs by default; skip with --no-challenge
 const WITH_ANALYTICS    = args.includes('--with-analytics');
 
 const ANALYTICS_EVERY_N_DAYS = 3;  // Run analytics automatically every 3 days
@@ -130,6 +131,7 @@ async function runDailyJob() {
   const totalSteps = 3  // archive + prompts + x-text-posts (always run)
     + (WITH_STORY      ? 1 : 0)
     + (WITH_ASMR_BRIEF ? 1 : 0)
+    + (WITH_CHALLENGE  ? 1 : 0)
     + (WITH_ANALYTICS || daysSince(state.lastAnalyticsRun) >= ANALYTICS_EVERY_N_DAYS ? 1 : 0)
     + (isMonday ? 3 : 0);  // pinterest token refresh + intelligence-refresh + apply-intelligence
   // Posting is excluded from this job — handled by hourly Task Scheduler
@@ -225,6 +227,20 @@ async function runDailyJob() {
     } else {
       log('ASMR brief failed — run manually: npm run generate:asmr:brief');
       await appendLog('ASMR brief FAILED');
+    }
+  }
+
+  // Step N: Generate challenge brief (default on; skip with --no-challenge)
+  if (WITH_CHALLENGE) {
+    stepNum++;
+    log(`Step ${stepNum}/${totalSteps}: Generating today's challenge brief...`);
+    const challengeOk = await runScript('generate-challenge-brief.mjs', ['--save']);
+    if (challengeOk) {
+      log('Challenge brief ready in output/challenge/ — open brief.md then drop in puzzle.png');
+      await appendLog('Challenge brief generated OK');
+    } else {
+      log('Challenge brief failed — run manually: npm run brief:challenge');
+      await appendLog('Challenge brief FAILED');
     }
   }
 

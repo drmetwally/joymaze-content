@@ -2182,7 +2182,7 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 
 ---
 
-## 2026-04-27 � [Agent: OpenClaw] � Reel roadmap locked for 2026-04-28 build sprint
+## 2026-04-27 � [Agent: OpenClaw] � Reel roadmap locked for 2026-04-28 build sprint
 
 **What was reviewed:** Current short story rendering still routes through the simpler `StoryEpisode` composition, while the longform story stack already has the stronger hook / scene / outro grammar. Animal facts longform also already contains the strongest short-form ingredient in the sung recap lane.
 
@@ -2192,3 +2192,26 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Scheduler parity task captured as `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md`: `package.json` already includes `generate-challenge-brief.mjs --save` in `npm run daily`, but `scripts/daily-scheduler.mjs` still lacks the mirrored challenge step.
 
 **Next build order:** 1) implement TASK-OC-005, 2) build Story Reel V2, 3) build Animal Facts Song Short, 4) only after both pass review, wire the new reel lanes into the daily automation flow.
+
+---
+
+## 2026-04-27 — [Claude] — OC-004 audit + cheatsheet update + plan audit + memory
+
+**What was done:**
+- Audited OC-004 (wire challenge audio + solve reveal props): PASSED. `CHALLENGE_SFX_MAP` correctly placed after `SOFT_MUSIC`, `resolveSfx()` and `resolveImage()` both fail-safe, all `activityChallengeSchema` fields present, `ctaText` removal correct (was dead data).
+- Updated `docs/DAILY_CHEATSHEET.md`: fixed stale Step 1 description (challenge brief not in scheduler), expanded Step 2D with blank/solved image instructions, expanded Step 3B with per-type extract+animate commands and audio auto-wire note, updated Phase 0 gate text, added 5 challenge troubleshooting entries.
+- Audited OpenClaw ROADMAP-REELS-001 plan commit (fade20b): APPROVED. TASK-OC-005 spec is clean (correct script name), Story Reel V2 direction sound, Animal Facts Song Short direction sound, automation sequencing correct.
+- Saved `project_reels_roadmap.md` to Claude memory + indexed in MEMORY.md.
+
+**Next:** Tomorrow — OC-005 first (small), then Story Reel V2 build, then Animal Facts Song Short.
+
+---
+
+## 2026-04-28 — [Claude] — TASK-OC-005 complete: challenge brief step added to daily-scheduler.mjs
+
+**What was done:**
+- Confirmed daily run was 4/5 clean (ASMR brief DID run — `dotdot-garden-bugs` — my glob was wrong, no date in folder name).
+- Added `WITH_CHALLENGE` flag + challenge brief step to `daily-scheduler.mjs` after ASMR block. Incremented `totalSteps` by 1.
+- Verified: `--no-story --no-asmr` test run shows Step 3/4 "Generating today's challenge brief..." → `generate-challenge-brief.mjs` exits OK. Step numbering correct.
+- `npm run daily` (via Task Scheduler) is now 100% clean: archive → prompts → story → ASMR → challenge → X posts → (analytics if due) → (Monday intelligence).
+- **Next:** Story Reel V2 build.

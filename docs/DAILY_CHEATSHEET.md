@@ -2,7 +2,7 @@
 
 > Follow top to bottom. Every day.
 
-Last updated: 2026-04-16
+Last updated: 2026-04-27
 
 ---
 
@@ -50,9 +50,10 @@ Automatically:
 3. Generates 10 image prompts → `output/prompts/prompts-YYYY-MM-DD.md`
 4. Generates story idea → `output/stories/`
 5. Generates ASMR brief → `output/asmr/` (rotation: coloring → maze → coloring → wordsearch → dotdot → maze)
-6. Generates challenge brief → `output/challenge/`
-7. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
-8. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
+6. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
+7. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
+
+> **Note:** Challenge brief is NOT auto-generated yet — run `npm run brief:challenge` manually, or see TASK-OC-005.
 
 **Check:** Open `output/prompts/prompts-YYYY-MM-DD.md`
 
@@ -101,11 +102,19 @@ Naming: `fact-dinosaurs.png`, `challenge-ocean.png`, `quiet-rainy-day.png`, etc.
 
 3. Save to `output/asmr/[type]-[theme]/blank.png` + `solved.png`
 
-### 2D — Challenge Image (1)
+### 2D — Challenge Images (1–3)
 
 1. Open `output/challenge/[type]-[theme]/brief.md`
-2. Generate one puzzle image (blank/unsolved, no answers)
-3. Save to `output/challenge/[type]-[theme]/puzzle.png`
+2. Generate images **in the same Gemini chat** for visual consistency:
+
+| What | Filename | Required? |
+|------|----------|-----------|
+| Blank/unsolved puzzle | `puzzle.png` | **Always** |
+| Clean unsolved (for reveal start) | `blank.png` | Maze + Word Search only |
+| Solved (path drawn / words highlighted) | `solved.png` | Maze + Word Search only |
+
+> `puzzle.png` and `blank.png` can be the same image — generate once, copy + rename.
+> Without `blank.png` + `solved.png`, the solve phase shows a static image (still valid for posting).
 
 ### 2E — Story Slides (7, optional)
 
@@ -163,13 +172,37 @@ npm run animate:asmr:dry -- --asmr output/asmr/[folder]/
 
 ---
 
-## STEP 3B — Challenge Video (1 min)
+## STEP 3B — Challenge Video (1–2 min)
 
+**All types — basic render (puzzle.png only, static solve):**
 ```bash
 npm run animate:challenge -- --challenge output/challenge/[folder]/
 ```
 
-**Dry-run:**
+**Maze — animated solve reveal (requires blank.png + solved.png):**
+```bash
+npm run extract:path -- --asmr output/challenge/[folder]/
+npm run animate:challenge -- --challenge output/challenge/[folder]/
+```
+
+**Word Search — animated solve reveal (requires blank.png + solved.png):**
+```bash
+npm run extract:wordsearch -- --asmr output/challenge/[folder]/
+npm run animate:challenge -- --challenge output/challenge/[folder]/
+```
+
+**Dot-to-Dot — animated solve reveal:**
+```bash
+npm run extract:dotdot -- --asmr output/challenge/[folder]/
+npm run animate:challenge -- --challenge output/challenge/[folder]/
+```
+
+**Audio is automatic** — SFX wired by puzzle type:
+- Maze: playful music bed + soft tick + success chime + Twinkle solve
+- Word Search: search groove bed + soft tick + shimmer cue + Twinkle solve
+- Other types: Twinkle bed + soft tick + brand hit
+
+**Dry-run (verify props + audio paths without rendering):**
 ```bash
 npm run animate:challenge:dry -- --challenge output/challenge/[folder]/
 ```
@@ -279,7 +312,7 @@ npm run post:scheduled:dry   # Dry-run posting locally
 
 ## Phase 0 Gate
 
-**Target:** 30 consecutive days ≥ 10 images + 1 story video + 1 ASMR video + 4 X text posts
+**Target:** 30 consecutive days ≥ 10 images + 1 ASMR video + 1 story video + 1 challenge reel + 4 X text posts
 
 ```bash
 npm run output:report    # Last 7 days + streak
@@ -339,6 +372,10 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | ASMR render fails with ENOSPC | `rm -rf /c/Users/BESOO/AppData/Local/Temp/remotion-webpack-bundle-*` |
 | ProtocolError at ~93% | Non-fatal Chrome race condition — render still completes, ignore |
 | Challenge video: image not found | Confirm `puzzle.png` in `output/challenge/[folder]/` |
+| Challenge solve phase is static | Add `blank.png` + `solved.png` then run `extract:path` / `extract:wordsearch` first |
+| Challenge audio is silent | Run dry-run — look for `[sfx] not found` warnings; check file names match exactly |
+| Challenge: no path drawn in solve | `extract:path` not run yet, or `blank.png` missing |
+| Challenge: no word highlights in solve | `extract:wordsearch` not run yet, or `solved.png` has low-contrast highlights |
 | Story video not generating | Confirm `01.png` through `07.png` all exist in the story folder |
 | Intelligence pools empty | Run `npm run intelligence:full` |
 | YouTube token expired | `node scripts/get-youtube-token.mjs` |

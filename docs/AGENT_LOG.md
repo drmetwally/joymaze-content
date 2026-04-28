@@ -153,15 +153,29 @@
 
 ### 2026-04-27 | OpenClaw | ROADMAP-REELS-001 | Lock reels roadmap + queue scheduler parity task for tomorrow
 **Files changed:**
-- `MEMORY.md` � added the locked short-form roadmap for Story Reel V2, Animal Facts Song Short, and scheduler integration order
-- `docs/TASKS.md` � queued the 2026-04-28 reels polish sprint and daily-automation follow-up order
-- `docs/SESSION_LOG.md` � appended the session handoff note for tomorrow's reel build sprint
-- `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md` � captured Claude's scheduler parity fix as an execution-safe task spec
-- `docs/AGENT_LOG.md` � appended this planning handoff entry for Claude
+- `MEMORY.md` � added the locked short-form roadmap for Story Reel V2, Animal Facts Song Short, and scheduler integration order
+- `docs/TASKS.md` � queued the 2026-04-28 reels polish sprint and daily-automation follow-up order
+- `docs/SESSION_LOG.md` � appended the session handoff note for tomorrow's reel build sprint
+- `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md` � captured Claude's scheduler parity fix as an execution-safe task spec
+- `docs/AGENT_LOG.md` � appended this planning handoff entry for Claude
 **What was done:** I reviewed the current short-form story and animal code paths against the longform engines and locked the next build direction in docs before ending the session. The repo now explicitly records that story reels should move to a dedicated longform-derived short format, animal facts shorts should become a dedicated song-led format rather than a crude cutdown, and TASK-OC-005 should bring `scripts/daily-scheduler.mjs` into parity with the already-existing challenge-brief step in `npm run daily`.
 **Test command:** `Select-String -Path package.json,scripts/daily-scheduler.mjs -Pattern "generate-challenge-brief|generate-asmr-brief|totalSteps"`
 **Test output summary:** `package.json` already contains `node scripts/generate-challenge-brief.mjs --save` in `npm run daily`, while `scripts/daily-scheduler.mjs` still shows the ASMR brief block and a `totalSteps` base count of `3`, confirming the queued OC-005 scheduler-only fix is real and correctly scoped.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Tomorrow, implement `docs/tasks/TASK-OC-005-add-challenge-brief-to-daily-scheduler.md` first, then build Story Reel V2, then build Animal Facts Song Short, and only after those pass review, wire the new reel formats into the daily automation flow.
+
+---
+
+### 2026-04-28 | Claude (supervisor) | TASK-OC-005 | Add challenge brief step to daily-scheduler.mjs
+**Files changed:**
+- `scripts/daily-scheduler.mjs` — added `WITH_CHALLENGE` flag, `+ (WITH_CHALLENGE ? 1 : 0)` to `totalSteps`, and the full challenge brief step block after the ASMR block
+- `docs/TASKS.md` — marked TASK-OC-005 `[x]` done
+- `docs/SESSION_LOG.md` — appended session entry
+- `docs/tasks/TASK-OC-006-challenge-brief-intelligence-parity.md` — new spec for next OpenClaw task
+**What was done:** Implemented the scheduler parity fix directly (small, well-scoped change). Added `WITH_CHALLENGE = !args.includes('--no-challenge')` to the flag block. Inserted the challenge brief step immediately after the ASMR brief block so step order mirrors `npm run daily`. Updated `totalSteps` to count it. Full-day step sequence (non-Monday, no skips) is now 6 steps: archive → prompts → story → ASMR → challenge → X posts.
+**Test command:** `node scripts/daily-scheduler.mjs --now --no-story --no-asmr`
+**Test output summary:** Step 3/4 printed "Generating today's challenge brief..." → `generate-challenge-brief.mjs` exited 0 → "Challenge brief ready in output/challenge/". Step numbering correct throughout.
+**Review status:** CONFIRMED by Ahmed — implementation verified in working tree.
+**Next:** Hand TASK-OC-006 to OpenClaw. Scope: wire trends + perf-weights + psych-triggers into `generate-challenge-brief.mjs` to match the other 5 daily generators.
 
 ---

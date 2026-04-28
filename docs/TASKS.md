@@ -64,7 +64,7 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
 ## NEXT SESSION — REELS POLISH SPRINT (2026-04-28)
 
-- [ ] **TASK-OC-005 — Daily scheduler challenge brief parity** — add the missing challenge-brief block to `scripts/daily-scheduler.mjs` using `generate-challenge-brief.mjs`, and update `totalSteps` so scheduler behavior matches the existing `npm run daily` chain.
+- [x] **TASK-OC-005 — Daily scheduler challenge brief parity** — add the missing challenge-brief block to `scripts/daily-scheduler.mjs` using `generate-challenge-brief.mjs`, and update `totalSteps` so scheduler behavior matches the existing `npm run daily` chain. DONE 2026-04-28.
 - [ ] **Story Reel V2** — build a dedicated short-form story composition that inherits the longform story grammar (flash-forward hook, stronger caption style, better scene motion, cleaner ending) instead of continuing to treat legacy `StoryEpisode.jsx` as the primary reel format.
 - [ ] **Animal Facts Song Short** — build a dedicated vertical short based on the longform animal rules, with the song / sung-recap energy as the main structure rather than cutting down the existing longform episode.
 - [ ] **Daily automation follow-up after reel builds pass review** — once Story Reel V2 and Animal Facts Song Short are rendering cleanly, add their planning/generation steps into `scripts/daily-scheduler.mjs` / `npm run daily` so the short-form stack can consistently cover ASMR + Challenge + Story + Animal reels.
