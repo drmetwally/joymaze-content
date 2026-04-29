@@ -36,11 +36,11 @@ const OUT_DIR_ARG = getArg('--out-dir');
 const WORDS_ARG = getArg('--words');
 
 const difficultyDefaults = {
-  easy: { size: 10, words: 6 },
-  medium: { size: 12, words: 8 },
-  hard: { size: 14, words: 10 },
-  difficult: { size: 15, words: 11 },
-  extreme: { size: 16, words: 12 },
+  easy: { size: 10, words: 6, directions: ['right', 'down'] },
+  medium: { size: 12, words: 8, directions: ['right', 'down'] },
+  hard: { size: 14, words: 10, directions: ['right', 'down', 'diag-down-right', 'diag-up-right'] },
+  difficult: { size: 15, words: 11, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right'] },
+  extreme: { size: 16, words: 12, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right', 'diag-down-left', 'diag-up-left'] },
 };
 
 const WORD_BANK = {
@@ -134,30 +134,35 @@ function placeWord(grid, word, row, col, dr, dc) {
   return cells;
 }
 
-function generateWordSearch(size, words, rng) {
+function generateWordSearch(size, words, rng, allowedDirectionKeys) {
   const grid = buildGrid(size);
   const placements = [];
-  const directions = [
-    { dr: 0, dc: 1 },
-    { dr: 1, dc: 0 },
-    { dr: 1, dc: 1 },
-    { dr: -1, dc: 1 },
-    { dr: 0, dc: -1 },
-    { dr: -1, dc: 0 },
-    { dr: -1, dc: -1 },
-    { dr: 1, dc: -1 },
+  const allDirections = [
+    { key: 'right', dr: 0, dc: 1 },
+    { key: 'down', dr: 1, dc: 0 },
+    { key: 'diag-down-right', dr: 1, dc: 1 },
+    { key: 'diag-up-right', dr: -1, dc: 1 },
+    { key: 'left', dr: 0, dc: -1 },
+    { key: 'up', dr: -1, dc: 0 },
+    { key: 'diag-up-left', dr: -1, dc: -1 },
+    { key: 'diag-down-left', dr: 1, dc: -1 },
   ];
+  const directions = allDirections.filter((dir) => allowedDirectionKeys.includes(dir.key));
 
   for (const word of words.sort((a, b) => b.length - a.length)) {
     let placed = false;
-    const attempts = 500;
+    const attempts = 600;
     for (let attempt = 0; attempt < attempts && !placed; attempt++) {
       const dir = directions[randomInt(rng, directions.length)];
-      const row = randomInt(rng, size);
-      const col = randomInt(rng, size);
+      const inset = attempt < 350 ? 1 : 0;
+      const row = inset + randomInt(rng, Math.max(1, size - inset * 2));
+      const col = inset + randomInt(rng, Math.max(1, size - inset * 2));
       if (!canPlaceWord(grid, word, row, col, dir.dr, dir.dc)) continue;
-      const cells = placeWord(grid, word, row, col, dir.dr, dir.dc);
-      placements.push({ word, row, col, dr: dir.dr, dc: dir.dc, cells });
+      const cells = word.split('').map((_, i) => ({ r: row + dir.dr * i, c: col + dir.dc * i }));
+      const touchesEdge = cells.some((cell) => cell.r === 0 || cell.c === 0 || cell.r === size - 1 || cell.c === size - 1);
+      if (touchesEdge && attempt < 350) continue;
+      placeWord(grid, word, row, col, dir.dr, dir.dc);
+      placements.push({ word, row, col, dr: dir.dr, dc: dir.dc, direction: dir.key, cells });
       placed = true;
     }
     if (!placed) throw new Error(`Could not place word: ${word}`);
@@ -194,7 +199,7 @@ function placementRect(placement, layout) {
   const maxRow = Math.max(...rows);
   const minCol = Math.min(...cols);
   const maxCol = Math.max(...cols);
-  const pad = layout.cell * 0.18;
+  const pad = layout.cell * 0.1;
   const x1 = layout.gridX + minCol * layout.cell - pad;
   const y1 = layout.gridY + minRow * layout.cell - pad;
   const x2 = layout.gridX + (maxCol + 1) * layout.cell + pad;
@@ -287,7 +292,7 @@ async function main() {
   const rng = mulberry32(seed);
   const defaults = difficultyDefaults[DIFFICULTY] || difficultyDefaults.medium;
   const words = parseWords(WORDS_ARG, THEME, defaults.words, rng);
-  const { grid, placements } = generateWordSearch(defaults.size, words, rng);
+  const { grid, placements } = generateWordSearch(defaults.size, words, rng, defaults.directions);
   const layout = buildLayout(defaults.size, words.length);
   const rects = placements.map((placement) => placementRect(placement, layout));
   const normalizedRects = rects.map(normalizedRect);
@@ -350,6 +355,7 @@ async function main() {
   console.log(`[wordsearch-factory] difficulty : ${DIFFICULTY}`);
   console.log(`[wordsearch-factory] grid       : ${defaults.size}x${defaults.size}`);
   console.log(`[wordsearch-factory] words      : ${words.join(', ')}`);
+  console.log(`[wordsearch-factory] directions : ${defaults.directions.join(', ')}`);
 
   if (DRY_RUN) {
     console.log('[wordsearch-factory] dry-run only, no files written.');

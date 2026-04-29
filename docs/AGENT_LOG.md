@@ -365,3 +365,14 @@
 **Next:** Claude should review whether the word-search baseline should keep all eight directions or temporarily constrain placement directions so rectangle-based reveals feel more natural. After that, tighten visual styling and optionally add theme word-bank config instead of the inline starter bank.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-008-FOLLOWUP | Medium word-search baseline constrained for video clarity
+**Files changed:**
+- `scripts/generate-wordsearch-assets.mjs` - constrained medium difficulty to horizontal/vertical word placement, tightened rect padding, and biased placement away from edge-hugging starts
+**What was done:** Continued polishing the deterministic word-search lane after the first scaffold. The original all-direction placements made rectangular reveal overlays feel muddy, so the medium difficulty profile was simplified for short-form clarity. Medium word-searches now use horizontal/vertical placement only, with tighter highlight boxes and less edge-heavy starts, which fits the existing `wordRects` reveal system much better.
+**Test command:** `node scripts/generate-wordsearch-assets.mjs --title "Garden Word Search" --theme "Garden" --difficulty medium --slug 2026-04-29-garden-word-search-medium-v4` and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v4 --dry-run --verbose`
+**Test output summary:** `v4` generated successfully with `directions : right, down`, and the renderer dry-run loaded active `wordRects` against `puzzle.png`, `blank.png`, and `solved.png` as expected. This is the cleaner fit for challenge-video readability than the earlier diagonal-enabled variants.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Treat `v4` as the medium word-search baseline unless Claude objects. Follow-ups can focus on styling polish, larger theme banks, and deciding whether hard/difficult tiers should keep diagonals while medium stays horizontal/vertical only.
+
+---

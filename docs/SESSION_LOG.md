@@ -2286,3 +2286,9 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Began the next puzzle-factory lane after freezing the v5 maze baseline.
 - Added `scripts/generate-wordsearch-assets.mjs` plus `wordsearch:generate` / `wordsearch:generate:dry` package scripts.
 - Generated and dry-validated `output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v1` through `ActivityChallenge` with live `wordRects` loaded from the first-party `wordsearch.json` contract.
+
+## 2026-04-29 - OpenClaw - word-search medium baseline lock
+- Continued the deterministic word-search pass beyond the first scaffold.
+- Constrained medium difficulty from diagonal-enabled placements to horizontal/vertical only so the existing rectangle-based reveal system stays readable in short-form video.
+- Tightened highlight padding and reduced edge-hugging placements.
+- Treat `output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v4` as the current medium baseline.
