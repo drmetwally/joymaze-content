@@ -388,3 +388,14 @@
 **Next:** Claude should review whether a dedicated animated matching solve reveal is worth adding now, or whether the current solved-image wipe is sufficient until more matching content examples exist.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-009-FOLLOWUP | Matching baseline tuned for cleaner mobile readability
+**Files changed:**
+- `scripts/generate-matching-assets.mjs` - tuned matching layout, added controlled crossing targets per difficulty, added center match lane, upgraded card styling, and improved solved connector presentation
+**What was done:** Continued refining the deterministic matching lane after the first scaffold. The initial sample was legible but too easy-looking and visually flat, with more central tangle than necessary. I added difficulty-level crossing targets so shuffled right-side answers still create challenge without becoming spaghetti, widened and stylized the match lane, increased card readability, and made the solved frame more intentional. Medium now aims for 1-2 crossings, which is a better short-form balance than a fully chaotic shuffle.
+**Test command:** `node scripts/generate-matching-assets.mjs --title "Match the Pairs" --theme "Animals and Homes" --difficulty medium --slug 2026-04-29-matching-animals-homes-medium-v2` and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v2 --dry-run --verbose`
+**Test output summary:** `v2` generated successfully with 5 pairs and `crossings  : 2`, then dry-loaded through `ActivityChallenge` using `blank.png`, `puzzle.png`, and `solved.png`. Visual-analysis follow-up was blocked by temporary image-model limits, but the layout/contract improvements themselves were validated and this is the stronger baseline.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Treat `v2` as the current matching baseline. Later follow-up can add a dedicated animated connector reveal if matching becomes a priority content lane.
+
+---

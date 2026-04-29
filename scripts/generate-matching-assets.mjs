@@ -16,7 +16,8 @@ const PANEL_COLOR = '#FFFFFF';
 const PANEL_STROKE = '#E8DFC9';
 const TEXT_COLOR = '#202020';
 const MUTED_COLOR = '#6B645B';
-const LINE_COLOR = '#FF8A5B';
+const MATCH_ZONE_FILL = '#FFF3E9';
+const MATCH_ZONE_STROKE = '#F0D5C1';
 const LINE_COLORS = ['#FF8A5B', '#4FA3FF', '#57B65F', '#B978FF', '#F4C542', '#FF5C8A'];
 
 const args = process.argv.slice(2);
@@ -36,11 +37,11 @@ const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
 
 const difficultyDefaults = {
-  easy: { pairs: 4 },
-  medium: { pairs: 5 },
-  hard: { pairs: 6 },
-  difficult: { pairs: 6 },
-  extreme: { pairs: 7 },
+  easy: { pairs: 4, minCrossings: 1, maxCrossings: 1 },
+  medium: { pairs: 5, minCrossings: 1, maxCrossings: 2 },
+  hard: { pairs: 6, minCrossings: 2, maxCrossings: 4 },
+  difficult: { pairs: 6, minCrossings: 3, maxCrossings: 5 },
+  extreme: { pairs: 7, minCrossings: 4, maxCrossings: 7 },
 };
 
 const BANKS = {
@@ -137,19 +138,53 @@ function pickPairs(theme, count, rng) {
 function buildLayout(pairCount) {
   const topY = 430;
   const rowGap = 210;
-  const cardW = 430;
-  const cardH = 124;
-  const leftX = 150;
+  const cardW = 440;
+  const cardH = 130;
+  const leftX = 170;
   const rightX = CANVAS_W - leftX - cardW;
   const lineStartX = leftX + cardW;
   const lineEndX = rightX;
   return { topY, rowGap, cardW, cardH, leftX, rightX, lineStartX, lineEndX, pairCount };
 }
 
-function buildPuzzle(pairs, rng) {
+function crossingCount(leftItems, rightItems) {
+  const rightIndexByText = new Map(rightItems.map((item, index) => [item.text, index]));
+  let count = 0;
+  for (let i = 0; i < leftItems.length; i++) {
+    for (let j = i + 1; j < leftItems.length; j++) {
+      const ri = rightIndexByText.get(leftItems[i].match);
+      const rj = rightIndexByText.get(leftItems[j].match);
+      if (ri > rj) count++;
+    }
+  }
+  return count;
+}
+
+function buildPuzzle(pairs, rng, difficultyConfig) {
   const leftItems = pairs.map(([left, right], index) => ({ id: `L${index + 1}`, text: left, match: right }));
-  const rightItems = shuffle(pairs.map(([left, right], index) => ({ id: `R${index + 1}`, text: right, match: left })), rng);
-  return { leftItems, rightItems };
+  const baseRightItems = pairs.map(([left, right], index) => ({ id: `R${index + 1}`, text: right, match: left }));
+  let best = shuffle(baseRightItems, rng);
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  for (let attempt = 0; attempt < 160; attempt++) {
+    const candidate = shuffle(baseRightItems, rng);
+    const crossings = crossingCount(leftItems, candidate);
+    if (crossings >= difficultyConfig.minCrossings && crossings <= difficultyConfig.maxCrossings) {
+      best = candidate;
+      bestScore = crossings;
+      break;
+    }
+    const distance = Math.min(
+      Math.abs(crossings - difficultyConfig.minCrossings),
+      Math.abs(crossings - difficultyConfig.maxCrossings),
+    );
+    if (distance < bestScore) {
+      best = candidate;
+      bestScore = distance;
+    }
+  }
+
+  return { leftItems, rightItems: best, crossingCount: crossingCount(leftItems, best) };
 }
 
 function connectorData(leftItems, rightItems, layout) {
@@ -183,25 +218,28 @@ function cardSvg(x, y, w, h, text, side) {
   const accent = side === 'left' ? '#FFD9C7' : '#D8E9FF';
   return `
     <g>
+      <rect x="${x + 4}" y="${y + 8}" width="${w}" height="${h}" rx="28" ry="28" fill="#EDE4D6" opacity="0.55"/>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" ry="28" fill="${PANEL_COLOR}" stroke="${PANEL_STROKE}" stroke-width="4"/>
-      <circle cx="${side === 'left' ? x + 34 : x + w - 34}" cy="${y + h / 2}" r="10" fill="${accent}" />
-      <text x="${labelX}" y="${y + h / 2 + 16}" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="${TEXT_COLOR}">${escapeXml(text)}</text>
+      <circle cx="${side === 'left' ? x + 38 : x + w - 38}" cy="${y + h / 2}" r="14" fill="${accent}" />
+      <text x="${labelX}" y="${y + h / 2 + 15}" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="${TEXT_COLOR}">${escapeXml(text)}</text>
     </g>`;
 }
 
-function buildSvg({ title, subtitle, leftItems, rightItems, connectors, layout, solved = false }) {
+function buildSvg({ title, subtitle, leftItems, rightItems, connectors, layout, solved = false, crossingCount = 0 }) {
   const leftCards = leftItems.map((item, index) => cardSvg(layout.leftX, layout.topY + index * layout.rowGap, layout.cardW, layout.cardH, item.text, 'left')).join('\n');
   const rightCards = rightItems.map((item, index) => cardSvg(layout.rightX, layout.topY + index * layout.rowGap, layout.cardW, layout.cardH, item.text, 'right')).join('\n');
   const lines = solved ? connectors.map((line) => `
-    <path d="M ${line.x1} ${line.y1} C ${line.x1 + 90} ${line.y1}, ${line.x2 - 90} ${line.y2}, ${line.x2} ${line.y2}" fill="none" stroke="${line.color}" stroke-width="14" stroke-linecap="round" opacity="0.9"/>`).join('\n') : '';
+    <path d="M ${line.x1} ${line.y1} C ${line.x1 + 105} ${line.y1}, ${line.x2 - 105} ${line.y2}, ${line.x2} ${line.y2}" fill="none" stroke="${line.color}" stroke-width="16" stroke-linecap="round" opacity="0.92"/>`).join('\n') : '';
 
   return `
 <svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="${BG_COLOR}"/>
   <text x="${CANVAS_W / 2}" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="68" font-weight="700" fill="${TEXT_COLOR}">${escapeXml(title)}</text>
   <text x="${CANVAS_W / 2}" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="${MUTED_COLOR}">${escapeXml(subtitle)}</text>
+  <rect x="648" y="368" width="404" height="1128" rx="64" ry="64" fill="${MATCH_ZONE_FILL}" stroke="${MATCH_ZONE_STROKE}" stroke-width="3" opacity="0.88"/>
   <text x="${layout.leftX + layout.cardW / 2}" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="${MUTED_COLOR}">Match from here</text>
   <text x="${layout.rightX + layout.cardW / 2}" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="${MUTED_COLOR}">To the correct pair</text>
+  <text x="850" y="1528" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="${MUTED_COLOR}">${solved ? `Solved with ${crossingCount} crossing${crossingCount === 1 ? '' : 's'}` : 'Draw each line through the center lane'}</text>
   ${lines}
   ${leftCards}
   ${rightCards}
@@ -220,15 +258,15 @@ async function main() {
   const defaults = difficultyDefaults[DIFFICULTY] || difficultyDefaults.medium;
   const pairs = pickPairs(THEME, defaults.pairs, rng);
   const layout = buildLayout(pairs.length);
-  const { leftItems, rightItems } = buildPuzzle(pairs, rng);
+  const { leftItems, rightItems, crossingCount } = buildPuzzle(pairs, rng, defaults);
   const connectors = connectorData(leftItems, rightItems, layout);
 
   const slug = SLUG_ARG || `${new Date().toISOString().slice(0, 10)}-${slugify(TITLE || THEME || 'matching')}-${slugify(DIFFICULTY)}`;
   const outDir = OUT_DIR_ARG ? path.resolve(ROOT, OUT_DIR_ARG) : path.join(OUTPUT_ROOT, slug);
   const folderRel = path.relative(ROOT, outDir).replace(/\\/g, '/');
 
-  const blankSvg = buildSvg({ title: TITLE, subtitle: 'Draw a line to match each pair', leftItems, rightItems, connectors, layout, solved: false });
-  const solvedSvg = buildSvg({ title: TITLE, subtitle: 'Here are the correct matches', leftItems, rightItems, connectors, layout, solved: true });
+  const blankSvg = buildSvg({ title: TITLE, subtitle: 'Draw a line to match each pair', leftItems, rightItems, connectors, layout, solved: false, crossingCount });
+  const solvedSvg = buildSvg({ title: TITLE, subtitle: 'Here are the correct matches', leftItems, rightItems, connectors, layout, solved: true, crossingCount });
 
   const activityJson = {
     type: 'challenge',
@@ -257,6 +295,7 @@ async function main() {
     rightItems,
     pairs: pairs.map(([left, right]) => ({ left, right })),
     connectors,
+    crossingCount,
   };
 
   console.log(`[matching-factory] title      : ${TITLE}`);
@@ -265,6 +304,7 @@ async function main() {
   console.log(`[matching-factory] seed       : ${seed}`);
   console.log(`[matching-factory] difficulty : ${DIFFICULTY}`);
   console.log(`[matching-factory] pairs      : ${pairs.map(([a, b]) => `${a}-${b}`).join(', ')}`);
+  console.log(`[matching-factory] crossings  : ${crossingCount}`);
 
   if (DRY_RUN) {
     console.log('[matching-factory] dry-run only, no files written.');

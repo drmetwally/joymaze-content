@@ -2297,3 +2297,9 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Started the next puzzle-factory lane after maze v5 and word-search medium v4 were stabilized.
 - Added `scripts/generate-matching-assets.mjs` plus `matching:generate` / `matching:generate:dry` package scripts.
 - Generated and dry-validated `output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v1` through `ActivityChallenge`.
+
+## 2026-04-29 - OpenClaw - matching v2 baseline lock
+- Continued matching refinement beyond the first scaffold.
+- Added controlled crossing targets by difficulty, a dedicated center match lane, and stronger card styling.
+- Generated `output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v2` with 2 crossings and validated it through `ActivityChallenge` dry-run.
+- Treat `v2` as the current matching baseline.
