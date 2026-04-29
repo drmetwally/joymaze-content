@@ -25,6 +25,32 @@ const normalizeRectSpace = (rect, VW, VH) => {
   return rect;
 };
 
+function rectPerimeterPoint(rect, progress) {
+  const perimeter = (rect.w + rect.h) * 2 || 1;
+  let d = Math.max(0, Math.min(perimeter, progress * perimeter));
+  if (d <= rect.w) return { x: rect.x + d, y: rect.y };
+  d -= rect.w;
+  if (d <= rect.h) return { x: rect.x + rect.w, y: rect.y + d };
+  d -= rect.h;
+  if (d <= rect.w) return { x: rect.x + rect.w - d, y: rect.y + rect.h };
+  d -= rect.w;
+  return { x: rect.x, y: rect.y + rect.h - Math.min(d, rect.h) };
+}
+
+function MarkerTip({ tipX, tipY, videoWidth, videoHeight }) {
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      <svg width={videoWidth} height={videoHeight} style={{ position: 'absolute', top: 0, left: 0 }}>
+        <g transform={`translate(${tipX.toFixed(1)} ${tipY.toFixed(1)}) rotate(35)`}>
+          <rect x="-8" y="-26" width="16" height="52" rx="7" fill="#FF9A3D" stroke="#C96B18" strokeWidth="2" />
+          <polygon points="-6,26 6,26 0,40" fill="#6B4A2F" />
+          <circle cx="0" cy="0" r="2.5" fill="#FFE3BF" opacity="0.9" />
+        </g>
+      </svg>
+    </AbsoluteFill>
+  );
+}
+
 export const WordSearchReveal = ({
   blankPath,
   solvedPath,
@@ -66,7 +92,11 @@ export const WordSearchReveal = ({
     const w = Math.max(0, (rect.x2 - rect.x1) - inset * 2);
     const h = Math.max(0, (rect.y2 - rect.y1) - inset * 2);
     const opacity = interpolate(
-      expandProgress, [0, 0.15, 1], [0, 0.55, 0.9],
+      expandProgress, [0, 0.15, 1], [0, 0.72, 1],
+      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+    );
+    const fillOpacity = interpolate(
+      expandProgress, [0, 0.6, 1], [0, 0.06, 0.12],
       { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
     );
 
@@ -76,9 +106,14 @@ export const WordSearchReveal = ({
       w,
       h,
       opacity,
+      fillOpacity,
+      expandProgress,
       dashOffset: 100 - expandProgress * 100,
     };
   });
+
+  const activeRect = [...highlightRects].reverse().find((rect) => rect && rect.expandProgress < 1) ?? null;
+  const markerTip = activeRect ? rectPerimeterPoint(activeRect, activeRect.expandProgress) : null;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#f5f5f0' }}>
@@ -113,10 +148,11 @@ export const WordSearchReveal = ({
                 y={r.y.toFixed(1)}
                 width={r.w.toFixed(1)}
                 height={r.h.toFixed(1)}
-                fill="none"
+                fill={highlightColor}
+                fillOpacity={r.fillOpacity}
                 stroke={highlightColor}
                 strokeOpacity={r.opacity}
-                strokeWidth="4"
+                strokeWidth="6"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 rx="10"
@@ -130,6 +166,8 @@ export const WordSearchReveal = ({
           })}
         </svg>
       </AbsoluteFill>
+
+      {markerTip ? <MarkerTip tipX={markerTip.x} tipY={markerTip.y} videoWidth={VW} videoHeight={VH} /> : null}
 
       {/* Solved image cross-fade at end */}
       {solvedOpacity > 0 && (

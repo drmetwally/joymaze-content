@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
+import { buildChallengeHook } from './lib/challenge-hooks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -331,15 +332,7 @@ async function writeSvgPng(svg, outSvgPath, outPngPath) {
   await fs.writeFile(outPngPath, pngBuffer);
 }
 
-function buildHookTitle({ puzzleType, difficulty }) {
-  if (puzzleType === 'maze') {
-    if (difficulty === 'hard' || difficulty === 'difficult' || difficulty === 'extreme') return 'ONLY SHARP KIDS BEAT THIS MAZE';
-    return 'ONLY SHARP KIDS SOLVE THIS MAZE';
-  }
-  return 'ONLY SHARP KIDS SOLVE THIS';
-}
-
-function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cells, solutionCells, solutionPoints, layout, folderRel }) {
+function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cells, solutionCells, solutionPoints, layout, folderRel, hookTitle }) {
   const mazeJson = {
     version: 1,
     puzzleType: PUZZLE_TYPE,
@@ -371,8 +364,6 @@ function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cell
     pathColor: PATH_COLOR,
     waypoints: normalizedWaypoints(solutionPoints, layout),
   };
-
-  const hookTitle = buildHookTitle({ puzzleType: PUZZLE_TYPE, difficulty });
 
   const activityJson = {
     type: 'challenge',
@@ -431,6 +422,11 @@ async function main() {
   const solutionPoints = buildSolutionPolyline(solutionCells, layout);
   const blankSvg = buildSvg({ cells, layout });
   const solvedSvg = buildSvg({ cells, layout, solutionPoints, pathColor: PATH_COLOR });
+  const hookTitle = await buildChallengeHook({
+    puzzleType: PUZZLE_TYPE,
+    countdownSec: COUNTDOWN_SEC,
+    seedHint: `${TITLE}|${THEME}|${DIFFICULTY}|${SHAPE}`,
+  });
   const { mazeJson, pathJson, activityJson } = buildMetadata({
     seed,
     title: TITLE,
@@ -444,6 +440,7 @@ async function main() {
     solutionPoints,
     layout,
     folderRel,
+    hookTitle,
   });
   const benchmarkJson = summarizeReferenceComparison(SHAPE, DIFFICULTY, ROWS, COLS);
 

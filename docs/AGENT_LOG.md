@@ -453,3 +453,18 @@
 **Next:** If there is another pass after user review, it should be content/performance tuning rather than structure repair. The timing, hook, audio hierarchy, banner removal, and solve style are now aligned.
 
 ---
+
+### 2026-04-29 | OpenClaw | intelligence-derived challenge hooks + smoother solve motion
+**Files changed:**
+- `scripts/lib/challenge-hooks.mjs` - new intelligence-backed challenge title selector reading `hooks-library.json`, `psychology-triggers.json`, and `content-intelligence.json`
+- `scripts/generate-maze-assets.mjs` - maze title/hook now sourced from challenge hook selector instead of hardcoded string
+- `scripts/generate-wordsearch-assets.mjs` - word-search title/hook now sourced from challenge hook selector instead of hardcoded string
+- `remotion/components/MazeSolverReveal.jsx` - changed from waypoint-step drawing to continuous path interpolation so the pencil tip slides along the route instead of hopping between points
+- `remotion/components/WordSearchReveal.jsx` - boosted solve visibility with a stronger outline/fill balance and added a marker tip that travels the outline during the reveal
+**What was done:** The user correctly challenged both the authorship and quality of the top title copy. The previous pass still hardcoded hook lines inside the generators, which meant the title was stronger than before but not actually connected to the repo intelligence system. I replaced that with a deterministic hook selector that pulls challenge-flavored lines from the hook library, challenge psychology examples, and pattern-interrupt intelligence, then adapts them into puzzle-type-specific challenge copy. Current rendered examples landed as `Can your kid solve this maze before 15 seconds?` and `How fast can your kid find all 8 hidden words?`. On the solve side, the deeper root of the maze pen issue was discrete waypoint reveal, not just jitter amplitude. I replaced the draw logic with continuous segment interpolation so the line and pencil move like a real sliding draw rather than point-to-point hops. For word-search, outline-only was too faint, so I strengthened visibility with a heavier outline, faint fill support, and a moving marker tip.
+**Test command:** Regenerated the existing `...-final` challenge folders and re-rendered `output/videos/maze-final.mp4` and `output/videos/wordsearch-final.mp4` after the hook-selector and solve-motion changes.
+**Test output summary:** Final render durations remain 29.5s (maze) and 34.5s (word-search). Challenge titles are now intelligence-derived instead of hardcoded. Maze final render uses continuous path interpolation, and word-search final render uses a more visible moving marker-style reveal.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If the user still wants title copy even punchier, the right next move is not more hardcoded text, but improving the challenge-hook selector heuristics or adding a challenge-specific hook pool inside the intelligence system.
+
+---

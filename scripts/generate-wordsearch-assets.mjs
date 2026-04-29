@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
+import { buildChallengeHook } from './lib/challenge-hooks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -264,10 +265,6 @@ function gridSvg(grid, layout) {
   return { lines, letters };
 }
 
-function buildHookTitle(wordsCount) {
-  return `ONLY SHARP EYES FIND ALL ${wordsCount} WORDS`;
-}
-
 function buildSvg({ title, theme, grid, layout, rects = [] }) {
   const { lines, letters } = gridSvg(grid, layout);
   const highlights = rects.map((rect) => `<rect x="${(rect.x1 + 5).toFixed(1)}" y="${(rect.y1 + 5).toFixed(1)}" width="${Math.max(0, rect.x2 - rect.x1 - 10).toFixed(1)}" height="${Math.max(0, rect.y2 - rect.y1 - 10).toFixed(1)}" rx="16" ry="16" fill="none" stroke="${HIGHLIGHT_COLOR}" stroke-width="8" stroke-linejoin="round" />`).join('\n    ');
@@ -308,7 +305,12 @@ async function main() {
   const outDir = OUT_DIR_ARG ? path.resolve(ROOT, OUT_DIR_ARG) : path.join(OUTPUT_ROOT, slug);
   const folderRel = path.relative(ROOT, outDir).replace(/\\/g, '/');
 
-  const hookTitle = buildHookTitle(words.length);
+  const hookTitle = await buildChallengeHook({
+    puzzleType: 'word-search',
+    countdownSec: COUNTDOWN_SEC,
+    wordsCount: words.length,
+    seedHint: `${TITLE}|${THEME}|${DIFFICULTY}|${words.join(',')}`,
+  });
   const blankSvg = buildSvg({ title: TITLE, theme: { words }, grid, layout, rects: [] });
   const solvedSvg = buildSvg({ title: TITLE, theme: { words }, grid, layout, rects });
 

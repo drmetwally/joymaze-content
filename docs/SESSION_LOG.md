@@ -2331,3 +2331,10 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Applied one last micro-pass on maze glow crispness and word-search outline spacing.
 - Rendered the final keeper files as `maze-final.mp4` and `wordsearch-final.mp4`.
 - Removed all older files from `output/videos`, leaving only the final render set and thumbnails.
+
+## 2026-04-29 - OpenClaw - intelligence hook wiring and smoother solve motion
+- Replaced hardcoded challenge titles with an intelligence-backed hook selector.
+- Maze title/hook and word-search title/hook now come from repo intelligence sources rather than literal generator strings.
+- Reworked maze solve drawing to interpolate continuously along segments so the pencil slides instead of hopping.
+- Strengthened word-search solve visibility and added a moving marker tip around the outline.
+- Re-rendered the final videos after these changes.

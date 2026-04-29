@@ -27,6 +27,52 @@ function extendPoint(from, toward, distance) {
   };
 }
 
+function interpolatePoint(a, b, t) {
+  return {
+    x: a.x + (b.x - a.x) * t,
+    y: a.y + (b.y - a.y) * t,
+  };
+}
+
+function buildContinuousPath(points, progress) {
+  if (points.length <= 1) {
+    const only = points[0] ?? { x: 0, y: 0 };
+    return { drawnPts: points, tip: only };
+  }
+
+  const segments = [];
+  let totalLength = 0;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+    const length = Math.hypot(b.x - a.x, b.y - a.y);
+    segments.push({ a, b, length });
+    totalLength += length;
+  }
+
+  const target = Math.max(0, Math.min(totalLength, progress * totalLength));
+  const drawnPts = [points[0]];
+  let traversed = 0;
+  let tip = points[0];
+
+  for (const segment of segments) {
+    if (traversed + segment.length <= target) {
+      drawnPts.push(segment.b);
+      tip = segment.b;
+      traversed += segment.length;
+      continue;
+    }
+
+    const remaining = Math.max(0, target - traversed);
+    const t = segment.length === 0 ? 0 : remaining / segment.length;
+    tip = interpolatePoint(segment.a, segment.b, t);
+    drawnPts.push(tip);
+    return { drawnPts, tip };
+  }
+
+  return { drawnPts, tip };
+}
+
 // Simple pencil SVG — no hand, just the pencil stick at the line tip
 function PencilTip({ tipX, tipY, frame, videoWidth, videoHeight }) {
   const { yOff, aOff } = jitter(frame, 1.47);
@@ -90,17 +136,15 @@ export const MazeSolverReveal = ({
   const localFrame = Math.max(0, frame - startFrame);
   const progress   = Math.min(localFrame / durationFrames, 1);
 
-  const drawnCount = Math.max(1, Math.floor(progress * waypoints.length));
-  const rawPts = waypoints.slice(0, drawnCount);
-  const first = rawPts[0];
-  const second = rawPts[1] ?? rawPts[0];
-  const penultimate = rawPts[rawPts.length - 2] ?? rawPts[rawPts.length - 1];
-  const last = rawPts[rawPts.length - 1] ?? { x: videoWidth / 2, y: videoHeight / 2 };
-  const extendedStart = rawPts.length > 1 ? extendPoint(first, second, -22) : first;
-  const extendedEnd = rawPts.length > 1 ? extendPoint(last, penultimate, -26) : last;
-  const drawnPts = rawPts.length > 1 ? [extendedStart, ...rawPts.slice(1, -1), extendedEnd] : rawPts;
+  const first = waypoints[0];
+  const second = waypoints[1] ?? waypoints[0];
+  const penultimate = waypoints[waypoints.length - 2] ?? waypoints[waypoints.length - 1];
+  const last = waypoints[waypoints.length - 1] ?? { x: videoWidth / 2, y: videoHeight / 2 };
+  const extendedStart = waypoints.length > 1 ? extendPoint(first, second, -22) : first;
+  const extendedEnd = waypoints.length > 1 ? extendPoint(last, penultimate, -26) : last;
+  const pathPts = waypoints.length > 1 ? [extendedStart, ...waypoints.slice(1, -1), extendedEnd] : waypoints;
+  const { drawnPts, tip } = buildContinuousPath(pathPts, progress);
   const pointsStr  = drawnPts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  const tip        = extendedEnd ?? last;
 
   const solvedOpacity = interpolate(
     progress, [0.92, 1.0], [0, 1],
