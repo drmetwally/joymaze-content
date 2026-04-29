@@ -16,6 +16,17 @@ function jitter(frame, seed = 0) {
   };
 }
 
+function extendPoint(from, toward, distance) {
+  if (!from || !toward) return from;
+  const dx = toward.x - from.x;
+  const dy = toward.y - from.y;
+  const length = Math.hypot(dx, dy) || 1;
+  return {
+    x: from.x + (dx / length) * distance,
+    y: from.y + (dy / length) * distance,
+  };
+}
+
 // Simple pencil SVG — no hand, just the pencil stick at the line tip
 function PencilTip({ tipX, tipY, frame, videoWidth, videoHeight }) {
   const { yOff, aOff } = jitter(frame, 1.47);
@@ -27,7 +38,7 @@ function PencilTip({ tipX, tipY, frame, videoWidth, videoHeight }) {
   const ax = d => tx + d * Math.sin(rad);
   const ay = d => ty - d * Math.cos(rad);
 
-  const GRAPHITE = 14, WOOD = 36, BODY = 200, BODY_W = 24;
+  const GRAPHITE = 12, WOOD = 32, BODY = 168, BODY_W = 20;
 
   return (
     <AbsoluteFill style={{ pointerEvents: 'none' }}>
@@ -80,9 +91,16 @@ export const MazeSolverReveal = ({
   const progress   = Math.min(localFrame / durationFrames, 1);
 
   const drawnCount = Math.max(1, Math.floor(progress * waypoints.length));
-  const drawnPts   = waypoints.slice(0, drawnCount);
+  const rawPts = waypoints.slice(0, drawnCount);
+  const first = rawPts[0];
+  const second = rawPts[1] ?? rawPts[0];
+  const penultimate = rawPts[rawPts.length - 2] ?? rawPts[rawPts.length - 1];
+  const last = rawPts[rawPts.length - 1] ?? { x: videoWidth / 2, y: videoHeight / 2 };
+  const extendedStart = rawPts.length > 1 ? extendPoint(first, second, -22) : first;
+  const extendedEnd = rawPts.length > 1 ? extendPoint(last, penultimate, -26) : last;
+  const drawnPts = rawPts.length > 1 ? [extendedStart, ...rawPts.slice(1, -1), extendedEnd] : rawPts;
   const pointsStr  = drawnPts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  const tip        = drawnPts[drawnPts.length - 1] ?? { x: videoWidth / 2, y: videoHeight / 2 };
+  const tip        = extendedEnd ?? last;
 
   const solvedOpacity = interpolate(
     progress, [0.92, 1.0], [0, 1],
@@ -105,13 +123,13 @@ export const MazeSolverReveal = ({
              style={{ position: 'absolute', top: 0, left: 0 }}>
           <defs>
             <filter id="msr-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="5"
-                floodColor={pathColor} floodOpacity="0.5" />
+              <feDropShadow dx="0" dy="0" stdDeviation="3.5"
+                floodColor={pathColor} floodOpacity="0.34" />
             </filter>
           </defs>
           {drawnPts.length >= 2 && (
             <polyline points={pointsStr} fill="none"
-              stroke={pathColor} strokeWidth="8"
+              stroke={pathColor} strokeWidth="7"
               strokeLinecap="round" strokeLinejoin="round"
               filter="url(#msr-glow)" />
           )}

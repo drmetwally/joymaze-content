@@ -2309,3 +2309,10 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Updated maze generator to emit `holdAfterSec: 12` and word-search generator to emit `holdAfterSec: 15`.
 - Regenerated fresh review folders: `...maze-medium-rectangle-v6` and `...word-search-medium-v5`.
 - Verified emitted activity data now carries the longer solve phase and the maze folder still includes `path.json`.
+
+## 2026-04-29 - OpenClaw - renderer-side solve polish
+- Rendered real maze + word-search challenge MP4s after the timing fix and verified they run end-to-end.
+- Found and fixed a renderer bug in `WordSearchReveal.jsx`: word-search rects were already in video pixel space, but the component was re-scaling them as if they were normalized.
+- Tightened word-search highlight rendering and softened overlap muddiness.
+- Polished maze reveal with lighter glow, smaller pencil, and slight start/end extension so the path reads more like a completed solve.
+- Hardened `render-video.mjs` for concurrent Windows renders by using process-unique temp public dirs and removing unsafe stale-bundle cleanup.

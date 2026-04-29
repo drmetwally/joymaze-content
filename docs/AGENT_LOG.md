@@ -411,3 +411,16 @@
 **Next:** User should re-review the newly generated `v6` maze and `v5` word-search challenge folders rather than older outputs. If the solve still feels off after that, the next step is renderer-side polish, not generator-side timing.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-007 / renderer-side solve polish
+**Files changed:**
+- `remotion/components/WordSearchReveal.jsx` - fixed word-search rect coordinate handling, added axis-aware reveal growth, tightened inset/stroke/glow treatment
+- `remotion/components/MazeSolverReveal.jsx` - extended line slightly through entry/exit, reduced glow, slimmed pencil cursor
+- `scripts/render-video.mjs` - switched Remotion public staging to process-unique temp dirs and removed unsafe cross-process webpack-bundle cleanup
+**What was done:** After generator timing repair, I rendered full challenge MP4s and then inspected solve-phase still frames. That exposed a real renderer bug: `render-video.mjs` already mapped `wordsearch.json` rects into video pixel space, but `WordSearchReveal.jsx` still treated them as normalized values and multiplied by video size again. I fixed that and hardened the component so it accepts either normalized or pixel-space rects. I also added vertical-vs-horizontal reveal growth, reduced muddy overlap by insetting/stroking the highlight boxes, and toned down the glow. For maze, I kept the same path contract but made the overlay feel more like a true solve by slightly extending the path through the visible opening direction, reducing glow softness, and shrinking the pencil so it feels less sticker-like. Separately, real render validation surfaced two Windows concurrency hazards in `render-video.mjs`: shared `.remotion-public` staging and aggressive stale-bundle deletion. Both are now removed/hardened in favor of process-unique temp staging and safer cleanup.
+**Test command:** Full renders of maze + word-search challenge videos, then solve-phase still extraction via temporary Remotion still render helper for frames 1440/1560/1710 (maze) and 1440/1620/1800 (word-search), plus concurrent re-render validation after the `render-video.mjs` stability changes.
+**Test output summary:** Both full renders succeeded serially, then succeeded concurrently after the public-dir fix. Updated still-frame review showed the word-search highlight alignment issue resolved, cleaner highlight stacking, better maze corridor centering, and more believable pencil placement. Remaining issues are minor crispness tweaks, not broken solve behavior.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If we want another polish pass, the best remaining targets are (1) slightly crisper maze line edge/glow and (2) possible text-preservation treatment under word-search highlight fills.
+
+---

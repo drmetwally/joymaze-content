@@ -22,6 +22,7 @@ import { bundle }                                      from '@remotion/bundler';
 import { renderMedia, selectComposition, renderStill } from '@remotion/renderer';
 import path   from 'path';
 import fs     from 'fs/promises';
+import os     from 'os';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -582,15 +583,15 @@ function computeDuration(inputProps, compId) {
 // Bundling takes ~50s on cold start. If this script is imported as a module or
 // called multiple times in one process, we reuse the same bundle URL.
 let _cachedServeUrl = null;
+let _cachedPublicDir = null;
 async function getBundle() {
   if (_cachedServeUrl) return _cachedServeUrl;
   console.log('\n    Bundling compositions...');
   const t = Date.now();
-  // Build a lean publicDir with only the folders staticFile() paths reference.
-  // Remotion copies publicDir into a temp webpack bundle — including node_modules or
-  // output/archive would exhaust disk space on Windows. Pre-copy only what's needed.
-  const publicDir = path.join(ROOT, '.remotion-public');
-  await fs.mkdir(publicDir, { recursive: true });
+  // Build a lean process-unique publicDir with only the folders staticFile() paths reference.
+  // A shared `.remotion-public` can collide on Windows when multiple renders run at once.
+  const publicDir = await fs.mkdtemp(path.join(os.tmpdir(), 'joymaze-remotion-public-'));
+  _cachedPublicDir = publicDir;
   // Subdirs to mirror: assets/ + output/asmr/ + output/stories/
   // cp -r equivalent using Node.js fs (no symlinks — avoids Windows EPERM)
   const toCopy = [
@@ -705,24 +706,13 @@ async function main() {
     }
   }
 
-  // ── Purge stale Remotion temp bundles ────────────────────────────────────────
-  // Remotion writes each bundle to a fresh tmp dir and never cleans up.
-  // After a successful render we delete all bundles EXCEPT the one we just used,
-  // so disk space doesn't accumulate across sessions.
-  try {
-    const os   = await import('os');
-    const tmpDir = os.tmpdir();
-    const entries = await fs.readdir(tmpDir);
-    const bundles = entries.filter(e => e.startsWith('remotion-webpack-bundle-'));
-    const currentBundle = serveUrl.startsWith('file:///')
-      ? serveUrl.replace('file:///', '').split('/')[0]
-      : null;
-    for (const b of bundles) {
-      if (b === currentBundle) continue; // keep the one we just used
-      await fs.rm(path.join(tmpDir, b), { recursive: true, force: true }).catch(() => {});
-    }
-    if (bundles.length > 1) console.log(`    [cleanup] removed ${bundles.length - 1} stale bundle(s) from ${tmpDir}`);
-  } catch { /* non-fatal */ }
+  // Keep Remotion webpack bundles in place here.
+  // Cross-process cleanup is unsafe on Windows because concurrent renders can still
+  // be serving those bundles during thumbnail extraction or late render steps.
+  if (_cachedPublicDir) {
+    await fs.rm(_cachedPublicDir, { recursive: true, force: true }).catch(() => {});
+    _cachedPublicDir = null;
+  }
 
   console.log();
 }

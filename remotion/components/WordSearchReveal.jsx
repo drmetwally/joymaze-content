@@ -13,6 +13,19 @@ import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, static
 //   startFrame     — frame at which reveal begins
 //   durationFrames — total frames for the full reveal sequence
 
+const normalizeRectSpace = (rect, VW, VH) => {
+  const looksNormalized = [rect.x1, rect.y1, rect.x2, rect.y2].every((value) => Math.abs(value) <= 1.5);
+  if (looksNormalized) {
+    return {
+      x1: rect.x1 * VW,
+      y1: rect.y1 * VH,
+      x2: rect.x2 * VW,
+      y2: rect.y2 * VH,
+    };
+  }
+  return rect;
+};
+
 export const WordSearchReveal = ({
   blankPath,
   solvedPath,
@@ -31,45 +44,40 @@ export const WordSearchReveal = ({
 
   // ── Timing: divide reveal window into equal slots per word ───────────────
   // Each word gets: (expand phase 0→1) then (hold until next word starts).
-  // EXPAND_FRAMES: how many frames the rect width grows from 0 to full.
-  const EXPAND_FRAMES = 14; // ~0.47s @ 30fps — fast satisfying swipe
+  // EXPAND_FRAMES: how many frames the marker grows for one word.
+  const EXPAND_FRAMES = 16;
   const wordCount     = rects.length;
   const framesPerWord = wordCount > 0 ? durationFrames / wordCount : durationFrames;
 
   // ── Cross-fade to solved image at the end ─────────────────────────────────
   const solvedOpacity = interpolate(
-    progress, [0.92, 1.0], [0, 1],
+    progress, [0.9, 1.0], [0, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
 
-  // ── Build highlight rects ─────────────────────────────────────────────────
-  // For each word: at what local frame does its expansion start?
-  // We stagger them evenly so the last word completes at ~92% of durationFrames.
-  const highlightRects = rects.map((rect, i) => {
+  const highlightRects = rects.map((rawRect, i) => {
     const wordStartFrame = i * framesPerWord;
     const localWordFrame = localFrame - wordStartFrame;
-
-    // Before this word's slot: not shown. After: fully shown.
     if (localWordFrame < 0) return null;
 
     const expandProgress = Math.min(localWordFrame / EXPAND_FRAMES, 1);
+    const rect = normalizeRectSpace(rawRect, VW, VH);
+    const inset = 5;
+    const x = rect.x1 + inset;
+    const y = rect.y1 + inset;
+    const fullW = Math.max(0, (rect.x2 - rect.x1) - inset * 2);
+    const fullH = Math.max(0, (rect.y2 - rect.y1) - inset * 2);
+    const vertical = fullH > fullW;
 
-    // Rect in video pixel space
-    const x = rect.x1 * VW;
-    const y = rect.y1 * VH;
-    const fullW = (rect.x2 - rect.x1) * VW;
-    const h     = (rect.y2 - rect.y1) * VH;
+    const currentW = vertical ? fullW : expandProgress * fullW;
+    const currentH = vertical ? expandProgress * fullH : fullH;
 
-    // Horizontal wipe: width grows from 0 to fullW
-    const currentW = expandProgress * fullW;
-
-    // Opacity: fade in with the expand, hold at target opacity
     const opacity = interpolate(
-      expandProgress, [0, 0.3, 1], [0, 0.62, 0.62],
+      expandProgress, [0, 0.25, 1], [0, 0.42, 0.48],
       { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
     );
 
-    return { x, y, w: currentW, h, opacity };
+    return { x, y, w: currentW, h: currentH, opacity };
   });
 
   return (
@@ -92,8 +100,8 @@ export const WordSearchReveal = ({
         >
           <defs>
             <filter id="wsr-glow" x="-20%" y="-40%" width="140%" height="180%">
-              <feDropShadow dx="0" dy="0" stdDeviation="6"
-                floodColor={highlightColor} floodOpacity="0.45" />
+              <feDropShadow dx="0" dy="0" stdDeviation="4"
+                floodColor={highlightColor} floodOpacity="0.28" />
             </filter>
           </defs>
           {highlightRects.map((r, i) => {
@@ -107,8 +115,11 @@ export const WordSearchReveal = ({
                 height={r.h.toFixed(1)}
                 fill={highlightColor}
                 fillOpacity={r.opacity}
-                rx="6"
-                ry="6"
+                stroke={highlightColor}
+                strokeOpacity={Math.min(0.9, r.opacity + 0.18)}
+                strokeWidth="2"
+                rx="10"
+                ry="10"
                 filter="url(#wsr-glow)"
               />
             );
