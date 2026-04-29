@@ -424,3 +424,18 @@
 **Next:** If we want another polish pass, the best remaining targets are (1) slightly crisper maze line edge/glow and (2) possible text-preservation treatment under word-search highlight fills.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-007 / engagement + timing + audio + branding pass
+**Files changed:**
+- `scripts/generate-maze-assets.mjs` - stronger intelligence-linked hook title, 30s challenge default, lower challenge music, louder ticks, brand banner off by default
+- `scripts/generate-wordsearch-assets.mjs` - stronger intelligence-linked hook title, 30s challenge default, orange outline solved state, brand banner off by default
+- `remotion/compositions/ActivityChallenge.jsx` - audio rebalance defaults, fast end-countdown ticks, brand banner default off
+- `remotion/components/MazeSolverReveal.jsx` - much smoother pencil jitter profile
+- `remotion/components/WordSearchReveal.jsx` - outline-first solve reveal instead of filled highlight treatment
+**What was done:** Applied the user’s next polish directives after reviewing the latest renders. The challenge phase was too long at 45 seconds, the top title was still descriptive instead of engagement-driven, the challenge music was overpowering the countdown tick, and the bottom `joymaze.com` banner contradicted the no-direct-marketing decision. I moved the default challenge timer down to 30 seconds for both lanes, switched title/hook text to intelligence-linked challenge hooks (`ONLY SHARP KIDS SOLVE THIS MAZE`, `ONLY SHARP EYES FIND ALL 8 WORDS`), lowered challenge/solve music, raised tick presence, and added extra half-second fast ticks in the final countdown window. For branding, `showBrandWatermark` now defaults off in the challenge pipeline. For solve-phase visuals, maze pencil jitter was reduced heavily to read smoother, and word-search switched from fill-heavy highlights to orange outline reveals plus matching outlined solved assets so the letters stay readable.
+**Test command:** Regenerated fresh folders `...maze-medium-rectangle-v7` and `...word-search-medium-v6`; rendered full challenge videos `output/videos/maze-v7-full.mp4` and `output/videos/wordsearch-v6-full.mp4`; rendered solve-phase stills for both lanes to inspect the new pen motion and outline reveal.
+**Test output summary:** New full render durations dropped to 44.5s (maze) and 47.5s (word-search), versus the earlier minute-plus pacing. Activity JSON now shows `countdownSec: 30`, lowered music volumes, louder ticks, and `showBrandWatermark: false`. Solve-frame inspection confirmed the maze pen reads smoother and the word-search orange outline reveal is much cleaner than filled overlays. Remaining issues are now minor polish only, mainly a slightly soft maze path glow and a few late-frame word-search outlines feeling a bit busy.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If another micro-pass is wanted, the best remaining targets are (1) crisper maze path edge/glow and (2) tiny alignment/spacing cleanup for a couple late word-search outlines. The bigger strategic requests from the user are now implemented.
+
+---

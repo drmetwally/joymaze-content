@@ -7,12 +7,12 @@ import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, static
 
 // Deterministic jitter — same frame = same values every render
 function jitter(frame, seed = 0) {
-  const t = frame / 300;
+  const t = frame / 420;
   return {
-    yOff:  Math.sin(t * Math.PI * 2 * 1.7 + seed) * 14
-         + Math.sin(t * Math.PI * 2 * 4.3 + seed * 1.3) * 6,
-    aOff:  Math.sin(t * Math.PI * 2 * 1.1 + seed * 0.7) * 3.5
-         + Math.sin(t * Math.PI * 2 * 3.1 + seed * 1.6) * 1.5,
+    yOff:  Math.sin(t * Math.PI * 2 * 0.65 + seed) * 2.4
+         + Math.sin(t * Math.PI * 2 * 1.4 + seed * 1.3) * 0.9,
+    aOff:  Math.sin(t * Math.PI * 2 * 0.45 + seed * 0.7) * 0.9
+         + Math.sin(t * Math.PI * 2 * 1.2 + seed * 1.6) * 0.45,
   };
 }
 

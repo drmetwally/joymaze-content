@@ -1,9 +1,8 @@
 import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, staticFile } from 'remotion';
 
 // ─── WordSearchReveal ─────────────────────────────────────────────────────────
-// Reveals word search solution word-by-word: a colored highlight rect expands
-// over each hidden word in sequence, like a marker being drawn across it.
-// After all words are highlighted, cross-fades to the solved image.
+// Reveals word search solution word-by-word with an outline-first rectangle draw.
+// After all words are outlined, cross-fades to the solved image.
 //
 // Props:
 //   blankPath      — path to blank word search image
@@ -43,9 +42,8 @@ export const WordSearchReveal = ({
   const toSrc = p => p?.startsWith('http') ? p : staticFile(p ?? '');
 
   // ── Timing: divide reveal window into equal slots per word ───────────────
-  // Each word gets: (expand phase 0→1) then (hold until next word starts).
-  // EXPAND_FRAMES: how many frames the marker grows for one word.
-  const EXPAND_FRAMES = 16;
+  // Each word gets a short outline-draw phase, then holds on screen.
+  const EXPAND_FRAMES = 18;
   const wordCount     = rects.length;
   const framesPerWord = wordCount > 0 ? durationFrames / wordCount : durationFrames;
 
@@ -65,19 +63,21 @@ export const WordSearchReveal = ({
     const inset = 5;
     const x = rect.x1 + inset;
     const y = rect.y1 + inset;
-    const fullW = Math.max(0, (rect.x2 - rect.x1) - inset * 2);
-    const fullH = Math.max(0, (rect.y2 - rect.y1) - inset * 2);
-    const vertical = fullH > fullW;
-
-    const currentW = vertical ? fullW : expandProgress * fullW;
-    const currentH = vertical ? expandProgress * fullH : fullH;
-
+    const w = Math.max(0, (rect.x2 - rect.x1) - inset * 2);
+    const h = Math.max(0, (rect.y2 - rect.y1) - inset * 2);
     const opacity = interpolate(
-      expandProgress, [0, 0.25, 1], [0, 0.42, 0.48],
+      expandProgress, [0, 0.15, 1], [0, 0.55, 0.9],
       { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
     );
 
-    return { x, y, w: currentW, h: currentH, opacity };
+    return {
+      x,
+      y,
+      w,
+      h,
+      opacity,
+      dashOffset: 100 - expandProgress * 100,
+    };
   });
 
   return (
@@ -113,13 +113,17 @@ export const WordSearchReveal = ({
                 y={r.y.toFixed(1)}
                 width={r.w.toFixed(1)}
                 height={r.h.toFixed(1)}
-                fill={highlightColor}
-                fillOpacity={r.opacity}
+                fill="none"
                 stroke={highlightColor}
-                strokeOpacity={Math.min(0.9, r.opacity + 0.18)}
-                strokeWidth="2"
+                strokeOpacity={r.opacity}
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 rx="10"
                 ry="10"
+                pathLength="100"
+                strokeDasharray="100"
+                strokeDashoffset={r.dashOffset.toFixed(1)}
                 filter="url(#wsr-glow)"
               />
             );

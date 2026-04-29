@@ -2316,3 +2316,11 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Tightened word-search highlight rendering and softened overlap muddiness.
 - Polished maze reveal with lighter glow, smaller pencil, and slight start/end extension so the path reads more like a completed solve.
 - Hardened `render-video.mjs` for concurrent Windows renders by using process-unique temp public dirs and removing unsafe stale-bundle cleanup.
+
+## 2026-04-29 - OpenClaw - engagement/timing/audio/branding challenge pass
+- Shortened challenge timer defaults from 45s to 30s for maze and word-search.
+- Replaced descriptive top-strip titles with intelligence-linked hook titles that stay visible through challenge.
+- Lowered challenge/solve music, raised tick levels, and added fast end-countdown ticks.
+- Turned off the bottom `joymaze.com` banner by default for challenge renders.
+- Smoothed maze pen motion and changed word-search solve treatment to orange outline reveals instead of filled highlights.
+- Regenerated fresh test folders (`maze v7`, `word-search v6`) and validated with real full renders plus solve-phase stills.

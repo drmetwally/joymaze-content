@@ -14,7 +14,7 @@ const CANVAS_H = 2200;
 const BG_COLOR = '#FFFFFF';
 const GRID_COLOR = '#222222';
 const LETTER_COLOR = '#111111';
-const HIGHLIGHT_COLOR = '#FFD84D';
+const HIGHLIGHT_COLOR = '#FF9A3D';
 const HEADER_COLOR = '#222222';
 const SUBTEXT_COLOR = '#666666';
 
@@ -29,8 +29,12 @@ const DRY_RUN = hasFlag('--dry-run');
 const TITLE = getArg('--title', 'Garden Word Search');
 const THEME = getArg('--theme', TITLE);
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
-const COUNTDOWN_SEC = Number(getArg('--countdown', '45'));
+const COUNTDOWN_SEC = Number(getArg('--countdown', '30'));
 const SOLVE_DURATION_SEC = 15;
+const DEFAULT_CHALLENGE_AUDIO_VOLUME = 0.1;
+const DEFAULT_TICK_AUDIO_VOLUME = 0.3;
+const DEFAULT_TRANSITION_CUE_VOLUME = 0.24;
+const DEFAULT_SOLVE_AUDIO_VOLUME = 0.48;
 const SEED_ARG = getArg('--seed');
 const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
@@ -260,15 +264,17 @@ function gridSvg(grid, layout) {
   return { lines, letters };
 }
 
+function buildHookTitle(wordsCount) {
+  return `ONLY SHARP EYES FIND ALL ${wordsCount} WORDS`;
+}
+
 function buildSvg({ title, theme, grid, layout, rects = [] }) {
   const { lines, letters } = gridSvg(grid, layout);
-  const highlights = rects.map((rect) => `<rect x="${rect.x1.toFixed(1)}" y="${rect.y1.toFixed(1)}" width="${(rect.x2 - rect.x1).toFixed(1)}" height="${(rect.y2 - rect.y1).toFixed(1)}" rx="18" ry="18" fill="${HIGHLIGHT_COLOR}" fill-opacity="0.62" />`).join('\n    ');
+  const highlights = rects.map((rect) => `<rect x="${(rect.x1 + 5).toFixed(1)}" y="${(rect.y1 + 5).toFixed(1)}" width="${Math.max(0, rect.x2 - rect.x1 - 10).toFixed(1)}" height="${Math.max(0, rect.y2 - rect.y1 - 10).toFixed(1)}" rx="16" ry="16" fill="none" stroke="${HIGHLIGHT_COLOR}" stroke-width="8" stroke-linejoin="round" />`).join('\n    ');
 
   return `
 <svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="${BG_COLOR}"/>
-  <text x="${CANVAS_W / 2}" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="${HEADER_COLOR}">${escapeXml(title)}</text>
-  <text x="${CANVAS_W / 2}" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="${SUBTEXT_COLOR}">Find all the hidden words</text>
   <g>${highlights}</g>
   <g stroke="${GRID_COLOR}" stroke-width="3">
     ${lines.join('\n    ')}
@@ -302,6 +308,7 @@ async function main() {
   const outDir = OUT_DIR_ARG ? path.resolve(ROOT, OUT_DIR_ARG) : path.join(OUTPUT_ROOT, slug);
   const folderRel = path.relative(ROOT, outDir).replace(/\\/g, '/');
 
+  const hookTitle = buildHookTitle(words.length);
   const blankSvg = buildSvg({ title: TITLE, theme: { words }, grid, layout, rects: [] });
   const solvedSvg = buildSvg({ title: TITLE, theme: { words }, grid, layout, rects });
 
@@ -310,8 +317,8 @@ async function main() {
     puzzleType: 'word-search',
     difficulty: DIFFICULTY,
     theme: THEME,
-    titleText: TITLE,
-    hookText: `Can your kid find all ${words.length} words in ${COUNTDOWN_SEC} seconds?`,
+    titleText: hookTitle,
+    hookText: hookTitle,
     ctaText: 'Tag a kid who can find them all',
     activityLabel: 'WORD SEARCH',
     countdownSec: COUNTDOWN_SEC,
@@ -321,8 +328,12 @@ async function main() {
     blankImage: 'blank.png',
     solvedImage: 'solved.png',
     highlightColor: HIGHLIGHT_COLOR,
+    challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
+    tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME,
+    transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
+    solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
     showJoyo: true,
-    showBrandWatermark: true,
+    showBrandWatermark: false,
     sourceFolder: folderRel,
   };
 

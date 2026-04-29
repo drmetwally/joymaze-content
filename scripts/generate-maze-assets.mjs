@@ -30,8 +30,12 @@ const THEME = getArg('--theme', TITLE);
 const SHAPE = getArg('--shape', 'rectangle');
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
 const PUZZLE_TYPE = 'maze';
-const COUNTDOWN_SEC = Number(getArg('--countdown', '45'));
+const COUNTDOWN_SEC = Number(getArg('--countdown', '30'));
 const SOLVE_DURATION_SEC = 12;
+const DEFAULT_CHALLENGE_AUDIO_VOLUME = 0.11;
+const DEFAULT_TICK_AUDIO_VOLUME = 0.3;
+const DEFAULT_TRANSITION_CUE_VOLUME = 0.24;
+const DEFAULT_SOLVE_AUDIO_VOLUME = 0.52;
 const CELL_SIZE = Number(getArg('--cell-size', '0')) || null;
 const PATH_COLOR = getArg('--path-color', DEFAULT_PATH_COLOR);
 const SEED_ARG = getArg('--seed');
@@ -327,6 +331,14 @@ async function writeSvgPng(svg, outSvgPath, outPngPath) {
   await fs.writeFile(outPngPath, pngBuffer);
 }
 
+function buildHookTitle({ puzzleType, difficulty }) {
+  if (puzzleType === 'maze') {
+    if (difficulty === 'hard' || difficulty === 'difficult' || difficulty === 'extreme') return 'ONLY SHARP KIDS BEAT THIS MAZE';
+    return 'ONLY SHARP KIDS SOLVE THIS MAZE';
+  }
+  return 'ONLY SHARP KIDS SOLVE THIS';
+}
+
 function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cells, solutionCells, solutionPoints, layout, folderRel }) {
   const mazeJson = {
     version: 1,
@@ -360,14 +372,16 @@ function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cell
     waypoints: normalizedWaypoints(solutionPoints, layout),
   };
 
+  const hookTitle = buildHookTitle({ puzzleType: PUZZLE_TYPE, difficulty });
+
   const activityJson = {
     type: 'challenge',
     puzzleType: PUZZLE_TYPE,
     shape,
     difficulty,
     theme,
-    titleText: title,
-    hookText: `Can your kid solve this maze in ${COUNTDOWN_SEC} seconds?`,
+    titleText: hookTitle,
+    hookText: hookTitle,
     ctaText: 'Tag a kid who can beat the timer',
     activityLabel: 'MAZE',
     countdownSec: COUNTDOWN_SEC,
@@ -377,8 +391,12 @@ function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cell
     blankImage: 'blank.png',
     solvedImage: 'solved.png',
     pathColor: PATH_COLOR,
+    challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
+    tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME,
+    transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
+    solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
     showJoyo: true,
-    showBrandWatermark: true,
+    showBrandWatermark: false,
     sourceFolder: folderRel,
   };
 

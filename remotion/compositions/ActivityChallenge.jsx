@@ -31,12 +31,12 @@ export const activityChallengeSchema = {
   tickAudioPath: '',
   transitionCueAudioPath: '',
   solveAudioPath: '',
-  challengeAudioVolume: 0.22,
-  tickAudioVolume: 0.16,
-  transitionCueVolume: 0.2,
-  solveAudioVolume: 0.85,
+  challengeAudioVolume: 0.11,
+  tickAudioVolume: 0.3,
+  transitionCueVolume: 0.24,
+  solveAudioVolume: 0.52,
   showJoyo: true,
-  showBrandWatermark: true,
+  showBrandWatermark: false,
   pathWaypoints: null,
   pathColor: '#22BB44',
   wordRects: null,
@@ -235,7 +235,7 @@ export const ActivityChallenge = ({
   transitionCueVolume = activityChallengeSchema.transitionCueVolume,
   solveAudioVolume = activityChallengeSchema.solveAudioVolume,
   showJoyo = true,
-  showBrandWatermark = true,
+  showBrandWatermark = false,
   pathWaypoints = null,
   pathColor = activityChallengeSchema.pathColor,
   wordRects = null,
@@ -282,6 +282,10 @@ export const ActivityChallenge = ({
   );
   const tickSequenceFrames = Math.min(Math.max(1, fps), challengeFrames);
   const tickCount = Math.ceil(challengeFrames / fps);
+  const fastTickWindowFrames = Math.min(challengeFrames, Math.max(fps * 5, Math.round(challengeFrames * 0.18)));
+  const fastTickStart = Math.max(0, challengeFrames - fastTickWindowFrames);
+  const fastTickInterval = Math.max(1, Math.round(fps / 2));
+  const fastTickCount = Math.ceil(fastTickWindowFrames / fastTickInterval);
   const stripExitSpring = spring({
     frame: Math.max(0, frame - transitionStart),
     fps,
@@ -365,6 +369,20 @@ export const ActivityChallenge = ({
             return (
               <Sequence key={`tick-${from}`} from={from} durationInFrames={tickSequenceFrames}>
                 <Audio src={toSrc(tickAudioPath)} volume={tickAudioVolume} />
+              </Sequence>
+            );
+          })
+        : null}
+
+      {tickAudioPath
+        ? Array.from({ length: fastTickCount }).map((_, index) => {
+            const from = fastTickStart + index * fastTickInterval;
+            if (from >= challengeFrames || from % fps === 0) {
+              return null;
+            }
+            return (
+              <Sequence key={`fast-tick-${from}`} from={from} durationInFrames={Math.max(1, Math.round(fps * 0.45))}>
+                <Audio src={toSrc(tickAudioPath)} volume={tickAudioVolume * 0.9} />
               </Sequence>
             );
           })
