@@ -237,6 +237,18 @@
 **Test output summary:** Syntax checks passed. Prompt save succeeded and rewrote the daily manifest with `topic`/`subject` fields. Manifest-driven generation rebuilt both the maze and word-search outputs successfully. Visual spot-check of the generated `post.png` files confirmed colored backgrounds, visible margin decorations, a start marker at the left entry side, a finish marker at the lower-right exit side, a solid CTA footer band, and non-generic sidecar subjects (`Ocean Animals Maze Puzzle`, `Colors and Shapes Word Search`).
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** If Claude agrees the direction is right, the next wrapper polish should focus on theme-aware art variation beyond generic type-based decorations, plus slightly better hook text fitting rules so long challenge lines lose less wording in the title/footer zones.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-009-WRAPPER-003 | Add title-fit policy, theme buckets, and remove footer copy
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — added title-picking/shortening helpers, removed footer copy entirely, and upgraded decorative rendering from simple type-level defaults into first-pass theme buckets (`ocean`, `space`, `animals`, `confetti/colors-shapes`, `workshop`)
+- `docs/AGENT_LOG.md` — appended this follow-up wrapper-polish entry
+**What was done:** Applied the next wrapper polish recommendation. The wrapper no longer uses any footer CTA text at all. Instead, the title and puzzle carry the composition. Added a tiny text policy so the wrapper now shortens candidate title strings before layout rather than just clipping them raw. Also replaced generic decor-only-by-puzzle-type behavior with a small theme-family mapper, so margin motifs and corner decorations now shift based on the assigned theme bucket instead of always rendering the same fish-or-star treatment.
+**Test command:** `node --check scripts/generate-puzzle-image-post.mjs`, `npm run puzzlepost:generate -- --type maze --theme "Ocean Animals" --difficulty hard`, `npm run puzzlepost:generate -- --type wordsearch --theme "Colors and Shapes" --difficulty hard`
+**Test output summary:** Syntax check passed. Fresh maze and word-search outputs rendered successfully. Visual spot-check confirmed there is now no footer copy band, title text fits more safely within the top zone, and decorative variation changes by theme bucket. Direct-run sidecars still write correctly, with expected generic subjects for direct one-off generation and richer manifest subjects preserved in manifest-driven mode.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If another polish pass is wanted, the most valuable follow-up is better semantic title selection, for example preferring short challenge hooks over generic puzzle names in direct mode while still avoiding truncation.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---

@@ -102,6 +102,45 @@ function wrapText(input, maxCharsPerLine = 22, maxLines = 2) {
   return lines;
 }
 
+function shortenForZone(text, maxCharsPerLine = 18, maxLines = 2) {
+  if (!text) return '';
+  const variants = [];
+  const raw = String(text).trim();
+  variants.push(raw);
+  variants.push(raw.replace(/,.*$/, '').trim());
+  variants.push(raw.replace(/\bin \d+\s*seconds?\b/gi, '').replace(/\s{2,}/g, ' ').trim());
+  variants.push(raw.replace(/Can your kid/gi, 'Can your child').replace(/\s{2,}/g, ' ').trim());
+  variants.push(raw.replace(/,.*$/, '').replace(/\bin \d+\s*seconds?\b/gi, '').replace(/Can your kid/gi, 'Can your child').replace(/\s{2,}/g, ' ').trim());
+
+  for (const candidate of variants) {
+    if (!candidate) continue;
+    const lines = wrapText(candidate, maxCharsPerLine, maxLines);
+    const joined = lines.join(' ');
+    if (!joined.endsWith('…')) return candidate;
+  }
+
+  return variants.find(Boolean) || raw;
+}
+
+function pickTitleText(activity, config, type) {
+  const candidates = [
+    TITLE,
+    activity?.titleText,
+    config?.title,
+    activity?.hookText,
+    activity?.ctaText,
+    getDefaultTitle(type, activity?.theme || config?.theme || THEME),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const shortened = shortenForZone(candidate, 18, 2);
+    const lines = wrapText(shortened, 18, 2);
+    if (!lines.join(' ').endsWith('…')) return shortened;
+  }
+
+  return shortenForZone(candidates[0] || getDefaultTitle(type, activity?.theme || config?.theme || THEME), 18, 2);
+}
+
 async function fileExists(targetPath) {
   try {
     await fs.access(targetPath);
@@ -137,41 +176,103 @@ async function ensurePuzzlePng(activityDir) {
   return puzzlePath;
 }
 
-function getStyleKit(type) {
+function getThemeDecor(theme, type) {
+  const t = String(theme || '').toLowerCase();
+
+  if (t.includes('ocean') || t.includes('sea')) {
+    return {
+      background: '#FFF8E7',
+      motif: '#D9B24C',
+      decorA: '#6EC5B8',
+      decorB: '#F08A5D',
+      decorC: '#7BC96F',
+      family: 'ocean',
+    };
+  }
+  if (t.includes('space') || t.includes('rocket') || t.includes('planet')) {
+    return {
+      background: '#EEF4FF',
+      motif: '#A8B8FF',
+      decorA: '#7AA6FF',
+      decorB: '#F7B267',
+      decorC: '#B39DFF',
+      family: 'space',
+    };
+  }
+  if (t.includes('pet') || t.includes('cat') || t.includes('dog') || t.includes('animal')) {
+    return {
+      background: '#FFF7F0',
+      motif: '#E8B98E',
+      decorA: '#F4A261',
+      decorB: '#84C69B',
+      decorC: '#E5989B',
+      family: 'animals',
+    };
+  }
+  if (t.includes('color') || t.includes('shape')) {
+    return {
+      background: '#F1F7FF',
+      motif: '#9FC2FF',
+      decorA: '#6EA8FE',
+      decorB: '#F9C74F',
+      decorC: '#90DBF4',
+      family: 'confetti',
+    };
+  }
+  if (t.includes('workshop') || t.includes('toy')) {
+    return {
+      background: '#FFF6EE',
+      motif: '#E6B980',
+      decorA: '#F4A261',
+      decorB: '#7AA6FF',
+      decorC: '#84C69B',
+      family: 'workshop',
+    };
+  }
+
   return type === 'maze'
     ? {
-        accent: '#4DAF54',
-        accentStrong: '#2F8C39',
-        badgeFill: '#4DAF54',
         background: '#FFF8E7',
         motif: '#D4A017',
         decorA: '#6EC5B8',
         decorB: '#F08A5D',
         decorC: '#7BC96F',
-        footer: '#4DAF54',
-        footerText: '#FFFFFF',
-        title: '#1A1A2E',
-        subtitle: '#2F8C39',
-        puzzleShadowOpacity: '0.08',
+        family: 'ocean',
       }
     : {
-        accent: '#3E7BFA',
-        accentStrong: '#275AD8',
-        badgeFill: '#3E7BFA',
         background: '#EEF6FF',
         motif: '#8BB8FF',
         decorA: '#F7B267',
         decorB: '#7AA6FF',
         decorC: '#8FD3FE',
-        footer: '#3E7BFA',
-        footerText: '#FFFFFF',
-        title: '#1A1A2E',
-        subtitle: '#2D6AE3',
-        puzzleShadowOpacity: '0.08',
+        family: 'confetti',
       };
 }
 
-function renderMazeCornerDecor(style) {
+function getStyleKit(type, theme) {
+  const decor = getThemeDecor(theme, type);
+  return type === 'maze'
+    ? {
+        accent: '#4DAF54',
+        accentStrong: '#2F8C39',
+        badgeFill: '#4DAF54',
+        title: '#1A1A2E',
+        subtitle: '#2F8C39',
+        puzzleShadowOpacity: '0.08',
+        ...decor,
+      }
+    : {
+        accent: '#3E7BFA',
+        accentStrong: '#275AD8',
+        badgeFill: '#3E7BFA',
+        title: '#1A1A2E',
+        subtitle: '#2D6AE3',
+        puzzleShadowOpacity: '0.08',
+        ...decor,
+      };
+}
+
+function renderFishCluster(style) {
   return `
     <g opacity="0.95">
       <g transform="translate(70 118)">
@@ -197,7 +298,7 @@ function renderMazeCornerDecor(style) {
     </g>`;
 }
 
-function renderWordsearchCornerDecor(style) {
+function renderStarCluster(style) {
   const stars = [
     [86, 96, 24, style.decorA],
     [156, 138, 18, style.decorB],
@@ -211,12 +312,81 @@ function renderWordsearchCornerDecor(style) {
     </g>`;
 }
 
+function renderPawCluster(style) {
+  return `
+    <g opacity="0.88">
+      <g transform="translate(86 110)">
+        <circle cx="0" cy="0" r="16" fill="${style.decorA}"/>
+        <circle cx="-18" cy="-18" r="8" fill="${style.decorA}"/>
+        <circle cx="0" cy="-24" r="8" fill="${style.decorA}"/>
+        <circle cx="18" cy="-18" r="8" fill="${style.decorA}"/>
+      </g>
+      <g transform="translate(850 1228) scale(0.9)">
+        <circle cx="0" cy="0" r="16" fill="${style.decorB}"/>
+        <circle cx="-18" cy="-18" r="8" fill="${style.decorB}"/>
+        <circle cx="0" cy="-24" r="8" fill="${style.decorB}"/>
+        <circle cx="18" cy="-18" r="8" fill="${style.decorB}"/>
+      </g>
+    </g>`;
+}
+
+function renderConfettiCluster(style) {
+  return `
+    <g opacity="0.9">
+      <rect x="56" y="92" width="20" height="20" rx="4" fill="${style.decorA}" transform="rotate(18 66 102)"/>
+      <circle cx="108" cy="116" r="10" fill="${style.decorB}"/>
+      <polygon points="144,86 160,112 128,112" fill="${style.decorC}"/>
+      <rect x="846" y="1192" width="22" height="22" rx="5" fill="${style.decorC}" transform="rotate(-14 857 1203)"/>
+      <circle cx="894" cy="1236" r="10" fill="${style.decorA}"/>
+      <polygon points="818,1248 834,1274 802,1274" fill="${style.decorB}"/>
+    </g>`;
+}
+
+function renderWorkshopCluster(style) {
+  return `
+    <g opacity="0.9">
+      <rect x="54" y="92" width="34" height="14" rx="7" fill="${style.decorA}"/>
+      <rect x="66" y="82" width="10" height="38" rx="5" fill="${style.decorB}"/>
+      <circle cx="138" cy="110" r="13" fill="${style.decorC}"/>
+      <rect x="824" y="1206" width="36" height="14" rx="7" fill="${style.decorB}"/>
+      <rect x="836" y="1196" width="10" height="38" rx="5" fill="${style.decorA}"/>
+      <circle cx="892" cy="1232" r="13" fill="${style.decorC}"/>
+    </g>`;
+}
+
+function renderCornerDecor(style, type) {
+  switch (style.family) {
+    case 'ocean': return renderFishCluster(style);
+    case 'space': return renderStarCluster(style);
+    case 'animals': return renderPawCluster(style);
+    case 'confetti': return renderConfettiCluster(style);
+    case 'workshop': return renderWorkshopCluster(style);
+    default: return type === 'maze' ? renderFishCluster(style) : renderStarCluster(style);
+  }
+}
+
 function renderMarginMotif(style, type) {
   const nodes = [];
-  if (type === 'maze') {
+  if (style.family === 'ocean' || type === 'maze') {
     for (let y = 86; y <= 1260; y += 74) {
       nodes.push(`<path d="M30 ${y} q18 -12 36 0 q18 12 36 0" fill="none" stroke="${style.motif}" stroke-width="2" opacity="0.18"/>`);
       nodes.push(`<path d="M892 ${y} q18 -12 36 0 q18 12 36 0" fill="none" stroke="${style.motif}" stroke-width="2" opacity="0.18"/>`);
+    }
+  } else if (style.family === 'space') {
+    for (let y = 88; y <= 1270; y += 92) {
+      nodes.push(`<circle cx="40" cy="${y}" r="3" fill="${style.motif}" opacity="0.16"/>`);
+      nodes.push(`<circle cx="60" cy="${y + 18}" r="2.5" fill="${style.motif}" opacity="0.16"/>`);
+      nodes.push(`<circle cx="936" cy="${y}" r="3" fill="${style.motif}" opacity="0.16"/>`);
+      nodes.push(`<circle cx="916" cy="${y + 18}" r="2.5" fill="${style.motif}" opacity="0.16"/>`);
+    }
+  } else if (style.family === 'animals') {
+    for (let y = 96; y <= 1260; y += 110) {
+      nodes.push(`<circle cx="42" cy="${y}" r="3.5" fill="${style.motif}" opacity="0.15"/>`);
+      nodes.push(`<circle cx="34" cy="${y - 10}" r="2.4" fill="${style.motif}" opacity="0.15"/>`);
+      nodes.push(`<circle cx="50" cy="${y - 12}" r="2.4" fill="${style.motif}" opacity="0.15"/>`);
+      nodes.push(`<circle cx="942" cy="${y}" r="3.5" fill="${style.motif}" opacity="0.15"/>`);
+      nodes.push(`<circle cx="934" cy="${y - 10}" r="2.4" fill="${style.motif}" opacity="0.15"/>`);
+      nodes.push(`<circle cx="950" cy="${y - 12}" r="2.4" fill="${style.motif}" opacity="0.15"/>`);
     }
   } else {
     for (let y = 88; y <= 1270; y += 78) {
@@ -229,15 +399,13 @@ function renderMarginMotif(style, type) {
   return nodes.join('');
 }
 
-function renderBackgroundSvg({ width, height, titleText, theme, difficulty, ctaText, style, type }) {
+function renderBackgroundSvg({ width, height, titleText, theme, difficulty, style, type }) {
   const safeTheme = escapeXml(theme);
   const safeDifficulty = escapeXml(titleCase(difficulty));
-  const decor = type === 'maze' ? renderMazeCornerDecor(style) : renderWordsearchCornerDecor(style);
+  const decor = renderCornerDecor(style, type);
   const motif = renderMarginMotif(style, type);
   const titleLines = wrapText(titleText, 18, 2);
-  const footerLines = wrapText(ctaText, 42, 2);
   const titleTspans = titleLines.map((line, index) => `<tspan x="70" dy="${index === 0 ? 0 : 62}">${escapeXml(line)}</tspan>`).join('');
-  const footerTspans = footerLines.map((line, index) => `<tspan x="500" dy="${index === 0 ? 0 : 34}">${escapeXml(line)}</tspan>`).join('');
   const themeY = titleLines.length > 1 ? 254 : 190;
 
   // tied to 1000x1500 canvas — positions are absolute px, not relative.
@@ -266,9 +434,6 @@ function renderBackgroundSvg({ width, height, titleText, theme, difficulty, ctaT
       <rect x="${PUZZLE_LEFT}" y="${PUZZLE_TOP}" width="${PUZZLE_WIDTH}" height="${PUZZLE_HEIGHT}" rx="28" fill="#FFFFFF"/>
     </g>
 
-    <rect x="0" y="1300" width="1000" height="160" fill="${style.footer}"/>
-    <text x="500" y="1350" text-anchor="middle" font-size="31" font-family="Arial, sans-serif" font-weight="900" fill="${style.footerText}">${footerTspans}</text>
-    <text x="500" y="1414" text-anchor="middle" font-size="18" font-family="Arial, sans-serif" font-weight="700" fill="#FFFFFF" opacity="0.80">Save &amp; print for free • JoyMaze</text>
   </svg>`;
 }
 
@@ -397,14 +562,13 @@ function buildDirectConfig() {
 
 async function buildPostImage(activityDir, activity, outputPath, type) {
   const sourcePuzzlePath = await ensurePuzzlePng(activityDir);
-  const style = getStyleKit(type);
+  const style = getStyleKit(type, activity.theme || THEME);
   const backgroundSvg = renderBackgroundSvg({
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
     theme: activity.theme || THEME,
-    titleText: activity.titleText || activity.activityLabel || getDefaultTitle(type, activity.theme || THEME),
+    titleText: pickTitleText(activity, null, type),
     difficulty: activity.difficulty || DIFFICULTY,
-    ctaText: activity.hookText || activity.ctaText || 'Save this for your next quiet-time printable',
     style,
     type,
   });
