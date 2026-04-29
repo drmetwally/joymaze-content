@@ -34,6 +34,13 @@ const SLOT_ARG = getArg('--slot');
 const CATEGORY_ARG = getArg('--category');
 const ALL_SUPPORTED = hasFlag('--all-supported');
 
+const CANVAS_WIDTH = 1000;
+const CANVAS_HEIGHT = 1500;
+const PUZZLE_LEFT = 70;
+const PUZZLE_TOP = 280;
+const PUZZLE_WIDTH = 860;
+const PUZZLE_HEIGHT = 960;
+
 function normalizeType(input) {
   if (input === 'wordsearch' || input === 'word-search') return 'word-search';
   if (input === 'maze') return 'maze';
@@ -69,6 +76,30 @@ function escapeXml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+}
+
+function wrapText(input, maxCharsPerLine = 22, maxLines = 2) {
+  const words = String(input || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = '';
+
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length <= maxCharsPerLine || !current) {
+      current = candidate;
+      continue;
+    }
+    lines.push(current);
+    current = word;
+    if (lines.length === maxLines - 1) break;
+  }
+
+  if (current && lines.length < maxLines) lines.push(current);
+  const consumed = lines.join(' ').split(/\s+/).filter(Boolean).length;
+  if (consumed < words.length && lines.length > 0) {
+    lines[lines.length - 1] = `${lines[lines.length - 1].replace(/[.!,?;:]+$/g, '')}…`;
+  }
+  return lines;
 }
 
 async function fileExists(targetPath) {
@@ -111,82 +142,155 @@ function getStyleKit(type) {
     ? {
         accent: '#4DAF54',
         accentStrong: '#2F8C39',
-        accentSoft: '#ECF8EE',
-        frame: '#CEEBCD',
-        heroGlow: '#D9F5DA',
-        footerBg: '#F5FBF5',
-        badgeText: 'MAZE TIME',
+        badgeFill: '#4DAF54',
+        background: '#FFF8E7',
+        motif: '#D4A017',
+        decorA: '#6EC5B8',
+        decorB: '#F08A5D',
+        decorC: '#7BC96F',
+        footer: '#4DAF54',
+        footerText: '#FFFFFF',
+        title: '#1A1A2E',
+        subtitle: '#2F8C39',
+        puzzleShadowOpacity: '0.08',
       }
     : {
-        accent: '#F28C28',
-        accentStrong: '#D96A12',
-        accentSoft: '#FFF1E4',
-        frame: '#FFD7B3',
-        heroGlow: '#FFE6CC',
-        footerBg: '#FFF8F2',
-        badgeText: 'WORD SEARCH',
+        accent: '#3E7BFA',
+        accentStrong: '#275AD8',
+        badgeFill: '#3E7BFA',
+        background: '#EEF6FF',
+        motif: '#8BB8FF',
+        decorA: '#F7B267',
+        decorB: '#7AA6FF',
+        decorC: '#8FD3FE',
+        footer: '#3E7BFA',
+        footerText: '#FFFFFF',
+        title: '#1A1A2E',
+        subtitle: '#2D6AE3',
+        puzzleShadowOpacity: '0.08',
       };
 }
 
-function renderBackgroundSvg({ width, height, titleText, theme, difficulty, ctaText, style }) {
-  const safeTheme = escapeXml(theme);
-  const safeTitle = escapeXml(titleText);
-  const safeDifficulty = escapeXml(titleCase(difficulty));
-  const safeCta = escapeXml(ctaText);
-  const safeBadge = escapeXml(style.badgeText);
+function renderMazeCornerDecor(style) {
+  return `
+    <g opacity="0.95">
+      <g transform="translate(70 118)">
+        <ellipse cx="0" cy="0" rx="32" ry="20" fill="${style.decorA}"/>
+        <polygon points="30,0 56,-12 56,12" fill="${style.decorA}"/>
+        <circle cx="-10" cy="-4" r="3" fill="#FFFFFF" opacity="0.9"/>
+      </g>
+      <g transform="translate(145 84) scale(0.82)">
+        <ellipse cx="0" cy="0" rx="28" ry="18" fill="${style.decorB}"/>
+        <polygon points="26,0 50,-10 50,10" fill="${style.decorB}"/>
+        <circle cx="-8" cy="-3" r="3" fill="#FFFFFF" opacity="0.9"/>
+      </g>
+      <g transform="translate(872 1194) scale(0.92)">
+        <ellipse cx="0" cy="0" rx="34" ry="21" fill="${style.decorC}"/>
+        <polygon points="32,0 58,-12 58,12" fill="${style.decorC}"/>
+        <circle cx="-10" cy="-4" r="3" fill="#FFFFFF" opacity="0.9"/>
+      </g>
+      <g transform="translate(810 1270) scale(0.76)">
+        <ellipse cx="0" cy="0" rx="28" ry="18" fill="${style.decorA}"/>
+        <polygon points="26,0 50,-10 50,10" fill="${style.decorA}"/>
+        <circle cx="-8" cy="-3" r="3" fill="#FFFFFF" opacity="0.9"/>
+      </g>
+    </g>`;
+}
 
+function renderWordsearchCornerDecor(style) {
+  const stars = [
+    [86, 96, 24, style.decorA],
+    [156, 138, 18, style.decorB],
+    [864, 1230, 24, style.decorC],
+    [806, 1184, 16, style.decorA],
+  ];
+  return `<g opacity="0.92">${stars.map(([x, y, r, fill]) => `
+      <g transform="translate(${x} ${y}) scale(${r / 24})">
+        <polygon points="0,-24 7,-8 24,-8 11,2 16,20 0,10 -16,20 -11,2 -24,-8 -7,-8" fill="${fill}"/>
+      </g>`).join('')}
+    </g>`;
+}
+
+function renderMarginMotif(style, type) {
+  const nodes = [];
+  if (type === 'maze') {
+    for (let y = 86; y <= 1260; y += 74) {
+      nodes.push(`<path d="M30 ${y} q18 -12 36 0 q18 12 36 0" fill="none" stroke="${style.motif}" stroke-width="2" opacity="0.18"/>`);
+      nodes.push(`<path d="M892 ${y} q18 -12 36 0 q18 12 36 0" fill="none" stroke="${style.motif}" stroke-width="2" opacity="0.18"/>`);
+    }
+  } else {
+    for (let y = 88; y <= 1270; y += 78) {
+      nodes.push(`<circle cx="42" cy="${y}" r="4" fill="${style.motif}" opacity="0.16"/>`);
+      nodes.push(`<circle cx="68" cy="${y + 20}" r="3" fill="${style.motif}" opacity="0.16"/>`);
+      nodes.push(`<circle cx="934" cy="${y}" r="4" fill="${style.motif}" opacity="0.16"/>`);
+      nodes.push(`<circle cx="908" cy="${y + 20}" r="3" fill="${style.motif}" opacity="0.16"/>`);
+    }
+  }
+  return nodes.join('');
+}
+
+function renderBackgroundSvg({ width, height, titleText, theme, difficulty, ctaText, style, type }) {
+  const safeTheme = escapeXml(theme);
+  const safeDifficulty = escapeXml(titleCase(difficulty));
+  const decor = type === 'maze' ? renderMazeCornerDecor(style) : renderWordsearchCornerDecor(style);
+  const motif = renderMarginMotif(style, type);
+  const titleLines = wrapText(titleText, 18, 2);
+  const footerLines = wrapText(ctaText, 42, 2);
+  const titleTspans = titleLines.map((line, index) => `<tspan x="70" dy="${index === 0 ? 0 : 62}">${escapeXml(line)}</tspan>`).join('');
+  const footerTspans = footerLines.map((line, index) => `<tspan x="500" dy="${index === 0 ? 0 : 34}">${escapeXml(line)}</tspan>`).join('');
+  const themeY = titleLines.length > 1 ? 254 : 190;
+
+  // tied to 1000x1500 canvas — positions are absolute px, not relative.
   return `
   <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#FFFFFF"/>
-        <stop offset="100%" stop-color="${style.footerBg}"/>
-      </linearGradient>
-      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000000" flood-opacity="0.10"/>
+      <filter id="titleShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.18"/>
+      </filter>
+      <filter id="puzzleShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="${style.puzzleShadowOpacity}"/>
       </filter>
     </defs>
 
-    <rect width="100%" height="100%" fill="url(#bg)"/>
-    <circle cx="110" cy="120" r="70" fill="${style.heroGlow}" opacity="0.65"/>
-    <circle cx="905" cy="170" r="110" fill="${style.accentSoft}" opacity="0.75"/>
-    <circle cx="930" cy="1345" r="82" fill="${style.accentSoft}" opacity="0.60"/>
-    <circle cx="80" cy="1365" r="56" fill="${style.heroGlow}" opacity="0.50"/>
+    <rect width="100%" height="100%" fill="${style.background}"/>
+    ${motif}
+    ${decor}
 
-    <rect x="34" y="34" width="932" height="1432" rx="34" fill="#FFFFFF" stroke="${style.frame}" stroke-width="4"/>
+    <text x="70" y="108" font-size="64" font-family="Arial, sans-serif" font-weight="900" letter-spacing="1" fill="${style.title}" filter="url(#titleShadow)">${titleTspans}</text>
+    <text x="70" y="${themeY}" font-size="30" font-family="Arial, sans-serif" font-weight="700" fill="${style.subtitle}">${safeTheme}</text>
 
-    <rect x="70" y="66" width="236" height="52" rx="26" fill="${style.accentSoft}"/>
-    <text x="188" y="100" text-anchor="middle" font-size="24" font-family="Arial, sans-serif" font-weight="800" fill="${style.accentStrong}">${safeBadge}</text>
+    <rect x="784" y="74" width="146" height="48" rx="24" fill="${style.badgeFill}"/>
+    <text x="857" y="106" text-anchor="middle" font-size="22" font-family="Arial, sans-serif" font-weight="800" fill="#FFFFFF">${safeDifficulty}</text>
 
-    <rect x="736" y="66" width="194" height="52" rx="26" fill="#FFFFFF" stroke="${style.frame}" stroke-width="2"/>
-    <text x="833" y="100" text-anchor="middle" font-size="22" font-family="Arial, sans-serif" font-weight="700" fill="#475569">${safeDifficulty}</text>
-
-    <text x="78" y="178" font-size="56" font-family="Arial, sans-serif" font-weight="800" fill="#16202A">${safeTitle}</text>
-    <text x="78" y="222" font-size="24" font-family="Arial, sans-serif" fill="#5B6472">Printable puzzle • clear lines • kid-friendly challenge</text>
-
-    <rect x="78" y="252" width="410" height="42" rx="21" fill="${style.accentSoft}"/>
-    <text x="102" y="280" font-size="21" font-family="Arial, sans-serif" font-weight="700" fill="${style.accentStrong}">Theme: ${safeTheme}</text>
-
-    <g filter="url(#shadow)">
-      <rect x="78" y="332" width="844" height="940" rx="34" fill="#FFFFFF" stroke="${style.frame}" stroke-width="6"/>
-      <rect x="112" y="366" width="776" height="872" rx="26" fill="#FFFFFF" stroke="#EEF2F7" stroke-width="3"/>
+    <g filter="url(#puzzleShadow)">
+      <rect x="${PUZZLE_LEFT}" y="${PUZZLE_TOP}" width="${PUZZLE_WIDTH}" height="${PUZZLE_HEIGHT}" rx="28" fill="#FFFFFF"/>
     </g>
 
-    <rect x="78" y="1312" width="844" height="102" rx="26" fill="${style.footerBg}" stroke="${style.frame}" stroke-width="2"/>
-    <text x="500" y="1360" text-anchor="middle" font-size="28" font-family="Arial, sans-serif" font-weight="800" fill="#27313D">${safeCta}</text>
-    <text x="500" y="1394" text-anchor="middle" font-size="18" font-family="Arial, sans-serif" fill="#667085">Save this printable for quiet time, travel, or classroom stations.</text>
+    <rect x="0" y="1300" width="1000" height="160" fill="${style.footer}"/>
+    <text x="500" y="1350" text-anchor="middle" font-size="31" font-family="Arial, sans-serif" font-weight="900" fill="${style.footerText}">${footerTspans}</text>
+    <text x="500" y="1414" text-anchor="middle" font-size="18" font-family="Arial, sans-serif" font-weight="700" fill="#FFFFFF" opacity="0.80">Save &amp; print for free • JoyMaze</text>
   </svg>`;
 }
 
-function renderPaperFrameSvg(style) {
+function renderStartMarkerSvg(style) {
+  // tied to 1000x1500 canvas — positions are absolute px, not relative.
   return `
-  <svg width="776" height="872" viewBox="0 0 776 872" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="776" height="872" rx="26" fill="#FFFFFF"/>
-    <rect x="14" y="14" width="748" height="844" rx="20" fill="#FFFFFF" stroke="#EFF3F8" stroke-width="3"/>
-    <circle cx="56" cy="54" r="7" fill="${style.accent}" opacity="0.55"/>
-    <circle cx="720" cy="54" r="7" fill="${style.accent}" opacity="0.55"/>
-    <circle cx="56" cy="818" r="7" fill="${style.accent}" opacity="0.55"/>
-    <circle cx="720" cy="818" r="7" fill="${style.accent}" opacity="0.55"/>
+  <svg width="170" height="120" viewBox="0 0 170 120" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="58" cy="60" r="40" fill="#FFCBA4" stroke="#E4A37D" stroke-width="3"/>
+    <circle cx="46" cy="54" r="4" fill="#1A1A2E"/>
+    <circle cx="69" cy="54" r="4" fill="#1A1A2E"/>
+    <path d="M46 73 q12 12 24 0" fill="none" stroke="#1A1A2E" stroke-width="3" stroke-linecap="round"/>
+    <path d="M102 42 h38 l18 18 -18 18 h-38 q-14 0 -14 -18 q0 -18 14 -18z" fill="#FFFFFF" stroke="${style.accent}" stroke-width="3"/>
+    <text x="122" y="66" text-anchor="middle" font-size="18" font-family="Arial, sans-serif" font-weight="900" fill="${style.accent}">→ Start!</text>
+  </svg>`;
+}
+
+function renderFinishMarkerSvg(style) {
+  // tied to 1000x1500 canvas — positions are absolute px, not relative.
+  return `
+  <svg width="150" height="130" viewBox="0 0 150 130" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="48,6 57,32 84,32 62,48 70,74 48,58 26,74 34,48 12,32 39,32" fill="#F4C430" stroke="#D29B00" stroke-width="3"/>
+    <text x="80" y="86" font-size="24" font-family="Arial, sans-serif" font-weight="900" fill="${style.accent}">FINISH</text>
   </svg>`;
 }
 
@@ -264,7 +368,7 @@ function buildConfigFromManifestSlot(manifest, slot) {
     type,
     theme: slot.theme || THEME,
     difficulty: String(slot.difficulty || DIFFICULTY || 'medium').toLowerCase(),
-    title: TITLE || getDefaultTitle(type, slot.theme || THEME),
+    title: TITLE || slot.topic || slot.subject || slot.label || getDefaultTitle(type, slot.theme || THEME),
     slug: SLUG_ARG || `${datePart}-${slotPart}-${themePart}-${type}`,
     activityDir: null,
     countdown: COUNTDOWN,
@@ -295,33 +399,34 @@ async function buildPostImage(activityDir, activity, outputPath, type) {
   const sourcePuzzlePath = await ensurePuzzlePng(activityDir);
   const style = getStyleKit(type);
   const backgroundSvg = renderBackgroundSvg({
-    width: 1000,
-    height: 1500,
+    width: CANVAS_WIDTH,
+    height: CANVAS_HEIGHT,
     theme: activity.theme || THEME,
     titleText: activity.titleText || activity.activityLabel || getDefaultTitle(type, activity.theme || THEME),
     difficulty: activity.difficulty || DIFFICULTY,
-    ctaText: activity.ctaText || 'Save this for your next quiet-time printable',
+    ctaText: activity.hookText || activity.ctaText || 'Save this for your next quiet-time printable',
     style,
+    type,
   });
 
-  const paperFrameSvg = renderPaperFrameSvg(style);
   const puzzleBuffer = await sharp(sourcePuzzlePath)
-    .resize(730, 820, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+    .resize(PUZZLE_WIDTH, PUZZLE_HEIGHT, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
     .png()
     .toBuffer();
 
   await sharp({
     create: {
-      width: 1000,
-      height: 1500,
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
       channels: 4,
-      background: '#FFFFFF',
+      background: style.background,
     },
   })
     .composite([
       { input: Buffer.from(backgroundSvg), top: 0, left: 0 },
-      { input: Buffer.from(paperFrameSvg), top: 366, left: 112 },
-      { input: puzzleBuffer, top: 392, left: 135 },
+      { input: puzzleBuffer, top: PUZZLE_TOP, left: PUZZLE_LEFT },
+      { input: Buffer.from(renderStartMarkerSvg(style)), top: PUZZLE_TOP + 4, left: PUZZLE_LEFT - 54 },
+      { input: Buffer.from(renderFinishMarkerSvg(style)), top: PUZZLE_TOP + PUZZLE_HEIGHT - 26, left: PUZZLE_LEFT + PUZZLE_WIDTH - 20 },
     ])
     .png()
     .toFile(outputPath);
@@ -347,6 +452,14 @@ async function processOne(config) {
   const puzzle = JSON.parse(await fs.readFile(puzzlePath, 'utf8'));
 
   const postPath = path.join(activityDir, 'post.png');
+
+  console.log(`[puzzle-post] activityDir: ${activityDir}`);
+
+  if (DRY_RUN) {
+    console.log('[puzzle-post] dry-run only, no files written.');
+    return;
+  }
+
   const rawFolder = getRawFolder(config.type);
   const rawSuffix = config.source === 'manifest'
     ? `${manifestSafe(config.manifestDate)}-slot${String(config.slotIndex).padStart(2, '0')}-${slugify(activity.theme || config.theme)}`
@@ -355,21 +468,16 @@ async function processOne(config) {
   const rawImagePath = path.join(rawFolder, `${rawBase}.png`);
   const rawSidecarPath = path.join(rawFolder, `${rawBase}.json`);
 
-  console.log(`[puzzle-post] activityDir: ${activityDir}`);
   console.log(`[puzzle-post] rawImage   : ${rawImagePath}`);
-
-  if (DRY_RUN) {
-    console.log('[puzzle-post] dry-run only, no files written.');
-    return;
-  }
 
   await fs.mkdir(rawFolder, { recursive: true });
   await buildPostImage(activityDir, activity, postPath, config.type);
   await fs.copyFile(postPath, rawImagePath);
 
+  const subject = config.title || activity.titleText || getDefaultTitle(config.type, activity.theme || config.theme);
   const sidecar = {
     category: config.type === 'maze' ? 'activity-maze' : 'activity-word-search',
-    subject: config.title || getDefaultTitle(config.type, activity.theme || config.theme),
+    subject,
     hookText: activity.hookText || activity.titleText || '',
     difficulty: puzzle.difficulty || activity.difficulty || config.difficulty,
     theme: activity.theme || config.theme,

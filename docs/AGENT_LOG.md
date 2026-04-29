@@ -224,6 +224,19 @@
 **Test output summary:** Syntax checks passed. `generate-prompts --save` succeeded and wrote both the markdown prompts file and `activity-manifest-2026-04-29.json`. Manifest-driven puzzle-post generation succeeded, including a real daily-slot word-search export from the live manifest and a validation manifest pass covering both maze and word-search slots. `import-raw.mjs` successfully branded and queued both exported puzzle posts, preserving puzzle-generator metadata into the queue JSON. `generate-captions.mjs --dry-run` generated sample captions for both queue entries without errors.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Claude review on the implementation quality, then likely a follow-up pass to make wrapper art direction even closer to final JoyMaze aesthetic and decide whether deterministic puzzle generation should expand to matching/find-the-difference next or first tighten the scheduler/import polish around the current two supported lanes.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-009-WRAPPER-002 | Rebuild puzzle-post art wrapper and fix manifest subject binding
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — rebuilt the wrapper layout away from the sterile card UI into a more illustrated printable treatment with themed backgrounds, corner decorations, start marker, finish marker, larger puzzle stage, and solid CTA footer band; also fixed manifest title/subject binding and the dry-run/raw-path ordering bug
+- `scripts/generate-prompts.mjs` — enriched `activity-manifest-YYYY-MM-DD.json` slots with `topic` and `subject` fields so downstream puzzle-post exports can carry a better subject signal than the generic fallback title
+- `docs/AGENT_LOG.md` — appended this wrapper/art pass entry for Claude
+**What was done:** Took the art-direction audit seriously and rebuilt the wrapper layer stack. The post no longer renders as a plain white app card. It now uses puzzle-type color worlds, low-opacity margin motifs, geometric decorative shapes, a start character marker, a goal marker, a larger central puzzle stage, and a solid colored CTA footer. In the same pass, fixed the manifest-driven subject problem by teaching the manifest to emit `topic`/`subject` and making the puzzle-post runner prefer those values for `config.title` and sidecar `subject`.
+**Test command:** `node --check scripts/generate-puzzle-image-post.mjs`, `node --check scripts/generate-prompts.mjs`, `node scripts/generate-prompts.mjs --save`, `npm run puzzlepost:generate -- --manifest output/prompts/activity-manifest-2026-04-29.json --all-supported`
+**Test output summary:** Syntax checks passed. Prompt save succeeded and rewrote the daily manifest with `topic`/`subject` fields. Manifest-driven generation rebuilt both the maze and word-search outputs successfully. Visual spot-check of the generated `post.png` files confirmed colored backgrounds, visible margin decorations, a start marker at the left entry side, a finish marker at the lower-right exit side, a solid CTA footer band, and non-generic sidecar subjects (`Ocean Animals Maze Puzzle`, `Colors and Shapes Word Search`).
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If Claude agrees the direction is right, the next wrapper polish should focus on theme-aware art variation beyond generic type-based decorations, plus slightly better hook text fitting rules so long challenge lines lose less wording in the title/footer zones.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---

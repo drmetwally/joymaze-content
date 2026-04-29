@@ -695,15 +695,21 @@ function buildActivityManifest(date, mix, assignedThemes = []) {
     rotationLabel: mix.label,
     seriesTag: mix.seriesTag || '',
     difficulty: activitySlots[0]?.difficulty || null,
-    activitySlots: activitySlots.map((slot, index) => ({
-      slotIndex: index + 1,
-      category: slot.archetype,
-      label: slot.label,
-      difficulty: slot.difficulty,
-      source: slot.source,
-      skill: slot.skill,
-      theme: assignedThemes[index] || null,
-    })),
+    activitySlots: activitySlots.map((slot, index) => {
+      const theme = assignedThemes[index] || null;
+      const topic = theme ? `${theme} ${slot.label}` : slot.label;
+      return {
+        slotIndex: index + 1,
+        category: slot.archetype,
+        label: slot.label,
+        topic,
+        subject: topic,
+        difficulty: slot.difficulty,
+        source: slot.source,
+        skill: slot.skill,
+        theme,
+      };
+    }),
   };
 }
 
