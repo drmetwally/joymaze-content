@@ -269,7 +269,9 @@ Preferred follow-up:
 
 Implementation started 2026-04-29:
 - `generate-prompts.mjs --save` now writes `output/prompts/activity-manifest-YYYY-MM-DD.json`
-- this manifest is the intended scheduler handoff seam for puzzle-post automation
+- `generate-puzzle-image-post.mjs` now accepts that manifest and can generate the supported deterministic puzzle slots directly (`--manifest ... --all-supported`)
+- `daily-scheduler.mjs` now calls that seam after prompt generation by default, with `--no-puzzle-posts` available as the escape hatch
+- this manifest is now the live scheduler handoff seam for puzzle-post automation
 
 ---
 

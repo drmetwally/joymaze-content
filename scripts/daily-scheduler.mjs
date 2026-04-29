@@ -6,7 +6,8 @@
  * Runs the automated morning workflow at 9:00 AM:
  *   1. Archive yesterday's queue (archive-queue.mjs)
  *   2. Generate today's image prompts (generate-prompts.mjs --save)
- *   3. Generate today's story idea (generate-story-ideas.mjs) [--no-story to skip]
+ *   3. Generate today's deterministic puzzle image posts from the activity manifest [--no-puzzle-posts to skip]
+ *   4. Generate today's story idea (generate-story-ideas.mjs) [--no-story to skip]
  *   4. Generate Story Reel V2: Imagen images + Remotion render [--no-story-reel to skip]
  *   5. Generate today's ASMR brief (generate-asmr-brief.mjs) [--no-asmr to skip]
  *   6. Generate today's challenge brief (generate-challenge-brief.mjs) [--no-challenge to skip]
@@ -53,6 +54,7 @@ const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const RUN_NOW            = args.includes('--now');
 const WITH_STORY         = !args.includes('--no-story');         // default on; skip with --no-story
+const WITH_PUZZLE_POSTS  = !args.includes('--no-puzzle-posts');  // default on; skip with --no-puzzle-posts
 const WITH_STORY_REEL    = !args.includes('--no-story-reel');    // default on; skip with --no-story-reel
 const WITH_ASMR_BRIEF    = !args.includes('--no-asmr');          // default on; skip with --no-asmr
 const WITH_CHALLENGE     = !args.includes('--no-challenge');     // default on; skip with --no-challenge
@@ -164,6 +166,7 @@ async function runDailyJob() {
   let stepNum = 0;
   const isMonday = new Date().getDay() === 1;
   const totalSteps = 3  // archive + prompts + x-text-posts (always run)
+    + (WITH_PUZZLE_POSTS             ? 1 : 0)
     + (WITH_STORY                    ? 1 : 0)
     + (WITH_STORY && WITH_STORY_REEL ? 1 : 0)
     + (WITH_ASMR_BRIEF               ? 1 : 0)
@@ -239,7 +242,22 @@ async function runDailyJob() {
     await appendLog('Prompt generation FAILED');
   }
 
-  // Step 3: Generate story idea (default on; skip with --no-story)
+  // Step 3: Generate deterministic puzzle posts from today's activity manifest
+  if (WITH_PUZZLE_POSTS) {
+    stepNum++;
+    log(`Step ${stepNum}/${totalSteps}: Generating today's deterministic puzzle posts...`);
+    const manifestPath = path.join('output', 'prompts', `activity-manifest-${today}.json`);
+    const puzzlePostsOk = await runScript('generate-puzzle-image-post.mjs', ['--manifest', manifestPath, '--all-supported'], 180_000);
+    if (puzzlePostsOk) {
+      log('Puzzle posts generated from today\'s activity manifest (maze/word-search when assigned).');
+      await appendLog('Puzzle posts generated OK');
+    } else {
+      log('Puzzle post generation failed — run manually: npm run puzzlepost:generate -- --manifest ' + manifestPath + ' --all-supported');
+      await appendLog('Puzzle posts generation FAILED');
+    }
+  }
+
+  // Step 4: Generate story idea (default on; skip with --no-story)
   if (WITH_STORY) {
     stepNum++;
     log(`Step ${stepNum}/${totalSteps}: Generating story idea for next episode...`);
@@ -373,7 +391,8 @@ async function runDailyJob() {
   log('  1. Open output/prompts/ — read today\'s image prompts (5 inspiration + 5 activity slots)');
   log('     Inspiration folders: output/raw/fact-card/, challenge/, quiet/, printable/, identity/');
   log('     Activity folders:    output/raw/maze/, wordsearch/, matching/, tracing/, quiz/');
-  log('  2. Generate images in Gemini/ChatGPT → save to the matching subfolder');
+  log('  2. Maze + word-search may already be pre-generated from the activity manifest.');
+  log('     Generate the remaining manual images in Gemini/ChatGPT → save to the matching subfolder');
   log('  3. npm run import:raw            ← brands images + assigns scheduledHour (6am–9pm spread)');
   log('  4. npm run generate:captions     ← generates captions for all platforms');
   log('  5. Hourly Task Scheduler posts them automatically throughout the day');

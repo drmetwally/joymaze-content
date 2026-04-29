@@ -209,6 +209,21 @@
 **Test output summary:** Both scripts passed Node syntax checks with no errors.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Teach the puzzle-post runner or daily scheduler to consume the new activity manifest directly, then run an end-to-end save/generate/import/captions pass for one daily maze slot and one daily word-search slot.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-009-FINISH-001 | Finish manifest consumption, wrapper polish, and end-to-end validation
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — upgraded from a direct-only bridge into a manifest-aware runner that can consume `activity-manifest-YYYY-MM-DD.json`, target specific or all supported slots, and emit cleaner slot/date-based filenames; also improved the social wrapper styling with stronger hierarchy, cleaner paper framing, and a more JoyMaze-like printable presentation
+- `scripts/daily-scheduler.mjs` — wired the new manifest seam into the daily run so puzzle-post generation now happens automatically after prompt generation unless explicitly disabled with `--no-puzzle-posts`
+- `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md` — updated the plan to reflect that the manifest seam is now live and scheduler-connected
+- `docs/TASKS.md` — marked TASK-OC-009 Phase 1 implementation complete and recorded the end-to-end validation status
+- `docs/AGENT_LOG.md` — appended this completion entry for Claude
+**What was done:** Closed the remaining three open points from the last checkpoint. First, the puzzle-post runner now consumes the machine-readable manifest instead of needing only manual CLI theme input. Second, the wrapper image was upgraded beyond the placeholder version so the exported post looks more like a branded printable card than a raw puzzle dropped on white. Third, the flow was validated end-to-end: prompt save wrote the real manifest, manifest-driven puzzle-post generation created daily-slot assets, `import-raw.mjs` imported the resulting maze and word-search exports into `output/queue/`, and `generate-captions.mjs --dry-run` filled sample captions for both queue entries.
+**Test command:** `node --check scripts/generate-puzzle-image-post.mjs`, `node --check scripts/daily-scheduler.mjs`, `node --check scripts/generate-prompts.mjs`, `node scripts/generate-prompts.mjs --save`, `npm run puzzlepost:generate -- --manifest output/prompts/activity-manifest-2026-04-29.json --all-supported`, `npm run puzzlepost:generate -- --manifest output/prompts/activity-manifest-2026-04-29-validation.json --all-supported`, `node scripts/import-raw.mjs --file maze/maze-2026-04-29-slot01-ocean-animals.png`, `node scripts/import-raw.mjs --file wordsearch/wordsearch-2026-04-29-slot02-toy-workshop.png`, `node scripts/generate-captions.mjs --dry-run --id 2026-04-29-activity-maze-00`, `node scripts/generate-captions.mjs --dry-run --id 2026-04-29-activity-word-search-00`
+**Test output summary:** Syntax checks passed. `generate-prompts --save` succeeded and wrote both the markdown prompts file and `activity-manifest-2026-04-29.json`. Manifest-driven puzzle-post generation succeeded, including a real daily-slot word-search export from the live manifest and a validation manifest pass covering both maze and word-search slots. `import-raw.mjs` successfully branded and queued both exported puzzle posts, preserving puzzle-generator metadata into the queue JSON. `generate-captions.mjs --dry-run` generated sample captions for both queue entries without errors.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude review on the implementation quality, then likely a follow-up pass to make wrapper art direction even closer to final JoyMaze aesthetic and decide whether deterministic puzzle generation should expand to matching/find-the-difference next or first tighten the scheduler/import polish around the current two supported lanes.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---
