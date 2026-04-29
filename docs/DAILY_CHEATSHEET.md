@@ -2,7 +2,7 @@
 
 > Follow top to bottom. Every day.
 
-Last updated: 2026-04-28
+Last updated: 2026-04-29
 
 ---
 
@@ -12,7 +12,7 @@ Last updated: 2026-04-28
 |------|------|------|---------|
 | 1 | Archive + briefs + Story Reel V2 auto-render | 3–5 min | `npm run daily` |
 | 2A | Inspiration images (5) | 10–15 min | Gemini → `output/raw/<slot>/` |
-| 2B | Activity puzzle images (5) | 15–20 min | Gemini → `output/raw/<type>/` |
+| 2B | Activity puzzle images (remaining manual only) | 10–15 min | Gemini → `output/raw/<type>/` |
 | 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
 | 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
 | 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
@@ -57,7 +57,8 @@ Automatically:
 7. Generates challenge brief → `output/challenge/`
 8. **Generates animal facts brief** → `output/longform/animal/` (intelligence: all 9 config files + virality contract) (skip with `--no-animal-brief`)
 9. Generates 4 X text posts → `output/queue/x-text-YYYY-MM-DD.json`
-10. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
+10. **Generates deterministic puzzle image posts from the daily activity manifest** for supported slots (currently maze + word-search) → wrapped `post.png` + raw import assets
+11. **Monday only:** collects trends, runs intelligence refresh, updates all 5 dynamic pools
 
 **Check:** Open `output/prompts/prompts-YYYY-MM-DD.md` · Check `output/videos/` for new Story Reel V2 · Check `output/longform/animal/` for new animal brief
 
@@ -79,16 +80,34 @@ Automatically:
 
 Naming: `fact-dinosaurs.png`, `challenge-ocean.png`, `quiet-rainy-day.png`, etc.
 
-### 2B — Activity Puzzle Images (5)
+### 2B — Activity Puzzle Images (remaining manual only)
+
+**Now automated by default after `npm run daily`:**
+- Maze
+- Word Search
+
+Those two supported deterministic puzzle lanes are generated from `output/prompts/activity-manifest-YYYY-MM-DD.json` and exported into:
+- `output/raw/maze/`
+- `output/raw/wordsearch/`
+
+**Still manual for now:**
 
 | Type | Folder | Name pattern |
 |------|--------|-------------|
-| Maze | `output/raw/maze/` | `maze-{theme}.png` |
-| Word Search | `output/raw/wordsearch/` | `wordsearch-{theme}.png` |
 | Matching | `output/raw/matching/` | `matching-{theme}.png` |
 | Tracing | `output/raw/tracing/` | `tracing-{theme}.png` |
 | Coloring | `output/raw/coloring/` | `coloring-{theme}.png` |
 | Dot-to-Dot | `output/raw/dottodot/` | `dottodot-{theme}.png` |
+
+**Manual puzzle-post commands (if you want to run them yourself):**
+```bash
+# Direct one-off generation
+npm run puzzlepost:generate -- --type maze --theme "Ocean Animals" --difficulty medium
+npm run puzzlepost:generate -- --type wordsearch --theme "Toy Workshop" --difficulty hard
+
+# From the saved daily manifest
+npm run puzzlepost:generate -- --manifest output/prompts/activity-manifest-YYYY-MM-DD.json --all-supported
+```
 
 ### 2C — ASMR Images (2)
 
@@ -294,6 +313,12 @@ npm run generate:story:openai -- --story epNN-[title]   # ~$0.01, better voice
 
 ```bash
 npm run import:raw
+```
+
+If you only want to validate the deterministic puzzle posts first:
+```bash
+node scripts/import-raw.mjs --file maze/maze-YYYY-MM-DD-slot01-theme.png
+node scripts/import-raw.mjs --file wordsearch/wordsearch-YYYY-MM-DD-slot02-theme.png
 ```
 
 - Adds JoyMaze logo, resizes for all platforms
@@ -513,6 +538,7 @@ MONDAY AUTOMATIC (npm run daily + GitHub Actions):
 
 DAILY (all 4 reel lanes run through intelligence):
   Image prompts  ← generate-prompts.mjs (themes + hooks + pattern-interrupts + series tag)
+  Puzzle posts   ← activity-manifest-YYYY-MM-DD.json → generate-puzzle-image-post.mjs (maze + word-search only for now)
   Story Reel V2  ← generate-story-ideas.mjs (trends + perf-weights + competitor + hooks + virality)
                  → generate-story-reel-images.mjs (Imagen) → render-video.mjs StoryReelV2
   Animal Song    ← generate-animal-facts-brief.mjs (all 9 config files + virality)

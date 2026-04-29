@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-04-29 — [Agent: OpenClaw] — Finish deterministic puzzle-post Phase 1 automation
+
+**Files changed:** `scripts/generate-puzzle-image-post.mjs`, `scripts/generate-prompts.mjs`, `scripts/import-raw.mjs`, `scripts/daily-scheduler.mjs`, `package.json`, `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md`, `docs/TASKS.md`, `docs/AGENT_LOG.md`, `docs/DAILY_CHEATSHEET.md`, `docs/DAILY_WORKFLOW.md`
+
+**What shipped:**
+- `generate-prompts.mjs --save` now emits `output/prompts/activity-manifest-YYYY-MM-DD.json`
+- `generate-puzzle-image-post.mjs` now supports both direct generation and manifest-driven generation
+- Scheduler now consumes that manifest seam and auto-generates supported deterministic puzzle image posts after prompt generation
+- Supported automated puzzle lanes: **maze** and **word-search**
+- Raw/import seam preserved: generated posts land in `output/raw/maze/` and `output/raw/wordsearch/` with sidecar JSON
+- `import-raw.mjs` now preserves richer puzzle metadata into queue JSON: `difficulty`, `theme`, `sourceFolder`, `puzzleType`, `titleText`, `ctaText`
+
+**Validation completed:**
+- prompt save -> manifest write
+- manifest-driven puzzle-post generation
+- import of maze export
+- import of word-search export
+- caption dry-run for both queue items
+
+**Current operator change:** `npm run daily` now already handles maze + word-search post generation when those slot categories are assigned. Human work remains focused on the non-deterministic/manual puzzle lanes and the other content systems.
+
+---
+
 ## 2026-04-28 — [Agent: Claude] — Wire Story Reel V2 + Animal Song Short into daily scheduler
 
 **Files changed:** `scripts/daily-scheduler.mjs`, `docs/TASKS.md`
