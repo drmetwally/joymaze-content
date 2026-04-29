@@ -118,6 +118,54 @@
 **Test command:** `Select-String -Path CLAUDE.md -Pattern "TTS fallback|Story video structure" -Context 0,1`
 **Test output summary:** `CLAUDE.md` now contains the new `TTS fallback` row directly under `Story video structure`, with Kokoro-82M (`kokoro-js`, `af_bella`) named as the fallback and Edge retained as last resort only.
 **Review status:** APPROVED by Claude (Sonnet 4.6) — stamped 2026-04-28; OC-003 fully closed
+
+---
+
+### 2026-04-29 | OpenClaw | ADHOC-WS-001 | Generate dogs/poodles word-search batch + manual cheatsheet
+**Files changed:**
+- `MANUAL_PUZZLE_GENERATORS_CHEATSHEET.md` — added a compact manual-use guide for the maze, word-search, and matching generators
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** Generated a 15-page dogs-and-poodles word-search batch directly through `scripts/generate-wordsearch-assets.mjs`, using four custom clue words per page and deterministic slugged output folders from `dogs-poodles-01` through `dogs-poodles-15`. Added a separate quickstart cheatsheet file outside the main repo docs so Ahmed can manually run puzzle generators without going through the full pipeline, including dry-run usage, core flags, output paths, and reuse notes.
+**Test command:** `npm run wordsearch:generate -- --title "Dogs and Poodles 01" --theme "dogs and poodles" --difficulty easy --slug dogs-poodles-01 --words "POODLE,COLLAR,LEASH,BARK"` plus the same command shape repeated for `dogs-poodles-02` through `dogs-poodles-15`
+**Test output summary:** Each run exited 0 and wrote `activity.json`, `puzzle.json`, `wordsearch.json`, `blank.png`, `puzzle.png`, and `solved.png` into `output/challenge/generated-activity/dogs-poodles-XX/`. Final directory check confirmed all 15 folders exist: `dogs-poodles-01` ... `dogs-poodles-15`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Ahmed can inspect the generated puzzle and answer pages, then either print/export them for KDP use or ask for a follow-up pass to tune page titles, word difficulty, or batch scripting further.
+
+---
+
+### 2026-04-29 | OpenClaw | ADHOC-MAZE-001 | Generate dogs/poodles maze batch
+**Files changed:**
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** Generated a second 15-page batch using the standalone maze generator with the same dogs-and-poodles theme, producing deterministic output folders from `dogs-poodles-maze-01` through `dogs-poodles-maze-15`. Used the built-in easy rectangular maze setup so the batch stays consistent with the simple printable word-search set created earlier.
+**Test command:** `npm run maze:generate -- --title "Dogs and Poodles Maze 01" --theme "dogs and poodles" --difficulty easy --slug dogs-poodles-maze-01 --shape rectangle` plus the same command shape repeated for `dogs-poodles-maze-02` through `dogs-poodles-maze-15`
+**Test output summary:** Each run exited 0 and wrote `activity.json`, `maze.json`, `path.json`, `blank.png`, `puzzle.png`, `solved.png`, and `_benchmark-notes.json` into `output/challenge/generated-activity/dogs-poodles-maze-XX/`. Final directory check confirmed all 15 folders exist: `dogs-poodles-maze-01` ... `dogs-poodles-maze-15`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Ahmed can review the printable maze pages and, if needed, ask for a follow-up pass to raise difficulty, vary grid sizes, or create a reusable maze-batch script.
+
+---
+
+### 2026-04-29 | OpenClaw | ADHOC-PUZZLE-002 | Consolidate poodle puzzle pages and archive challenge outputs automatically
+**Files changed:**
+- `scripts/archive-queue.mjs` — added challenge brief and generated-activity folder sweeps so daily archive runs now catch challenge outputs too
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** Collected the 15 poodle word-search puzzle pages into `output/challenge/generated-activity/wordsearch poodle/` as numbered files `1.png` through `15.png`. Removed the previously generated poodle maze batch, regenerated 15 medium-difficulty poodle mazes, and collected their `puzzle.png` pages into `output/challenge/generated-activity/maze poodle/` as `1.png` through `15.png`. Then extended `archive-queue.mjs` so both `output/challenge/*` brief folders and `output/challenge/generated-activity/*` asset folders are archived automatically whenever `npm run daily` or the scheduler archive step runs.
+**Test command:** `node scripts/archive-queue.mjs --dry-run --all`
+**Test output summary:** Dry run exited 0 and reported both new archive sweeps working, including lines like `Archive challenge: ... → archive/challenge/` and `Archive generated activity: ... → archive/challenge-generated/`, with summary totals for `challenge briefs` and `generated challenge activities`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Ahmed can use the two consolidated folders directly for print/book assembly, and future daily archive runs will automatically sweep older challenge briefs plus generated activity folders.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-008-PLAN | Plan puzzle image-post automation lane
+**Files changed:**
+- `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md` — added the new image-post automation plan covering workflow structure, wrapper strategy, and build order
+- `docs/TASKS.md` — registered the new workflow-structure and image-post integration tasks under the active puzzle asset factory program
+- `docs/AGENT_LOG.md` — appended this planning entry for Claude
+**What was done:** Wrote the planning layer for the next JoyMaze phase after the challenge reel pass: use deterministic puzzle engines for printable masters, then add a social-ready art wrapper layer for the daily activity image posts. The plan starts with the image-post section, locks the generator-versus-wrapper responsibility split, recommends preserving the existing `generate-prompts -> import-raw -> queue` flow, and defines TASK-OC-008/TASK-OC-009 as the next implementation path for maze plus word-search image automation.
+**Test command:** `Select-String -Path docs\PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md,docs\TASKS.md -Pattern "TASK-OC-008|TASK-OC-009|image-post|import-raw"`
+**Test output summary:** The new plan doc contains the image-post automation architecture, wrapper strategy, and task recommendations; `docs/TASKS.md` now includes TASK-OC-008 and TASK-OC-009 under the active puzzle asset factory section.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Start TASK-OC-008 implementation by mapping the exact current activity image-post contract in code, then decide whether the first maze/word-search integration should emit into `output/raw/{type}` or write queue-ready metadata directly.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---
@@ -404,7 +452,7 @@
 **Files changed:**
 - `scripts/generate-maze-assets.mjs` - added `SOLVE_DURATION_SEC = 12` and emit that via `holdAfterSec`
 - `scripts/generate-wordsearch-assets.mjs` - added `SOLVE_DURATION_SEC = 15` and emit that via `holdAfterSec`
-**What was done:** Applied the solve-reveal repair after reviewing `docs/OPENCLAW_REPORT_2026-04-29_solve-reveal.md`. Claude�s timing diagnosis was correct: both generators were collapsing the solve phase to 2.5 seconds, which made the word-search sweep look absent and the maze reveal feel like a flash. The current maze generator already emitted `path.json`, so the concrete fix here was to lengthen the solve window and regenerate fresh review folders.
+**What was done:** Applied the solve-reveal repair after reviewing `docs/OPENCLAW_REPORT_2026-04-29_solve-reveal.md`. Claude�s timing diagnosis was correct: both generators were collapsing the solve phase to 2.5 seconds, which made the word-search sweep look absent and the maze reveal feel like a flash. The current maze generator already emitted `path.json`, so the concrete fix here was to lengthen the solve window and regenerate fresh review folders.
 **Test command:** `node scripts/generate-maze-assets.mjs --title "Garden Adventure Maze" --theme "Garden Adventure" --difficulty medium --shape rectangle --slug 2026-04-29-garden-adventure-maze-medium-rectangle-v6`, `node scripts/generate-wordsearch-assets.mjs --title "Garden Word Search" --theme "Garden" --difficulty medium --slug 2026-04-29-garden-word-search-medium-v5`, and dry-run renders for both folders through `render-video.mjs --comp ActivityChallenge --challenge ... --dry-run --verbose`
 **Test output summary:** Fresh maze folder `...maze-medium-rectangle-v6` now emits `holdAfterSec: 12` and includes `path.json`; fresh word-search folder `...word-search-medium-v5` now emits `holdAfterSec: 15`. Renderer dry-run props confirmed active maze `pathWaypoints` and active word-search `wordRects`, with the longer solve windows now present in emitted activity data.
 **Review status:** PENDING CLAUDE REVIEW
@@ -432,7 +480,7 @@
 - `remotion/compositions/ActivityChallenge.jsx` - audio rebalance defaults, fast end-countdown ticks, brand banner default off
 - `remotion/components/MazeSolverReveal.jsx` - much smoother pencil jitter profile
 - `remotion/components/WordSearchReveal.jsx` - outline-first solve reveal instead of filled highlight treatment
-**What was done:** Applied the user�s next polish directives after reviewing the latest renders. The challenge phase was too long at 45 seconds, the top title was still descriptive instead of engagement-driven, the challenge music was overpowering the countdown tick, and the bottom `joymaze.com` banner contradicted the no-direct-marketing decision. I moved the default challenge timer down to 30 seconds for both lanes, switched title/hook text to intelligence-linked challenge hooks (`ONLY SHARP KIDS SOLVE THIS MAZE`, `ONLY SHARP EYES FIND ALL 8 WORDS`), lowered challenge/solve music, raised tick presence, and added extra half-second fast ticks in the final countdown window. For branding, `showBrandWatermark` now defaults off in the challenge pipeline. For solve-phase visuals, maze pencil jitter was reduced heavily to read smoother, and word-search switched from fill-heavy highlights to orange outline reveals plus matching outlined solved assets so the letters stay readable.
+**What was done:** Applied the user�s next polish directives after reviewing the latest renders. The challenge phase was too long at 45 seconds, the top title was still descriptive instead of engagement-driven, the challenge music was overpowering the countdown tick, and the bottom `joymaze.com` banner contradicted the no-direct-marketing decision. I moved the default challenge timer down to 30 seconds for both lanes, switched title/hook text to intelligence-linked challenge hooks (`ONLY SHARP KIDS SOLVE THIS MAZE`, `ONLY SHARP EYES FIND ALL 8 WORDS`), lowered challenge/solve music, raised tick presence, and added extra half-second fast ticks in the final countdown window. For branding, `showBrandWatermark` now defaults off in the challenge pipeline. For solve-phase visuals, maze pencil jitter was reduced heavily to read smoother, and word-search switched from fill-heavy highlights to orange outline reveals plus matching outlined solved assets so the letters stay readable.
 **Test command:** Regenerated fresh folders `...maze-medium-rectangle-v7` and `...word-search-medium-v6`; rendered full challenge videos `output/videos/maze-v7-full.mp4` and `output/videos/wordsearch-v6-full.mp4`; rendered solve-phase stills for both lanes to inspect the new pen motion and outline reveal.
 **Test output summary:** New full render durations dropped to 44.5s (maze) and 47.5s (word-search), versus the earlier minute-plus pacing. Activity JSON now shows `countdownSec: 30`, lowered music volumes, louder ticks, and `showBrandWatermark: false`. Solve-frame inspection confirmed the maze pen reads smoother and the word-search orange outline reveal is much cleaner than filled overlays. Remaining issues are now minor polish only, mainly a slightly soft maze path glow and a few late-frame word-search outlines feeling a bit busy.
 **Review status:** PENDING CLAUDE REVIEW
