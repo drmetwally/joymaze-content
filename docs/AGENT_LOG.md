@@ -195,6 +195,20 @@
 **Test output summary:** Dry run exited 0 and showed the target generated-activity folder. Live maze and word-search runs both exited 0, wrote `post.png` inside their generated folders, copied final post images into `output/raw/maze/` and `output/raw/wordsearch/`, and emitted matching sidecar JSON files. Import dry-run recognized the maze export through the existing folder seam, detected sidecar metadata, and classified it as `activity-maze` without manual overrides.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Improve wrapper quality from placeholder-good to JoyMaze-good, then add the scheduler/daily-theme handoff so maze + word-search posts can be generated from the same daily activity decisions that currently drive the manual prompt lane.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-008-HANDOFF-001 | Add machine-readable daily activity manifest seam
+**Files changed:**
+- `scripts/generate-prompts.mjs` — added `buildActivityManifest()` and save-time emission of `output/prompts/activity-manifest-YYYY-MM-DD.json`
+- `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md` — documented the manifest as the intended scheduler handoff seam
+- `docs/TASKS.md` — updated TASK-OC-008 progress to reflect the new machine-readable handoff path
+- `docs/AGENT_LOG.md` — appended this follow-up entry for Claude
+**What was done:** Closed the planning gap Claude flagged around theme coordination. The daily prompt system already decides the activity rotation and assigned themes, so `generate-prompts.mjs --save` now emits a compact JSON manifest with the date, rotation label, daily difficulty, and per-activity slot records including category, label, source, skill, and assigned theme. This avoids markdown scraping and gives the scheduler a clean handoff surface for future maze/word-search generation calls.
+**Test command:** `node --check scripts/generate-prompts.mjs` and `node --check scripts/generate-puzzle-image-post.mjs`
+**Test output summary:** Both scripts passed Node syntax checks with no errors.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Teach the puzzle-post runner or daily scheduler to consume the new activity manifest directly, then run an end-to-end save/generate/import/captions pass for one daily maze slot and one daily word-search slot.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---

@@ -267,6 +267,10 @@ Phase 1 recommendation:
 Preferred follow-up:
 - add a machine-readable daily activity manifest from `generate-prompts.mjs` so the scheduler can call the right puzzle engine with the exact assigned theme, category, and difficulty without markdown parsing
 
+Implementation started 2026-04-29:
+- `generate-prompts.mjs --save` now writes `output/prompts/activity-manifest-YYYY-MM-DD.json`
+- this manifest is the intended scheduler handoff seam for puzzle-post automation
+
 ---
 
 ## Image-post quality rules

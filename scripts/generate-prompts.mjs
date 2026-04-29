@@ -686,6 +686,27 @@ function buildProgressCarouselFooter(plan) {
     `import:raw auto-detects the \`progress-carousel-*\` folder and builds the carousel queue file. **No sidecar JSONs needed.**\n`;
 }
 
+function buildActivityManifest(date, mix, assignedThemes = []) {
+  const dateStr = date.toISOString().slice(0, 10);
+  const activitySlots = mix.slots.filter(s => s.type === 'activity');
+  return {
+    version: 1,
+    date: dateStr,
+    rotationLabel: mix.label,
+    seriesTag: mix.seriesTag || '',
+    difficulty: activitySlots[0]?.difficulty || null,
+    activitySlots: activitySlots.map((slot, index) => ({
+      slotIndex: index + 1,
+      category: slot.archetype,
+      label: slot.label,
+      difficulty: slot.difficulty,
+      source: slot.source,
+      skill: slot.skill,
+      theme: assignedThemes[index] || null,
+    })),
+  };
+}
+
 function pickPatternInterrupt(date, dynamicInterrupts = []) {
   const merged = [...PATTERN_INTERRUPT_POOL, ...dynamicInterrupts];
   return merged[dayOfYear(date) % merged.length];
@@ -2384,6 +2405,11 @@ async function main() {
 
     await fs.writeFile(filepath, header + finalResult + footer, 'utf-8');
     console.log(`\nSaved to: ${filepath}`);
+
+    const activityManifest = buildActivityManifest(today, mix, assignedThemes);
+    const manifestPath = path.join(OUTPUT_DIR, `activity-manifest-${dateStr}.json`);
+    await fs.writeFile(manifestPath, JSON.stringify(activityManifest, null, 2));
+    console.log(`Activity manifest saved to: ${manifestPath}`);
 
     // Write carousel plan JSON for reference
     if (carouselPlan) {
