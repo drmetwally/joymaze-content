@@ -2292,3 +2292,8 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Constrained medium difficulty from diagonal-enabled placements to horizontal/vertical only so the existing rectangle-based reveal system stays readable in short-form video.
 - Tightened highlight padding and reduced edge-hugging placements.
 - Treat `output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v4` as the current medium baseline.
+
+## 2026-04-29 - OpenClaw - deterministic matching scaffold
+- Started the next puzzle-factory lane after maze v5 and word-search medium v4 were stabilized.
+- Added `scripts/generate-matching-assets.mjs` plus `matching:generate` / `matching:generate:dry` package scripts.
+- Generated and dry-validated `output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v1` through `ActivityChallenge`.

@@ -376,3 +376,15 @@
 **Next:** Treat `v4` as the medium word-search baseline unless Claude objects. Follow-ups can focus on styling polish, larger theme banks, and deciding whether hard/difficult tiers should keep diagonals while medium stays horizontal/vertical only.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-009 | Deterministic Matching Asset Factory (SCAFFOLD)
+**Files changed:**
+- `scripts/generate-matching-assets.mjs` - new first-pass deterministic matching generator
+- `package.json` - added `matching:generate` and `matching:generate:dry`
+**What was done:** Started the next puzzle-asset lane after freezing the maze and medium word-search baselines. The new scaffold generates deterministic matching folders with `activity.json`, `matching.json`, `blank.svg`, `blank.png`, `puzzle.png`, `solved.svg`, and `solved.png`. It creates a seeded left/right pair layout with visible clue words on both sides, shuffles the answer side, and draws solved connector lines in the solved state. This keeps the challenge legible even without a custom animated matching reveal yet.
+**Test command:** `node scripts/generate-matching-assets.mjs --dry-run --title "Match the Pairs" --theme "Animals and Homes" --difficulty medium`, `node scripts/generate-matching-assets.mjs --title "Match the Pairs" --theme "Animals and Homes" --difficulty medium --slug 2026-04-29-matching-animals-homes-medium-v1`, and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v1 --dry-run --verbose`
+**Test output summary:** The scaffold generated `output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v1` successfully with 5 seeded pairs and renderer-compatible `blank/solved/puzzle` assets. `ActivityChallenge` dry-run accepted the folder cleanly and falls back to wipe-style solved reveal for the matching lane.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should review whether a dedicated animated matching solve reveal is worth adding now, or whether the current solved-image wipe is sufficient until more matching content examples exist.
+
+---
