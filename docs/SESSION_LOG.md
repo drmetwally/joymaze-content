@@ -2281,3 +2281,8 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Tested a denser merged-wall variant (`v4`), but it over-corrected into a spiral/schematic look and was rejected.
 - Reverted the directional-bias change while keeping the improved `12x9` medium density target and merged-wall rendering.
 - Generated `output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v5` and validated it as the best middle-ground baseline for Phase 1 rectangular mazes.
+
+## 2026-04-29 - OpenClaw - deterministic word-search scaffold
+- Began the next puzzle-factory lane after freezing the v5 maze baseline.
+- Added `scripts/generate-wordsearch-assets.mjs` plus `wordsearch:generate` / `wordsearch:generate:dry` package scripts.
+- Generated and dry-validated `output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v1` through `ActivityChallenge` with live `wordRects` loaded from the first-party `wordsearch.json` contract.

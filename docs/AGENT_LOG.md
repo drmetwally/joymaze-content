@@ -353,3 +353,15 @@
 **Next:** Freeze `v5` as the rectangular baseline unless Claude objects, then either do a very small rhythm-polish pass later or move directly into deterministic word-search generation using the same structure-first contract.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-008 | Deterministic Word-Search Asset Factory (SCAFFOLD)
+**Files changed:**
+- `scripts/generate-wordsearch-assets.mjs` - new first-pass deterministic word-search generator
+- `package.json` - added `wordsearch:generate` and `wordsearch:generate:dry`
+**What was done:** Started the next puzzle-asset lane after freezing the maze baseline. The new scaffold generates deterministic word-search folders with `activity.json`, `wordsearch.json`, `puzzle.json`, `blank.svg`, `blank.png`, `puzzle.png`, `solved.svg`, and `solved.png`. It places seeded words into a generated grid, fills the rest with letters, derives normalized highlight rects from placements, and uses the same structure-first contract shape as the maze factory so the renderer does not need extraction-time image analysis.
+**Test command:** `node scripts/generate-wordsearch-assets.mjs --dry-run --title "Garden Word Search" --theme "Garden" --difficulty medium`, `node scripts/generate-wordsearch-assets.mjs --title "Garden Word Search" --theme "Garden" --difficulty medium --slug 2026-04-29-garden-word-search-medium-v1`, and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v1 --dry-run --verbose`
+**Test output summary:** The scaffold generated `output\challenge\generated-activity\2026-04-29-garden-word-search-medium-v1` successfully with a `12x12` grid and 8 seeded garden words. The renderer dry-run loaded `puzzle.png`, `blank.png`, `solved.png`, and active `wordRects`, confirming the current `ActivityChallenge` flow accepts the new first-party contract.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should review whether the word-search baseline should keep all eight directions or temporarily constrain placement directions so rectangle-based reveals feel more natural. After that, tighten visual styling and optionally add theme word-bank config instead of the inline starter bank.
+
+---

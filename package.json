@@ -56,6 +56,8 @@
     "generate:activity:video:dry": "node scripts/generate-activity-video.mjs --dry-run",
     "maze:generate": "node scripts/generate-maze-assets.mjs",
     "maze:generate:dry": "node scripts/generate-maze-assets.mjs --dry-run",
+    "wordsearch:generate": "node scripts/generate-wordsearch-assets.mjs",
+    "wordsearch:generate:dry": "node scripts/generate-wordsearch-assets.mjs --dry-run",
     "analytics:collect": "node scripts/collect-analytics.mjs",
     "analytics:report": "node scripts/analytics-report.mjs",
     "analytics": "node scripts/collect-analytics.mjs && node scripts/analytics-report.mjs",
