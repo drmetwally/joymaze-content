@@ -439,3 +439,17 @@
 **Next:** If another micro-pass is wanted, the best remaining targets are (1) crisper maze path edge/glow and (2) tiny alignment/spacing cleanup for a couple late word-search outlines. The bigger strategic requests from the user are now implemented.
 
 ---
+
+### 2026-04-29 | OpenClaw | final timing correction + output cleanup
+**Files changed:**
+- `scripts/generate-maze-assets.mjs` - final maze countdown default moved to 15s
+- `scripts/generate-wordsearch-assets.mjs` - final word-search countdown default moved to 17s
+- `remotion/components/MazeSolverReveal.jsx` - tightened path stroke/glow for crisper final line
+- `remotion/components/WordSearchReveal.jsx` - slightly tighter inset/stroke for cleaner final outline spacing
+**What was done:** The user correctly called out that the prior 30-second countdowns still contradicted the earlier 25-35 second reel target once solve time was included. I revisited the timing as a whole reel problem, not just a puzzle-window problem, and corrected the final defaults so full runtime now fits the target band. Maze challenge is now 15s + 12s solve (+2.5s transition) for a 29.5s reel; word-search is now 17s + 15s solve (+2.5s transition) for a 34.5s reel. I also used this final pass to shave down maze glow softness and tighten word-search outline spacing. After rendering the final keepers, I removed all older files from `output/videos` and left only the final render set there, per the user's request.
+**Test command:** Generated final folders `...maze-medium-rectangle-final` and `...word-search-medium-final`, rendered `output/videos/maze-final.mp4` and `output/videos/wordsearch-final.mp4`, then cleaned `output/videos` to keep only those two MP4s plus their thumbnails.
+**Test output summary:** Final render durations are exactly 29.5s (maze) and 34.5s (word-search), which now matches the intended 25-35 second total-length rule. `output/videos` now contains only `maze-final.mp4`, `maze-final-thumb.jpg`, `wordsearch-final.mp4`, and `wordsearch-final-thumb.jpg`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** If there is another pass after user review, it should be content/performance tuning rather than structure repair. The timing, hook, audio hierarchy, banner removal, and solve style are now aligned.
+
+---

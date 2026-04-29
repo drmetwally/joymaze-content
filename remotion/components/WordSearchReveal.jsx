@@ -60,7 +60,7 @@ export const WordSearchReveal = ({
 
     const expandProgress = Math.min(localWordFrame / EXPAND_FRAMES, 1);
     const rect = normalizeRectSpace(rawRect, VW, VH);
-    const inset = 5;
+    const inset = 7;
     const x = rect.x1 + inset;
     const y = rect.y1 + inset;
     const w = Math.max(0, (rect.x2 - rect.x1) - inset * 2);
@@ -116,7 +116,7 @@ export const WordSearchReveal = ({
                 fill="none"
                 stroke={highlightColor}
                 strokeOpacity={r.opacity}
-                strokeWidth="5"
+                strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 rx="10"

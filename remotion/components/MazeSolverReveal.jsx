@@ -123,13 +123,13 @@ export const MazeSolverReveal = ({
              style={{ position: 'absolute', top: 0, left: 0 }}>
           <defs>
             <filter id="msr-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="3.5"
-                floodColor={pathColor} floodOpacity="0.34" />
+              <feDropShadow dx="0" dy="0" stdDeviation="2.4"
+                floodColor={pathColor} floodOpacity="0.22" />
             </filter>
           </defs>
           {drawnPts.length >= 2 && (
             <polyline points={pointsStr} fill="none"
-              stroke={pathColor} strokeWidth="7"
+              stroke={pathColor} strokeWidth="6"
               strokeLinecap="round" strokeLinejoin="round"
               filter="url(#msr-glow)" />
           )}

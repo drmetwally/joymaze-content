@@ -2324,3 +2324,10 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Turned off the bottom `joymaze.com` banner by default for challenge renders.
 - Smoothed maze pen motion and changed word-search solve treatment to orange outline reveals instead of filled highlights.
 - Regenerated fresh test folders (`maze v7`, `word-search v6`) and validated with real full renders plus solve-phase stills.
+
+## 2026-04-29 - OpenClaw - final timing correction and video output cleanup
+- Corrected the earlier timing contradiction by treating 25-35s as full reel length, not just puzzle time.
+- Final defaults are now 15s maze challenge and 17s word-search challenge, yielding 29.5s and 34.5s total reels.
+- Applied one last micro-pass on maze glow crispness and word-search outline spacing.
+- Rendered the final keeper files as `maze-final.mp4` and `wordsearch-final.mp4`.
+- Removed all older files from `output/videos`, leaving only the final render set and thumbnails.
