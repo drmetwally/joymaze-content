@@ -58,6 +58,8 @@
     "maze:generate:dry": "node scripts/generate-maze-assets.mjs --dry-run",
     "wordsearch:generate": "node scripts/generate-wordsearch-assets.mjs",
     "wordsearch:generate:dry": "node scripts/generate-wordsearch-assets.mjs --dry-run",
+    "puzzlepost:generate": "node scripts/generate-puzzle-image-post.mjs",
+    "puzzlepost:generate:dry": "node scripts/generate-puzzle-image-post.mjs --dry-run",
     "matching:generate": "node scripts/generate-matching-assets.mjs",
     "matching:generate:dry": "node scripts/generate-matching-assets.mjs --dry-run",
     "analytics:collect": "node scripts/collect-analytics.mjs",

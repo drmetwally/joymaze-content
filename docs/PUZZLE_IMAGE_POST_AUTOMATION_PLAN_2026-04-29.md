@@ -250,9 +250,22 @@ For maze and word-search, the first automation pass should:
 4. write a sidecar JSON beside it with at least:
    - `subject`
    - `hookText`
-   - later `difficulty`, `theme`, and `sourceFolder` once `import-raw.mjs` is extended
+   - `difficulty`
+   - `theme`
+   - `sourceFolder`
 
 This preserves the current production system while letting puzzle generation become the upstream source of truth.
+
+### Theme handoff seam, must be explicit
+Claude's audit correctly flagged one more coordination seam: `generate-prompts.mjs` already chooses the daily activity themes, so the puzzle-post lane must consume that decision instead of inventing a separate theme source.
+
+Phase 1 recommendation:
+- the puzzle-post generator should accept `--theme` directly
+- the first scheduler integration should pass the pre-assigned activity theme into the generator
+- near-term source of truth can be the daily prompts output or a small machine-readable companion artifact written by `generate-prompts.mjs`
+
+Preferred follow-up:
+- add a machine-readable daily activity manifest from `generate-prompts.mjs` so the scheduler can call the right puzzle engine with the exact assigned theme, category, and difficulty without markdown parsing
 
 ---
 

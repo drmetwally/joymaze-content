@@ -179,6 +179,22 @@
 **Test output summary:** Verified that `import-raw.mjs` auto-detects maze/wordsearch via folder names under `output/raw/`, reads same-basename sidecar JSON, emits queue metadata with `category`, `categoryName`, `subject`, `sourceFile`, `hookText`, and `outputs`, and that `generate-captions.mjs` relies primarily on those fields plus optional `difficulty` if present.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Implement the first `generate-puzzle-image-post` seam for maze + word-search and decide whether to patch `import-raw.mjs` immediately to preserve extra generator metadata or keep Phase 1 minimal.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-009-START | Start puzzle image-post integration seam for maze + word-search
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — new first-pass bridge script that can generate maze or word-search assets, build a wrapped `post.png`, copy it into `output/raw/{maze|wordsearch}/`, and write sidecar metadata for the current import flow
+- `scripts/import-raw.mjs` — extended queue metadata pass-through for puzzle-generator sidecars (`difficulty`, `theme`, `sourceFolder`, `puzzleType`, `titleText`, `ctaText`, and source override)
+- `package.json` — added `puzzlepost:generate` and `puzzlepost:generate:dry` scripts
+- `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md` — added Claude audit follow-up about the explicit theme handoff seam from `generate-prompts.mjs`
+- `docs/TASKS.md` — updated TASK-OC-008/009 progress state and implementation notes
+- `docs/AGENT_LOG.md` — appended this implementation entry for Claude
+**What was done:** Took Claude's audit literally: moved the rich sidecar-field pass-through from "later" into the start of TASK-OC-009, and also documented the missing theme handoff seam so it stays in scope. Then built the first real automation seam, `generate-puzzle-image-post.mjs`, which creates a generator-owned puzzle folder, composes a simple social wrapper, exports it into the existing raw-import path, and writes sidecar metadata so the current `import-raw -> queue` chain can keep working.
+**Test command:** `npm run puzzlepost:generate:dry -- --type maze --theme "Dogs and Puppies" --difficulty medium`, `npm run puzzlepost:generate -- --type maze --theme "Dogs and Puppies" --difficulty medium`, `npm run puzzlepost:generate -- --type wordsearch --theme "Toy Workshop" --difficulty medium`, and `node scripts/import-raw.mjs --dry-run --file maze/maze-dogs-and-puppies.png`
+**Test output summary:** Dry run exited 0 and showed the target generated-activity folder. Live maze and word-search runs both exited 0, wrote `post.png` inside their generated folders, copied final post images into `output/raw/maze/` and `output/raw/wordsearch/`, and emitted matching sidecar JSON files. Import dry-run recognized the maze export through the existing folder seam, detected sidecar metadata, and classified it as `activity-maze` without manual overrides.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Improve wrapper quality from placeholder-good to JoyMaze-good, then add the scheduler/daily-theme handoff so maze + word-search posts can be generated from the same daily activity decisions that currently drive the manual prompt lane.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---
