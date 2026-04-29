@@ -2275,3 +2275,9 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Benchmarked against `D:\Books and Publishing\Mega Maze (5000 pages)-20240708T093655Z-001` and confirmed sample page dimensions are `1700x2200`.
 - Refined `scripts/generate-maze-assets.mjs` to output 1700x2200 maze pages, write `puzzle.png` in addition to `blank.png`, shift to top-entry/bottom-exit metadata, lighten the visual weight, and rebalance medium difficulty to a less boxed, more print-like page composition.
 - Generated and validated `output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v3` with `ActivityChallenge` dry-run loading solver waypoints correctly.
+
+## 2026-04-29 - OpenClaw - TASK-OC-007 v5 baseline lock
+- Continued the maze benchmark loop after the v3 benchmark-fit pass.
+- Tested a denser merged-wall variant (`v4`), but it over-corrected into a spiral/schematic look and was rejected.
+- Reverted the directional-bias change while keeping the improved `12x9` medium density target and merged-wall rendering.
+- Generated `output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v5` and validated it as the best middle-ground baseline for Phase 1 rectangular mazes.

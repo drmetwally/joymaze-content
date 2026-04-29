@@ -342,3 +342,14 @@
 **Next:** Claude should review the maze-factory contract and visual tuning pass, then decide whether the next highest-value move is (a) one more density/perimeter tuning pass, or (b) starting the deterministic word-search factory using the same structure-first contract.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-007-FOLLOWUP | Maze baseline tuned to v5 middle-ground profile
+**Files changed:**
+- `scripts/generate-maze-assets.mjs` - tuned medium-density defaults and wall merging, tested v4 over-correction, then settled on a v5 middle-ground topology with cleaner print-like strokes but restored irregular DFS branching
+**What was done:** I continued the benchmark-fit loop beyond the initial v3 pass. A denser/merged-wall experiment (`v4`) made the maze too spiral-like and schematic, so I kept the improved density target (`12x9` medium) and merged wall rendering but reverted the directional-bias logic. The resulting `v5` artifact landed much closer to the print-book benchmark while preserving the new page composition, stroke feel, and top-entry/bottom-exit contract.
+**Test command:** `node scripts/generate-maze-assets.mjs --title "Garden Adventure Maze" --theme "Garden Adventure" --difficulty medium --shape rectangle --slug 2026-04-29-garden-adventure-maze-medium-rectangle-v5` and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v5 --dry-run --verbose`
+**Test output summary:** `v5` generated successfully at `output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v5` with a `12x9` medium grid, `64` solution cells, `14` dead ends, and dry-run renderer load showing `puzzle.png` plus `blank/solved` images and active solver waypoints. Vision comparison judged `v5` acceptable as the Phase 1 rectangular maze baseline, with only two notable follow-ups left: slightly mechanical path rhythm and some uneven whitespace/corridor proportions.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Freeze `v5` as the rectangular baseline unless Claude objects, then either do a very small rhythm-polish pass later or move directly into deterministic word-search generation using the same structure-first contract.
+
+---

@@ -38,11 +38,11 @@ const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
 
 const difficultyDefaults = {
-  easy: { rows: 7, cols: 7 },
-  medium: { rows: 10, cols: 8 },
-  hard: { rows: 13, cols: 10 },
-  difficult: { rows: 16, cols: 12 },
-  extreme: { rows: 20, cols: 14 },
+  easy: { rows: 8, cols: 8 },
+  medium: { rows: 12, cols: 9 },
+  hard: { rows: 15, cols: 11 },
+  difficult: { rows: 18, cols: 13 },
+  extreme: { rows: 22, cols: 16 },
 };
 
 const explicitRows = Number(getArg('--rows', '0')) || null;
@@ -228,8 +228,10 @@ function normalizedWaypoints(polyline, layout) {
 
 function buildWallSegments(cells, layout) {
   const segments = [];
-  for (let r = 0; r < cells.length; r++) {
-    for (let c = 0; c < cells[0].length; c++) {
+  const rows = cells.length;
+  const cols = cells[0].length;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       const cell = cells[r][c];
       const x = layout.offsetX + c * layout.cell;
       const y = layout.offsetY + r * layout.cell;
@@ -237,11 +239,61 @@ function buildWallSegments(cells, layout) {
       const y2 = y + layout.cell;
       if (cell.top) segments.push([x, y, x2, y]);
       if (cell.left) segments.push([x, y, x, y2]);
-      if (r === cells.length - 1 && cell.bottom) segments.push([x, y2, x2, y2]);
-      if (c === cells[0].length - 1 && cell.right) segments.push([x2, y, x2, y2]);
+      if (r === rows - 1 && cell.bottom) segments.push([x, y2, x2, y2]);
+      if (c === cols - 1 && cell.right) segments.push([x2, y, x2, y2]);
     }
   }
-  return segments;
+  return mergeWallSegments(segments);
+}
+
+function mergeWallSegments(segments) {
+  const horizontal = new Map();
+  const vertical = new Map();
+
+  for (const [x1, y1, x2, y2] of segments) {
+    if (y1 === y2) {
+      const key = y1.toFixed(3);
+      const list = horizontal.get(key) || [];
+      list.push([Math.min(x1, x2), Math.max(x1, x2)]);
+      horizontal.set(key, list);
+    } else if (x1 === x2) {
+      const key = x1.toFixed(3);
+      const list = vertical.get(key) || [];
+      list.push([Math.min(y1, y2), Math.max(y1, y2)]);
+      vertical.set(key, list);
+    }
+  }
+
+  const merged = [];
+  for (const [yKey, list] of horizontal.entries()) {
+    list.sort((a, b) => a[0] - b[0]);
+    let [start, end] = list[0];
+    for (let i = 1; i < list.length; i++) {
+      const [nextStart, nextEnd] = list[i];
+      if (nextStart <= end + 0.001) end = Math.max(end, nextEnd);
+      else {
+        merged.push([start, Number(yKey), end, Number(yKey)]);
+        [start, end] = [nextStart, nextEnd];
+      }
+    }
+    merged.push([start, Number(yKey), end, Number(yKey)]);
+  }
+
+  for (const [xKey, list] of vertical.entries()) {
+    list.sort((a, b) => a[0] - b[0]);
+    let [start, end] = list[0];
+    for (let i = 1; i < list.length; i++) {
+      const [nextStart, nextEnd] = list[i];
+      if (nextStart <= end + 0.001) end = Math.max(end, nextEnd);
+      else {
+        merged.push([Number(xKey), start, Number(xKey), end]);
+        [start, end] = [nextStart, nextEnd];
+      }
+    }
+    merged.push([Number(xKey), start, Number(xKey), end]);
+  }
+
+  return merged;
 }
 
 function polylinePoints(points) {
