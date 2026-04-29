@@ -59,6 +59,8 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [x] **Puzzle Challenge Reel video testing** — animated solve-reveal end-to-end tested 2026-04-28. Created `activity.json` for maze test folder; dry-run confirmed blank.png + solved.png + 400-waypoint path.json all auto-resolved; full render completed: `ActivityChallenge-1777406858199.mp4` (1500 frames, 50.0s @ 30fps). Animated maze solve fully working.
 - [ ] **Tune Puzzle Challenge Reel based on render review** — likely focus areas: title size/weight, countdown prominence, transition cue feel, audio balance, and per-type pacing.
 - [ ] **True word-search solve validation** — run once a sample exists with real `solved.png` and `wordsearch.json` so the solve phase can be fully tested, not just fallback static solve.
+- [~] **Puzzle asset factory program** — active direction locked 2026-04-29. See `docs/PUZZLE_ASSET_FACTORY_PLAN_2026-04-29.md`. Build order: Maze → Word Search → Matching → Find the Difference → Coloring → Tracing/Dot-to-Dot.
+- [~] **TASK-OC-007 — Deterministic Maze Asset Factory** — Phase 1 started 2026-04-29. `scripts/generate-maze-assets.mjs` now generates first-party rectangular maze assets (`maze.json`, `path.json`, `blank.svg`, `solved.svg`, `blank.png`, `solved.png`, `activity.json`) and a fresh generated folder already dry-loads plus preview-renders through `ActivityChallenge` with solver waypoints active. Remaining work: inspect visual quality against benchmark references, tune line/margin/difficulty feel, add npm scripts + docs closure review, then expand shape support beyond rectangular/square while keeping `shape` first-class in the contract.
 
 ## NEXT SESSION — REELS POLISH SPRINT (2026-04-28)
 

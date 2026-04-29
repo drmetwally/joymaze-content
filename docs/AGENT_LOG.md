@@ -327,3 +327,18 @@
 **Next:** Wire `npm run daily` package.json script to reflect the new flags if needed; test a full `--now` run tomorrow morning to confirm Story Reel V2 renders cleanly from a fresh story idea.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-007 | Deterministic Maze Asset Factory (BENCHMARK FIT PASS)
+**Files changed:**
+- `scripts/generate-maze-assets.mjs` - refined Phase 1 maze renderer toward the benchmark print-maze format
+- `package.json` - added `maze:generate` and `maze:generate:dry`
+- `docs/TASKS.md` - marked TASK-OC-007 as active with current state
+- `docs/PUZZLE_ASSET_FACTORY_PLAN_2026-04-29.md` - plan doc for the factory lane
+- `docs/tasks/TASK-OC-007-deterministic-maze-asset-factory.md` - scoped task spec
+**What was done:** Built the first working deterministic maze asset generator, validated it through the existing `ActivityChallenge` pipeline, then ran a benchmark-fit pass against the Mega Maze reference corpus. The generator now emits first-party maze structure plus render-ready assets, targets a 1700x2200 page canvas, writes `puzzle.png` as a compatibility alias, uses a more print-like whitespace/layout profile, and moved the maze contract to top-entry/bottom-exit labeling with explicit Start/End markers. Difficulty defaults were also rebalanced to reduce over-dense digital-looking grids in Phase 1.
+**Test command:** `node scripts/generate-maze-assets.mjs --title "Garden Adventure Maze" --theme "Garden Adventure" --difficulty medium --shape rectangle --slug 2026-04-29-garden-adventure-maze-medium-rectangle-v3` and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v3 --dry-run --verbose`
+**Test output summary:** Latest benchmark-fit artifact generated successfully at `output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v3`. `maze.json` now reports a `10x8` medium grid with top/bottom entry metadata and `37` solution cells. Dry-run render loaded `puzzle.png`, `blank.png`, `solved.png`, and `39 waypoints (solver active)` with the expected 45-second challenge timing.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should review the maze-factory contract and visual tuning pass, then decide whether the next highest-value move is (a) one more density/perimeter tuning pass, or (b) starting the deterministic word-search factory using the same structure-first contract.
+
+---

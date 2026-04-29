@@ -2269,3 +2269,9 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 **Audit backlog pending (not yet reviewed this session):** REELS-001 through REELS-004 (Story Reel V2 + Animal Song Short compositions), REELS-006 (virality contract), plus the OC-001/002/003 chain from 2026-04-27.
 
 **Next:** Audit REELS-001 through REELS-006 to close the review backlog, then wire Story Reel V2 + Animal Song Short into `daily-scheduler.mjs`. Challenge reel animated solve-reveal needs blank.png + solved.png content assets — content task, not code.
+
+## 2026-04-29 - OpenClaw - TASK-OC-007 benchmark-fit pass
+- Confirmed the active repo for this workstream is `D:\Joymaze-Content` and wrote a continuity note in the OpenClaw workspace to avoid future compaction drift.
+- Benchmarked against `D:\Books and Publishing\Mega Maze (5000 pages)-20240708T093655Z-001` and confirmed sample page dimensions are `1700x2200`.
+- Refined `scripts/generate-maze-assets.mjs` to output 1700x2200 maze pages, write `puzzle.png` in addition to `blank.png`, shift to top-entry/bottom-exit metadata, lighten the visual weight, and rebalance medium difficulty to a less boxed, more print-like page composition.
+- Generated and validated `output\challenge\generated-activity\2026-04-29-garden-adventure-maze-medium-rectangle-v3` with `ActivityChallenge` dry-run loading solver waypoints correctly.

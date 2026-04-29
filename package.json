@@ -54,6 +54,8 @@
     "brief:asmr:coloring": "node scripts/generate-asmr-brief.mjs --type coloring --save",
     "generate:activity:video": "node scripts/generate-activity-video.mjs",
     "generate:activity:video:dry": "node scripts/generate-activity-video.mjs --dry-run",
+    "maze:generate": "node scripts/generate-maze-assets.mjs",
+    "maze:generate:dry": "node scripts/generate-maze-assets.mjs --dry-run",
     "analytics:collect": "node scripts/collect-analytics.mjs",
     "analytics:report": "node scripts/analytics-report.mjs",
     "analytics": "node scripts/collect-analytics.mjs && node scripts/analytics-report.mjs",
