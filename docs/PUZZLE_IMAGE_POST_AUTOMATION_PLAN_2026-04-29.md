@@ -56,6 +56,63 @@ Today the activity image lane is effectively:
 3. `import-raw.mjs` turns those images into queue metadata
 4. queue posts flow through captions / posting / archive
 
+### Current code contract (confirmed in repo)
+
+#### Raw drop folders recognized by `import-raw.mjs`
+- `output/raw/maze/` -> `activity-maze`
+- `output/raw/wordsearch/` or `output/raw/word-search/` -> `activity-word-search`
+- `output/raw/matching/` -> `activity-matching`
+- `output/raw/dottodot/` or `output/raw/dot-to-dot/` -> `activity-dot-to-dot`
+- `output/raw/coloring/` -> `activity-coloring`
+- `output/raw/tracing/` -> `activity-tracing`
+- `output/raw/quiz/` -> `activity-quiz`
+- `output/raw/sudoku/` -> `activity-sudoku`
+
+`import-raw.mjs` scans `output/raw/` recursively, so subfolder placement is the current contract seam.
+
+#### File naming / sidecar contract
+For an image like:
+- `output/raw/maze/maze-dogs-and-puppies.png`
+
+`import-raw.mjs` will also read:
+- `output/raw/maze/maze-dogs-and-puppies.json`
+
+Current sidecar fields it actually consumes:
+- `category`
+- `subject`
+- `textOverlay`
+- `hookText`
+- `carouselGroup`
+- `slideIndex`
+
+#### Queue metadata produced today
+`import-raw.mjs` currently writes queue JSON with these important fields:
+- `id`
+- `category`
+- `categoryName`
+- `subject`
+- `source: "manual-import"`
+- `sourceFile`
+- `textOverlay`
+- `hookText`
+- `generatedAt`
+- `scheduledHour`
+- `outputs`
+- `platforms`
+- `captions: null`
+
+#### Downstream caption dependencies
+`generate-captions.mjs` relies most on:
+- `category`
+- `categoryName`
+- `subject`
+- `sourceFile`
+- optional `difficulty` if present in queue metadata
+
+Important implementation note:
+- `import-raw.mjs` does **not** currently pass through extra sidecar fields like `difficulty`, `theme`, `sourceFolder`, or `puzzleType` into queue metadata.
+- So if we want puzzle generators to preserve richer structured metadata for captions or later analytics, `import-raw.mjs` needs a small extension in Phase 1.
+
 ### New target flow
 
 1. `generate-prompts.mjs` still decides the 5 activity slots and themes
@@ -182,6 +239,20 @@ Reason:
 - lower risk
 - smaller code surface
 - preserves the current queue/caption/posting chain while the new lane proves itself
+
+### Exact Phase 1 seam
+For maze and word-search, the first automation pass should:
+1. generate puzzle master assets into `output/challenge/generated-activity/<slug>/`
+2. generate a wrapped social post image, likely `post.png`, in that same folder
+3. copy that final wrapper image into:
+   - `output/raw/maze/maze-<theme>.png`, or
+   - `output/raw/wordsearch/wordsearch-<theme>.png`
+4. write a sidecar JSON beside it with at least:
+   - `subject`
+   - `hookText`
+   - later `difficulty`, `theme`, and `sourceFolder` once `import-raw.mjs` is extended
+
+This preserves the current production system while letting puzzle generation become the upstream source of truth.
 
 ---
 

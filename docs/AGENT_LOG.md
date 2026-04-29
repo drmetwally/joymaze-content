@@ -166,6 +166,19 @@
 **Test output summary:** The new plan doc contains the image-post automation architecture, wrapper strategy, and task recommendations; `docs/TASKS.md` now includes TASK-OC-008 and TASK-OC-009 under the active puzzle asset factory section.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Start TASK-OC-008 implementation by mapping the exact current activity image-post contract in code, then decide whether the first maze/word-search integration should emit into `output/raw/{type}` or write queue-ready metadata directly.
+
+---
+
+### 2026-04-29 | OpenClaw | TASK-OC-008-MAP | Map current activity image-post contract in code
+**Files changed:**
+- `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md` — added the confirmed current-code contract, sidecar behavior, queue metadata fields, and exact Phase 1 seam recommendation
+- `docs/TASKS.md` — updated TASK-OC-008 with the concrete mapped seam and the likely `import-raw.mjs` extension note
+- `docs/AGENT_LOG.md` — appended this implementation entry for Claude
+**What was done:** Traced the actual current image-post path through `generate-prompts.mjs`, `import-raw.mjs`, and `generate-captions.mjs` instead of planning from memory. Confirmed that the safest first integration seam is still the raw-import path: puzzle engines should generate a final wrapped `post.png`, copy it into `output/raw/{maze|wordsearch}/`, and provide a sidecar JSON, while a small follow-up patch to `import-raw.mjs` will likely be needed if JoyMaze wants queue metadata to preserve richer generator fields like difficulty, theme, or sourceFolder.
+**Test command:** `Select-String -Path scripts\import-raw.mjs,scripts\generate-prompts.mjs,scripts\generate-captions.mjs -Pattern "output/raw/maze|output/raw/wordsearch|categoryName|sourceFile|sidecar|activity-word-search|activity-maze"`
+**Test output summary:** Verified that `import-raw.mjs` auto-detects maze/wordsearch via folder names under `output/raw/`, reads same-basename sidecar JSON, emits queue metadata with `category`, `categoryName`, `subject`, `sourceFile`, `hookText`, and `outputs`, and that `generate-captions.mjs` relies primarily on those fields plus optional `difficulty` if present.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Implement the first `generate-puzzle-image-post` seam for maze + word-search and decide whether to patch `import-raw.mjs` immediately to preserve extra generator metadata or keep Phase 1 minimal.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---
