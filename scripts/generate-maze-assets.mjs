@@ -31,6 +31,7 @@ const SHAPE = getArg('--shape', 'rectangle');
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
 const PUZZLE_TYPE = 'maze';
 const COUNTDOWN_SEC = Number(getArg('--countdown', '45'));
+const SOLVE_DURATION_SEC = 12;
 const CELL_SIZE = Number(getArg('--cell-size', '0')) || null;
 const PATH_COLOR = getArg('--path-color', DEFAULT_PATH_COLOR);
 const SEED_ARG = getArg('--seed');
@@ -371,7 +372,7 @@ function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cell
     activityLabel: 'MAZE',
     countdownSec: COUNTDOWN_SEC,
     hookDurationSec: 2.5,
-    holdAfterSec: 2.5,
+    holdAfterSec: SOLVE_DURATION_SEC,
     imagePath: 'puzzle.png',
     blankImage: 'blank.png',
     solvedImage: 'solved.png',

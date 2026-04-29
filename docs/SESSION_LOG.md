@@ -2303,3 +2303,9 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Added controlled crossing targets by difficulty, a dedicated center match lane, and stronger card styling.
 - Generated `output\challenge\generated-activity\2026-04-29-matching-animals-homes-medium-v2` with 2 crossings and validated it through `ActivityChallenge` dry-run.
 - Treat `v2` as the current matching baseline.
+
+## 2026-04-29 - OpenClaw - solve reveal repair pass
+- Reviewed `docs/OPENCLAW_REPORT_2026-04-29_solve-reveal.md` and confirmed the main bug was generator timing, not missing solved images.
+- Updated maze generator to emit `holdAfterSec: 12` and word-search generator to emit `holdAfterSec: 15`.
+- Regenerated fresh review folders: `...maze-medium-rectangle-v6` and `...word-search-medium-v5`.
+- Verified emitted activity data now carries the longer solve phase and the maze folder still includes `path.json`.

@@ -399,3 +399,15 @@
 **Next:** Treat `v2` as the current matching baseline. Later follow-up can add a dedicated animated connector reveal if matching becomes a priority content lane.
 
 ---
+
+### 2026-04-29 | OpenClaw | TASK-OC-007 / TASK-OC-008 | Solve-reveal timing repair
+**Files changed:**
+- `scripts/generate-maze-assets.mjs` - added `SOLVE_DURATION_SEC = 12` and emit that via `holdAfterSec`
+- `scripts/generate-wordsearch-assets.mjs` - added `SOLVE_DURATION_SEC = 15` and emit that via `holdAfterSec`
+**What was done:** Applied the solve-reveal repair after reviewing `docs/OPENCLAW_REPORT_2026-04-29_solve-reveal.md`. Claude’s timing diagnosis was correct: both generators were collapsing the solve phase to 2.5 seconds, which made the word-search sweep look absent and the maze reveal feel like a flash. The current maze generator already emitted `path.json`, so the concrete fix here was to lengthen the solve window and regenerate fresh review folders.
+**Test command:** `node scripts/generate-maze-assets.mjs --title "Garden Adventure Maze" --theme "Garden Adventure" --difficulty medium --shape rectangle --slug 2026-04-29-garden-adventure-maze-medium-rectangle-v6`, `node scripts/generate-wordsearch-assets.mjs --title "Garden Word Search" --theme "Garden" --difficulty medium --slug 2026-04-29-garden-word-search-medium-v5`, and dry-run renders for both folders through `render-video.mjs --comp ActivityChallenge --challenge ... --dry-run --verbose`
+**Test output summary:** Fresh maze folder `...maze-medium-rectangle-v6` now emits `holdAfterSec: 12` and includes `path.json`; fresh word-search folder `...word-search-medium-v5` now emits `holdAfterSec: 15`. Renderer dry-run props confirmed active maze `pathWaypoints` and active word-search `wordRects`, with the longer solve windows now present in emitted activity data.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** User should re-review the newly generated `v6` maze and `v5` word-search challenge folders rather than older outputs. If the solve still feels off after that, the next step is renderer-side polish, not generator-side timing.
+
+---

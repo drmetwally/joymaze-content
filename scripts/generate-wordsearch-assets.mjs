@@ -30,6 +30,7 @@ const TITLE = getArg('--title', 'Garden Word Search');
 const THEME = getArg('--theme', TITLE);
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
 const COUNTDOWN_SEC = Number(getArg('--countdown', '45'));
+const SOLVE_DURATION_SEC = 15;
 const SEED_ARG = getArg('--seed');
 const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
@@ -315,7 +316,7 @@ async function main() {
     activityLabel: 'WORD SEARCH',
     countdownSec: COUNTDOWN_SEC,
     hookDurationSec: 2.5,
-    holdAfterSec: 2.5,
+    holdAfterSec: SOLVE_DURATION_SEC,
     imagePath: 'puzzle.png',
     blankImage: 'blank.png',
     solvedImage: 'solved.png',
