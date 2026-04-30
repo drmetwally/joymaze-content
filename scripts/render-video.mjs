@@ -76,8 +76,9 @@ const PREVIEW_SCALE  = 0.5; // half resolution → 540×960
 const SOFT_MUSIC = 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3';
 
 const AUDIO_MAP = {
-  coloring:   SOFT_MUSIC,   // screen wipe — soft background music
-  maze:       SOFT_MUSIC,   // path drawing — soft background music
+  coloring:   'assets/audio/crayon.mp3',  // crayon scratch ASMR — no background music
+  maze:       'assets/audio/crayon.mp3',  // pencil/scribble path ASMR — no background music
+  challenge: 'assets/audio/crayon.mp3',  // maze challenge folders used for ASMR renders
   wordsearch: SOFT_MUSIC,
   dotdot:     SOFT_MUSIC,
   story:      SOFT_MUSIC,

@@ -26,7 +26,7 @@ export const asmrRevealSchema = {
   revealDurationSec: 30,    // wipe takes this long
   holdDurationSec:   1.5,   // hold on completed reveal before loop fade begins
   loopDurationSec:   2.0,   // blank fades back in — last frame ≈ first frame for seamless loop
-  audioPath:       'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
+  audioPath:       'assets/audio/crayon.mp3',
   audioVolume:     0.85,
   showJoyo:        true,
   showParticles:   true,    // sparkles after reveal completes
