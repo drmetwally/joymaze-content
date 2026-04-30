@@ -1113,3 +1113,37 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 - `output/challenge/generated-activity/space-dot-to-dot-medium/post.png` — 197KB, nonWhite=496431
 - `output/challenge/generated-activity/animals-dot-to-dot-medium/post.png` — 212KB, nonWhite=355243
 
+
+### 2026-05-01 | OpenClaw | REF-003-FIX | Post quality fix — 4 issues resolved
+**Files changed:**
+- `scripts/lib/puzzle-post-renderer.mjs` — word-search footer repositioned to card bottom (absolute, bottom:32px); added matching.json crop metadata path
+- `scripts/generate-puzzle-image-post.mjs` — matching posts now use solved.svg (labeled face-up cards) instead of blank.svg; svgRaw read before layout for all types
+- `scripts/generate-dottodot-assets.mjs` — hookText is now theme-specific (ocean/space/animals variants)
+**What was done:** Applied 4 fixes from Claude's REF-003 audit: (1) Word-search grid overflow — moved "FIND THESE WORDS" label to card bottom using absolute positioning (bottom:32px) so it never overlaps the grid regardless of card height. (2) Matching blank post — changed buildPostImage to use solved.svg for matching type (face-up labeled cards show what to match, not featureless face-down cards). (3) Dot-to-dot subtitle — hookText is now theme-specific: ocean→"...ocean animal!", space→"...a space shape!", animals→"...an animal!". (4) Find-diff count mismatch — confirmed diffLabel() already uses diffCount correctly; hook and divider now both show actual diff count. All 12 affected posts regenerated successfully.
+**Test command:** 12 regenerate commands (wordsearch×3, matching×3, dot-to-dot×6, find-diff×3)
+**Test output summary:** All 12 posts exit 0. Word-search footer now at card bottom. Matching posts show labeled face-up cards. Dot-to-dot titles differ by theme. Find-diff ocean (4 diffs) → "Can you spot all 4 differences?", space (4 diffs) → "Can you spot all 4 differences?", animals (5 diffs) → "Can you spot all 5 differences?".
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Do not proceed to REF-001 until Claude stamps REF-003-FIX APPROVED.
+
+## REF-003-FIX — 12 Regenerated Post Paths
+
+### Word Search (3)
+- `output/challenge/generated-activity/ocean-animals-word-search-medium/post.png`
+- `output/challenge/generated-activity/space-word-search-medium/post.png`
+- `output/challenge/generated-activity/animals-word-search-medium/post.png`
+
+### Matching (3)
+- `output/challenge/generated-activity/ocean-animals-matching-medium/post.png` — now uses solved.svg (labeled cards)
+- `output/challenge/generated-activity/space-matching-medium/post.png`
+- `output/challenge/generated-activity/animals-matching-medium/post.png`
+
+### Dot-to-Dot (3)
+- `output/challenge/generated-activity/ocean-animals-dot-to-dot-medium/post.png` — "Connect the dots to reveal an ocean animal!"
+- `output/challenge/generated-activity/space-dot-to-dot-medium/post.png` — "Connect the dots to reveal a space shape!"
+- `output/challenge/generated-activity/animals-dot-to-dot-medium/post.png` — "Connect the dots to reveal an animal!"
+
+### Find Diff (3)
+- `output/challenge/generated-activity/ocean-animals-find-diff-medium/post.png` — "Can you spot all 4 differences?"
+- `output/challenge/generated-activity/space-find-diff-medium/post.png` — "Can you spot all 4 differences?"
+- `output/challenge/generated-activity/animals-find-diff-medium/post.png` — "Can you spot all 5 differences?"
+
