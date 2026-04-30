@@ -458,7 +458,7 @@ async function main() {
   const diffCircles = buildDiffCircles(diffs);
 
   const labelStrip = `  <text x="${CANVAS_W / 2}" y="58" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="32" font-weight="900" fill="#FF6B35" letter-spacing="2">SPOT THE DIFFERENCES</text>`;
-  const dividerLabel = `  <text x="${CANVAS_W / 2}" y="${BOTTOM_Y - 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#888" font-weight="bold">↓ FIND ${DIFF_COUNT} DIFFERENCE${DIFF_COUNT !== 1 ? 'S' : ''} ↓</text>`;
+  const dividerLabel = `  <text x="${CANVAS_W / 2}" y="${BOTTOM_Y - 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#888" font-weight="bold">↓ FIND THE DIFFERENCES ↓</text>`;
   const dividerLine = `  <line x1="40" y1="${BOTTOM_Y - 50}" x2="${CANVAS_W - 40}" y2="${BOTTOM_Y - 50}" stroke="#DDD" stroke-width="2" stroke-dasharray="8,6"/>`;
   const panelBorder = (y) => `  <rect x="${PANEL_X - 4}" y="${y - 4}" width="${PANEL_W + 8}" height="${PANEL_H + 8}" fill="none" stroke="#E0E0E0" stroke-width="3" rx="8"/>`;
 
