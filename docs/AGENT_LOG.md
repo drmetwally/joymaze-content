@@ -942,6 +942,25 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 
 ---
 
+### 2026-04-30 | Claude (Sonnet 4.6) | OC-016-017-ROUND2 | Round-2 fixes: matching z-order + find-diff buildScene color
+**Files changed:**
+- `scripts/generate-matching-assets.mjs` — swapped `${lines}` after `${cards}` in `buildSolvedSvg` SVG template so connection lines render on top of cards
+- `scripts/generate-find-diff-assets.mjs` — replaced random palette color in `buildScene` with `slot.color` so both panels share deterministic per-slot colors and `color_change` diffs have visible effect
+**What was done:** Two critical bugs remained after the b6b8134 fix round. (1) Matching solved state: connection lines were drawn before cards in the SVG template — cards painted over them, leaving only tiny orange stubs visible at card borders. Fixed by reordering the SVG render: cards first, lines second. (2) Find-diff `buildScene`: ignored `slot.color` entirely, using `palette[randInt(mulberry32(seed + i*31), palette.length)]` instead — meaning top/bottom panels got random unrelated colors (not matching each other), and `color_change` diffs had zero visual effect (the diffed color was overwritten by a new random). Fixed by using `slot.color` directly. Both generators re-run at seed 42, all four PNGs read and verified.
+**Test command:** `node scripts/generate-matching-assets.mjs --theme "Ocean Animals" --difficulty medium --slug matching-round2-test --seed 42` and `node scripts/generate-find-diff-assets.mjs --theme "Ocean Animals" --difficulty medium --slug find-diff-round2-test --seed 42`
+**Test output summary:** Both exits 0. Matching solved: 6 distinct pair colors, connection lines fully visible crossing non-adjacent cards. Find-diff blank: top and bottom panels nearly identical (same objects, same colors); 3 color_change diffs visually distinguishable, 2 remove diffs show as empty slots. Find-diff solved: top panel unchanged, bottom panel + 3 red circles on color_change locations. Commit a287772.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30.
+- Matching connection lines ✅ — fully visible, crossing between non-adjacent pairs
+- Matching pair colors ✅ — 6 distinct soft colors (from previous fix round)
+- Find-diff panels near-identical ✅ — slot.color fix resolves the "completely different scenes" issue
+- Find-diff color_change diffs ✅ — visually detectable (orange→pink, yellow→purple, teal→purple)
+- Find-diff remove diffs ✅ — empty slots visible in bottom panel
+- Minor remaining: "JELLYFI..." truncation in matching — cosmetic, not blocking OC-018
+- Minor remaining: 2 of 5 solved circles (the remove diffs) are over empty background — subtle but present
+**Next:** Both generators fully approved. OC-017 is DONE. Proceed to OC-018 after spec review with Claude.
+
+---
+
 ### 2026-04-30 | OpenClaw | OC-016 | Matching puzzle generator
 **Files changed:**
 - `scripts/generate-matching-assets.mjs` — new matching puzzle generator following the maze contract: themed pair pools, SVG blank/solved cards, matching.json with pair positions, activity.json with challenge metadata
@@ -960,3 +979,14 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 - Static reveal ✅ accepted — `matching.json` connection data is structured for future `MatchingReveal` component; log as OC-016B follow-up when Sprint 2 complete
 - Minor content flag: `hookText` is the generic "Can your kid solve this before the timer hits 0?" — consider a matching-specific hook ("Find all the matching pairs!") when hook generation is wired for this type
 **Next:** Mark OC-016 done. Next Sprint 2 task: OC-017 (find-the-difference generator).
+
+### 2026-04-30 | Claude (Sonnet 4.6) | OC-018-HANDOFF | Coloring page generator + image post integration
+**Files changed:**
+- `docs/OPENCLAW_TASK_OC-018.md` — full task spec written
+
+**What was done:** Spec review complete. OC-018 is two deliverables: (1) `generate-coloring-assets.mjs` — new deterministic SVG generator producing blank (thick black outlines, white fill) and colored (palette fills) coloring page assets, same 7-file contract as matching/find-diff, reusing find-diff's shape factories; (2) `generate-puzzle-image-post.mjs --type coloring` — small plumbing addition to support the coloring post type. The ASMR bridge is already wired — `activityJsonToProps()` reads `colored.png` as the TTB wipe end-state when `revealType === 'coloring'`; no changes to render-video.mjs needed. Pre-flight: fix "JELLYFI..." truncation in matching generator before starting.
+
+**Test command:** See `docs/OPENCLAW_TASK_OC-018.md` verification section
+**Test output summary:** N/A — handoff only
+**Review status:** HANDOFF TO OPENCLAW
+**Next:** OpenClaw implements OC-018 per spec. Claude audits blank.png + colored.png + ASMR render exit code before approving.
