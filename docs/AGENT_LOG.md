@@ -1055,7 +1055,18 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 - ⚠️ Duration flag: 5.5s is short for production ASMR. Challenge folder `activity.json` has challenge timing, not ASMR timing. Production coloring ASMR should use native `generate-asmr-video.mjs` path (proper timing) OR add ASMR-specific duration fields to the activity.json schema. Not a REF-004 blocker.
 **Next:** REF-004 CLOSED. Proceed to REF-002.
 
+
+### 2026-05-01 | OpenClaw | REF-003-FIX-2 | Find-diff divider label — generic "FIND THE DIFFERENCES"
+**Files changed:**
+- `scripts/generate-find-diff-assets.mjs` — dividerLabel changed from `FIND ${DIFF_COUNT} DIFFERENCE(S)` to `FIND THE DIFFERENCES` (generic, never wrong)
+**What was done:** Replaced hardcoded diff count in SVG divider label with generic "FIND THE DIFFERENCES" text. Space theme generates 5 diffs but the divider now correctly says "FIND THE DIFFERENCES" without a number — no contradiction possible.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type find-diff --theme "Ocean Animals" --difficulty medium` + `--type find-diff --theme "Space" --difficulty medium`
+**Test output summary:** Both exit 0. Ocean (4 diffs) → divider says "FIND THE DIFFERENCES". Space (5 diffs) → divider says "FIND THE DIFFERENCES". No count mismatch.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Do not proceed to REF-001 until Claude stamps REF-003 APPROVED.
+
 ---
+-
 
 ### 2026-05-01 | OpenClaw | REF-002 | Daily scheduler validation
 **Files changed:**
