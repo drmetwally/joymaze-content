@@ -18,6 +18,12 @@ const CARD_BORDER = '#2A2A3A';
 const MATCH_COLOR = '#FF6B35';
 const MATCH_STROKE = 8;
 
+const PAIR_COLORS = [
+  '#FFD6D6', '#D6EAFF', '#D6FFE4', '#FFF4D6',
+  '#EDD6FF', '#D6FFF9', '#FFE8D6', '#F0FFD6',
+  '#FFD6F4', '#D6D6FF', '#FFFFD6', '#D6F4FF',
+];
+
 const args = process.argv.slice(2);
 const hasFlag = (flag) => args.includes(flag);
 const getArg = (flag, fallback = null) => {
@@ -146,12 +152,13 @@ function buildMatchingPairs(pairs, grid) {
 // ── Layout ─────────────────────────────────────────────────────────────────────
 
 function buildLayout(cols, rows) {
-  const cardSize = 148;
+  const MARGIN = 80;
   const gap = 18;
+  const cardSize = Math.floor((CANVAS_W - MARGIN - (cols - 1) * gap) / cols);
   const totalW = cols * cardSize + (cols - 1) * gap;
   const totalH = rows * cardSize + (rows - 1) * gap;
   const offsetX = Math.round((CANVAS_W - totalW) / 2);
-  const offsetY = 300;
+  const offsetY = Math.round((CANVAS_H - totalH) / 2);
   return { cardSize, gap, totalW, totalH, offsetX, offsetY, cols, rows };
 }
 
@@ -205,13 +212,20 @@ ${cards}
 
 function buildSolvedSvg(layout, pairs, grid) {
   const { cardSize, offsetX, offsetY, gap } = layout;
-
   const patterns = cardBackPattern();
 
-  const cards = grid.map((cell, i) => {
+  // Map each grid position to its pair's color
+  const positionToColor = {};
+  pairs.forEach((pair, i) => {
+    const color = PAIR_COLORS[i % PAIR_COLORS.length];
+    pair.positions.forEach(pos => { positionToColor[pos] = color; });
+  });
+
+  const cards = grid.map((cell) => {
     const x = offsetX + cell.col * (cardSize + gap);
     const y = offsetY + cell.row * (cardSize + gap);
-    return `  <rect x="${x}" y="${y}" width="${cardSize}" height="${cardSize}" rx="14" fill="${CARD_COLOR}" stroke="${CARD_BORDER}" stroke-width="3"/>`;
+    const fill = positionToColor[cell.index] ?? CARD_COLOR;
+    return `  <rect x="${x}" y="${y}" width="${cardSize}" height="${cardSize}" rx="14" fill="${fill}" stroke="${CARD_BORDER}" stroke-width="3"/>`;
   }).join('\n');
 
   // Connection lines between matched pairs
@@ -339,10 +353,25 @@ async function main() {
   // Create card items: two copies of each pair label, shuffled into grid positions
   const cardLabels = [...selectedPairs, ...selectedPairs];
   shuffleInPlace(cardLabels, rng);
-
   const grid = buildGrid(cardLabels, actualCols);
 
-  const pairs = buildMatchingPairs(selectedPairs, grid);
+  // Shuffle position indices so pairs are placed non-adjacently across the grid
+  const positionIndices = Array.from({ length: totalCards }, (_, i) => i);
+  shuffleInPlace(positionIndices, rng);
+
+  const pairs = selectedPairs.map((label, i) => {
+    const posA = positionIndices[i];
+    const posB = positionIndices[PAIRS + i];
+    const cellA = grid[posA];
+    const cellB = grid[posB];
+    return {
+      id: i,
+      label,
+      positions: [cellA.index, cellB.index],
+      centerA: { x: cellA.col, y: cellA.row },
+      centerB: { x: cellB.col, y: cellB.row },
+    };
+  });
   const layout = buildLayout(actualCols, actualRows);
 
   const hookTitle = await buildChallengeHook({

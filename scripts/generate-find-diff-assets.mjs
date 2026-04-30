@@ -415,8 +415,11 @@ async function main() {
     const size = Math.min(SLOT_W, SLOT_H) * 0.72;
     // Leave 1–2 slots empty for natural feel
     const visible = i < slotCount - 1 - randInt(rng, 2);
-    slots.push({ index: i, cx, cy, size, color: palette[0], rotation: 0, visible, typeIndex: i % factories.length });
+    slots.push({ index: i, cx, cy, size, color: palette[i % palette.length], rotation: 0, visible, typeIndex: i % factories.length });
   }
+
+  // Snapshot original slots BEFORE diff loop — topScene uses unmodified scene
+  const originalSlots = slots.map(s => ({ ...s }));
 
   // Pick diff slots — no adjacent slots
   const diffTypes = ['color_change', 'color_change', 'size_change', 'rotation', 'remove', 'add'];
@@ -447,9 +450,12 @@ async function main() {
     diffsPlaced++;
   }
 
-  // Build SVGs
-  const topScene = buildScene(slots.map(s => ({ ...s, cy: s.cy - (BOTTOM_Y - TOP_Y) })), palette, factories, seed);
-  const bottomScene = buildScene(slots, palette, factories, seed + 1);
+  // Build SVGs — topScene uses originalSlots (unmodified), bottomScene uses diffed slots shifted down
+  const topScene = buildScene(originalSlots, palette, factories, seed);
+  const bottomScene = buildScene(
+    slots.map(s => ({ ...s, cy: s.cy + (BOTTOM_Y - TOP_Y) })),
+    palette, factories, seed + 1
+  );
   const diffCircles = buildDiffCircles(diffs);
 
   const labelStrip = `  <text x="${CANVAS_W / 2}" y="58" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="32" font-weight="900" fill="#FF6B35" letter-spacing="2">SPOT THE DIFFERENCES</text>`;
