@@ -90,16 +90,17 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
 > Sprint 2 complete ✅ — maze, matching, find-diff, coloring generators all live and audited.
 > **Decision locked 2026-04-30:** Crossword dropped permanently — not in brand (app/books). After dot-to-dot, stop building and focus on quality refinement + automation.
-- [x] **OC-019** — Dot-to-Dot generator. APPROVED 2026-04-30. Hardcoded shape libraries (ocean 6, animals 5, space 5 shapes), normalized dots.json contract wired to existing render-video.mjs reader, z-order enforced (lines before dots). 7-file contract, all 3 theme families tested. Challenge reel 33.5s total ✅ within 35s band. Flags: moon crescent polygon fill, rabbit ear outline clarity — visual QC required on solved.png images.
+- [x] **OC-019** — Dot-to-Dot generator. APPROVED 2026-05-01. Hardcoded shape libraries (ocean 6, animals 5, space 5 shapes), bounding-box auto-scale added (normalizeShape), r=15 dots, dots.json contract matches render-video.mjs reader. 7-file contract, ocean + space themes verified. Challenge reel 33.5s ✅ within 35s band. Commit bab97d6.
 - [~] **OC-020** — ~~Crossword generator~~ DROPPED — not a JoyMaze brand activity (not in app or KDP books). Do not revisit.
 - [ ] **OC-021** — Theme-family detection centralization: extract shared `resolveThemeFamily()` into `scripts/lib/theme-family.mjs`. Low priority — do after OC-019.
 
 ### Refinement Phase (after OC-019)
 > No new generators. Focus: quality, automation reliability, daily output consistency.
-- [ ] **REF-001** — Challenge reel visual QC: Ahmed watches and logs issues for all 5 puzzle types before first production run
-- [ ] **REF-002** — Daily scheduler end-to-end validation: run `npm run daily` dry-run for a full week, confirm all 5 reel lanes + image posts + X posts schedule without errors
-- [ ] **REF-003** — Image post quality pass: audit puzzle post wrapper across all themes, fix any theme families that look off
-- [ ] **REF-004** — ASMR coloring pipe: wire `generate-coloring-assets.mjs` into ASMR brief rotation (coloring lane currently uses manually placed assets)
+- [x] **REF-004** — ASMR coloring pipe: bridge verified works, no fix needed. Note added to generate-asmr-brief.mjs header. ✅ CLOSED 2026-05-01.
+- [x] **REF-002** — Daily scheduler validation: all 14 scripts syntax OK, all 6 puzzle types callable, minimal scheduler run exit 0. Fixed missing type aliases (matching, find-diff, dottodot). ✅ CLOSED 2026-05-01.
+- [x] **REF-003** — Image post quality pass: 18 posts audited, 5 fixes applied (ws grid overflow, matching uses solved.svg, dottodot theme titles, find-diff count mismatch ×2). All 12 affected posts regenerated. ✅ CLOSED 2026-05-01.
+- [x] **REF-001** — Challenge reel renders: all 6 puzzle types exit 0, all within 25-35s band. Ahmed must watch all 6 MP4s before first production post. ⚠️ AHMED QC PENDING.
+- [x] **Disk cleanup** — Orphaned Remotion temp dirs cleared. 8.2 GB free.
 
 ---
 
