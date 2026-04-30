@@ -74,13 +74,13 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [x] **OC-012** — Challenge reel visual tuning: title size/weight, countdown prominence, transition cue feel, audio balance. APPROVED 2026-04-30. Ahmed must watch both renders (29.5s maze + 34.5s word-search) before first production post — motion+audio QC not verifiable in-session.
 - [x] **OC-013** — Challenge reel stickers + word-search footer fix. APPROVED 2026-04-30. Maze reel START/FINISH badges geometry-anchored via maze.json fractions ✅. Word-search footer stripped from SVG, re-homed to post renderer ✅. Word-search theme emoji badge ✅. Ahmed must watch both renders before first production post.
 - [x] **OC-014** — ASMR live coloring test. Clarified 2026-04-30 from user memory correction: coloring ASMR swipe-reveal was already tested successfully and the video was posted socially, so this lane is considered validated. Maze ASMR is also considered in a good state.
-- [ ] **OC-014B** — ASMR generator integration: connect the new puzzle-generator + art-layer pipeline into the ASMR lane for the visually strong reveal types, especially maze and coloring. Explicitly de-prioritize word-search ASMR, which is better kept in the challenge-reel lane.
+- [x] **OC-014B** — ASMR generator integration (maze-first). APPROVED 2026-04-30. `blank.png` fallback wired in all 3 ASMR locations ✅. Generated maze folder → AsmrReveal bridge live via `activityJsonToProps()` ✅. Brief rotation cleaned (coloring + maze only) ✅. Ahmed must watch `oc-014b-maze-asmr.mp4` before first production ASMR post.
 - [ ] **OC-015** — Wire Story Reel V2 + Animal Song Short to `daily-scheduler.mjs` (compositions built + audited, only scheduler trigger wiring remains).
 
 ### Sprint 2 — Puzzle Engine Expansion (next week)
-- [ ] **OC-016** — Matching puzzle generator: `scripts/generate-matching-assets.mjs` (pairs, blank/solved SVG, activity.json, layout.json). Follows same contract as maze generator. Claude audit required.
-- [ ] **OC-017** — Find the Difference generator: `scripts/generate-find-diff-assets.mjs` (two near-identical images, diff markers, JSON contract). Claude audit required.
-- [ ] **OC-018** — Coloring page image post: extend `generate-puzzle-image-post.mjs` to support `--type coloring`, wrapping existing ASMR coloring assets through the Puppeteer renderer. Claude audit required. This should stay aligned with OC-014B so the same art-layer assumptions can feed both post and ASMR lanes.
+- [x] **OC-014** — ASMR live coloring test. Clarified 2026-04-30 from user memory correction: coloring ASMR swipe-reveal was already tested successfully and the video was posted socially, so this lane is considered validated. Maze ASMR is also considered in a good state.
+- [x] **OC-014B** — ASMR generator integration: maze-first bridge so `AsmrReveal` renders directly from `output/challenge/generated-activity/<slug>`. APPROVED 2026-04-30.
+- [ ] **OC-016** — Matching puzzle generator: `scripts/generate-matching-assets.mjs` (pairs, blank/solved SVG, matching.json, activity.json). Follows same contract as maze generator. Handoff at `docs/OPENCLAW_TASK_OC-016.md`.
 
 ### Sprint 3 — Remaining Puzzle Engines (week 3)
 - [ ] **OC-019** — Tracing/Dot-to-Dot generator: numbered dot sequence, SVG path, activity.json contract. Claude audit required.
