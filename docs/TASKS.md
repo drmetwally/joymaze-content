@@ -80,7 +80,11 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 ### Sprint 2 — Puzzle Engine Expansion (next week)
 - [x] **OC-014** — ASMR live coloring test. Clarified 2026-04-30 from user memory correction: coloring ASMR swipe-reveal was already tested successfully and the video was posted socially, so this lane is considered validated. Maze ASMR is also considered in a good state.
 - [x] **OC-014B** — ASMR generator integration: maze-first bridge so `AsmrReveal` renders directly from `output/challenge/generated-activity/<slug>`. APPROVED 2026-04-30.
-- [ ] **OC-016** — Matching puzzle generator: `scripts/generate-matching-assets.mjs` (pairs, blank/solved SVG, matching.json, activity.json). Follows same contract as maze generator. Handoff at `docs/OPENCLAW_TASK_OC-016.md`.
+- [x] **OC-016** — Matching puzzle generator. APPROVED 2026-04-30. 7-file contract complete, themed pairs from word-packs, `matching.json` with pixel connections, challenge reel renders with static reveal. Follow-up: OC-016B animated MatchingReveal component (post Sprint 2).
+- [x] **OC-016B** — Animated matching reveal: `MatchingReveal` component for `ActivityChallenge.jsx` reading `matching.json` pair positions and connections. Deferred until Sprint 2 complete.
+- [x] **OC-017** — Find-the-difference generator. APPROVED 2026-04-30. 7-file contract, two-panel SVG (1080×1500), 4×3 themed slot grid, 5 difference types (add/rotation/color/size/replace), `diff.json` with canvas-absolute circle coordinates. Challenge reel renders static reveal. Follow-up: OC-017B animated FindDiffReveal component (post Sprint 2).
+- [ ] **OC-017B** — Animated find-diff reveal: `FindDiffReveal` component for `ActivityChallenge.jsx` reading `diff.json` and animating circles one-by-one. Deferred until Sprint 2 complete.
+- [ ] **OC-018** — Coloring page image post + ASMR seam: extend `generate-puzzle-image-post.mjs --type coloring` and normalize `colored.png` contract for ASMR. Spec review with Claude before start.
 
 ### Sprint 3 — Remaining Puzzle Engines (week 3)
 - [ ] **OC-019** — Tracing/Dot-to-Dot generator: numbered dot sequence, SVG path, activity.json contract. Claude audit required.
