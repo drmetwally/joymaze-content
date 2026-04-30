@@ -990,3 +990,33 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **Test output summary:** N/A — handoff only
 **Review status:** HANDOFF TO OPENCLAW
 **Next:** OpenClaw implements OC-018 per spec. Claude audits blank.png + colored.png + ASMR render exit code before approving.
+
+### 2026-04-30 | Claude (Sonnet 4.6) | OC-018-FIX | Coloring generator blank mode — white fill fix
+**Files changed:**
+- `scripts/generate-coloring-assets.mjs` — fixed `buildScene`: replaced dead `fill` variable with `const drawFill = colored ? slot.color : '#FFFFFF'` passed to each factory call
+
+**What was done:** The `buildScene` function computed `fill = colored ? null : '#FFFFFF'` for blank mode but then called every factory with `slot.color` regardless of mode — the white fill was never used. Both blank.png and colored.png rendered the same palette colors, making the "coloring page" indistinguishable from the pre-colored reveal. One-line fix: factories now receive `drawFill` which is white in blank mode and the palette color in colored mode. Regenerated and verified via PNG read.
+
+**Test command:** `node scripts/generate-coloring-assets.mjs --theme "Ocean Animals" --difficulty medium --slug oc-018-ocean-coloring-test --seed 42`
+**Test output summary:** Exit 0. blank.png: 9 shapes with white fills + thick black outlines (printable coloring page). colored.png: same 9 shapes with palette fills (orange crab, teal fish, pink starfish, yellow crab, purple shell, orange coral). Both layouts pixel-identical in position and size. Commit 90473f9.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30.
+- blank.png coloring page format ✅ — white fills, thick black outlines, looks printable
+- colored.png reveal ✅ — same positions, distinct palette fills, visually satisfying
+- ASMR bridge ✅ — colored.png named correctly, TTB wipe will work without further changes
+- Layout ✅ — 9 objects in 4×3 grid (3 empty slots), title header present, panel border clean
+- Minor: seahorse renders as a thin abstract curve — recognizable but simple; acceptable for geometric coloring style
+- Minor: bottom third slightly sparse with 9 objects — normal for medium difficulty
+**Next:** Sprint 2 fully closed. Proceed to OC-019 spec review (dot-to-dot/tracing generator) when ready.
+
+### 2026-04-30 | Claude (Sonnet 4.6) | OC-019-HANDOFF | Dot-to-dot generator spec
+**Files changed:**
+- `docs/OPENCLAW_TASK_OC-019.md` — full task spec written
+
+**What was done:** Spec written for the final new generator in the puzzle factory. Key design decisions: (1) `dots.json` contract is already wired in `render-video.mjs` (reads `dotsData.dots[i].x/y` as normalized 0–1 coords, `width`/`height`/`dotColor` top-level) — no changes to render-video needed; (2) shapes are hardcoded ordered coordinate arrays per theme family, seeded RNG picks one per puzzle; (3) blank = numbered dots only (black circles, white numbers), solved = same dots + orange polyline below (z-order: lines first); (4) 5–6 shapes per theme, 3 theme families required at minimum (ocean, animals, space); (5) complete coordinate arrays provided for all 5 ocean shapes, skeletons provided for animals + space. After OC-019, build sprint ends — refinement phase begins.
+
+**Decision also recorded:** OC-020 crossword DROPPED permanently. Not a JoyMaze brand activity. After OC-019 is approved, build sprint closes and next work is REF-001–004 (reel QC, scheduler validation, image post quality, ASMR coloring pipe).
+
+**Test command:** See `docs/OPENCLAW_TASK_OC-019.md` verification section
+**Test output summary:** N/A — handoff only
+**Review status:** HANDOFF TO OPENCLAW
+**Next:** OpenClaw implements OC-019. Claude reads blank.png + solved.png for both ocean + space themes before approving. Shape recognizability is the primary audit gate.
