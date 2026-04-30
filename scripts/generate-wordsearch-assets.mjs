@@ -17,7 +17,6 @@ const GRID_COLOR = '#222222';
 const LETTER_COLOR = '#111111';
 const HIGHLIGHT_COLOR = '#FF9A3D';
 const HEADER_COLOR = '#222222';
-const SUBTEXT_COLOR = '#666666';
 
 const args = process.argv.slice(2);
 const hasFlag = (flag) => args.includes(flag);
@@ -47,13 +46,6 @@ const difficultyDefaults = {
   hard: { size: 14, words: 10, directions: ['right', 'down', 'diag-down-right', 'diag-up-right'] },
   difficult: { size: 15, words: 11, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right'] },
   extreme: { size: 16, words: 12, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right', 'diag-down-left', 'diag-up-left'] },
-};
-
-const WORD_BANK = {
-  garden: ['FLOWER', 'BUTTERFLY', 'LEAF', 'BEE', 'ROSE', 'TULIP', 'SEED', 'GRASS', 'STEM', 'LADYBUG', 'ROOT', 'SOIL'],
-  ocean: ['WHALE', 'CORAL', 'SHELL', 'WAVE', 'REEF', 'STARFISH', 'OCTOPUS', 'TIDE', 'CRAB', 'SEAHORSE'],
-  animal: ['TIGER', 'ZEBRA', 'PANDA', 'MONKEY', 'LION', 'KOALA', 'OTTER', 'EAGLE', 'FOX', 'RABBIT'],
-  default: ['APPLE', 'SUN', 'CLOUD', 'BIRD', 'TREE', 'MOON', 'STAR', 'RIVER', 'GRASS', 'STONE', 'HOUSE', 'SMILE'],
 };
 
 function slugify(input) {
@@ -97,20 +89,34 @@ function shuffle(items, rng) {
   return clone;
 }
 
-function pickWords(theme, count, rng) {
-  const lower = String(theme || '').toLowerCase();
-  const bankKey = Object.keys(WORD_BANK).find((key) => key !== 'default' && lower.includes(key)) || 'default';
-  const bank = WORD_BANK[bankKey];
-  return shuffle(bank, rng).slice(0, Math.min(count, bank.length));
+function resolveWordPackFamily(themeStr) {
+  const t = String(themeStr || '').toLowerCase();
+  if (t.includes('ocean') || t.includes('sea') || t.includes('fish') || t.includes('marine')) return 'ocean';
+  if (t.includes('space') || t.includes('rocket') || t.includes('planet') || t.includes('galaxy')) return 'space';
+  if (t.includes('jungle') || t.includes('safari') || t.includes('forest') || t.includes('tropical') || t.includes('lion') || t.includes('tiger')) return 'jungle';
+  if (t.includes('dino') || t.includes('dinosaur') || t.includes('jurassic')) return 'dinosaurs';
+  if (t.includes('pet') || t.includes('dog') || t.includes('cat') || t.includes('puppy') || t.includes('kitten') || t.includes('rabbit') || t.includes('poodle')) return 'animals';
+  if (t.includes('fairy') || t.includes('princess') || t.includes('magic') || t.includes('unicorn')) return 'fairy';
+  if (t.includes('vehicle') || t.includes('car') || t.includes('truck') || t.includes('train')) return 'vehicles';
+  if (t.includes('food') || t.includes('kitchen') || t.includes('fruit') || t.includes('pizza') || t.includes('bake')) return 'food';
+  if (t.includes('workshop') || t.includes('toy') || t.includes('build') || t.includes('lego')) return 'workshop';
+  if (t.includes('color') || t.includes('shape') || t.includes('confetti') || t.includes('art')) return 'confetti';
+  return 'default';
 }
 
-function parseWords(wordsArg, fallbackTheme, count, rng) {
-  if (!wordsArg) return pickWords(fallbackTheme, count, rng);
-  return wordsArg
-    .split(',')
-    .map((w) => w.trim().toUpperCase().replace(/[^A-Z]/g, ''))
-    .filter(Boolean)
-    .slice(0, count);
+async function loadWordPack(theme, maxLen) {
+  const raw = await fs.readFile(path.join(ROOT, 'config', 'wordsearch-word-packs.json'), 'utf8');
+  const packs = JSON.parse(raw);
+  const family = resolveWordPackFamily(theme);
+  return (packs[family] || packs.default || []).filter((w) => w.length <= maxLen);
+}
+
+async function parseWords(wordsArg, fallbackTheme, count, rng, maxLen) {
+  if (!wordsArg) {
+    const pack = await loadWordPack(fallbackTheme, maxLen);
+    return shuffle(pack, rng).slice(0, Math.min(count, pack.length));
+  }
+  return wordsArg.split(',').map((w) => w.trim().toUpperCase().replace(/[^A-Z]/g, '')).filter(Boolean).slice(0, count);
 }
 
 function buildGrid(size) {
@@ -157,8 +163,7 @@ function generateWordSearch(size, words, rng, allowedDirectionKeys) {
 
   for (const word of words.sort((a, b) => b.length - a.length)) {
     let placed = false;
-    const attempts = 600;
-    for (let attempt = 0; attempt < attempts && !placed; attempt++) {
+    for (let attempt = 0; attempt < 600 && !placed; attempt++) {
       const dir = directions[randomInt(rng, directions.length)];
       const inset = attempt < 350 ? 1 : 0;
       const row = inset + randomInt(rng, Math.max(1, size - inset * 2));
@@ -223,12 +228,7 @@ function normalizedRect(rect) {
 }
 
 function escapeXml(input) {
-  return String(input)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+  return String(input).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
 function wordsListSvg(words, layout) {
@@ -252,7 +252,6 @@ function gridSvg(grid, layout) {
     lines.push(`<line x1="${layout.gridX}" y1="${y}" x2="${layout.gridX + layout.gridSizePx}" y2="${y}" />`);
     lines.push(`<line x1="${x}" y1="${layout.gridY}" x2="${x}" y2="${layout.gridY + layout.gridSizePx}" />`);
   }
-
   const letters = [];
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
@@ -261,14 +260,12 @@ function gridSvg(grid, layout) {
       letters.push(`<text x="${x}" y="${y}" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="${LETTER_COLOR}">${grid[r][c]}</text>`);
     }
   }
-
   return { lines, letters };
 }
 
-function buildSvg({ title, theme, grid, layout, rects = [] }) {
+function buildSvg({ theme, grid, layout, rects = [] }) {
   const { lines, letters } = gridSvg(grid, layout);
   const highlights = rects.map((rect) => `<rect x="${(rect.x1 + 5).toFixed(1)}" y="${(rect.y1 + 5).toFixed(1)}" width="${Math.max(0, rect.x2 - rect.x1 - 10).toFixed(1)}" height="${Math.max(0, rect.y2 - rect.y1 - 10).toFixed(1)}" rx="16" ry="16" fill="none" stroke="${HIGHLIGHT_COLOR}" stroke-width="8" stroke-linejoin="round" />`).join('\n    ');
-
   return `
 <svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="${BG_COLOR}"/>
@@ -295,7 +292,7 @@ async function main() {
   const seed = SEED_ARG ? Number(SEED_ARG) : hashStringToSeed(`${TITLE}|${THEME}|${DIFFICULTY}|wordsearch`);
   const rng = mulberry32(seed);
   const defaults = difficultyDefaults[DIFFICULTY] || difficultyDefaults.medium;
-  const words = parseWords(WORDS_ARG, THEME, defaults.words, rng);
+  const words = await parseWords(WORDS_ARG, THEME, defaults.words, rng, defaults.size);
   const { grid, placements } = generateWordSearch(defaults.size, words, rng, defaults.directions);
   const layout = buildLayout(defaults.size, words.length);
   const rects = placements.map((placement) => placementRect(placement, layout));
@@ -311,72 +308,20 @@ async function main() {
     wordsCount: words.length,
     seedHint: `${TITLE}|${THEME}|${DIFFICULTY}|${words.join(',')}`,
   });
-  const blankSvg = buildSvg({ title: TITLE, theme: { words }, grid, layout, rects: [] });
-  const solvedSvg = buildSvg({ title: TITLE, theme: { words }, grid, layout, rects });
+  const blankSvg = buildSvg({ theme: { words }, grid, layout, rects: [] });
+  const solvedSvg = buildSvg({ theme: { words }, grid, layout, rects });
 
   const activityJson = {
-    type: 'challenge',
-    puzzleType: 'word-search',
-    difficulty: DIFFICULTY,
-    theme: THEME,
-    titleText: hookTitle,
-    hookText: hookTitle,
-    ctaText: 'Tag a kid who can find them all',
-    activityLabel: 'WORD SEARCH',
-    countdownSec: COUNTDOWN_SEC,
-    hookDurationSec: 2.5,
-    holdAfterSec: SOLVE_DURATION_SEC,
-    imagePath: 'puzzle.png',
-    blankImage: 'blank.png',
-    solvedImage: 'solved.png',
-    highlightColor: HIGHLIGHT_COLOR,
-    challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
-    tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME,
-    transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
-    solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
-    showJoyo: true,
-    showBrandWatermark: false,
-    sourceFolder: folderRel,
+    type: 'challenge', puzzleType: 'word-search', difficulty: DIFFICULTY, theme: THEME, titleText: hookTitle, hookText: hookTitle,
+    ctaText: 'Tag a kid who can find them all', activityLabel: 'WORD SEARCH', countdownSec: COUNTDOWN_SEC, hookDurationSec: 2.5, holdAfterSec: SOLVE_DURATION_SEC,
+    imagePath: 'puzzle.png', blankImage: 'blank.png', solvedImage: 'solved.png', highlightColor: HIGHLIGHT_COLOR,
+    challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME, tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME, transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME, solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
+    showJoyo: true, showBrandWatermark: false, sourceFolder: folderRel,
   };
 
-  const wordsearchJson = {
-    width: CANVAS_W,
-    height: CANVAS_H,
-    highlightColor: HIGHLIGHT_COLOR,
-    rects: normalizedRects,
-    words,
-    placements,
-    grid,
-    layout: {
-      offsetX: layout.gridX,
-      offsetY: layout.gridY,
-      mazeW: layout.gridSizePx,
-      mazeH: layout.gridSizePx,
-      canvasW: CANVAS_W,
-      canvasH: CANVAS_H,
-    },
-  };
-
-  const puzzleJson = {
-    version: 1,
-    puzzleType: 'word-search',
-    title: TITLE,
-    theme: THEME,
-    difficulty: DIFFICULTY,
-    seed,
-    gridSize: defaults.size,
-    words,
-    placements,
-    grid,
-    layout: {
-      offsetX: layout.gridX,
-      offsetY: layout.gridY,
-      mazeW: layout.gridSizePx,
-      mazeH: layout.gridSizePx,
-      canvasW: CANVAS_W,
-      canvasH: CANVAS_H,
-    },
-  };
+  const layoutMeta = { offsetX: layout.gridX, offsetY: layout.gridY, mazeW: layout.gridSizePx, mazeH: layout.gridSizePx, canvasW: CANVAS_W, canvasH: CANVAS_H, wordsTop: layout.wordsTop, wordCols: layout.wordCols };
+  const wordsearchJson = { width: CANVAS_W, height: CANVAS_H, highlightColor: HIGHLIGHT_COLOR, rects: normalizedRects, words, placements, grid, layout: layoutMeta };
+  const puzzleJson = { version: 1, puzzleType: 'word-search', title: TITLE, theme: THEME, difficulty: DIFFICULTY, seed, gridSize: defaults.size, words, placements, grid, layout: layoutMeta };
 
   console.log(`[wordsearch-factory] title      : ${TITLE}`);
   console.log(`[wordsearch-factory] theme      : ${THEME}`);

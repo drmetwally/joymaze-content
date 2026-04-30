@@ -720,8 +720,8 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** I followed the diagnosis pivot and moved the maze post renderer onto the Puppeteer path. The new flow reads `blank.svg`, uses `maze.json.layout` to rewrite the SVG `viewBox` and remove the large baked-in print margins, then screenshots a simple HTML template with a local font-face source, falling back to `C:\Windows\Fonts\comicbd.ttf` because the requested Nunito TTF was not available locally in this session. Theme styling is now reduced to background plus accent only, matching the simplified template. `maze.json` now persists the full `layout` object so the crop is data-driven instead of guessed.
 **Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`
 **Test output summary:** The maze run exited 0 and rewrote `output/challenge/generated-activity/ocean-animals-maze-post-medium/post.png` plus `output/raw/maze/maze-ocean-animals.png`. Local visual inspection confirmed the maze now fills the frame much more aggressively and the title pill no longer looks like the old Sharp SVG wrapper. Important blocker: the word-search path currently fails under this new renderer because `puzzle.json` does not yet expose a `layout` field analogous to `maze.json`, so the Puppeteer crop seam is complete for maze but not yet generalized to word-search.
-**Review status:** PENDING CLAUDE REVIEW
-**Next:** Claude should review the maze result first. If accepted, the follow-up is to add equivalent layout metadata for word-search so the same Puppeteer crop path can cover both deterministic puzzle types.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30. First migration step accepted. viewBox crop seam confirmed clean. Comic/Trebuchet fallback fonts noted as temporary — superseded by TASK-OC-010-FONTS.
+**Next:** DONE — superseded by TASK-OC-010-PUPPETEER-FULL.
 
 ---
 
@@ -736,11 +736,38 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** I implemented the fuller Claude architecture pass by moving presentation into a dedicated Puppeteer renderer module and slimming `generate-puzzle-image-post.mjs` down to generation, SVG loading, optional `viewBox` cropping, and output copy logic. Because the requested Google font TTF downloads were not reachable from this session, the renderer is written to prefer `assets/fonts/FredokaOne-Regular.ttf` and `assets/fonts/Nunito-ExtraBold.ttf` when present, but falls back locally to Windows fonts (`comic.ttf` and `trebucbd.ttf`) so the pipeline still works now without blocking the structural migration.
 **Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`, `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Dinosaurs" --difficulty easy`, `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Space" --difficulty hard`, and `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dogs and Poodles" --difficulty medium`
 **Test output summary:** All four runs exited 0 and wrote fresh `post.png` outputs. Local visual inspection confirmed the maze renders now fill the card correctly after `viewBox` cropping, the shared theme shell varies across ocean/dinosaur/space, and word-search now renders through the same Puppeteer shell after adding `layout` metadata. One remaining quality gap is fonts: the renderer structure is ready for Fredoka/Nunito, but this session could not fetch those TTF files, so the current visuals still use local fallback fonts until the real assets are staged in `assets/fonts/`.
-**Review status:** PENDING CLAUDE REVIEW
-**Next:** Claude should verify the renderer architecture and sample outputs. If accepted, the immediate polish follow-up is only asset-level: add the real Fredoka/Nunito TTF files into `assets/fonts/` so the live renders use the intended typography without further code changes.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30. Renderer architecture clean: shared module, theme configs, HTML/CSS shell, viewBox crop seam, layout metadata contract for both maze and word-search. Windows font fallback accepted as temporary scaffolding — superseded by TASK-OC-010-FONTS.
+**Next:** DONE — font assets staged in TASK-OC-010-FONTS; polish in TASK-OC-011.
 
 ---
 
+
+### 2026-04-30 | Claude (Sonnet 4.6) | TASK-OC-010-AUDIT | Audit + live render verification of Puppeteer migration
+
+**Files changed:** None — audit only
+
+**What was done:** Live renders run for both puzzle types and both output images read directly.
+
+**Maze (Ocean Animals, Medium):** Maze fills the card correctly — viewBox crop confirmed working. No duplicate Start/End labels. START sticker placed correctly at maze entry. Ocean theme applied (blue gradient, card border, `🐠`/`🌊` corner emoji). Fredoka One font rendering correctly on title. Bottom strip: 2 difficulty dots, Ages 5–8, JoyMaze brand mark. Walls bold and legible.
+
+**Word-search (Dogs and Poodles, Medium):** Grid fills the card, crop seam confirmed working for word-search. Animals/pets theme correctly matched. Word list displayed below grid, all 8 words visible. Fredoka One title rendering correctly.
+
+**Audit answers to OpenClaw's flagged questions:**
+- viewBox crop seam: ✅ APPROVED — stable contract via `maze.json` layout field
+- Title guard order: ✅ APPROVED — hookText → titleText → config → default is correct
+- wordsearch.json layout shape: ✅ APPROVED — confirmed working in live render
+- Commit scope: ✅ APPROVED — 7 files, cleanly scoped
+- Start sticker: ✅ ACCEPTED — correctly placed at maze entry
+- Finish sticker: ⚠️ NOT VISIBLE in live render output — absent from maze exit, not just nudge-needed; flagged as TASK-OC-011 item
+
+**Separate issue flagged (not renderer):** Word-search words for "Dogs and Poodles" theme are CLOUD, APPLE, RIVER, STONE, HOUSE, GRASS, STAR, SUN — generic, zero theme relevance. Word-search generator has no theme-aware word list. Separate task.
+
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium` + `--type wordsearch --theme "Dogs and Poodles" --difficulty medium`
+**Test output summary:** Both exited 0. Maze: fills card, START sticker visible, theme applied, fonts correct. Word-search: fills card, theme applied, word list visible. FINISH marker absent on maze.
+**Review status:** APPROVED — TASK-OC-010 fully closed. Two follow-up items logged as TASK-OC-011.
+**Next:** TASK-OC-011 — (1) fix FINISH sticker placement/visibility on maze post, (2) add theme-aware word lists to word-search generator
+
+---
 
 ### 2026-04-30 | OpenClaw | TASK-OC-010-FONTS | Stage live Puppeteer font assets
 **Files changed:**
@@ -750,7 +777,77 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** I downloaded and staged the two font files the Puppeteer renderer expects inside `assets/fonts/`. The renderer was already written to prefer these filenames, so no code changes were needed after the files landed. I then regenerated a maze sample to confirm the live pipeline still renders successfully with the staged assets in place.
 **Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`
 **Test output summary:** Font directory now contains `FredokaOne-Regular.ttf` and `Nunito-ExtraBold.ttf`, and the sample maze render exited 0 and rewrote `output/challenge/generated-activity/ocean-animals-maze-post-medium/post.png` plus `output/raw/maze/maze-ocean-animals.png`.
-**Review status:** PENDING CLAUDE REVIEW
-**Next:** Claude should visually verify that the rendered title/bottom-strip typography is now coming from the staged font assets rather than the previous local fallbacks.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30. Fredoka One confirmed rendering on title (warm rounded weight, correct for kids puzzle branding). Nunito ExtraBold confirmed on difficulty label and bottom strip. Clean upgrade from Comic Sans/Trebuchet fallbacks.
+**Next:** DONE — font assets live and confirmed.
 
 ---
+
+### 2026-04-30 | OpenClaw | TASK-OC-011 | Polish puzzle-post renderer and theme-aware word-search packs
+**Files changed:**
+- `scripts/lib/puzzle-post-renderer.mjs` — moved decor emoji to card-relative corners, widened the outer theme gutters, and rendered maze FINISH as an HTML overlay inside the card
+- `scripts/generate-wordsearch-assets.mjs` — replaced generic fallback banks with theme-family word-pack loading, length filtering, shuffled sampling, and a labeled divider above the word list
+- `config/wordsearch-word-packs.json` — added curated 20-word packs for core JoyMaze theme families plus a default fallback
+- `scripts/generate-maze-assets.mjs` — increased maze wall and solution stroke weights for stronger readability at post scale
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** Fixed the largest visual regressions from the first Puppeteer pass by moving the corner emoji off the title plane, exposing more theme background at the sides, and rendering the maze FINISH sticker as a card overlay so it cannot disappear inside the cropped SVG. Then replaced the generic word-search fallback words with theme-aware curated packs, filtered them against grid size before sampling, and added a small FIND THESE WORDS divider/header so the word-list section reads as intentional instead of tacked on.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`, `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Space" --difficulty hard`, `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dogs and Poodles" --difficulty medium`, `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dinosaurs" --difficulty easy`
+**Test output summary:** All four runs exited 0 and rewrote their target folders with fresh `post.png` outputs. Key verification lines included `wrote post : ...\ocean-animals-maze-post-medium\post.png`, `wrote post : ...\space-maze-post-hard\post.png`, `words      : PURRING, WAGGING, KITTEN, RABBIT, TREATS, FLUFFY, PUPPY, FETCH`, and `words      : HERBIVORE, CARNIVORE, HUNTER, METEOR, CLAWS, WINGS`.
+**Review status:** PARTIALLY APPROVED by Claude (Sonnet 4.6) — 2026-04-30. Corner emoji ✅, 60px gutters ✅, theme-correct word packs ✅, FIND THESE WORDS label ✅, stroke weights ✅. FINISH sticker bug found and fixed by Claude in TASK-OC-011-FINISH-FIX (see next entry). Root cause: `stickerHtml()` used post-level origin offsets (60px outer pad + 160px title zone) as card-relative coordinates, pushing FINISH outside overflow:hidden bounds for tall mazes.
+**Next:** DONE — FINISH sticker fixed by Claude; OC-011 fully closed after that fix.
+
+---
+
+### 2026-04-30 | Claude (Sonnet 4.6) | TASK-OC-011-FINISH-FIX | Fix FINISH sticker coordinate bug in puzzle-post renderer
+
+**Files changed:**
+- `scripts/lib/puzzle-post-renderer.mjs` — removed post-level origin offsets from `stickerHtml()` coordinate calculation
+
+**What was done:** Live render inspection revealed FINISH sticker completely absent from maze posts. Root cause traced to `stickerHtml()`: the formula used `zoneLeft = 60 + centering` and `zoneTop = 160 + centering` — these include the outer post padding (60px) and title zone height (160px approximation) — but stickers are injected inside `.maze-card` which is a `position:relative` container, so coordinates must be card-relative, not post-relative. For tall mazes (e.g. mazeH=1464, cropH=1528), this inflated `finishY` to ~1274px inside a 1286px card — the sticker was clipped to ~12px by `overflow:hidden`, making it invisible. Fix: changed `zoneLeft = 60 + (...)` → `zoneLeft = (...)` and `zoneTop = 160 + (...)` → `zoneTop = (...)`. After fix: FINISH correctly tracks the maze exit cell (bottom-right), START correctly tracks the entrance cell (top-left). Both verified on Ocean Animals (medium) and Space (hard).
+
+**Audit answers to OC-011 flagged questions:**
+- FINISH badge anchor: ✅ FIXED — now mathematically tied to maze grid exit coordinates via layout metadata
+- 60px side gutters: ✅ KEEP — visible theme strips on both sides look right; no further change needed
+- Theme-family detection centralization: ⚠️ DEFER — two call sites (`getThemeConfig` + `resolveWordPackFamily`), both string-matching only, no divergence risk yet; centralize as part of a future word-pack expansion pass (OC-013 backlog)
+- Word list SVG vs HTML: ✅ KEEP SVG — current FIND THESE WORDS label/divider is clean and sufficient; migrating to HTML adds complexity with no meaningful visual payoff right now
+- Stroke weights across difficulties: ✅ ACCEPTED — WALL_STROKE 12 and SOLUTION_STROKE 36 render well at post scale; not tested exhaustively on easy but the weight increase is uniform so regression risk is minimal
+
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium` and `--theme "Space" --difficulty hard`
+**Test output summary:** Both exited 0. Ocean Animals: START at top-left entrance ✅, FINISH at bottom-right exit (row 11 col 8) ✅. Space hard: START top-left ✅, FINISH bottom-right ✅, 3-dot difficulty strip ✅.
+**Review status:** SELF-APPLIED — Claude fix, no further review needed
+**Next:** OC-010 and OC-011 both fully closed. Puzzle post pipeline is production-ready for maze and word-search types.
+
+### 2026-04-30 | OpenClaw | OC-012 | Challenge reel visual tuning
+**Files changed:**
+- `remotion/compositions/ActivityChallenge.jsx` — enlarged the title/countdown strip, added a brief hard-cut-compatible flash cue, and tuned per-type reveal pacing for maze vs word-search
+- `scripts/generate-activity-video.mjs` — aligned challenge-reel audio asset resolution with the challenge SFX map so maze/word-search countdown and transition cues are properly wired
+- `docs/OPENCLAW_REPORT_2026-04-30_task-oc-012.md` — wrote the Claude-facing audit report for this tuning pass
+- `docs/AGENT_LOG.md` — appended this audit handoff entry for Claude
+**What was done:** Applied the requested visual polish pass to the `ActivityChallenge` reel without changing the broader architecture. The title/countdown bar was made more phone-readable, a short payoff flash was added at the challenge-to-solve boundary without introducing a crossfade, word-search and maze solve pacing were separated slightly, and the queue-driven challenge renderer now resolves proper challenge audio/tick/transition assets instead of leaving countdown ticks unwired.
+**Test command:** `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/ocean-animals-maze-post-medium --out output/videos/oc-012-ocean-animals-maze.mp4` and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/dinosaurs-wordsearch-post-easy --out output/videos/oc-012-dinosaurs-wordsearch.mp4`
+**Test output summary:** Both renders exited 0 and produced valid `.mp4` outputs plus thumbnails. Maze render: `885 frames (29.5s @ 30fps)` with `52 waypoints (solver active)`. Word-search render: `1035 frames (34.5s @ 30fps)`. Opening thumbnails confirmed the larger title/countdown treatment rendered correctly.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30.
+- Title/countdown sizing ✅ — direction correct; 50→60 font increase + illuminated badge is the right phone-readability fix
+- Transition flash ✅ — radial flash at boundary is correct approach; hard-cut architecture preserved (locked rule respected)
+- Audio SFX wiring ✅ — countdown ticks were genuinely unwired before; correction was needed
+- Per-type pacing ✅ — maze 84% / word-search 1.2s-per-word is pragmatic and correct; composition-level is fine until Sprint 2 adds more types
+- Render durations ✅ — 29.5s maze + 34.5s word-search both inside the locked 25–35s band
+- Multiline title wrap: acceptable risk now; if a hook wraps badly in production, tighten the hook selector character cap (not a blocker for this audit)
+- Motion+audio QC: not verifiable from static evidence — Ahmed must watch both renders before first production post
+**Next:** Mark OC-012 done in TASKS.md. Next Sprint 1 task: OC-013 (word-search solve validation).
+
+
+---
+
+### 2026-04-30 | OpenClaw | OC-013 | Reel sticker/footer split polish
+**Files changed:**
+- `scripts/render-video.mjs` — passed source image sizing through the challenge props path and derived normalized maze entry/exit sticker fractions from `maze.json`
+- `remotion/compositions/ActivityChallenge.jsx` — rendered geometry-based maze START / FINISH reel badges and added a small word-search theme emoji badge
+- `scripts/generate-wordsearch-assets.mjs` — removed the baked `FIND THESE WORDS` footer from raw word-search SVG assets and exposed footer layout metadata
+- `scripts/lib/puzzle-post-renderer.mjs` — re-homed the word-search footer label/divider to the static image-post renderer only
+- `docs/OPENCLAW_REPORT_2026-04-30_task-oc-013.md` — wrote the Claude-facing audit report for this pass
+- `docs/AGENT_LOG.md` — appended this audit handoff entry for Claude
+**What was done:** Completed the OC-013 cleanup pass at the intended seam boundaries. Maze reel stickers now come from real maze geometry instead of decorative guesswork, word-search raw assets no longer carry the post-only footer chrome into video, and the static post renderer still adds that footer back while the word-search reel gets a small theme emoji badge.
+**Test command:** `node --check scripts/render-video.mjs`, `node --check scripts/generate-wordsearch-assets.mjs`, `node scripts/generate-wordsearch-assets.mjs --title "Dogs and Poodles Word Search" --theme "Dogs and Poodles" --difficulty medium --slug oc-013-wordsearch-test`, `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`, `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dogs and Poodles" --difficulty medium`, `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/ocean-animals-maze-post-medium --out output/videos/oc-013-maze.mp4`, and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/oc-013-wordsearch-test --out output/videos/oc-013-wordsearch.mp4`
+**Test output summary:** Both syntax checks passed. Fresh generator output was created at `output/challenge/generated-activity/oc-013-wordsearch-test`. Both image-post regressions exited 0 and preserved the intended static footer/sticker layout. Both reel renders exited 0 and produced `output/videos/oc-013-maze.mp4` plus `oc-013-maze-thumb.jpg`, and `output/videos/oc-013-wordsearch.mp4` plus `oc-013-wordsearch-thumb.jpg`; opening thumbnails confirmed visible maze START/FINISH stickers and a clean word-search reel frame with a dog emoji badge and no baked footer header.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should audit the new `OC-013` report and sample outputs, especially sticker placement across maze geometry and the raw-asset vs post-renderer ownership split for the word-search footer.

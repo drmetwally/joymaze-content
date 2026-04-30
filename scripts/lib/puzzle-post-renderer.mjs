@@ -91,27 +91,47 @@ function difficultyDotsHtml(level, cfg) {
 }
 
 function decorHtml(decors) {
-  const posStyle = { tl: 'top:18px;left:18px', tr: 'top:18px;right:18px', bl: 'bottom:92px;left:18px', br: 'bottom:92px;right:18px' };
-  return decors.map(d => `<span style="position:absolute;${posStyle[d.pos]};font-size:${d.size}px;opacity:${d.opacity};line-height:1;z-index:3;user-select:none;">${d.emoji}</span>`).join('\n');
+  const positions = {
+    tl: 'top:130px; left:40px',
+    tr: 'top:130px; right:40px',
+    bl: 'bottom:100px; left:40px',
+    br: 'bottom:100px; right:40px',
+  };
+  return decors.map(d => `<span style="position:absolute;${positions[d.pos]};font-size:${d.size}px;opacity:${d.opacity};line-height:1;z-index:5;user-select:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25));">${d.emoji}</span>`).join('\n');
 }
 
-function stickerHtml(meta, cfg) {
-  if (meta.puzzleType !== 'maze' || !meta.layout) return '';
-  const { offsetX, offsetY, mazeW, mazeH, cropPad = 32, canvasW, canvasH } = meta.layout;
+function fittedCropLayout(layout) {
+  if (!layout) return null;
+  const { offsetX, offsetY, mazeW, mazeH, cropPad = 32 } = layout;
   const cropX = offsetX - cropPad;
   const cropY = offsetY - cropPad;
   const cropW = mazeW + cropPad * 2;
   const cropH = mazeH + cropPad * 2;
-  const fitScale = Math.min(944 / cropW, 1258 / cropH);
+  const fitScale = Math.min(824 / cropW, 1258 / cropH);
   const fittedW = cropW * fitScale;
   const fittedH = cropH * fitScale;
-  const zoneLeft = 28 + ((944 - fittedW) / 2);
-  const zoneTop = 160 + ((1258 - fittedH) / 2);
-  const startX = zoneLeft + (((offsetX - cropX) / cropW) * fittedW) - 18;
-  const startY = zoneTop + (((offsetY - cropY) / cropH) * fittedH) - 54;
-  const finishX = zoneLeft + (((offsetX + mazeW - cropX) / cropW) * fittedW) - 52;
-  const finishY = zoneTop + (((offsetY + mazeH - cropY) / cropH) * fittedH) + 8;
-  return `<div class="sticker sticker-start" style="left:${startX}px;top:${startY}px;">${cfg.startSticker}</div><div class="sticker sticker-finish" style="left:${finishX}px;top:${finishY}px;">${cfg.finishSticker}</div>`;
+  const zoneLeft = (824 - fittedW) / 2;
+  const zoneTop = (1258 - fittedH) / 2;
+  return { cropX, cropY, cropW, cropH, fittedW, fittedH, zoneLeft, zoneTop };
+}
+
+function stickerHtml(meta, cfg) {
+  if (meta.puzzleType !== 'maze' || !meta.layout) return '';
+  const fit = fittedCropLayout(meta.layout);
+  const { offsetX, offsetY, mazeW, mazeH } = meta.layout;
+  const startX = fit.zoneLeft + (((offsetX - fit.cropX) / fit.cropW) * fit.fittedW) - 18;
+  const startY = fit.zoneTop + (((offsetY - fit.cropY) / fit.cropH) * fit.fittedH) - 54;
+  const finishX = fit.zoneLeft + (((offsetX + mazeW - fit.cropX) / fit.cropW) * fit.fittedW) - 104;
+  const finishY = fit.zoneTop + (((offsetY + mazeH - fit.cropY) / fit.cropH) * fit.fittedH) - 34;
+  const finishSticker = `<div class="finish-sticker" style="left:${finishX}px;top:${finishY}px;">${cfg.finishSticker}</div>`;
+  return `<div class="sticker sticker-start" style="left:${startX}px;top:${startY}px;">${cfg.startSticker}</div>${finishSticker}`;
+}
+
+function wordSearchFooterHtml(meta, cfg) {
+  if (meta.puzzleType !== 'word-search' || !meta.layout?.wordsTop) return '';
+  const fit = fittedCropLayout(meta.layout);
+  const y = fit.zoneTop + (((meta.layout.wordsTop - fit.cropY) / fit.cropH) * fit.fittedH) - 42;
+  return `<div class="word-label-zone" style="top:${y}px;"><div class="word-label-divider"></div><div class="word-label-text">FIND THESE WORDS</div></div>`;
 }
 
 export async function buildPostHtml(svgContent, titleText, cfg, meta = {}) {
@@ -129,14 +149,14 @@ export async function buildPostHtml(svgContent, titleText, cfg, meta = {}) {
 .bg{position:absolute;inset:0;background:${cfg.bg};z-index:0;} .bg-pattern{position:absolute;inset:0;background-image:${cfg.pattern};z-index:1;}
 .title-zone{position:relative;z-index:4;width:100%;padding:20px 60px 6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;height:132px;}
 .title-text{font-family:'Fredoka',Arial,sans-serif;font-size:54px;font-weight:400;color:${cfg.titleColor};text-align:center;line-height:1.05;max-width:900px;text-shadow:${cfg.titleShadow};-webkit-text-stroke:10px ${cfg.titleStroke};paint-order:stroke fill;letter-spacing:0.5px;}
-.maze-zone{position:relative;z-index:4;flex:1;width:100%;padding:0 28px 0;display:flex;align-items:stretch;min-height:0;}
+.maze-zone{position:relative;z-index:4;flex:1;width:100%;padding:0 60px 0;display:flex;align-items:stretch;min-height:0;}
 .maze-card{background:${cfg.cardBg};border:${cfg.cardBorderWidth} solid ${cfg.cardBorderColor};border-radius:${cfg.cardRadius};box-shadow:${cfg.cardShadow};width:100%;display:flex;align-items:center;justify-content:center;padding:22px;overflow:hidden;position:relative;}
 .maze-card svg{width:100%;height:100%;display:block;}
-.sticker{position:absolute;z-index:6;background:${cfg.stickerBg};border:4px solid ${cfg.stickerBorder};border-radius:999px;padding:8px 14px;font-family:'Nunito',Arial,sans-serif;font-size:24px;font-weight:800;color:${cfg.stickerText};box-shadow:0 10px 22px rgba(0,0,0,0.18);white-space:nowrap;transform:rotate(-6deg);} .sticker-finish{transform:rotate(6deg);}
+.sticker{position:absolute;z-index:6;background:${cfg.stickerBg};border:4px solid ${cfg.stickerBorder};border-radius:999px;padding:8px 14px;font-family:'Nunito',Arial,sans-serif;font-size:24px;font-weight:800;color:${cfg.stickerText};box-shadow:0 10px 22px rgba(0,0,0,0.18);white-space:nowrap;transform:rotate(-6deg);} .finish-sticker{position:absolute;background:#E53E3E;color:#FFFFFF;font-family:'Fredoka', Arial, sans-serif;font-size:24px;font-weight:400;padding:8px 16px;border-radius:20px;box-shadow:0 3px 10px rgba(0,0,0,0.30);z-index:10;letter-spacing:0.5px;transform:rotate(6deg);} .word-label-zone{position:absolute;left:88px;right:88px;z-index:8;pointer-events:none;} .word-label-divider{height:2px;background:${cfg.cardBorderColor};opacity:0.28;margin-bottom:8px;} .word-label-text{font-family:'Fredoka',Arial,sans-serif;font-size:22px;font-weight:400;letter-spacing:1.5px;color:${cfg.cardBorderColor};text-align:center;text-shadow:0 1px 0 rgba(255,255,255,0.3);}
 .bottom-strip{position:relative;z-index:4;width:100%;height:82px;flex-shrink:0;background:${cfg.bottomBg};display:flex;align-items:center;justify-content:space-between;padding:0 36px;}
 .difficulty-block{display:flex;align-items:center;gap:8px;} .dot{display:inline-block;width:15px;height:15px;border-radius:50%;} .dot-on{background:${cfg.dotFill};} .dot-off{background:${cfg.dotEmpty};}
 .diff-label{font-family:'Nunito',Arial,sans-serif;font-size:22px;font-weight:800;color:${cfg.bottomColor};margin-left:4px;} .age-badge{font-family:'Nunito',Arial,sans-serif;font-size:22px;font-weight:800;color:${cfg.bottomColor};opacity:0.85;} .brand{font-family:'Fredoka',Arial,sans-serif;font-size:24px;font-weight:400;color:${cfg.bottomColor};opacity:0.60;letter-spacing:1px;}
-</style></head><body><div class="post"><div class="bg"></div><div class="bg-pattern"></div>${decorHtml(cfg.decors)}<div class="title-zone"><div class="title-text">${safeTitle}</div></div><div class="maze-zone"><div class="maze-card">${cleanSvg}${stickerHtml(meta, cfg)}</div></div><div class="bottom-strip"><div class="difficulty-block">${difficultyDotsHtml(difficulty, cfg)}<span class="diff-label">${diffLabel}</span></div><span class="age-badge">Ages ${ageMin}–${ageMax}</span><span class="brand">${brandName}</span></div></div></body></html>`;
+</style></head><body><div class="post"><div class="bg"></div><div class="bg-pattern"></div>${decorHtml(cfg.decors)}<div class="title-zone"><div class="title-text">${safeTitle}</div></div><div class="maze-zone"><div class="maze-card">${cleanSvg}${stickerHtml(meta, cfg)}${wordSearchFooterHtml(meta, cfg)}</div></div><div class="bottom-strip"><div class="difficulty-block">${difficultyDotsHtml(difficulty, cfg)}<span class="diff-label">${diffLabel}</span></div><span class="age-badge">Ages ${ageMin}–${ageMax}</span><span class="brand">${brandName}</span></div></div></body></html>`;
 }
 
 export async function renderPuzzlePost(svgContent, titleText, theme, outPath, meta = {}) {

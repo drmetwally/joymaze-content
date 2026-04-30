@@ -401,11 +401,23 @@ async function challengeJsonToProps(activity, activityDir) {
   const VW = 1080, VH = 1920;
   const toRelative = (filename) =>
     path.relative(ROOT, path.resolve(activityDir, filename)).replace(/\\/g, '/');
+  const fitContainBounds = (imageWidth = VW, imageHeight = VH) => {
+    const imgAR = imageWidth / imageHeight;
+    const videoAR = VW / VH;
+    if (imgAR > videoAR) {
+      const renderW = VW;
+      const renderH = VW / imgAR;
+      return { width: renderW, height: renderH, offsetX: 0, offsetY: (VH - renderH) / 2 };
+    }
+    const renderH = VH;
+    const renderW = VH * imgAR;
+    return { width: renderW, height: renderH, offsetX: (VW - renderW) / 2, offsetY: 0 };
+  };
 
   async function resolveSfx(rel) {
     if (!rel) return '';
     const exists = await fs.access(path.join(ROOT, rel)).then(() => true).catch(() => false);
-    if (!exists) console.warn(`    [sfx] not found — skipping: ${rel}`);
+    if (!exists) console.warn(`    [sfx] not found - skipping: ${rel}`);
     return exists ? rel : '';
   }
 
@@ -425,28 +437,26 @@ async function challengeJsonToProps(activity, activityDir) {
       resolveSfx(activity.solveAudioPath ?? sfx.solveAudioPath),
     ]);
 
+  let sourceImageWidth = VW, sourceImageHeight = VH;
+
   // Load path.json for maze solve reveal
   let pathWaypoints = null, pathColor = '#22BB44';
   try {
     const pathData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'path.json'), 'utf-8'));
-    const imgAR = (pathData.width ?? VW) / (pathData.height ?? VH);
-    const videoAR = VW / VH;
-    let renderW, renderH, offsetX, offsetY;
-    if (imgAR > videoAR) { renderW = VW; renderH = VW / imgAR; offsetX = 0; offsetY = (VH - renderH) / 2; }
-    else { renderH = VH; renderW = VH * imgAR; offsetX = (VW - renderW) / 2; offsetY = 0; }
+    sourceImageWidth = pathData.width ?? VW;
+    sourceImageHeight = pathData.height ?? VH;
+    const { width: renderW, height: renderH, offsetX, offsetY } = fitContainBounds(sourceImageWidth, sourceImageHeight);
     pathWaypoints = pathData.waypoints.map(p => ({ x: offsetX + p.x * renderW, y: offsetY + p.y * renderH }));
     if (pathData.pathColor) pathColor = pathData.pathColor;
-  } catch { /* no path.json — solve falls back to static */ }
+  } catch { /* no path.json - solve falls back to static */ }
 
   // Load wordsearch.json
   let wordRects = null, highlightColor = '#FFD700';
   try {
     const wsData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'wordsearch.json'), 'utf-8'));
-    const imgAR = (wsData.width ?? VW) / (wsData.height ?? VH);
-    const videoAR = VW / VH;
-    let renderW, renderH, offsetX, offsetY;
-    if (imgAR > videoAR) { renderW = VW; renderH = VW / imgAR; offsetX = 0; offsetY = (VH - renderH) / 2; }
-    else { renderH = VH; renderW = VH * imgAR; offsetX = (VW - renderW) / 2; offsetY = 0; }
+    sourceImageWidth = wsData.width ?? VW;
+    sourceImageHeight = wsData.height ?? VH;
+    const { width: renderW, height: renderH, offsetX, offsetY } = fitContainBounds(sourceImageWidth, sourceImageHeight);
     wordRects = wsData.rects.map(r => ({
       x1: offsetX + r.x1 * renderW,
       y1: offsetY + r.y1 * renderH,
@@ -456,15 +466,45 @@ async function challengeJsonToProps(activity, activityDir) {
     if (wsData.highlightColor) highlightColor = wsData.highlightColor;
   } catch { /* no wordsearch.json */ }
 
+  // Load maze sticker fractions
+  let mazeStartFraction = null, mazeFinishFraction = null;
+  try {
+    const mazeData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'maze.json'), 'utf-8'));
+    sourceImageWidth = mazeData.layout?.canvasW ?? sourceImageWidth;
+    sourceImageHeight = mazeData.layout?.canvasH ?? sourceImageHeight;
+    const layout = mazeData.layout || {};
+    const cropPad = layout.cropPad ?? 32;
+    const cropX = layout.offsetX - cropPad;
+    const cropY = layout.offsetY - cropPad;
+    const cropW = layout.mazeW + cropPad * 2;
+    const cropH = layout.mazeH + cropPad * 2;
+    const cols = mazeData.cols || 1;
+    const rows = mazeData.rows || 1;
+    const cellW = layout.mazeW / cols;
+    const cellH = layout.mazeH / rows;
+    const entry = mazeData.entry || mazeData.entrance;
+    const exit = mazeData.exit;
+    if (entry) {
+      mazeStartFraction = {
+        x: (layout.offsetX + entry.col * cellW + cellW / 2 - cropX) / cropW,
+        y: (layout.offsetY + entry.row * cellH + cellH / 2 - cropY) / cropH,
+      };
+    }
+    if (exit) {
+      mazeFinishFraction = {
+        x: (layout.offsetX + exit.col * cellW + cellW / 2 - cropX) / cropW,
+        y: (layout.offsetY + exit.row * cellH + cellH / 2 - cropY) / cropH,
+      };
+    }
+  } catch { /* no maze.json */ }
+
   // Load dots.json
   let dotWaypoints = null, dotColor = '#FF6B35';
   try {
     const dotsData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'dots.json'), 'utf-8'));
-    const imgAR = (dotsData.width ?? VW) / (dotsData.height ?? VH);
-    const videoAR = VW / VH;
-    let renderW, renderH, offsetX, offsetY;
-    if (imgAR > videoAR) { renderW = VW; renderH = VW / imgAR; offsetX = 0; offsetY = (VH - renderH) / 2; }
-    else { renderH = VH; renderW = VH * imgAR; offsetX = (VW - renderW) / 2; offsetY = 0; }
+    sourceImageWidth = dotsData.width ?? sourceImageWidth;
+    sourceImageHeight = dotsData.height ?? sourceImageHeight;
+    const { width: renderW, height: renderH, offsetX, offsetY } = fitContainBounds(sourceImageWidth, sourceImageHeight);
     dotWaypoints = dotsData.dots.map(d => ({ x: offsetX + d.x * renderW, y: offsetY + d.y * renderH }));
     if (dotsData.dotColor) dotColor = dotsData.dotColor;
   } catch { /* no dots.json */ }
@@ -474,6 +514,7 @@ async function challengeJsonToProps(activity, activityDir) {
     blankImagePath: await resolveImage(activity.blankImage ?? 'blank.png'),
     solvedImagePath: await resolveImage(activity.solvedImage ?? 'solved.png'),
     puzzleType: activity.puzzleType ?? 'maze',
+    theme: activity.theme ?? '',
     hookText: activity.hookText ?? 'Can your kid solve this?',
     titleText: activity.titleText ?? '',
     activityLabel: activity.activityLabel ?? 'PUZZLE',
@@ -496,6 +537,10 @@ async function challengeJsonToProps(activity, activityDir) {
     highlightColor: activity.highlightColor ?? highlightColor,
     dotWaypoints,
     dotColor: activity.dotColor ?? dotColor,
+    sourceImageWidth,
+    sourceImageHeight,
+    mazeStartFraction,
+    mazeFinishFraction,
   };
 }
 
