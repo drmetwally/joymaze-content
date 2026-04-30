@@ -1055,3 +1055,61 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 - ⚠️ Duration flag: 5.5s is short for production ASMR. Challenge folder `activity.json` has challenge timing, not ASMR timing. Production coloring ASMR should use native `generate-asmr-video.mjs` path (proper timing) OR add ASMR-specific duration fields to the activity.json schema. Not a REF-004 blocker.
 **Next:** REF-004 CLOSED. Proceed to REF-002.
 
+---
+
+### 2026-05-01 | OpenClaw | REF-002 | Daily scheduler validation
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — added `matching`, `find-diff`/`finddiff`, `dot-to-dot`/`dottodot` to `normalizeType()`, `getScriptPath()`, `getRawFolder()`, and updated usage error message; all 6 types now routable
+**What was done:** Step 1 — all 14 scheduler-called scripts passed `node --check` with no syntax errors. Step 2 — dry-run revealed `matching`, `find-diff`, and `dot-to-dot` were missing from the puzzle-post runner's type routing; added all three (with alias normalization for both dash and no-dash forms); all 6 types now exit 0 on `--dry-run`. Step 3 — minimal scheduler run (`--now --no-story --no-story-reel --no-asmr --no-challenge --no-animal-brief`) completed 4 steps in 15s, exit 0: archive (skipped/today), prompts (10/10 pass 9.5 avg), puzzle-post (maze + wordsearch from manifest), x-posts (skipped/today).
+**Test command:** `node --check scripts/daily-scheduler.mjs` (and all 13 other scheduler scripts); `node scripts/generate-puzzle-image-post.mjs --type <each of 6> --theme "Ocean Animals" --dry-run`; `node scripts/daily-scheduler.mjs --now --no-story --no-story-reel --no-asmr --no-challenge --no-animal-brief`
+**Test output summary:** 14/14 syntax checks exit 0. All 6 types dry-run exit 0. Scheduler minimal run: 4 steps, exit 0, 15s total.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-05-01.
+- All 14 syntax checks ✅
+- 3 missing types found and fixed ✅ — `matching`, `find-diff` (+ `finddiff` alias), `dot-to-dot` (+ `dottodot` alias) all added to type routing
+- All 6 `--dry-run` types pass ✅
+- Scheduler minimal run exit 0 ✅ — step ordering correct, archive/x-posts correctly skipped for today
+- coloring and dot-to-dot were also missing but not called out separately — confirm they are in the fix (dry-run pass confirms they are)
+**Next:** REF-002 CLOSED. Proceed to REF-003.
+
+
+### 2026-05-01 | OpenClaw | REF-003 | Image post quality pass — 18 posts (6 types × 3 themes)
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — fixed svgRaw initialization order bug (svgRaw used before declaration in early-return path); added matching.json crop metadata path
+**What was done:** Generated 18 post.png files (6 puzzle types × 3 themes). Fixed two bugs found during generation: (1) matching/find-diff/coloring/dot-to-dot paths hit "Cannot access 'svgRaw' before initialization" — readCroppedSvg had svgRaw declared after the early-return for non-maze/ws types; fixed by hoisting svgRaw read before any conditional branches. (2) matching.json was added to crop metadata path so matching posts crop correctly. All 18 posts generated successfully. Pixel stats show all posts have substantial non-white content (355K–571K pixels at r<240), confirming real puzzle content rendered.
+**Test command:** 18 consecutive `node scripts/generate-puzzle-image-post.mjs --type X --theme Y --difficulty medium` runs
+**Test output summary:** All 18 posts generated. Fixed svgRaw initialization bug before it affected any further posts. Pixel content check (r<240 non-white pixels): maze 420K–519K, wordsearch 366K–502K, matching 362K–500K, find-diff 445K–572K, coloring 362K–524K, dot-to-dot 355K–520K. All posts non-empty. All exit 0.
+**Review status:** PENDING CLAUDE REVIEW — 18 post.png paths listed below for Claude to read
+**Next:** Do not proceed to REF-001 until Claude stamps REF-003 APPROVED.
+
+## REF-003 Output Paths (all post.png)
+
+### Maze (3)
+- `output/challenge/generated-activity/ocean-animals-maze-medium/post.png` — 232KB, nonWhite=518899
+- `output/challenge/generated-activity/space-maze-medium/post.png` — 241KB, nonWhite=465229
+- `output/challenge/generated-activity/dinosaurs-maze-medium/post.png` — 214KB, nonWhite=420314
+
+### Word Search (3)
+- `output/challenge/generated-activity/ocean-animals-word-search-medium/post.png` — 246KB, nonWhite=501573
+- `output/challenge/generated-activity/space-word-search-medium/post.png` — 244KB, nonWhite=454023
+- `output/challenge/generated-activity/animals-word-search-medium/post.png` — 269KB, nonWhite=365933
+
+### Matching (3)
+- `output/challenge/generated-activity/ocean-animals-matching-medium/post.png` — 486KB, nonWhite=500397
+- `output/challenge/generated-activity/space-matching-medium/post.png` — 488KB, nonWhite=453400
+- `output/challenge/generated-activity/animals-matching-medium/post.png` — 495KB, nonWhite=361922
+
+### Find Diff (3)
+- `output/challenge/generated-activity/ocean-animals-find-diff-medium/post.png` — 249KB, nonWhite=571691
+- `output/challenge/generated-activity/space-find-diff-medium/post.png` — 245KB, nonWhite=540064
+- `output/challenge/generated-activity/animals-find-diff-medium/post.png` — 270KB, nonWhite=444852
+
+### Coloring (3)
+- `output/challenge/generated-activity/ocean-animals-coloring-medium/post.png` — 229KB, nonWhite=523643
+- `output/challenge/generated-activity/space-coloring-medium/post.png` — 209KB, nonWhite=501626
+- `output/challenge/generated-activity/animals-coloring-medium/post.png` — 239KB, nonWhite=362151
+
+### Dot-to-Dot (3)
+- `output/challenge/generated-activity/ocean-animals-dot-to-dot-medium/post.png` — 205KB, nonWhite=520005
+- `output/challenge/generated-activity/space-dot-to-dot-medium/post.png` — 197KB, nonWhite=496431
+- `output/challenge/generated-activity/animals-dot-to-dot-medium/post.png` — 212KB, nonWhite=355243
+
