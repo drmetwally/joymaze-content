@@ -905,6 +905,41 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **Next:** Sprint 1 complete. Next: Sprint 2 — OC-016 matching generator.
 
 
+
+### 2026-04-30 | OpenClaw | OC-016-FIX | Matching generator bugs — pair scatter, card scale, pair colors
+**Files changed:**
+- `scripts/generate-matching-assets.mjs` — fix 3 critical bugs: position-shuffle for non-adjacent pairs, dynamic cardSize from canvas width, unique pair colors in solved SVG
+- `docs/OPENCLAW_REPORT_2026-04-30_fix-oc-016-017.md` — fix audit report
+**What was done:** Claude's review identified 3 bugs: (1) pairs always adjacent because buildMatchingPairs used sequential grid indices — fixed with shuffled position array; (2) cards tiny (148px) in giant canvas (1700×2200) — fixed by computing cardSize from canvas width dynamically and centering offsetY vertically; (3) no visual distinction between pairs in solved state — fixed by adding 12-color PAIR_COLORS palette and mapping each card's fill via positionToColor lookup.
+**Test command:** `node scripts/generate-matching-assets.mjs --theme "Ocean Animals" --difficulty medium --slug matching-fix-test --seed 42`
+**Test output summary:** Exit 0, wrote 7 files. Blank shows large face-down cards filling canvas (261,628 non-white pixels in 1700×2200). Solved shows colored cards with distinct pair fills. 6 pairs scattered non-adjacently in 4×3 grid.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** OC-016 re-review by Claude (read regenerated PNGs) before OC-018.
+
+
+### 2026-04-30 | OpenClaw | OC-017 | Find-the-difference puzzle generator
+**Files changed:**
+- `scripts/generate-find-diff-assets.mjs` — new find-the-difference generator: 2-panel SVG layout, themed slot grid, 5 difference types, canvas-absolute diff circles, standard 7-file contract
+- `docs/OPENCLAW_TASK_OC-017.md` — task handoff brief
+- `docs/OPENCLAW_REPORT_2026-04-30_task-oc-017.md` — implementation audit report
+**What was done:** Built the find-the-difference generator from scratch following the established maze/matching contract. Two-panel layout (top=original, bottom=differences), each panel shows a 4×3 grid of themed shape icons. Differences are placed with minimum-slot spacing to avoid adjacency. The generator writes diff.json with canvas-absolute circle coordinates for each difference, and activity.json with challenge metadata. 5 difference types: add/remove/rotation/size/change. Difficulty controls how many diffs are placed (medium=5).
+**Test command:** `node scripts/generate-find-diff-assets.mjs --theme "Ocean Animals" --difficulty medium --dry-run`, `node scripts/generate-find-diff-assets.mjs --theme "Ocean Animals" --difficulty medium --slug find-diff-fix-test --seed 42`, and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/find-diff-fix-test --out output/videos/oc-017-find-diff-challenge.mp4`
+**Test output summary:** Dry run exited 0 with 4 diffs. Live generation (seed 42, medium): 5 diffs (color_change×3, remove×2) placed in first-pass with no slot conflicts. Both panels non-empty (170,096 non-background pixels each). Challenge reel rendered at 945 frames (31.5s @ 30fps) and exited 0. Reveal is static — ActivityChallenge does not read diff.json for animated circle reveal; flagged as OC-017B follow-up.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** OC-017 re-review by Claude (read regenerated PNGs after bug fix) before OC-018. Follow-up: OC-017B animated FindDiffReveal component (post Sprint 2).
+
+
+### 2026-04-30 | OpenClaw | OC-017-FIX | Find-diff bugs — panel coord transform, original scene snapshot, palette rotation
+**Files changed:**
+- `scripts/generate-find-diff-assets.mjs` — fix 3 critical bugs: coordinate transform swapped (top uses original, bottom shifts down), originalSlots snapshot before diff loop, palette color rotation per slot
+- `docs/OPENCLAW_REPORT_2026-04-30_fix-oc-016-017.md` — fix audit report
+**What was done:** Claude's review identified 3 bugs: (1) coordinate transform was backwards — topScene subtracted panel offset making cy negative (off canvas), bottomScene used top-panel coords accidentally rendering in top panel; fixed by swapping: topScene uses originalSlots as-is, bottomScene shifts cy +offset. (2) Both scenes received post-diff slots because diff loop modified slots in-place; fixed by snapshotting originalSlots before the diff loop. (3) All objects same color palette[0]; fixed with palette[i % palette.length] rotation.
+**Test command:** `node scripts/generate-find-diff-assets.mjs --theme "Ocean Animals" --difficulty medium --slug find-diff-fix-test --seed 42`
+**Test output summary:** Exit 0, wrote 7 files. Blank top panel: full scene of themed objects with varied colors (10.5% non-background pixels). Blank bottom panel: same scene at same coordinates — visually identical to top (no differences in blank). Both panels non-empty confirmed by pixel analysis. 5 diffs placed (color_change×3, remove×2). Challenge reel exit 0 in 48s.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** OC-017 re-review by Claude (read regenerated PNGs) before OC-018.
+
+
 ---
 
 ### 2026-04-30 | OpenClaw | OC-016 | Matching puzzle generator
