@@ -86,12 +86,20 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [ ] **OC-017B** — Animated find-diff reveal: `FindDiffReveal` component for `ActivityChallenge.jsx` reading `diff.json` and animating circles one-by-one. Deferred until Sprint 2 complete.
 - [x] **OC-018** — Coloring page generator + image post integration. APPROVED 2026-04-30. `generate-coloring-assets.mjs` new (7-file contract, single-panel 1080×1500, thick outline strokes for coloring feel, `colored.png` as ASMR end-state). `generate-puzzle-image-post.mjs --type coloring` plumbing done. Pre-flight: label truncation fix applied (7→10 chars). ASMR render exits 0 in 8.7s with crayon.mp3. Image post exits 0, writes to `output/raw/coloring/`. No changes to render-video.mjs or AsmrReveal. Follow-up: OC-018B coloring ASMR audio (marker-on-paper sound instead of crayon.mp3) — lower priority, deferred.
 
-### Sprint 3 — Remaining Puzzle Engines (week 3)
+### Sprint 3 — Final Engine + Refinement Phase
 
 > Sprint 2 complete ✅ — maze, matching, find-diff, coloring generators all live and audited.
-- [ ] **OC-019** — Tracing/Dot-to-Dot generator: numbered dot sequence, SVG path, activity.json contract. Claude audit required.
-- [ ] **OC-020** — Crossword generator: grid-filling algorithm + Groq clue generation. Most complex — spec review with Claude before OpenClaw starts.
-- [ ] **OC-021** — Theme-family detection centralization: extract shared utility from renderer + word-search generator (OC-013 tech debt). Low priority, defer until Sprint 2 complete.
+> **Decision locked 2026-04-30:** Crossword dropped permanently — not in brand (app/books). After dot-to-dot, stop building and focus on quality refinement + automation.
+- [x] **OC-019** — Dot-to-Dot generator. APPROVED 2026-04-30. Hardcoded shape libraries (ocean 6, animals 5, space 5 shapes), normalized dots.json contract wired to existing render-video.mjs reader, z-order enforced (lines before dots). 7-file contract, all 3 theme families tested. Challenge reel 33.5s total ✅ within 35s band. Flags: moon crescent polygon fill, rabbit ear outline clarity — visual QC required on solved.png images.
+- [~] **OC-020** — ~~Crossword generator~~ DROPPED — not a JoyMaze brand activity (not in app or KDP books). Do not revisit.
+- [ ] **OC-021** — Theme-family detection centralization: extract shared `resolveThemeFamily()` into `scripts/lib/theme-family.mjs`. Low priority — do after OC-019.
+
+### Refinement Phase (after OC-019)
+> No new generators. Focus: quality, automation reliability, daily output consistency.
+- [ ] **REF-001** — Challenge reel visual QC: Ahmed watches and logs issues for all 5 puzzle types before first production run
+- [ ] **REF-002** — Daily scheduler end-to-end validation: run `npm run daily` dry-run for a full week, confirm all 5 reel lanes + image posts + X posts schedule without errors
+- [ ] **REF-003** — Image post quality pass: audit puzzle post wrapper across all themes, fix any theme families that look off
+- [ ] **REF-004** — ASMR coloring pipe: wire `generate-coloring-assets.mjs` into ASMR brief rotation (coloring lane currently uses manually placed assets)
 
 ---
 
