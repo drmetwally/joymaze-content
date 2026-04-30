@@ -1046,6 +1046,12 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** Tested the existing ASMR bridge with the OC-018 coloring test folder. Bridge already works fully — no code changes needed. `render-video.mjs --comp AsmrReveal --challenge <coloring-folder>` resolves `blank.png` + `colored.png` from `activity.json`'s `blankImage`/`solvedImage` fields directly, exits 0, and produces the ASMR video. Added documentation note to `generate-asmr-brief.mjs` header clarifying the two coloring ASMR paths (generated deterministic vs AI-generated brief-based).
 **Test command:** `node scripts/render-video.mjs --comp AsmrReveal --challenge output/challenge/generated-activity/oc-018-ocean-coloring-test --out output/videos/ref-004-coloring-asmr-test.mp4`
 **Test output summary:** Exit 0 in 9.3s. Hook: "Color the Ocean Animals!" Audio: crayon.mp3. Blank: blank.png, Solved: colored.png. Duration: 165 frames (5.5s @ 30fps). Bridge resolves correctly — no fix needed.
-**Review status:** PENDING CLAUDE REVIEW
-**Next:** Do not proceed to REF-002 until Claude stamps REF-004 APPROVED.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-05-01.
+- Bridge works ✅ — `activityJsonToProps()` resolves `blank.png` + `colored.png` from `activity.json` fields; no coloring-specific case needed
+- Exit 0 ✅ — render succeeded without code changes
+- TTB wipe confirmed ✅ — thumbnail shows mid-reveal correctly: top half colored, bottom half blank/white; title badge, progress bar, Joyo mascot all rendering
+- Audio ✅ — crayon.mp3 wired
+- Documentation note ✅ — two coloring ASMR paths clarified in `generate-asmr-brief.mjs`
+- ⚠️ Duration flag: 5.5s is short for production ASMR. Challenge folder `activity.json` has challenge timing, not ASMR timing. Production coloring ASMR should use native `generate-asmr-video.mjs` path (proper timing) OR add ASMR-specific duration fields to the activity.json schema. Not a REF-004 blocker.
+**Next:** REF-004 CLOSED. Proceed to REF-002.
 
