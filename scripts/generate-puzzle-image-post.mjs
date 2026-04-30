@@ -37,6 +37,7 @@ const ALL_SUPPORTED = hasFlag('--all-supported');
 function normalizeType(input) {
   if (input === 'wordsearch' || input === 'word-search') return 'word-search';
   if (input === 'maze') return 'maze';
+  if (input === 'coloring') return 'coloring';
   return '';
 }
 
@@ -76,13 +77,17 @@ function getDefaultTitle(type, theme) {
 }
 
 function getScriptPath(type) {
-  return type === 'maze'
-    ? path.join(ROOT, 'scripts', 'generate-maze-assets.mjs')
-    : path.join(ROOT, 'scripts', 'generate-wordsearch-assets.mjs');
+  if (type === 'maze') return path.join(ROOT, 'scripts', 'generate-maze-assets.mjs');
+  if (type === 'word-search') return path.join(ROOT, 'scripts', 'generate-wordsearch-assets.mjs');
+  if (type === 'coloring') return path.join(ROOT, 'scripts', 'generate-coloring-assets.mjs');
+  return null;
 }
 
 function getRawFolder(type) {
-  return type === 'maze' ? path.join(RAW_DIR, 'maze') : path.join(RAW_DIR, 'wordsearch');
+  if (type === 'maze') return path.join(RAW_DIR, 'maze');
+  if (type === 'word-search') return path.join(RAW_DIR, 'wordsearch');
+  if (type === 'coloring') return path.join(RAW_DIR, 'coloring');
+  return path.join(RAW_DIR, type);
 }
 
 function runGenerator(type, config, dryRun = false) {
@@ -178,18 +183,25 @@ function buildDirectConfig() {
 }
 
 async function readCroppedSvg(activityDir, puzzleType) {
-  const svgFile = path.join(activityDir, 'blank.svg');
-  const jsonFile = path.join(activityDir, puzzleType === 'maze' ? 'maze.json' : 'wordsearch.json');
-  const [svgRaw, meta] = await Promise.all([
-    fs.readFile(svgFile, 'utf-8'),
-    fs.readFile(jsonFile, 'utf-8').then(JSON.parse).catch(() => null),
-  ]);
+  let svgFile = path.join(activityDir, 'blank.svg');
+  let metaFile = null;
+  if (puzzleType === 'maze') {
+    metaFile = path.join(activityDir, 'maze.json');
+  } else if (puzzleType === 'word-search') {
+    metaFile = path.join(activityDir, 'wordsearch.json');
+  } else if (puzzleType === 'coloring') {
+    metaFile = path.join(activityDir, 'coloring.json');
+  }
+  const svgRaw = await fs.readFile(svgFile, 'utf8');
   const pad = 32;
-  if (!meta?.layout) return { svgContent: svgRaw, layoutMeta: null };
-  const { offsetX, offsetY, mazeW, mazeH } = meta.layout;
+  if (!metaFile) return { svgContent: svgRaw, layoutMeta: null };
+  const meta = await fs.readFile(metaFile, 'utf8').then(JSON.parse).catch(() => null);
+  if (!meta?.layout && !meta?.panels) return { svgContent: svgRaw, layoutMeta: null };
+  const src = meta.layout ?? meta.panels;
+  const { offsetX, offsetY, panelW: mazeW, panelH: mazeH } = src;
   return {
     svgContent: svgRaw.replace(/viewBox="[^"]*"/, `viewBox="${offsetX - pad} ${offsetY - pad} ${mazeW + pad * 2} ${mazeH + pad * 2}"`),
-    layoutMeta: { ...meta.layout, cropPad: pad },
+    layoutMeta: { ...src, cropPad: pad },
   };
 }
 
@@ -220,7 +232,7 @@ async function processOne(config) {
     }
   }
   const activityPath = path.join(activityDir, 'activity.json');
-  const puzzleJsonName = config.type === 'maze' ? 'maze.json' : 'puzzle.json';
+  const puzzleJsonName = config.type === 'maze' ? 'maze.json' : config.type === 'coloring' ? 'coloring.json' : 'puzzle.json';
   const puzzlePath = path.join(activityDir, puzzleJsonName);
   const activity = JSON.parse(await fs.readFile(activityPath, 'utf8'));
   const puzzle = JSON.parse(await fs.readFile(puzzlePath, 'utf8'));
@@ -234,7 +246,7 @@ async function processOne(config) {
   const rawSuffix = config.source === 'manifest'
     ? `${manifestSafe(config.manifestDate)}-slot${String(config.slotIndex).padStart(2, '0')}-${slugify(activity.theme || config.theme)}`
     : slugify(activity.theme || config.theme || config.slug);
-  const rawBase = `${config.type === 'maze' ? 'maze' : 'wordsearch'}-${rawSuffix}`;
+  const rawBase = `${config.type === 'maze' ? 'maze' : config.type === 'coloring' ? 'coloring' : 'wordsearch'}-${rawSuffix}`;
   const rawImagePath = path.join(rawFolder, `${rawBase}.png`);
   const rawSidecarPath = path.join(rawFolder, `${rawBase}.json`);
   console.log(`[puzzle-post] rawImage   : ${rawImagePath}`);

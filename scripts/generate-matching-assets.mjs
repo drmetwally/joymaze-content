@@ -243,7 +243,7 @@ function buildSolvedSvg(layout, pairs, grid) {
       const cell = grid.find(c => c.index === pos);
       const cx = offsetX + cell.col * (cardSize + gap) + cardSize / 2;
       const cy = offsetY + cell.row * (cardSize + gap) + cardSize / 2;
-      const shortLabel = pair.label.length > 8 ? pair.label.slice(0, 7) + '…' : pair.label;
+      const shortLabel = pair.label.length > 10 ? pair.label.slice(0, 10) + '…' : pair.label;
       return `  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#1A1A2A">${escapeXml(shortLabel)}</text>`;
     });
   }).join('\n');
