@@ -308,18 +308,12 @@ function polylinePoints(points) {
 
 function buildSvg({ cells, layout, solutionPoints = null, pathColor = DEFAULT_PATH_COLOR }) {
   const wallSegments = buildWallSegments(cells, layout);
-  const startX = layout.offsetX + layout.cell / 2;
-  const startY = layout.offsetY - 56;
-  const endX = layout.offsetX + layout.mazeW - layout.cell / 2;
-  const endY = layout.offsetY + layout.mazeH + 96;
   const solutionPolyline = solutionPoints ? `
     <polyline points="${polylinePoints(solutionPoints)}" fill="none" stroke="${pathColor}" stroke-width="${SOLUTION_STROKE}" stroke-linecap="round" stroke-linejoin="round" opacity="0.92" />` : '';
 
   return `
 <svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="${BG_COLOR}"/>
-  <text x="${startX}" y="${startY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#222222">Start</text>
-  <text x="${endX}" y="${endY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#222222">End</text>
   <g stroke="${WALL_COLOR}" stroke-width="${WALL_STROKE}" stroke-linecap="round" stroke-linejoin="round">
     ${wallSegments.map(([x1, y1, x2, y2]) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`).join('\n    ')}
   </g>${solutionPolyline}
@@ -347,6 +341,7 @@ function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cell
     exit: { side: 'bottom', row: rows - 1, col: cols - 1 },
     walls: cells,
     solutionCells,
+    layout,
     metrics: {
       deadEnds: countDeadEnds(cells),
       solutionSteps: solutionCells.length,

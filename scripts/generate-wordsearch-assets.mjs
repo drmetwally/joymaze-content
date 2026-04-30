@@ -347,6 +347,14 @@ async function main() {
     words,
     placements,
     grid,
+    layout: {
+      offsetX: layout.gridX,
+      offsetY: layout.gridY,
+      mazeW: layout.gridSizePx,
+      mazeH: layout.gridSizePx,
+      canvasW: CANVAS_W,
+      canvasH: CANVAS_H,
+    },
   };
 
   const puzzleJson = {
@@ -360,6 +368,14 @@ async function main() {
     words,
     placements,
     grid,
+    layout: {
+      offsetX: layout.gridX,
+      offsetY: layout.gridY,
+      mazeW: layout.gridSizePx,
+      mazeH: layout.gridSizePx,
+      canvasW: CANVAS_W,
+      canvasH: CANVAS_H,
+    },
   };
 
   console.log(`[wordsearch-factory] title      : ${TITLE}`);

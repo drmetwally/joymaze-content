@@ -249,6 +249,117 @@
 **Test output summary:** Syntax check passed. Fresh maze and word-search outputs rendered successfully. Visual spot-check confirmed there is now no footer copy band, title text fits more safely within the top zone, and decorative variation changes by theme bucket. Direct-run sidecars still write correctly, with expected generic subjects for direct one-off generation and richer manifest subjects preserved in manifest-driven mode.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** If another polish pass is wanted, the most valuable follow-up is better semantic title selection, for example preferring short challenge hooks over generic puzzle names in direct mode while still avoiding truncation.
+
+---
+
+### 2026-04-30 | Claude (Sonnet 4.6) | TASK-OC-010 | Puzzle wrapper minimal rebuild — handoff to OpenClaw
+
+**Files changed:**
+- `docs/AGENT_LOG.md` — handoff entry only; no code changes from Claude
+
+**What was done:** Decision made 2026-04-30: retire the current decorative wrapper in `generate-puzzle-image-post.mjs` entirely. All theme backgrounds, corner decor, margin motifs, start/finish markers, and footer bands are removed. Replacement is a Sharp minimal layout: puzzle image fills the canvas edge-to-edge with a thin border, title text only at top as a clean pill badge. Rationale: "printable puzzle worksheet" is a high-save Pinterest category precisely because it looks like a real thing you'd print — decorative UI chrome fights that signal. Imagen as an artistic upgrade layer is deferred to Phase 1 (after analytics show which puzzle types convert).
+
+**Test command:** After rebuild: `npm run puzzlepost:generate -- --type maze --theme "Ocean Animals"` and `npm run puzzlepost:generate -- --type wordsearch --theme "Dinosaurs"` — verify post.png looks like a clean printed worksheet, not an app card.
+**Test output summary:** N/A — handoff only
+**Review status:** HANDOFF TO OPENCLAW
+**Next:** OpenClaw to implement TASK-OC-010 per spec below, then append completed entry to this log.
+
+---
+
+### 2026-04-30 | OpenClaw | TASK-OC-010 | Puzzle wrapper minimal rebuild
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — removed the decorative wrapper system and replaced it with a 2-layer minimal Sharp composition: fitted puzzle image plus title pill badge on an off-white canvas
+- `docs/AGENT_LOG.md` — appended this task handoff entry for Claude
+**What was done:** Implemented Claude's delete-first handoff literally. The wrapper script now uses the specified `#FAFAFA` 1000×1500 canvas, fits the puzzle image into the `30,110,940,1360` zone, keeps `pickTitleText()` but simplifies it to the required cascade, removes `shortenForZone()`, deletes all render-time decoration helpers and theme decor logic, reduces `getStyleKit()` to the two title/accent fields, and leaves the compositing stack at exactly two layers: puzzle image plus the top title badge SVG. The manifest path, CLI flags, sidecar write, and raw import copy flow were left unchanged.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals"` and `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dinosaurs"`
+**Test output summary:** Both runs exited 0. Maze run wrote `output/challenge/generated-activity/ocean-animals-maze-post-medium/post.png` plus `output/raw/maze/maze-ocean-animals.png`; word-search run wrote `output/challenge/generated-activity/dinosaurs-wordsearch-post-medium/post.png` plus `output/raw/wordsearch/wordsearch-dinosaurs.png`. Visual-model inspection from this environment was blocked because the repo output path is outside the allowed local-media roots, so Claude should do the final printable-vs-noise visual judgment during review.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should visually inspect the two generated `post.png` files and either mark this minimal rebuild verified or request a tiny follow-up if the title badge/puzzle fit still reads too app-like.
+
+---
+
+### 2026-04-30 | OpenClaw | TASK-OC-010-FOLLOWUP | Themed puzzle-post polish after visual review
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — lowered the title area, added kid-friendlier badge styling, reintroduced only minimal theme-based decorations, and added small start/end themed reward art while keeping the existing manifest/CLI/raw-copy pipeline intact
+- `docs/AGENT_LOG.md` — appended this follow-up entry for Claude
+**What was done:** After visual review feedback, I adjusted the puzzle zone downward so the title sits a little lower, swapped the title treatment to a softer rounded badge with brighter kid-oriented colors, and added the minimum Sharp-only beautification layer requested: light background decorations plus a small theme-based hero near the puzzle start and reward near the end. I kept the rest of the wrapper restrained and left the generation/manifest/sidecar contract untouched.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals"` and `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dinosaurs"`
+**Test output summary:** Both runs exited 0 and rewrote the target `post.png` and raw image outputs. Local visual inspection confirmed the maze now has a lower blue title badge with a fish + reward accent on an ocean-themed background, and the word-search now has a warmer yellow title badge with dinosaur/leaf accents and light themed background decoration.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should check whether the new themed polish is at the right ceiling or whether the title badge still needs a final typography/color nudge before this lane is considered settled.
+
+---
+
+### 2026-04-30 | OpenClaw | TASK-OC-010-FOLLOWUP-2 | Final badge typography and accent scale polish
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — tightened title badge typography/colors and slightly increased hero/reward art scale/placement for a stronger kid-facing finish
+- `docs/AGENT_LOG.md` — appended this final polish entry for Claude
+**What was done:** I kept the wrapper architecture stable and made only the narrow polish requested: richer badge fills/strokes, stronger title contrast with a soft outline treatment, and larger hero/reward accent art placed a bit more confidently around the puzzle. This keeps the page clean while making the top hook and themed accents feel less flat.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals"` and `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dinosaurs"`
+**Test output summary:** Both runs exited 0 and rewrote the sample `post.png` outputs. Local visual inspection showed clearer title badges and better-sized themed accents on both the ocean maze and dinosaur word-search samples.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should decide whether this is the accepted ceiling for the Sharp-only worksheet wrapper or whether a later pass should move from system-font SVG text to a custom embedded display font.
+
+---
+
+#### TASK-OC-010 spec for OpenClaw
+
+**File:** `scripts/generate-puzzle-image-post.mjs`
+
+**Goal:** Replace the current multi-layer art wrapper with a Sharp minimal layout. The puzzle image IS the post. No decorations.
+
+**Layout contract (1000×1500 canvas):**
+- Background: solid `#FAFAFA` (off-white, not pure white — avoids Instagram compression artifacts)
+- Title zone: y=0 to y=90px — centered pill badge with `#1A1A2E` bold text ~46px, white pill fill (`#FFFFFF`), subtle `rgba(0,0,0,0.06)` shadow. Title comes from `pickTitleText()` — keep that function, simplify it.
+- Puzzle image: resize-to-fit within `left=30, top=110, width=940, height=1360` — use `sharp().resize(940, 1360, { fit: 'contain', background: '#FAFAFA' })`. Center the fitted image in that zone.
+- Nothing else. No motifs, no markers, no footer band, no theme decor.
+
+**What to remove:**
+- All SVG decoration render functions (`renderFishCluster`, `renderStartMarkerSvg`, `renderFinishMarkerSvg`, and any other `render*` functions)
+- `getThemeDecor()` — delete entirely
+- `getStyleKit()` — reduce to just `{ title: '#1A1A2E', accent: '#333333' }` (two fields, used only for title pill text color)
+- `shortenForZone()` — delete; `wrapText()` kept only if needed for title pill line-break logic
+- All composite layer entries in the Sharp pipeline except: (1) puzzle image layer, (2) title badge SVG layer
+
+**What to keep unchanged:**
+- All CLI flags: `--type`, `--theme`, `--difficulty`, `--manifest`, `--all-supported`, `--slug`, `--activity-dir`, `--dry-run`
+- Manifest consumption path and all-supported slot iteration
+- `ensurePuzzlePng()`, `getScriptPath()`, `getRawFolder()`, sidecar write, `import-raw` copy
+- `CANVAS_WIDTH=1000`, `CANVAS_HEIGHT=1500`
+- `pickTitleText()` — simplify but keep the cascade logic (TITLE arg → activity.titleText → config.title → default)
+
+**Simplest valid title badge SVG** (drop-in for the composite layer):
+```js
+function renderTitleBadgeSvg(titleText) {
+  const lines = wrapText(titleText, 28, 2); // 28 chars/line, 2 lines max
+  const lineH = 52;
+  const h = 60 + lines.length * lineH;
+  const linesMarkup = lines.map((l, i) =>
+    `<text x="500" y="${44 + i * lineH}" font-size="44" font-family="Arial Black, Arial, sans-serif" font-weight="900" fill="#1A1A2E" text-anchor="middle" dominant-baseline="middle">${escapeXml(l)}</text>`
+  ).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="${h}">
+    <rect x="40" y="8" width="920" height="${h - 16}" rx="18" fill="#FFFFFF" opacity="0.92"/>
+    ${linesMarkup}
+  </svg>`;
+}
+```
+Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left: 0 }`.
+
+**After the rebuild, the compositing stack should be exactly 2 layers:**
+1. Puzzle image (resized, centered in the puzzle zone)
+2. Title badge SVG (top of canvas)
+
+---
+
+### 2026-04-29 | OpenClaw | SESSION-END-001 | Close session with next-step decision
+**Files changed:**
+- `docs/SESSION_LOG.md` — recorded the end-of-session wrapper/Sharp-first direction note
+- `docs/AGENT_LOG.md` — appended this closure entry for Claude
+**What was done:** Closed the session by locking the strategic next-step decision: do not jump to Imagen yet. The current recommendation is to push the Sharp-only wrapper to its ceiling first, because that preserves deterministic puzzle truth and printable solvability with less risk. Imagen stays as a later option only for protected outer-frame or margin art if Sharp still cannot reach production quality after another polish pass.
+**Test command:** `git log --oneline -n 6`
+**Test output summary:** Recent session commits now clearly show the sequence from automation -> docs -> wrapper rebuild -> title/theme polish, ending with `d8a959f` and `03e48a5` as the current wrapper state.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Tomorrow, run the Sharp-ceiling pass and comparison pack before deciding whether Imagen is needed at all.
 **Next:** If Claude accepts this follow-up, TASK-OC-003 is fully closed.
 
 ---
@@ -597,5 +708,49 @@
 **Test output summary:** Final render durations remain 29.5s (maze) and 34.5s (word-search). Challenge titles are now intelligence-derived instead of hardcoded. Maze final render uses continuous path interpolation, and word-search final render uses a more visible moving marker-style reveal.
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** If the user still wants title copy even punchier, the right next move is not more hardcoded text, but improving the challenge-hook selector heuristics or adding a challenge-specific hook pool inside the intelligence system.
+
+---
+
+
+### 2026-04-30 | OpenClaw | TASK-OC-010-PUPPETEER | Switch maze puzzle-post rendering from Sharp to Puppeteer
+**Files changed:**
+- `scripts/generate-puzzle-image-post.mjs` — replaced the Sharp compositing path with an HTML/CSS + Puppeteer screenshot renderer that reads `blank.svg` directly, applies a theme-color title pill, and crops the maze via SVG `viewBox`
+- `scripts/generate-maze-assets.mjs` — added `layout` to `maze.json` so the post renderer can crop out the baked-in margins deterministically
+- `docs/AGENT_LOG.md` — appended this handoff entry for Claude
+**What was done:** I followed the diagnosis pivot and moved the maze post renderer onto the Puppeteer path. The new flow reads `blank.svg`, uses `maze.json.layout` to rewrite the SVG `viewBox` and remove the large baked-in print margins, then screenshots a simple HTML template with a local font-face source, falling back to `C:\Windows\Fonts\comicbd.ttf` because the requested Nunito TTF was not available locally in this session. Theme styling is now reduced to background plus accent only, matching the simplified template. `maze.json` now persists the full `layout` object so the crop is data-driven instead of guessed.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`
+**Test output summary:** The maze run exited 0 and rewrote `output/challenge/generated-activity/ocean-animals-maze-post-medium/post.png` plus `output/raw/maze/maze-ocean-animals.png`. Local visual inspection confirmed the maze now fills the frame much more aggressively and the title pill no longer looks like the old Sharp SVG wrapper. Important blocker: the word-search path currently fails under this new renderer because `puzzle.json` does not yet expose a `layout` field analogous to `maze.json`, so the Puppeteer crop seam is complete for maze but not yet generalized to word-search.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should review the maze result first. If accepted, the follow-up is to add equivalent layout metadata for word-search so the same Puppeteer crop path can cover both deterministic puzzle types.
+
+---
+
+
+### 2026-04-30 | OpenClaw | TASK-OC-010-PUPPETEER-FULL | Shared Puppeteer puzzle-post renderer integration
+**Files changed:**
+- `scripts/lib/puzzle-post-renderer.mjs` — new shared Puppeteer HTML/CSS renderer with multi-theme configs, title treatment, card shell, corner decorators, and bottom strip UI
+- `scripts/generate-puzzle-image-post.mjs` — refactored to read `blank.svg`, crop via `layout` when present, and call `renderPuzzlePost()` instead of building Sharp layers inline
+- `scripts/generate-wordsearch-assets.mjs` — added `layout` metadata to `wordsearch.json` and `puzzle.json` so the crop seam works for word-search too
+- `scripts/generate-maze-assets.mjs` — already updated in the prior step to persist `layout` in `maze.json`
+- `docs/AGENT_LOG.md` — appended this task entry for Claude
+**What was done:** I implemented the fuller Claude architecture pass by moving presentation into a dedicated Puppeteer renderer module and slimming `generate-puzzle-image-post.mjs` down to generation, SVG loading, optional `viewBox` cropping, and output copy logic. Because the requested Google font TTF downloads were not reachable from this session, the renderer is written to prefer `assets/fonts/FredokaOne-Regular.ttf` and `assets/fonts/Nunito-ExtraBold.ttf` when present, but falls back locally to Windows fonts (`comic.ttf` and `trebucbd.ttf`) so the pipeline still works now without blocking the structural migration.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`, `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Dinosaurs" --difficulty easy`, `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Space" --difficulty hard`, and `node scripts/generate-puzzle-image-post.mjs --type wordsearch --theme "Dogs and Poodles" --difficulty medium`
+**Test output summary:** All four runs exited 0 and wrote fresh `post.png` outputs. Local visual inspection confirmed the maze renders now fill the card correctly after `viewBox` cropping, the shared theme shell varies across ocean/dinosaur/space, and word-search now renders through the same Puppeteer shell after adding `layout` metadata. One remaining quality gap is fonts: the renderer structure is ready for Fredoka/Nunito, but this session could not fetch those TTF files, so the current visuals still use local fallback fonts until the real assets are staged in `assets/fonts/`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should verify the renderer architecture and sample outputs. If accepted, the immediate polish follow-up is only asset-level: add the real Fredoka/Nunito TTF files into `assets/fonts/` so the live renders use the intended typography without further code changes.
+
+---
+
+
+### 2026-04-30 | OpenClaw | TASK-OC-010-FONTS | Stage live Puppeteer font assets
+**Files changed:**
+- `assets/fonts/FredokaOne-Regular.ttf` — staged display font asset for title pills
+- `assets/fonts/Nunito-ExtraBold.ttf` — staged supporting font asset for labels and bottom-strip text
+- `docs/AGENT_LOG.md` — appended this asset-staging entry for Claude
+**What was done:** I downloaded and staged the two font files the Puppeteer renderer expects inside `assets/fonts/`. The renderer was already written to prefer these filenames, so no code changes were needed after the files landed. I then regenerated a maze sample to confirm the live pipeline still renders successfully with the staged assets in place.
+**Test command:** `node scripts/generate-puzzle-image-post.mjs --type maze --theme "Ocean Animals" --difficulty medium`
+**Test output summary:** Font directory now contains `FredokaOne-Regular.ttf` and `Nunito-ExtraBold.ttf`, and the sample maze render exited 0 and rewrote `output/challenge/generated-activity/ocean-animals-maze-post-medium/post.png` plus `output/raw/maze/maze-ocean-animals.png`.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Claude should visually verify that the rendered title/bottom-strip typography is now coming from the staged font assets rather than the previous local fallbacks.
 
 ---
