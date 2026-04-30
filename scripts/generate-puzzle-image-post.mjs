@@ -38,6 +38,9 @@ function normalizeType(input) {
   if (input === 'wordsearch' || input === 'word-search') return 'word-search';
   if (input === 'maze') return 'maze';
   if (input === 'coloring') return 'coloring';
+  if (input === 'matching') return 'matching';
+  if (input === 'find-diff' || input === 'finddiff' || input === 'find-diff') return 'find-diff';
+  if (input === 'dot-to-dot' || input === 'dottodot' || input === 'dot_to_dot') return 'dot-to-dot';
   return '';
 }
 
@@ -80,6 +83,9 @@ function getScriptPath(type) {
   if (type === 'maze') return path.join(ROOT, 'scripts', 'generate-maze-assets.mjs');
   if (type === 'word-search') return path.join(ROOT, 'scripts', 'generate-wordsearch-assets.mjs');
   if (type === 'coloring') return path.join(ROOT, 'scripts', 'generate-coloring-assets.mjs');
+  if (type === 'matching') return path.join(ROOT, 'scripts', 'generate-matching-assets.mjs');
+  if (type === 'find-diff') return path.join(ROOT, 'scripts', 'generate-find-diff-assets.mjs');
+  if (type === 'dot-to-dot') return path.join(ROOT, 'scripts', 'generate-dottodot-assets.mjs');
   return null;
 }
 
@@ -87,6 +93,9 @@ function getRawFolder(type) {
   if (type === 'maze') return path.join(RAW_DIR, 'maze');
   if (type === 'word-search') return path.join(RAW_DIR, 'wordsearch');
   if (type === 'coloring') return path.join(RAW_DIR, 'coloring');
+  if (type === 'matching') return path.join(RAW_DIR, 'matching');
+  if (type === 'find-diff') return path.join(RAW_DIR, 'find-diff');
+  if (type === 'dot-to-dot') return path.join(RAW_DIR, 'dot-to-dot');
   return path.join(RAW_DIR, type);
 }
 
@@ -168,14 +177,14 @@ function buildConfigFromManifestSlot(manifest, slot) {
 
 function buildDirectConfig() {
   const type = normalizeType(TYPE_ARG);
-  if (!type) throw new Error('Usage: --type maze|wordsearch --theme "Theme Name" [--difficulty medium] [--activity-dir existing-folder]');
+  if (!type) throw new Error('Usage: --type maze|wordsearch|matching|find-diff|coloring|dot-to-dot --theme "Theme Name" [--difficulty medium] [--activity-dir existing-folder]');
   return {
     source: 'direct',
     type,
     theme: THEME,
     difficulty: DIFFICULTY,
     title: TITLE || getDefaultTitle(type, THEME),
-    slug: SLUG_ARG || `${slugify(THEME)}-${type === 'maze' ? 'maze-post' : 'wordsearch-post'}-${DIFFICULTY}`,
+    slug: SLUG_ARG || `${slugify(THEME)}-${slugify(type)}-${DIFFICULTY}`,
     activityDir: ACTIVITY_DIR_ARG ? path.resolve(ROOT, ACTIVITY_DIR_ARG) : null,
     countdown: COUNTDOWN,
     words: WORDS,
@@ -184,6 +193,7 @@ function buildDirectConfig() {
 
 async function readCroppedSvg(activityDir, puzzleType) {
   let svgFile = path.join(activityDir, 'blank.svg');
+  const svgRaw = await fs.readFile(svgFile, 'utf8');
   let metaFile = null;
   if (puzzleType === 'maze') {
     metaFile = path.join(activityDir, 'maze.json');
@@ -191,10 +201,11 @@ async function readCroppedSvg(activityDir, puzzleType) {
     metaFile = path.join(activityDir, 'wordsearch.json');
   } else if (puzzleType === 'coloring') {
     metaFile = path.join(activityDir, 'coloring.json');
+  } else if (puzzleType === 'matching') {
+    metaFile = path.join(activityDir, 'matching.json');
   }
-  const svgRaw = await fs.readFile(svgFile, 'utf8');
-  const pad = 32;
   if (!metaFile) return { svgContent: svgRaw, layoutMeta: null };
+  const pad = 32;
   const meta = await fs.readFile(metaFile, 'utf8').then(JSON.parse).catch(() => null);
   if (!meta?.layout && !meta?.panels) return { svgContent: svgRaw, layoutMeta: null };
   const src = meta.layout ?? meta.panels;
@@ -232,7 +243,7 @@ async function processOne(config) {
     }
   }
   const activityPath = path.join(activityDir, 'activity.json');
-  const puzzleJsonName = config.type === 'maze' ? 'maze.json' : config.type === 'coloring' ? 'coloring.json' : 'puzzle.json';
+  const puzzleJsonName = config.type === 'maze' ? 'maze.json' : config.type === 'coloring' ? 'coloring.json' : config.type === 'matching' ? 'matching.json' : config.type === 'find-diff' ? 'diff.json' : config.type === 'dot-to-dot' ? 'dots.json' : 'puzzle.json';
   const puzzlePath = path.join(activityDir, puzzleJsonName);
   const activity = JSON.parse(await fs.readFile(activityPath, 'utf8'));
   const puzzle = JSON.parse(await fs.readFile(puzzlePath, 'utf8'));
@@ -246,7 +257,16 @@ async function processOne(config) {
   const rawSuffix = config.source === 'manifest'
     ? `${manifestSafe(config.manifestDate)}-slot${String(config.slotIndex).padStart(2, '0')}-${slugify(activity.theme || config.theme)}`
     : slugify(activity.theme || config.theme || config.slug);
-  const rawBase = `${config.type === 'maze' ? 'maze' : config.type === 'coloring' ? 'coloring' : 'wordsearch'}-${rawSuffix}`;
+  const rawBase = (() => {
+    const t = config.type;
+    if (t === 'maze') return 'maze';
+    if (t === 'word-search') return 'wordsearch';
+    if (t === 'coloring') return 'coloring';
+    if (t === 'matching') return 'matching';
+    if (t === 'find-diff') return 'find-diff';
+    if (t === 'dot-to-dot') return 'dot-to-dot';
+    return t;
+  })() + `-${rawSuffix}`;
   const rawImagePath = path.join(rawFolder, `${rawBase}.png`);
   const rawSidecarPath = path.join(rawFolder, `${rawBase}.json`);
   console.log(`[puzzle-post] rawImage   : ${rawImagePath}`);
