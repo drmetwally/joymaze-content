@@ -335,14 +335,10 @@ const SPACE_FACTORIES = [drawSpaceRocket, drawSpacePlanet, drawSpaceStar, drawSp
 // ── Scene builder ────────────────────────────────────────────────────────────
 
 function buildScene(slots, colored) {
-  const fill = colored ? null : '#FFFFFF';
-  const stroke = '#1A1A1A';
-  const strokeWidth = colored ? 3 : 6;  // thinner strokes on colored version
-  const lines = slots.filter(s => s.visible).map(slot => {
-    const factory = slot.factory;
-    return factory(slot.cx, slot.cy, slot.size, slot.color, slot.rotation);
-  });
-  return lines.join('\n');
+  return slots.filter(s => s.visible).map(slot => {
+    const drawFill = colored ? slot.color : '#FFFFFF';
+    return slot.factory(slot.cx, slot.cy, slot.size, drawFill, slot.rotation);
+  }).join('\n');
 }
 
 // ── Coloring JSON builder ────────────────────────────────────────────────────
