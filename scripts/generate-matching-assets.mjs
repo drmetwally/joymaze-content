@@ -251,8 +251,8 @@ function buildSolvedSvg(layout, pairs, grid) {
   return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
 ${patterns}
   <rect width="100%" height="100%" fill="${BG_COLOR}"/>
-${lines}
 ${cards}
+${lines}
 ${labels}
 </svg>`;
 }

@@ -346,8 +346,7 @@ function ellipse(cx, cy, rx, ry, fill) {
 function buildScene(slots, palette, factories, seed) {
   return slots.map((slot, i) => {
     if (!slot.visible) return `  <!-- empty slot ${i} -->`;
-    const rng2 = mulberry32(seed + i * 31);
-    const color = palette[randInt(rng2, palette.length)];
+    const color = slot.color;
     const factory = factories[slot.typeIndex % factories.length];
     return factory(slot.cx, slot.cy, slot.size, color, slot.rotation || 0);
   }).join('\n');
