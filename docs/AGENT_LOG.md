@@ -892,5 +892,28 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** Implemented the actual OC-014B bridge after the earlier seam-map planning pass. The ASMR Remotion lane can now render directly from a generated maze folder under `output/challenge/generated-activity/...` with solver waypoints active, and the legacy ASMR generator no longer breaks on new maze folders that use `blank.png` instead of `maze.png`. I also aligned the ASMR brief rotation to the current product direction by keeping only maze and coloring active while leaving word-search and dot-to-dot code dormant.
 **Test command:** `node --check scripts/generate-asmr-video.mjs`, `node --check scripts/render-video.mjs`, `node --check scripts/generate-asmr-brief.mjs`, and `node scripts/render-video.mjs --comp AsmrReveal --challenge output/challenge/generated-activity/ocean-animals-maze-post-medium --out output/videos/oc-014b-maze-asmr.mp4`
 **Test output summary:** All three syntax checks exited 0. The proof render exited 0, produced `output/videos/oc-014b-maze-asmr.mp4` plus `oc-014b-maze-asmr-thumb.jpg`, and logged `Path pts    : 52 waypoints (solver active)` with `Blank : output/challenge/generated-activity/ocean-animals-maze-post-medium/blank.png` and `Solved : output/challenge/generated-activity/ocean-animals-maze-post-medium/solved.png`, confirming the generated-folder bridge worked without a manual `output/asmr/...` copy step.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-04-30.
+- `blank.png` fallback ✅ — `resolveRevealFiles()` applied in all 3 locations; legacy `maze.png` preserved
+- Bridge seam ✅ — `activityJsonToProps()` correctly intercepts `--comp AsmrReveal`, builds ASMR props from challenge folder without a copy step
+- `revealType: 'maze'` safety ✅ — `useSolverReveal` is data-driven (`pathWaypoints.length > 0` + negative conditions); `'maze'` and `'ltr'` satisfy identically; `WipeReveal` never reached when path active
+- Coloring solved-image default ✅ — `revealType === 'coloring' ? 'colored.png' : 'solved.png'` correct for both types
+- `countdownSec` timing fallback ✅ — acceptable; ASMR-native timing can be added to activity.json schema later
+- `VW`/`VH` hoist ✅ — latent bug in dormant branches fixed
+- Brief rotation ✅ — `['coloring', 'maze', 'coloring', 'maze']` confirmed
+- Minor watchlist ⚠️ — `AsmrReveal.jsx` schema comment still says `revealType: 'ltr'` for maze; bridge passes `'maze'`; harmless today, update if a `'maze'`-specific branch is ever added
+- Motion QC: Ahmed must watch `oc-014b-maze-asmr.mp4` before first production ASMR post
+**Next:** Sprint 1 complete. Next: Sprint 2 — OC-016 matching generator.
+
+
+---
+
+### 2026-04-30 | OpenClaw | OC-016 | Matching puzzle generator
+**Files changed:**
+- `scripts/generate-matching-assets.mjs` — new matching puzzle generator following the maze contract: themed pair pools, SVG blank/solved cards, matching.json with pair positions, activity.json with challenge metadata
+- `docs/OPENCLAW_REPORT_2026-04-30_task-oc-016.md` — wrote the Claude-facing audit report for this generator pass
+- `docs/AGENT_LOG.md` — appended this implementation handoff entry for Claude
+**What was done:** Built the matching puzzle generator from scratch following the established maze generator contract. The generator resolves a themed pair pool (reads from the same wordsearch-word-packs.json), shuffles N pairs into a grid, generates SVG blank (face-down dotted cards) and solved (face-up with labeled cards and orange connection lines) outputs, and writes matching.json with pair positions and pixel-perfect connection coordinates. The activity.json follows the same challenge metadata shape as maze and word-search so the challenge reel can render it without modification.
+**Test command:** `node scripts/generate-matching-assets.mjs --theme "Ocean Animals" --difficulty medium --dry-run`, `node scripts/generate-matching-assets.mjs --theme "Ocean Animals" --difficulty medium`, and `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/2026-04-30-animal-match-matching-medium --out output/videos/oc-016-matching-challenge.mp4`
+**Test output summary:** Dry run correctly resolved ocean family and 6 pairs. Live generation exited 0 and wrote all 7 files. Challenge reel exited 0 and produced `output/videos/oc-016-matching-challenge.mp4` plus thumbnail. Visual inspection confirmed: blank SVG shows 12 face-down dotted cards in 4x3 grid, solved SVG shows face-up cards with labeled pairs and orange connection lines. Reveal is static (no animated matching reveal yet) — ActivityChallenge does not yet read matching.json for pair-by-pair animation; flagged as a natural follow-up.
 **Review status:** PENDING CLAUDE REVIEW
-**Next:** Claude should audit the direct generated-folder → AsmrReveal seam and confirm the timing fallback choice (`countdownSec` reused as ASMR reveal duration when no dedicated ASMR timing exists). Coloring contract cleanup and broader coloring integration remain deferred to OC-018.
+**Next:** OC-016 generator is complete. The animated matching reveal (pair-by-pair highlighting in the challenge reel) requires a MatchingReveal component or equivalent extension to ActivityChallenge and is a natural separate follow-up. OC-017 (find-the-difference generator) is the next generator in Sprint 2 queue.

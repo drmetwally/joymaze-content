@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
+import { buildChallengeHook } from './lib/challenge-hooks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -11,14 +12,11 @@ const OUTPUT_ROOT = path.join(ROOT, 'output', 'challenge', 'generated-activity')
 
 const CANVAS_W = 1700;
 const CANVAS_H = 2200;
-const BG_COLOR = '#FFFDF8';
-const PANEL_COLOR = '#FFFFFF';
-const PANEL_STROKE = '#E8DFC9';
-const TEXT_COLOR = '#202020';
-const MUTED_COLOR = '#6B645B';
-const MATCH_ZONE_FILL = '#FFF3E9';
-const MATCH_ZONE_STROKE = '#F0D5C1';
-const LINE_COLORS = ['#FF8A5B', '#4FA3FF', '#57B65F', '#B978FF', '#F4C542', '#FF5C8A'];
+const BG_COLOR = '#FFFFFF';
+const CARD_COLOR = '#F0EFE8';
+const CARD_BORDER = '#2A2A3A';
+const MATCH_COLOR = '#FF6B35';
+const MATCH_STROKE = 8;
 
 const args = process.argv.slice(2);
 const hasFlag = (flag) => args.includes(flag);
@@ -28,66 +26,46 @@ const getArg = (flag, fallback = null) => {
 };
 
 const DRY_RUN = hasFlag('--dry-run');
-const TITLE = getArg('--title', 'Match the Pairs');
-const THEME = getArg('--theme', 'Animals and Homes');
+const TITLE = getArg('--title', 'Animal Match');
+const THEME = getArg('--theme', TITLE);
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
-const COUNTDOWN_SEC = Number(getArg('--countdown', '45'));
+const PAIRS_ARG = Number(getArg('--pairs', '0')) || null;
 const SEED_ARG = getArg('--seed');
 const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
 
+const PUZZLE_TYPE = 'matching';
+const COUNTDOWN_SEC = Number(getArg('--countdown', '15'));
+const SOLVE_DURATION_SEC = 12;
+const DEFAULT_CHALLENGE_AUDIO_VOLUME = 0.11;
+const DEFAULT_TICK_AUDIO_VOLUME = 0.3;
+const DEFAULT_TRANSITION_CUE_VOLUME = 0.24;
+const DEFAULT_SOLVE_AUDIO_VOLUME = 0.52;
+
 const difficultyDefaults = {
-  easy: { pairs: 4, minCrossings: 1, maxCrossings: 1 },
-  medium: { pairs: 5, minCrossings: 1, maxCrossings: 2 },
-  hard: { pairs: 6, minCrossings: 2, maxCrossings: 4 },
-  difficult: { pairs: 6, minCrossings: 3, maxCrossings: 5 },
-  extreme: { pairs: 7, minCrossings: 4, maxCrossings: 7 },
+  easy:     { pairs: 4,  cols: 4, rows: 3 },
+  medium:   { pairs: 6,  cols: 4, rows: 3 },
+  hard:     { pairs: 8,  cols: 4, rows: 4 },
+  difficult:{ pairs: 10, cols: 5, rows: 4 },
+  extreme:  { pairs: 12, cols: 6, rows: 4 },
 };
 
-const BANKS = {
-  animals: [
-    ['BIRD', 'NEST'],
-    ['BEE', 'HIVE'],
-    ['FOX', 'DEN'],
-    ['SPIDER', 'WEB'],
-    ['RABBIT', 'BURROW'],
-    ['FROG', 'POND'],
-    ['DUCK', 'LAKE'],
-  ],
-  colors: [
-    ['APPLE', 'RED'],
-    ['LEAF', 'GREEN'],
-    ['SUN', 'YELLOW'],
-    ['OCEAN', 'BLUE'],
-    ['GRAPE', 'PURPLE'],
-    ['SNOW', 'WHITE'],
-    ['NIGHT', 'BLACK'],
-  ],
-  shapes: [
-    ['WHEEL', 'CIRCLE'],
-    ['WINDOW', 'SQUARE'],
-    ['SLICE', 'TRIANGLE'],
-    ['DOOR', 'RECTANGLE'],
-    ['SIGN', 'OVAL'],
-    ['KITE', 'DIAMOND'],
-  ],
-  default: [
-    ['BIRD', 'NEST'],
-    ['BEE', 'HIVE'],
-    ['FOX', 'DEN'],
-    ['FROG', 'POND'],
-    ['DUCK', 'LAKE'],
-    ['SPIDER', 'WEB'],
-    ['RABBIT', 'BURROW'],
-  ],
-};
+const explicitPairs = PAIRS_ARG;
+const dims = difficultyDefaults[DIFFICULTY] || difficultyDefaults.medium;
+const PAIRS = explicitPairs ?? dims.pairs;
+const COLS = Number(getArg('--cols', '0')) || dims.cols;
+const ROWS = Number(getArg('--rows', '0')) || dims.rows;
 
-function slugify(input) {
-  return String(input || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
+// ── Seed helpers ─────────────────────────────────────────────────────────────────
+
+function mulberry32(seed) {
+  let t = seed >>> 0;
+  return function () {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 function hashStringToSeed(input) {
@@ -100,151 +78,172 @@ function hashStringToSeed(input) {
   return h >>> 0;
 }
 
-function mulberry32(seed) {
-  let t = seed >>> 0;
-  return function () {
-    t += 0x6D2B79F5;
-    let r = Math.imul(t ^ (t >>> 15), 1 | t);
-    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 function randomInt(rng, max) {
   return Math.floor(rng() * max);
 }
 
-function shuffle(items, rng) {
-  const clone = [...items];
-  for (let i = clone.length - 1; i > 0; i--) {
+function shuffleInPlace(items, rng) {
+  for (let i = items.length - 1; i > 0; i--) {
     const j = randomInt(rng, i + 1);
-    [clone[i], clone[j]] = [clone[j], clone[i]];
+    [items[i], items[j]] = [items[j], items[i]];
   }
-  return clone;
+  return items;
 }
 
-function chooseBank(theme) {
-  const lower = String(theme || '').toLowerCase();
-  if (lower.includes('color')) return BANKS.colors;
-  if (lower.includes('shape')) return BANKS.shapes;
-  if (lower.includes('animal') || lower.includes('home')) return BANKS.animals;
-  return BANKS.default;
-}
+// ── Themed item pool ───────────────────────────────────────────────────────────
 
-function pickPairs(theme, count, rng) {
-  return shuffle(chooseBank(theme), rng).slice(0, count);
-}
-
-function buildLayout(pairCount) {
-  const topY = 430;
-  const rowGap = 210;
-  const cardW = 440;
-  const cardH = 130;
-  const leftX = 170;
-  const rightX = CANVAS_W - leftX - cardW;
-  const lineStartX = leftX + cardW;
-  const lineEndX = rightX;
-  return { topY, rowGap, cardW, cardH, leftX, rightX, lineStartX, lineEndX, pairCount };
-}
-
-function crossingCount(leftItems, rightItems) {
-  const rightIndexByText = new Map(rightItems.map((item, index) => [item.text, index]));
-  let count = 0;
-  for (let i = 0; i < leftItems.length; i++) {
-    for (let j = i + 1; j < leftItems.length; j++) {
-      const ri = rightIndexByText.get(leftItems[i].match);
-      const rj = rightIndexByText.get(leftItems[j].match);
-      if (ri > rj) count++;
-    }
+async function loadWordPack(themeStr, maxLen = 20) {
+  try {
+    const packs = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'wordsearch-word-packs.json'), 'utf-8'));
+    const t = themeStr.toLowerCase();
+    const key = Object.keys(packs).find(k => t.includes(k)) ?? 'default';
+    return packs[key] ?? packs.default ?? [];
+  } catch {
+    return ['BIRD', 'FISH', 'BEAR', 'FROG', 'LION', 'DUCK', 'DEER', 'FOX'];
   }
-  return count;
 }
 
-function buildPuzzle(pairs, rng, difficultyConfig) {
-  const leftItems = pairs.map(([left, right], index) => ({ id: `L${index + 1}`, text: left, match: right }));
-  const baseRightItems = pairs.map(([left, right], index) => ({ id: `R${index + 1}`, text: right, match: left }));
-  let best = shuffle(baseRightItems, rng);
-  let bestScore = Number.POSITIVE_INFINITY;
-
-  for (let attempt = 0; attempt < 160; attempt++) {
-    const candidate = shuffle(baseRightItems, rng);
-    const crossings = crossingCount(leftItems, candidate);
-    if (crossings >= difficultyConfig.minCrossings && crossings <= difficultyConfig.maxCrossings) {
-      best = candidate;
-      bestScore = crossings;
-      break;
-    }
-    const distance = Math.min(
-      Math.abs(crossings - difficultyConfig.minCrossings),
-      Math.abs(crossings - difficultyConfig.maxCrossings),
-    );
-    if (distance < bestScore) {
-      best = candidate;
-      bestScore = distance;
-    }
-  }
-
-  return { leftItems, rightItems: best, crossingCount: crossingCount(leftItems, best) };
+function resolveThemeFamily(themeStr) {
+  const t = themeStr.toLowerCase();
+  if (t.includes('ocean') || t.includes('sea') || t.includes('fish')) return 'ocean';
+  if (t.includes('space') || t.includes('rocket') || t.includes('planet')) return 'space';
+  if (t.includes('dino') || t.includes('jurassic')) return 'dinosaurs';
+  if (t.includes('jungle') || t.includes('safari') || t.includes('zoo')) return 'jungle';
+  if (t.includes('dog') || t.includes('cat') || t.includes('puppy') || t.includes('kitten') || t.includes('pet') || t.includes('animal')) return 'animals';
+  if (t.includes('fairy') || t.includes('princess') || t.includes('magic')) return 'fairy';
+  if (t.includes('vehicle') || t.includes('car') || t.includes('truck')) return 'vehicles';
+  if (t.includes('food') || t.includes('kitchen') || t.includes('fruit')) return 'food';
+  if (t.includes('workshop') || t.includes('tool')) return 'workshop';
+  return 'default';
 }
 
-function connectorData(leftItems, rightItems, layout) {
-  return leftItems.map((left, index) => {
-    const rightIndex = rightItems.findIndex((right) => right.text === left.match);
-    const y1 = layout.topY + index * layout.rowGap + layout.cardH / 2;
-    const y2 = layout.topY + rightIndex * layout.rowGap + layout.cardH / 2;
+// ── Matching logic ──────────────────────────────────────────────────────────────
+
+function buildGrid(cells, cols) {
+  const rows = Math.ceil(cells.length / cols);
+  return cells.map((item, i) => ({
+    index: i,
+    row: Math.floor(i / cols),
+    col: i % cols,
+    item,
+  }));
+}
+
+function buildMatchingPairs(pairs, grid) {
+  return pairs.map((label, i) => {
+    const a = grid[i * 2];
+    const b = grid[i * 2 + 1];
     return {
-      leftId: left.id,
-      rightId: rightItems[rightIndex].id,
-      color: LINE_COLORS[index % LINE_COLORS.length],
-      x1: layout.lineStartX,
-      y1,
-      x2: layout.lineEndX,
-      y2,
+      id: i,
+      label,
+      positions: [a.index, b.index],
+      centerA: { x: a.col, y: a.row },
+      centerB: { x: b.col, y: b.row },
     };
   });
 }
 
-function escapeXml(input) {
-  return String(input)
+// ── Layout ─────────────────────────────────────────────────────────────────────
+
+function buildLayout(cols, rows) {
+  const cardSize = 148;
+  const gap = 18;
+  const totalW = cols * cardSize + (cols - 1) * gap;
+  const totalH = rows * cardSize + (rows - 1) * gap;
+  const offsetX = Math.round((CANVAS_W - totalW) / 2);
+  const offsetY = 300;
+  return { cardSize, gap, totalW, totalH, offsetX, offsetY, cols, rows };
+}
+
+function cardPixelCenter(layout, col, row) {
+  return {
+    x: layout.offsetX + col * (layout.cardSize + layout.gap) + layout.cardSize / 2,
+    y: layout.offsetY + row * (layout.cardSize + layout.gap) + layout.cardSize / 2,
+  };
+}
+
+// ── SVG generation ──────────────────────────────────────────────────────────────
+
+function escapeXml(str) {
+  return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+    .replace(/>/g, '&gt;');
 }
 
-function cardSvg(x, y, w, h, text, side) {
-  const labelX = x + w / 2;
-  const accent = side === 'left' ? '#FFD9C7' : '#D8E9FF';
+function cardBackPattern() {
+  const id = 'cardback';
   return `
-    <g>
-      <rect x="${x + 4}" y="${y + 8}" width="${w}" height="${h}" rx="28" ry="28" fill="#EDE4D6" opacity="0.55"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" ry="28" fill="${PANEL_COLOR}" stroke="${PANEL_STROKE}" stroke-width="4"/>
-      <circle cx="${side === 'left' ? x + 38 : x + w - 38}" cy="${y + h / 2}" r="14" fill="${accent}" />
-      <text x="${labelX}" y="${y + h / 2 + 15}" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="${TEXT_COLOR}">${escapeXml(text)}</text>
-    </g>`;
+  <defs>
+    <pattern id="${id}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#E8E4D4"/>
+      <circle cx="10" cy="10" r="3" fill="#C8C4B0"/>
+      <circle cx="0" cy="0" r="3" fill="#C8C4B0"/>
+      <circle cx="20" cy="0" r="3" fill="#C8C4B0"/>
+      <circle cx="0" cy="20" r="3" fill="#C8C4B0"/>
+      <circle cx="20" cy="20" r="3" fill="#C8C4B0"/>
+    </pattern>
+  </defs>`;
 }
 
-function buildSvg({ title, subtitle, leftItems, rightItems, connectors, layout, solved = false, crossingCount = 0 }) {
-  const leftCards = leftItems.map((item, index) => cardSvg(layout.leftX, layout.topY + index * layout.rowGap, layout.cardW, layout.cardH, item.text, 'left')).join('\n');
-  const rightCards = rightItems.map((item, index) => cardSvg(layout.rightX, layout.topY + index * layout.rowGap, layout.cardW, layout.cardH, item.text, 'right')).join('\n');
-  const lines = solved ? connectors.map((line) => `
-    <path d="M ${line.x1} ${line.y1} C ${line.x1 + 105} ${line.y1}, ${line.x2 - 105} ${line.y2}, ${line.x2} ${line.y2}" fill="none" stroke="${line.color}" stroke-width="16" stroke-linecap="round" opacity="0.92"/>`).join('\n') : '';
+function buildBlankSvg(layout, grid) {
+  const { cardSize, offsetX, offsetY, gap, cols, rows } = layout;
+  const patterns = cardBackPattern();
 
-  return `
-<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
+  const cards = grid.map(cell => {
+    const x = offsetX + cell.col * (cardSize + gap);
+    const y = offsetY + cell.row * (cardSize + gap);
+    return `  <rect x="${x}" y="${y}" width="${cardSize}" height="${cardSize}" rx="14" fill="url(#cardback)" stroke="#C8C4B0" stroke-width="2.5"/>`;
+  }).join('\n');
+
+  return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
+${patterns}
   <rect width="100%" height="100%" fill="${BG_COLOR}"/>
-  <text x="${CANVAS_W / 2}" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="68" font-weight="700" fill="${TEXT_COLOR}">${escapeXml(title)}</text>
-  <text x="${CANVAS_W / 2}" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="${MUTED_COLOR}">${escapeXml(subtitle)}</text>
-  <rect x="648" y="368" width="404" height="1128" rx="64" ry="64" fill="${MATCH_ZONE_FILL}" stroke="${MATCH_ZONE_STROKE}" stroke-width="3" opacity="0.88"/>
-  <text x="${layout.leftX + layout.cardW / 2}" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="${MUTED_COLOR}">Match from here</text>
-  <text x="${layout.rightX + layout.cardW / 2}" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="${MUTED_COLOR}">To the correct pair</text>
-  <text x="850" y="1528" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="${MUTED_COLOR}">${solved ? `Solved with ${crossingCount} crossing${crossingCount === 1 ? '' : 's'}` : 'Draw each line through the center lane'}</text>
-  ${lines}
-  ${leftCards}
-  ${rightCards}
-</svg>`.trim();
+${cards}
+</svg>`;
 }
+
+function buildSolvedSvg(layout, pairs, grid) {
+  const { cardSize, offsetX, offsetY, gap } = layout;
+
+  const patterns = cardBackPattern();
+
+  const cards = grid.map((cell, i) => {
+    const x = offsetX + cell.col * (cardSize + gap);
+    const y = offsetY + cell.row * (cardSize + gap);
+    return `  <rect x="${x}" y="${y}" width="${cardSize}" height="${cardSize}" rx="14" fill="${CARD_COLOR}" stroke="${CARD_BORDER}" stroke-width="3"/>`;
+  }).join('\n');
+
+  // Connection lines between matched pairs
+  const lines = pairs.map(pair => {
+    const a = grid.find(c => c.index === pair.positions[0]);
+    const b = grid.find(c => c.index === pair.positions[1]);
+    const ca = cardPixelCenter(layout, a.col, a.row);
+    const cb = cardPixelCenter(layout, b.col, b.row);
+    return `  <line x1="${ca.x}" y1="${ca.y}" x2="${cb.x}" y2="${cb.y}" stroke="${MATCH_COLOR}" stroke-width="${MATCH_STROKE}" stroke-linecap="round" opacity="0.85"/>`;
+  }).join('\n');
+
+  // Labels on cards
+  const labels = pairs.flatMap(pair => {
+    return pair.positions.map(pos => {
+      const cell = grid.find(c => c.index === pos);
+      const cx = offsetX + cell.col * (cardSize + gap) + cardSize / 2;
+      const cy = offsetY + cell.row * (cardSize + gap) + cardSize / 2;
+      const shortLabel = pair.label.length > 8 ? pair.label.slice(0, 7) + '…' : pair.label;
+      return `  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#1A1A2A">${escapeXml(shortLabel)}</text>`;
+    });
+  }).join('\n');
+
+  return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
+${patterns}
+  <rect width="100%" height="100%" fill="${BG_COLOR}"/>
+${lines}
+${cards}
+${labels}
+</svg>`;
+}
+
+// ── Output helpers ─────────────────────────────────────────────────────────────
 
 async function writeSvgPng(svg, outSvgPath, outPngPath) {
   await fs.writeFile(outSvgPath, svg, 'utf8');
@@ -252,59 +251,118 @@ async function writeSvgPng(svg, outSvgPath, outPngPath) {
   await fs.writeFile(outPngPath, pngBuffer);
 }
 
-async function main() {
-  const seed = SEED_ARG ? Number(SEED_ARG) : hashStringToSeed(`${TITLE}|${THEME}|${DIFFICULTY}|matching`);
-  const rng = mulberry32(seed);
-  const defaults = difficultyDefaults[DIFFICULTY] || difficultyDefaults.medium;
-  const pairs = pickPairs(THEME, defaults.pairs, rng);
-  const layout = buildLayout(pairs.length);
-  const { leftItems, rightItems, crossingCount } = buildPuzzle(pairs, rng, defaults);
-  const connectors = connectorData(leftItems, rightItems, layout);
+function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, folderRel }) {
+  return {
+    version: 1,
+    puzzleType: PUZZLE_TYPE,
+    title,
+    theme,
+    difficulty,
+    pairs: pairs.map(p => ({
+      id: p.id,
+      label: p.label,
+      positions: p.positions,
+    })),
+    grid: {
+      cols: layout.cols,
+      rows: layout.rows,
+      cardSize: layout.cardSize,
+      gap: layout.gap,
+      offsetX: layout.offsetX,
+      offsetY: layout.offsetY,
+      canvasW: CANVAS_W,
+      canvasH: CANVAS_H,
+    },
+    connections: pairs.map(p => {
+      const a = grid.find(c => c.index === p.positions[0]);
+      const b = grid.find(c => c.index === p.positions[1]);
+      const ca = cardPixelCenter(layout, a.col, a.row);
+      const cb = cardPixelCenter(layout, b.col, b.row);
+      return {
+        from: p.positions[0],
+        to: p.positions[1],
+        label: p.label,
+        x1: ca.x, y1: ca.y,
+        x2: cb.x, y2: cb.y,
+      };
+    }),
+  };
+}
 
-  const slug = SLUG_ARG || `${new Date().toISOString().slice(0, 10)}-${slugify(TITLE || THEME || 'matching')}-${slugify(DIFFICULTY)}`;
-  const outDir = OUT_DIR_ARG ? path.resolve(ROOT, OUT_DIR_ARG) : path.join(OUTPUT_ROOT, slug);
-  const folderRel = path.relative(ROOT, outDir).replace(/\\/g, '/');
-
-  const blankSvg = buildSvg({ title: TITLE, subtitle: 'Draw a line to match each pair', leftItems, rightItems, connectors, layout, solved: false, crossingCount });
-  const solvedSvg = buildSvg({ title: TITLE, subtitle: 'Here are the correct matches', leftItems, rightItems, connectors, layout, solved: true, crossingCount });
-
-  const activityJson = {
+function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel }) {
+  return {
     type: 'challenge',
-    puzzleType: 'matching',
-    difficulty: DIFFICULTY,
-    theme: THEME,
-    titleText: TITLE,
-    hookText: `Can your kid match all ${pairs.length} pairs in ${COUNTDOWN_SEC} seconds?`,
-    ctaText: 'Tag a kid who can match them all',
+    puzzleType: PUZZLE_TYPE,
+    difficulty,
+    theme,
+    titleText: hookTitle,
+    hookText: hookTitle,
+    ctaText: 'Tag a kid who found all the pairs!',
     activityLabel: 'MATCHING',
     countdownSec: COUNTDOWN_SEC,
     hookDurationSec: 2.5,
-    holdAfterSec: 2.5,
+    holdAfterSec: SOLVE_DURATION_SEC,
     imagePath: 'puzzle.png',
     blankImage: 'blank.png',
     solvedImage: 'solved.png',
+    challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
+    tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME,
+    transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
+    solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
     showJoyo: true,
-    showBrandWatermark: true,
+    showBrandWatermark: false,
     sourceFolder: folderRel,
   };
+}
 
-  const matchingJson = {
-    width: CANVAS_W,
-    height: CANVAS_H,
-    leftItems,
-    rightItems,
-    pairs: pairs.map(([left, right]) => ({ left, right })),
-    connectors,
-    crossingCount,
-  };
+// ── Main ────────────────────────────────────────────────────────────────────────
+
+async function main() {
+  const seed = SEED_ARG ? Number(SEED_ARG) : hashStringToSeed(`${TITLE}|${THEME}|${DIFFICULTY}|${PAIRS}pairs|${COLS}x${ROWS}`);
+  const rng = mulberry32(seed);
+  const slug = SLUG_ARG || `${new Date().toISOString().slice(0, 10)}-${TITLE.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)}-matching-${DIFFICULTY}`;
+  const outDir = OUT_DIR_ARG ? path.resolve(ROOT, OUT_DIR_ARG) : path.join(OUTPUT_ROOT, slug);
+  const folderRel = path.relative(ROOT, outDir).replace(/\\/g, '/');
+
+  // Load themed word pool and sample pairs
+  const family = resolveThemeFamily(THEME);
+  const pool = await loadWordPack(family, PAIRS * 3);
+  const shuffled = shuffleInPlace([...pool], rng);
+  const selectedPairs = shuffled.slice(0, PAIRS);
+
+  // Build grid: total cards = PAIRS * 2, fill row by row
+  const totalCards = PAIRS * 2;
+  const gridRows = Math.ceil(totalCards / COLS);
+  const actualCols = COLS;
+  const actualRows = gridRows;
+
+  // Create card items: two copies of each pair label, shuffled into grid positions
+  const cardLabels = [...selectedPairs, ...selectedPairs];
+  shuffleInPlace(cardLabels, rng);
+
+  const grid = buildGrid(cardLabels, actualCols);
+
+  const pairs = buildMatchingPairs(selectedPairs, grid);
+  const layout = buildLayout(actualCols, actualRows);
+
+  const hookTitle = await buildChallengeHook({
+    theme: THEME,
+    puzzleType: PUZZLE_TYPE,
+    difficulty: DIFFICULTY,
+    seedHint: `${TITLE}|${THEME}|${DIFFICULTY}`,
+  });
+
+  const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, folderRel });
+  const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel });
 
   console.log(`[matching-factory] title      : ${TITLE}`);
   console.log(`[matching-factory] theme      : ${THEME}`);
-  console.log(`[matching-factory] outDir     : ${outDir}`);
-  console.log(`[matching-factory] seed       : ${seed}`);
-  console.log(`[matching-factory] difficulty : ${DIFFICULTY}`);
-  console.log(`[matching-factory] pairs      : ${pairs.map(([a, b]) => `${a}-${b}`).join(', ')}`);
-  console.log(`[matching-factory] crossings  : ${crossingCount}`);
+  console.log(`[matching-factory] family    : ${family}`);
+  console.log(`[matching-factory] outDir    : ${outDir}`);
+  console.log(`[matching-factory] seed      : ${seed}`);
+  console.log(`[matching-factory] difficulty: ${DIFFICULTY}`);
+  console.log(`[matching-factory] pairs     : ${PAIRS} (${actualCols}×${actualRows} grid)`);
+  console.log(`[matching-factory] words     : ${selectedPairs.join(', ')}`);
 
   if (DRY_RUN) {
     console.log('[matching-factory] dry-run only, no files written.');
@@ -312,16 +370,20 @@ async function main() {
   }
 
   await fs.mkdir(outDir, { recursive: true });
+
+  const blankSvg = buildBlankSvg(layout, grid);
+  const solvedSvg = buildSolvedSvg(layout, pairs, grid);
+
   await Promise.all([
-    fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2)),
     fs.writeFile(path.join(outDir, 'matching.json'), JSON.stringify(matchingJson, null, 2)),
+    fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2)),
   ]);
   await writeSvgPng(blankSvg, path.join(outDir, 'blank.svg'), path.join(outDir, 'blank.png'));
   await writeSvgPng(solvedSvg, path.join(outDir, 'solved.svg'), path.join(outDir, 'solved.png'));
   await fs.copyFile(path.join(outDir, 'blank.png'), path.join(outDir, 'puzzle.png'));
 
   console.log('[matching-factory] wrote files:');
-  for (const file of ['activity.json', 'matching.json', 'blank.svg', 'blank.png', 'puzzle.png', 'solved.svg', 'solved.png']) {
+  for (const file of ['activity.json', 'matching.json', 'blank.svg', 'blank.png', 'solved.svg', 'solved.png', 'puzzle.png']) {
     console.log(`  - ${path.join(outDir, file)}`);
   }
 }
