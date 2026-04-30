@@ -219,7 +219,10 @@ async function readCroppedSvg(activityDir, puzzleType) {
 async function buildPostImage(activityDir, activity, outputPath, type) {
   const titleText = pickTitleText(activity, null, type);
   const theme = activity.theme || THEME;
-  const { svgContent, layoutMeta } = await readCroppedSvg(activityDir, type);
+  // For matching, use solved.svg (labeled face-up cards) as the social post image
+  const svgFile = type === 'matching' ? 'solved.svg' : 'blank.svg';
+  const svgRaw = await fs.readFile(path.join(activityDir, svgFile), 'utf8');
+  const { layoutMeta } = await readCroppedSvg(activityDir, type);
   const postMeta = {
     difficulty: activity.difficulty || DIFFICULTY,
     ageMin: 5,
@@ -228,7 +231,7 @@ async function buildPostImage(activityDir, activity, outputPath, type) {
     puzzleType: type,
     layout: layoutMeta,
   };
-  await renderPuzzlePost(svgContent, titleText, theme, outputPath, postMeta);
+  await renderPuzzlePost(svgRaw, titleText, theme, outputPath, postMeta);
 }
 
 async function processOne(config) {

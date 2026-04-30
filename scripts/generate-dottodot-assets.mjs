@@ -429,7 +429,7 @@ async function main() {
     difficulty: DIFFICULTY,
     theme: THEME,
     titleText: hookTitle,
-    hookText: 'Connect the dots!',
+    hookText: `Connect the dots${family === 'ocean' ? ' to reveal an ocean animal!' : family === 'space' ? ' to reveal a space shape!' : ' to reveal an animal!'}`,
     ctaText: 'What did you draw? Tell us below!',
     activityLabel: 'DOT TO DOT',
     countdownSec,
