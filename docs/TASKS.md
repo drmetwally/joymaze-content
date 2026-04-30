@@ -84,9 +84,11 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [x] **OC-016B** — Animated matching reveal: `MatchingReveal` component for `ActivityChallenge.jsx` reading `matching.json` pair positions and connections. Deferred until Sprint 2 complete.
 - [x] **OC-017** — Find-the-difference generator. APPROVED 2026-04-30. 7-file contract, two-panel SVG (1080×1500), 4×3 themed slot grid, 5 difference types (add/rotation/color/size/replace), `diff.json` with canvas-absolute circle coordinates. Challenge reel renders static reveal. Follow-up: OC-017B animated FindDiffReveal component (post Sprint 2).
 - [ ] **OC-017B** — Animated find-diff reveal: `FindDiffReveal` component for `ActivityChallenge.jsx` reading `diff.json` and animating circles one-by-one. Deferred until Sprint 2 complete.
-- [ ] **OC-018** — Coloring page image post + ASMR seam: extend `generate-puzzle-image-post.mjs --type coloring` and normalize `colored.png` contract for ASMR. Spec review with Claude before start.
+- [x] **OC-018** — Coloring page generator + image post integration. APPROVED 2026-04-30. `generate-coloring-assets.mjs` new (7-file contract, single-panel 1080×1500, thick outline strokes for coloring feel, `colored.png` as ASMR end-state). `generate-puzzle-image-post.mjs --type coloring` plumbing done. Pre-flight: label truncation fix applied (7→10 chars). ASMR render exits 0 in 8.7s with crayon.mp3. Image post exits 0, writes to `output/raw/coloring/`. No changes to render-video.mjs or AsmrReveal. Follow-up: OC-018B coloring ASMR audio (marker-on-paper sound instead of crayon.mp3) — lower priority, deferred.
 
 ### Sprint 3 — Remaining Puzzle Engines (week 3)
+
+> Sprint 2 complete ✅ — maze, matching, find-diff, coloring generators all live and audited.
 - [ ] **OC-019** — Tracing/Dot-to-Dot generator: numbered dot sequence, SVG path, activity.json contract. Claude audit required.
 - [ ] **OC-020** — Crossword generator: grid-filling algorithm + Groq clue generation. Most complex — spec review with Claude before OpenClaw starts.
 - [ ] **OC-021** — Theme-family detection centralization: extract shared utility from renderer + word-search generator (OC-013 tech debt). Low priority, defer until Sprint 2 complete.
