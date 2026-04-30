@@ -1065,7 +1065,27 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** Do not proceed to REF-001 until Claude stamps REF-003 APPROVED.
 
+
+### 2026-05-01 | OpenClaw | REF-001 | Challenge reel renders — all 6 puzzle types
+**Files changed:** None (render-only validation)
+**What was done:** Rendered ActivityChallenge reels for all 6 puzzle types using ocean-animals theme test folders. All exit 0. All within 25-35s locked band. Disk space was full (17 orphaned Remotion webpack bundle dirs filling temp) — cleaned up via PowerShell, recovered ~7GB, dot-to-dot render retried successfully.
+**Test command:** `node scripts/render-video.mjs --comp ActivityChallenge --challenge <folder> --out output/videos/ref-001-<type>-challenge.mp4`
+**Test output summary:**
+| Type | Exit | Frames | Duration | In band |
+|------|------|--------|----------|---------|
+| Maze | 0 | 885 (29.5s) | hook+15+trans+12 | Yes |
+| Word Search | 0 | 885 (29.5s) | hook+15+trans+12 | Yes |
+| Matching | 0 | 885 (29.5s) | hook+15+trans+12 | Yes |
+| Find Diff | 0 | 945 (31.5s) | hook+17+trans+12 | Yes |
+| Coloring | 0 | 945 (31.5s) | hook+0+trans+15 | Yes |
+| Dot-to-Dot | 0 | 945 (31.5s) | hook+17+trans+12 | Yes |
+
+All 6 within band (25-35s). Dot-to-dot hook confirmed: "Connect the dots to reveal an ocean animal!" Disk full fixed: 17 orphaned remotion-webpack-bundle-* dirs removed (~7GB freed). Ahmed must watch all 6 MP4s before first production post.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Refinement phase complete after this entry. Write final refinement phase report.
+
 ---
+-
 -
 
 ### 2026-05-01 | OpenClaw | REF-002 | Daily scheduler validation
@@ -1133,8 +1153,13 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** Applied 4 fixes from Claude's REF-003 audit: (1) Word-search grid overflow — moved "FIND THESE WORDS" label to card bottom using absolute positioning (bottom:32px) so it never overlaps the grid regardless of card height. (2) Matching blank post — changed buildPostImage to use solved.svg for matching type (face-up labeled cards show what to match, not featureless face-down cards). (3) Dot-to-dot subtitle — hookText is now theme-specific: ocean→"...ocean animal!", space→"...a space shape!", animals→"...an animal!". (4) Find-diff count mismatch — confirmed diffLabel() already uses diffCount correctly; hook and divider now both show actual diff count. All 12 affected posts regenerated successfully.
 **Test command:** 12 regenerate commands (wordsearch×3, matching×3, dot-to-dot×6, find-diff×3)
 **Test output summary:** All 12 posts exit 0. Word-search footer now at card bottom. Matching posts show labeled face-up cards. Dot-to-dot titles differ by theme. Find-diff ocean (4 diffs) → "Can you spot all 4 differences?", space (4 diffs) → "Can you spot all 4 differences?", animals (5 diffs) → "Can you spot all 5 differences?".
-**Review status:** PENDING CLAUDE REVIEW
-**Next:** Do not proceed to REF-001 until Claude stamps REF-003-FIX APPROVED.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-05-01.
+- Word search overflow ✅ — full 12×12 grid visible all 3 themes; word list in two columns below grid; "FIND THESE WORDS" at card bottom; no overlap
+- Matching labeled cards ✅ — solved.svg used for post; pair words readable; connection lines visible; minor ~35% top dead space acceptable
+- Dot-to-dot theme titles ✅ — "…ocean animal", "…space shape", "…an animal" confirmed on all 3
+- Find-diff separator ✅ — "FIND THE DIFFERENCES" (generic, no count); ocean/space "4 differences" title internally consistent; animals "5 differences" consistent
+- All 18 posts production-ready
+**Next:** REF-003 CLOSED. Proceed to REF-001.
 
 ## REF-003-FIX — 12 Regenerated Post Paths
 
