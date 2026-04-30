@@ -39,9 +39,9 @@ const FORCE_TYPE = typeIdx !== -1 ? args[typeIdx + 1] : null;
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
-// Rotate coloring / maze / wordsearch / dotdot by calendar day
+// Rotate only the active ASMR product types by calendar day
 function getDefaultType() {
-  const types = ['coloring', 'maze', 'coloring', 'wordsearch', 'dotdot', 'maze'];
+  const types = ['coloring', 'maze', 'coloring', 'maze'];
   return types[new Date().getDate() % types.length];
 }
 

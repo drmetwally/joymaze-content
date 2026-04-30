@@ -96,6 +96,23 @@ function checkFfmpeg() {
   return false;
 }
 
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveRevealFiles(baseDir, revealType) {
+  if (revealType === 'coloring') {
+    return { blankFile: 'blank.png', solvedFile: 'colored.png' };
+  }
+  const blankFile = await fileExists(path.join(baseDir, 'blank.png')) ? 'blank.png' : 'maze.png';
+  return { blankFile, solvedFile: 'solved.png' };
+}
+
 function escapeXml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
@@ -769,8 +786,9 @@ async function initAsmr(title, type) {
     console.log(`  5. Run: npm run generate:asmr -- --asmr ${folderName}`);
   } else if (type === 'maze') {
     console.log('  1. Generate 2 images in ChatGPT/Gemini:');
-    console.log('       maze.png   — blank maze (no solution shown)');
+    console.log('       blank.png  — blank maze (no solution shown)');
     console.log('       solved.png — same maze with solution path drawn in');
+    console.log('       (legacy manual folders may still use maze.png as the blank image name)');
     console.log('       Dimensions: 9:16 portrait (1080×1920 px) — fills the video frame natively');
     console.log('       Tell Gemini: "portrait orientation, 9:16 aspect ratio (1080×1920 pixels)"');
     console.log(`  2. Drop both into: output/asmr/${folderName}/`);
@@ -1099,10 +1117,8 @@ async function renderWithRemotion(asmrDir, activityMeta, revealType) {
   const videoId = `${dateStr}-asmr-${slug}-remotion`;
   const outputPath = path.join(VIDEOS_DIR, `${videoId}.mp4`);
 
-  // File naming: coloring uses blank.png + colored.png; maze uses maze.png + solved.png
-  const [srcFile, dstFile] = revealType === 'coloring'
-    ? ['blank.png', 'colored.png']
-    : ['maze.png', 'solved.png'];
+  // File naming: coloring uses blank.png + colored.png; maze prefers blank.png and falls back to legacy maze.png
+  const { blankFile: srcFile, solvedFile: dstFile } = await resolveRevealFiles(asmrDir, revealType);
 
   const blankImagePath  = path.relative(ROOT, path.join(asmrDir, srcFile)).replace(/\\/g, '/');
   const solvedImagePath = path.relative(ROOT, path.join(asmrDir, dstFile)).replace(/\\/g, '/');
@@ -1256,9 +1272,7 @@ async function main() {
   let totalDuration;
 
   if (revealType === 'coloring' || revealType === 'maze') {
-    const [srcFile, dstFile] = revealType === 'coloring'
-      ? ['blank.png', 'colored.png']
-      : ['maze.png', 'solved.png'];
+    const { blankFile: srcFile, solvedFile: dstFile } = await resolveRevealFiles(asmrDir, revealType);
 
     for (const f of [srcFile, dstFile]) {
       try { await fs.access(path.join(asmrDir, f)); }
@@ -1316,9 +1330,7 @@ async function main() {
 
   if (revealType === 'coloring' || revealType === 'maze') {
     // ---- Progressive reveal flow ----
-    const [srcFile, dstFile] = revealType === 'coloring'
-      ? ['blank.png', 'colored.png']
-      : ['maze.png', 'solved.png'];
+    const { blankFile: srcFile, solvedFile: dstFile } = await resolveRevealFiles(asmrDir, revealType);
 
     console.log(`  [Load] Resizing images to ${VIDEO_WIDTH}x${VIDEO_HEIGHT}...`);
     const srcBuffer = await resizeActivityImage(path.join(asmrDir, srcFile));

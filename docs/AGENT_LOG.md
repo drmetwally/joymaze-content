@@ -870,5 +870,27 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **What was done:** This was a planning and continuity pass, not an implementation pass. I updated the task board to reflect the clarified product direction: coloring ASMR was already live-tested and posted, maze ASMR is already good, word-search should be de-prioritized for ASMR, and the real next move is generator-to-ASMR integration for maze first and coloring second. I then wrote a seam-map handoff doc so the next agent can implement OC-014B without re-discovering the old folder-model split or the `colored.png` vs `solved.png` naming trap.
 **Test command:** `git grep -n "ASMR|AsmrReveal|coloring|maze|wordsearch|word-search|blank\.png|colored\.png|pencil|solve" -- remotion scripts docs` and targeted file reads across `generate-asmr-brief.mjs`, `generate-asmr-video.mjs`, `render-video.mjs`, `generate-maze-assets.mjs`, and sample `output/asmr/*/activity.json` + `brief.md`
 **Test output summary:** Inspection confirmed the new deterministic maze pipeline already emits an ASMR-usable asset set (`blank.png`, `solved.png`, `path.json`, `activity.json`) under `output/challenge/generated-activity/...`, while the ASMR lane still assumes manual `output/asmr/...` folders. It also surfaced a real coloring contract mismatch: `generate-asmr-video.mjs` expects `colored.png` for coloring, while some older defaults/docs still mention `solved.png`. Word-search ASMR support still exists in code, but product direction is now to keep word-search in the challenge-reel lane instead.
+**Review status:** APPROVED (planning pass) by Claude (Sonnet 4.6) — 2026-04-30.
+- Folder model mismatch ✅ confirmed — `generated-activity/...` vs `output/asmr/...` are parallel systems with no bridge
+- Coloring filename mismatch ✅ confirmed — `generate-asmr-video.mjs:1102` explicitly uses `colored.png` for coloring; `render-video.mjs` defaults to `solved.png` everywhere
+- Word-search ASMR still in brief rotation ✅ confirmed — `generate-asmr-brief.mjs` line 44 rotation: `['coloring', 'maze', 'coloring', 'wordsearch', 'dotdot', 'maze']`
+- Additional mismatch not in seam map ⚠️ ADDED: `generate-asmr-video.mjs` maze path expects **`maze.png`** (not `blank.png`) — see lines 1105, 1261, 1321. The new generator writes `blank.png`. OC-014B maze bridge must account for this: either teach ASMR to accept `blank.png` or add a rename step.
+- Option A (direct folder bridge, no copy) ✅ correct architectural preference
+- Implementation order ✅ maze first, then coloring cleanup, then coloring seam — correct
+**Next:** Implement OC-014B as a maze-first integration pass. Key first fix: update ASMR maze file resolution to accept `blank.png` (new generator contract) and fall back to legacy `maze.png`. Prove: generated maze folder → ASMR render exits 0.
+
+
+---
+
+### 2026-04-30 | OpenClaw | OC-014B | Maze-first ASMR generator integration
+**Files changed:**
+- `scripts/generate-asmr-video.mjs` — added shared reveal-file resolution so maze now prefers `blank.png` and falls back to legacy `maze.png` in all three reveal asset lookup paths; also updated maze init instructions to advertise `blank.png` as preferred
+- `scripts/render-video.mjs` — routed `--challenge <generated-folder>` into the ASMR prop loader when rendering `AsmrReveal`, extended `activityJsonToProps()` to derive maze revealType from challenge metadata, reuse `path.json` waypoints, and accept generated-folder `blank.png` / `solved.png` directly
+- `scripts/generate-asmr-brief.mjs` — removed `wordsearch` and `dotdot` from the active ASMR brief rotation so only `coloring` and `maze` are scheduled by default
+- `docs/OPENCLAW_REPORT_2026-04-30_task-oc-014b.md` — wrote the Claude-facing audit report for this maze-first integration pass
+- `docs/AGENT_LOG.md` — appended this implementation handoff entry for Claude
+**What was done:** Implemented the actual OC-014B bridge after the earlier seam-map planning pass. The ASMR Remotion lane can now render directly from a generated maze folder under `output/challenge/generated-activity/...` with solver waypoints active, and the legacy ASMR generator no longer breaks on new maze folders that use `blank.png` instead of `maze.png`. I also aligned the ASMR brief rotation to the current product direction by keeping only maze and coloring active while leaving word-search and dot-to-dot code dormant.
+**Test command:** `node --check scripts/generate-asmr-video.mjs`, `node --check scripts/render-video.mjs`, `node --check scripts/generate-asmr-brief.mjs`, and `node scripts/render-video.mjs --comp AsmrReveal --challenge output/challenge/generated-activity/ocean-animals-maze-post-medium --out output/videos/oc-014b-maze-asmr.mp4`
+**Test output summary:** All three syntax checks exited 0. The proof render exited 0, produced `output/videos/oc-014b-maze-asmr.mp4` plus `oc-014b-maze-asmr-thumb.jpg`, and logged `Path pts    : 52 waypoints (solver active)` with `Blank : output/challenge/generated-activity/ocean-animals-maze-post-medium/blank.png` and `Solved : output/challenge/generated-activity/ocean-animals-maze-post-medium/solved.png`, confirming the generated-folder bridge worked without a manual `output/asmr/...` copy step.
 **Review status:** PENDING CLAUDE REVIEW
-**Next:** Implement `OC-014B` as a maze-first integration pass. Preferred proof point: render ASMR directly from a generated maze folder before touching coloring or removing dormant word-search ASMR code.
+**Next:** Claude should audit the direct generated-folder → AsmrReveal seam and confirm the timing fallback choice (`countdownSec` reused as ASMR reveal duration when no dedicated ASMR timing exists). Coloring contract cleanup and broader coloring integration remain deferred to OC-018.

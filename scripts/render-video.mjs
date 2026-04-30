@@ -6,6 +6,7 @@
  *   node scripts/render-video.mjs --comp StoryReelV2 --story output/stories/my-story/story.json
  *   node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/ep03-hedgehog
  *   node scripts/render-video.mjs --comp AsmrReveal   --asmr  output/asmr/maze-slug/activity.json
+ *   node scripts/render-video.mjs --comp AsmrReveal   --challenge output/challenge/generated-activity/maze-slug
  *   node scripts/render-video.mjs --comp HookIntro    --props '{"headline":"Can your kid solve this?","subline":"Screen-free fun for ages 4-8"}'
  *   node scripts/render-video.mjs --comp StoryEpisode --props '{"slides":[...]}'  --out output/videos/ep01.mp4
  *   node scripts/render-video.mjs --comp StoryEpisode --dry-run --verbose
@@ -268,15 +269,22 @@ async function animalEpisodeToSongShortProps(episode, episodeDir) {
 // activity.json → AsmrReveal props
 async function activityJsonToProps(activity, activityDir) {
   const fps = 30;
+  const VW = 1080, VH = 1920;
   const toRelative = (filename) =>
     path.relative(ROOT, path.resolve(activityDir, filename)).replace(/\\/g, '/');
+  const fileExists = async (filename) => fs.access(path.resolve(activityDir, filename)).then(() => true).catch(() => false);
+
+  const revealType = activity.revealType ?? activity.puzzleType ?? activity.type ?? 'ltr';
+  const blankFilename = revealType === 'maze'
+    ? (await fileExists(activity.blankImage ?? 'blank.png') ? (activity.blankImage ?? 'blank.png') : 'maze.png')
+    : (activity.blankImage ?? 'blank.png');
 
   // Expect blank.png / solved.png in same folder (or custom names from activity.json)
-  const blankImagePath  = toRelative(activity.blankImage  ?? 'blank.png');
-  const solvedImagePath = toRelative(activity.solvedImage ?? 'solved.png');
+  const blankImagePath  = toRelative(blankFilename);
+  const solvedImagePath = toRelative(activity.solvedImage ?? (revealType === 'coloring' ? 'colored.png' : 'solved.png'));
 
   const hookSec    = activity.hookDurationSec    ?? 3;
-  const revealSec  = activity.revealDurationSec  ?? 26;  // 3+26+1+2 = 32s total
+  const revealSec  = activity.revealDurationSec  ?? activity.countdownSec ?? 26;  // challenge folders reuse countdown duration
   const holdSec    = activity.holdDurationSec    ?? 1;
   const loopSec    = activity.loopDurationSec    ?? 2.0; // loop fade-back to blank
 
@@ -288,7 +296,6 @@ async function activityJsonToProps(activity, activityDir) {
     const pathData = JSON.parse(await fs.readFile(pathJsonFile, 'utf-8'));
     // AR-corrected mapping: account for objectFit:contain letterboxing so the SVG overlay
     // aligns with the actual image position in the 1080×1920 video frame.
-    const VW = 1080, VH = 1920;
     const imgW = pathData.width ?? VW;
     const imgH = pathData.height ?? VH;
     const imgAR   = imgW / imgH;
@@ -372,7 +379,7 @@ async function activityJsonToProps(activity, activityDir) {
   return {
     blankImagePath,
     solvedImagePath,
-    revealType:       activity.revealType ?? 'ltr',
+    revealType,
     hookText:         activity.hookText   ?? '',
     hookDurationSec:  hookSec,
     revealDurationSec: revealSec,
@@ -380,7 +387,7 @@ async function activityJsonToProps(activity, activityDir) {
     loopDurationSec:  loopSec,
     audioPath:        activity.audioPath !== undefined
                         ? activity.audioPath
-                        : await resolveAudio(activity.type ?? 'coloring'),
+                        : await resolveAudio(activity.type ?? activity.puzzleType ?? 'coloring'),
     audioVolume:      activity.audioVolume ?? 0.85,
     showJoyo:         activity.showJoyo ?? true,
     showParticles:    activity.showParticles ?? true,
@@ -572,6 +579,9 @@ async function loadInputProps() {
     const stat = await fs.stat(jsonPath).catch(() => null);
     if (stat?.isDirectory()) jsonPath = path.join(jsonPath, 'activity.json');
     const activity = JSON.parse(await fs.readFile(jsonPath, 'utf-8'));
+    if (compositionId === 'AsmrReveal') {
+      return activityJsonToProps(activity, path.dirname(jsonPath));
+    }
     return challengeJsonToProps(activity, path.dirname(jsonPath));
   }
   if (propsFileArg) {
