@@ -303,8 +303,29 @@ const COMPLEXITY_MAP = {
 function dotPixelX(nx) { return DA_X + nx * DA_W; }
 function dotPixelY(ny) { return DA_Y + ny * DA_H; }
 
+// Scale every shape's raw coordinates to fill 84% of the drawing area,
+// centered. Shapes whose raw coords span only part of 0–1 (e.g. y: 0.35–0.65)
+// would otherwise leave large blank margins. This normalizes all of them.
+function normalizeShape(shape) {
+  const xs = shape.dots.map(d => d[0]);
+  const ys = shape.dots.map(d => d[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const rangeX = maxX - minX || 1;
+  const rangeY = maxY - minY || 1;
+  const PAD = 0.08; // 8% padding on each side inside DA
+  return {
+    ...shape,
+    dots: shape.dots.map(d => [
+      PAD + (d[0] - minX) / rangeX * (1 - 2 * PAD),
+      PAD + (d[1] - minY) / rangeY * (1 - 2 * PAD),
+    ]),
+  };
+}
+
 function buildSvgLine(shape, solved) {
-  const pts = shape.dots.map(d => `${dotPixelX(d[0])},${dotPixelY(d[1])}`).join(' ');
+  const s = normalizeShape(shape);
+  const pts = s.dots.map(d => `${dotPixelX(d[0])},${dotPixelY(d[1])}`).join(' ');
   if (shape.closed) {
     return `    <polygon points="${pts}" fill="none" stroke="#FF6B35" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
   } else {
@@ -313,12 +334,13 @@ function buildSvgLine(shape, solved) {
 }
 
 function buildSvgDots(shape, numbered) {
-  return shape.dots.map((d, i) => {
+  const s = normalizeShape(shape);
+  return s.dots.map((d, i) => {
     const px = dotPixelX(d[0]);
     const py = dotPixelY(d[1]);
     const n = i + 1;
-    return `    <circle cx="${px}" cy="${py}" r="10" fill="#1A1A1A"/>
-    <text x="${px}" y="${py}" text-anchor="middle" dominant-baseline="central" font-family="Arial Black, Arial, sans-serif" font-size="20" font-weight="900" fill="#FFFFFF">${n}</text>`;
+    return `    <circle cx="${px}" cy="${py}" r="15" fill="#1A1A1A"/>
+    <text x="${px}" y="${py}" text-anchor="middle" dominant-baseline="central" font-family="Arial Black, Arial, sans-serif" font-size="19" font-weight="900" fill="#FFFFFF">${n}</text>`;
   }).join('\n');
 }
 
