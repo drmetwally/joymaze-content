@@ -61,8 +61,33 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [ ] **True word-search solve validation** — run once a sample exists with real `solved.png` and `wordsearch.json` so the solve phase can be fully tested, not just fallback static solve.
 - [~] **Puzzle asset factory program** — active direction locked 2026-04-29. See `docs/PUZZLE_ASSET_FACTORY_PLAN_2026-04-29.md` and `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md`. Build order: Maze → Word Search → Matching → Find the Difference → Coloring → Tracing/Dot-to-Dot.
 - [~] **TASK-OC-007 — Deterministic Maze Asset Factory** — Phase 1 started 2026-04-29. `scripts/generate-maze-assets.mjs` now generates first-party rectangular maze assets (`maze.json`, `path.json`, `blank.svg`, `solved.svg`, `blank.png`, `solved.png`, `activity.json`) and a fresh generated folder already dry-loads plus preview-renders through `ActivityChallenge` with solver waypoints active. Remaining work: inspect visual quality against benchmark references, tune line/margin/difficulty feel, add npm scripts + docs closure review, then expand shape support beyond rectangular/square while keeping `shape` first-class in the contract.
-- [~] **TASK-OC-008 — Puzzle image-post workflow structure** — NEW 2026-04-29. First priority after the reel pass. Goal: convert the existing puzzle engines into the 5 daily activity image-post lane without breaking the current `generate-prompts → import-raw → queue` flow. Start with maze + word-search. Define puzzle-master outputs, wrapped social-post outputs, wrapper seam, and raw/import compatibility. Progress: current repo contract mapped on 2026-04-29. Confirmed Phase 1 seam is `output/challenge/generated-activity/<slug>/post.png` -> `output/raw/{maze|wordsearch}/...` plus sidecar JSON. Claude audit follow-up: the theme handoff must also be explicit, so TASK-OC-008 now includes defining how scheduler/generator calls receive the pre-assigned activity themes from `generate-prompts.mjs`. First seam now exists: `generate-prompts.mjs --save` writes `output/prompts/activity-manifest-YYYY-MM-DD.json` for machine-readable daily activity theme/category handoff.
+- [x] **TASK-OC-008 — Puzzle image-post workflow structure** — DONE 2026-04-29. Contract mapped, manifest seam defined and live, Phase 1 integration complete. Art wrapper rebuilt with modular Sharp layers (corner decor, margin motifs, start/goal markers, title system). All 3 Claude-audit bugs fixed. Two visual gaps remain for next wrapper pass: (1) no footer CTA band — 260px dead space below puzzle, (2) finish marker clips at right edge (left=910, marker=150px wide, canvas=1000px). Theme families partial: 5 of 10 done (ocean, space, animals, colors/shapes, workshop) — missing dinosaurs, jungle/safari, fairy/princess, vehicles, food/kitchen. Sharp decision gate (A8) pending comparison pack generation (A7).
 - [x] **TASK-OC-009 — Maze + Word Search image-post integration** — started 2026-04-29, finished first Phase 1 implementation on 2026-04-29. `scripts/generate-puzzle-image-post.mjs` now supports direct generation and manifest-driven generation, builds a polished wrapped `post.png`, copies it into `output/raw/{maze|wordsearch}/`, writes import sidecars, and can target all supported daily slots from `activity-manifest-YYYY-MM-DD.json`. `import-raw.mjs` preserves richer sidecar metadata (`difficulty`, `theme`, `sourceFolder`, `puzzleType`, `titleText`, `ctaText`). Validation completed through `generate-prompts --save` -> manifest-driven puzzle-post generation -> `import-raw` -> `generate-captions --dry-run` for both a maze slot and a word-search slot.
+
+## ACTIVE SPRINT — DUAL TRACK (2026-04-30)
+
+> Track 1: daily posting running now (npm run daily + npm run brief).
+> Track 2: build sprint below. OpenClaw executes, Claude audits each task before marking done.
+> Phase 0 gate target: ~3-4 weeks once all puzzle + reel lanes live.
+
+### Sprint 1 — Reel Completion (this week)
+- [x] **OC-012** — Challenge reel visual tuning: title size/weight, countdown prominence, transition cue feel, audio balance. APPROVED 2026-04-30. Ahmed must watch both renders (29.5s maze + 34.5s word-search) before first production post — motion+audio QC not verifiable in-session.
+- [x] **OC-013** — Challenge reel stickers + word-search footer fix. APPROVED 2026-04-30. Maze reel START/FINISH badges geometry-anchored via maze.json fractions ✅. Word-search footer stripped from SVG, re-homed to post renderer ✅. Word-search theme emoji badge ✅. Ahmed must watch both renders before first production post.
+- [x] **OC-014** — ASMR live coloring test. Clarified 2026-04-30 from user memory correction: coloring ASMR swipe-reveal was already tested successfully and the video was posted socially, so this lane is considered validated. Maze ASMR is also considered in a good state.
+- [ ] **OC-014B** — ASMR generator integration: connect the new puzzle-generator + art-layer pipeline into the ASMR lane for the visually strong reveal types, especially maze and coloring. Explicitly de-prioritize word-search ASMR, which is better kept in the challenge-reel lane.
+- [ ] **OC-015** — Wire Story Reel V2 + Animal Song Short to `daily-scheduler.mjs` (compositions built + audited, only scheduler trigger wiring remains).
+
+### Sprint 2 — Puzzle Engine Expansion (next week)
+- [ ] **OC-016** — Matching puzzle generator: `scripts/generate-matching-assets.mjs` (pairs, blank/solved SVG, activity.json, layout.json). Follows same contract as maze generator. Claude audit required.
+- [ ] **OC-017** — Find the Difference generator: `scripts/generate-find-diff-assets.mjs` (two near-identical images, diff markers, JSON contract). Claude audit required.
+- [ ] **OC-018** — Coloring page image post: extend `generate-puzzle-image-post.mjs` to support `--type coloring`, wrapping existing ASMR coloring assets through the Puppeteer renderer. Claude audit required. This should stay aligned with OC-014B so the same art-layer assumptions can feed both post and ASMR lanes.
+
+### Sprint 3 — Remaining Puzzle Engines (week 3)
+- [ ] **OC-019** — Tracing/Dot-to-Dot generator: numbered dot sequence, SVG path, activity.json contract. Claude audit required.
+- [ ] **OC-020** — Crossword generator: grid-filling algorithm + Groq clue generation. Most complex — spec review with Claude before OpenClaw starts.
+- [ ] **OC-021** — Theme-family detection centralization: extract shared utility from renderer + word-search generator (OC-013 tech debt). Low priority, defer until Sprint 2 complete.
+
+---
 
 ## NEXT SESSION — REELS POLISH SPRINT (2026-04-28)
 
