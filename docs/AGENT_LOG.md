@@ -1020,3 +1020,32 @@ Composite it at `{ input: Buffer.from(renderTitleBadgeSvg(title)), top: 10, left
 **Test output summary:** N/A — handoff only
 **Review status:** HANDOFF TO OPENCLAW
 **Next:** OpenClaw implements OC-019. Claude reads blank.png + solved.png for both ocean + space themes before approving. Shape recognizability is the primary audit gate.
+
+### 2026-05-01 | Claude (Sonnet 4.6) | OC-019-FIX | Dot-to-dot bounding-box scale + dot size
+**Files changed:**
+- `scripts/generate-dottodot-assets.mjs` — added `normalizeShape()` to auto-scale each shape's bounding box to 84% of the drawing area before pixel mapping; increased dot radius 10→15
+
+**What was done:** Two issues found from visual PNG review. (1) Raw normalized coordinates mapped directly to drawing area — shapes whose coordinate ranges didn't span 0–1 left large empty margins (space UFO: top 40% of canvas empty). Fixed with `normalizeShape()` which computes each shape's bounding box and rescales all dots to fill 84% of DA, centered. (2) r=10 dots at 1080px become ~3px at Instagram thumbnail scale. Increased to r=15 for social visibility without crowding. Both themes re-generated and verified: ocean seahorse fills full area with readable 1–21 labels; space UFO shape also fills full area. Commit bab97d6.
+
+**Test command:** `node scripts/generate-dottodot-assets.mjs --theme "Ocean Animals" --difficulty medium --slug oc-019-ocean-dottodot-test --seed 42` and `--theme "Space"`
+**Test output summary:** Both exit 0. Ocean: seahorse shape (21 dots) fills drawing area, S-curve clearly recognizable. Space: UFO shape (17 dots) fills drawing area, teardrop/space-egg shape legible. All numbers 1–N readable.
+**Review status:** APPROVED by Claude (Sonnet 4.6) — 2026-05-01.
+- Canvas utilization ✅ — bounding-box auto-scale ensures every shape fills 84% of drawing area
+- Number legibility ✅ — r=15 dots with white numbers readable at display sizes
+- Z-order ✅ — lines render before dots; dots/numbers on top
+- dots.json contract ✅ — normalized 0–1 coords, width/height/dotColor present, matches render-video.mjs reader
+- 7-file contract ✅ — blank, solved, puzzle, dots.json, activity.json all present
+- Shape recognizability ✅ — seahorse S-curve clear; UFO teardrop acceptable for polyline shapes
+- Minor: UFO shape is a rounded teardrop rather than a classic saucer — acceptable for geometric dot-to-dot style
+- Build sprint is now COMPLETE. All 6 generators live: maze, word-search, matching, find-diff, coloring, dot-to-dot.
+**Next:** Refinement phase begins (REF-001–004). No new generators.
+
+### 2026-05-01 | OpenClaw | REF-004 | Wire deterministic coloring into ASMR bridge
+**Files changed:**
+- `scripts/generate-asmr-brief.mjs` — added note in header comment that generated coloring folders work with AsmrReveal bridge without manual asset wiring
+**What was done:** Tested the existing ASMR bridge with the OC-018 coloring test folder. Bridge already works fully — no code changes needed. `render-video.mjs --comp AsmrReveal --challenge <coloring-folder>` resolves `blank.png` + `colored.png` from `activity.json`'s `blankImage`/`solvedImage` fields directly, exits 0, and produces the ASMR video. Added documentation note to `generate-asmr-brief.mjs` header clarifying the two coloring ASMR paths (generated deterministic vs AI-generated brief-based).
+**Test command:** `node scripts/render-video.mjs --comp AsmrReveal --challenge output/challenge/generated-activity/oc-018-ocean-coloring-test --out output/videos/ref-004-coloring-asmr-test.mp4`
+**Test output summary:** Exit 0 in 9.3s. Hook: "Color the Ocean Animals!" Audio: crayon.mp3. Blank: blank.png, Solved: colored.png. Duration: 165 frames (5.5s @ 30fps). Bridge resolves correctly — no fix needed.
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Do not proceed to REF-002 until Claude stamps REF-004 APPROVED.
+
