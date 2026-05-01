@@ -285,6 +285,7 @@ async function loadSolverProps(stageDir) {
     highlightColor: undefined,
     dotWaypoints: null,
     dotColor: undefined,
+    matchRects: null,
   };
 
   const pathJson = path.join(stageDir, 'path.json');
@@ -355,6 +356,32 @@ async function loadSolverProps(stageDir) {
     }
   }
 
+  // Load matchRects from matching.json (same pattern as wordRects)
+  const matchingJsonPath = path.join(stageDir, 'matching.json');
+  if (await fileExists(matchingJsonPath)) {
+    try {
+      const data = JSON.parse(await fs.readFile(matchingJsonPath, 'utf-8'));
+      solverProps.matchRects = (data.matchRects || []).map((rect) => {
+        // rect has xNorm, yNorm, wNorm, hNorm — convert to pixel coords in video space
+        const mapped = mapContainPoint({
+          x: rect.xNorm,
+          y: rect.yNorm,
+          imageWidth: data.canvasW ?? 1700,
+          imageHeight: data.canvasH ?? 2200,
+        });
+        return {
+          x: mapped.x,
+          y: mapped.y,
+          w: rect.wNorm * (mapped.renderWidth),
+          h: rect.hNorm * (mapped.renderHeight),
+          gridIndex: rect.gridIndex,
+        };
+      });
+    } catch {
+      // ignore malformed sidecar, degrade cleanly
+    }
+  }
+
   return solverProps;
 }
 
@@ -388,6 +415,7 @@ async function stagePuzzleAssets({ sourceId, imagePath, meta, activityType }) {
     meta.pathJsonPath ? { src: meta.pathJsonPath, dest: 'path.json' } : null,
     meta.wordsearchJsonPath ? { src: meta.wordsearchJsonPath, dest: 'wordsearch.json' } : null,
     meta.dotsJsonPath ? { src: meta.dotsJsonPath, dest: 'dots.json' } : null,
+    meta.matchingJsonPath ? { src: meta.matchingJsonPath, dest: 'matching.json' } : null,
   ].filter(Boolean);
 
   for (const sidecar of sidecarCandidates) {
@@ -439,6 +467,7 @@ function buildRenderProps({ meta, sourceId, activityType, stagedAssets, hookText
     highlightColor: stagedAssets.highlightColor,
     dotWaypoints: stagedAssets.dotWaypoints,
     dotColor: stagedAssets.dotColor,
+    matchRects: stagedAssets.matchRects,
   };
 }
 

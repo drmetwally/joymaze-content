@@ -321,61 +321,24 @@ ${labels}
 
 // ── Output helpers ─────────────────────────────────────────────────────────────
 
-async function buildMatchingPuzzleImage(layout, grid, stickerAssignments, outPath) {
-  // Create white canvas
-  const canvas = sharp({
-    create: {
-      width: CANVAS_W,
-      height: CANVAS_H,
-      channels: 4,
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
-    },
-  });
-
-  const composites = [];
-
-  for (let i = 0; i < grid.length; i++) {
-    const cell = grid[i];
+function computeMatchRects(grid, layout) {
+  // Returns normalized card rects: each rect is { xFraction, yFraction, wFraction, hFraction }
+  // relative to CANVAS_W / CANVAS_H (matching.json uses pixel coords, we normalize)
+  return grid.map((cell) => {
     const x = layout.offsetX + cell.col * (layout.cardSize + layout.gap);
     const y = layout.offsetY + cell.row * (layout.cardSize + layout.gap);
-    const cardSize = layout.cardSize;
-
-    // Draw card background (cardback pattern — off-white with dots)
-    composites.push({
-      input: Buffer.from(
-        `<svg width="${cardSize}" height="${cardSize}">
-          <rect width="${cardSize}" height="${cardSize}" fill="#E8E4D4" rx="14"/>
-          <circle cx="10" cy="10" r="3" fill="#C8C4B0"/>
-          <circle cx="30" cy="10" r="3" fill="#C8C4B0"/>
-          <circle cx="10" cy="30" r="3" fill="#C8C4B0"/>
-          <circle cx="30" cy="30" r="3" fill="#C8C4B0"/>
-        </svg>`
-      ),
-      blend: 'over',
-      top: Math.round(y),
-      left: Math.round(x),
-    });
-
-    // Composite sticker image if available
-    const stickerB64 = stickerAssignments?.[i];
-    if (stickerB64) {
-      const stickerBuf = Buffer.from(stickerB64.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-      const pad = Math.round(cardSize * 0.12);
-      const insetSize = cardSize - pad * 2;
-      const stickerImg = sharp(stickerBuf).resize(insetSize, insetSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
-      composites.push({
-        input: await stickerImg.toBuffer(),
-        blend: 'over',
-        top: Math.round(y + pad),
-        left: Math.round(x + pad),
-      });
-    }
-  }
-
-  await canvas.composite(composites).png().toFile(outPath);
+    return {
+      gridIndex: cell.index,
+      xNorm: x / CANVAS_W,
+      yNorm: y / CANVAS_H,
+      wNorm: layout.cardSize / CANVAS_W,
+      hNorm: layout.cardSize / CANVAS_H,
+    };
+  });
 }
 
 function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, folderRel }) {
+  const matchRects = computeMatchRects(grid, layout);
   return {
     version: 1,
     puzzleType: PUZZLE_TYPE,
@@ -397,6 +360,7 @@ function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, fold
       canvasW: CANVAS_W,
       canvasH: CANVAS_H,
     },
+    matchRects,
     connections: pairs.map(p => {
       const a = grid.find(c => c.index === p.positions[0]);
       const b = grid.find(c => c.index === p.positions[1]);
@@ -526,8 +490,11 @@ async function main() {
     fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2)),
   ]);
 
-  // Build blank.png with sticker images composited via sharp
-  await buildMatchingPuzzleImage(layout, grid, stickerAssignments, path.join(outDir, 'blank.png'));
+  // Build blank.png — cardback pattern only (stickers render as overlays in Remotion)
+  const blankSvg = buildBlankSvg(layout, grid, null);
+  await fs.writeFile(path.join(outDir, 'blank.svg'), blankSvg, 'utf8');
+  const blankPng = await sharp(Buffer.from(blankSvg)).png().toBuffer();
+  await fs.writeFile(path.join(outDir, 'blank.png'), blankPng);
   await fs.copyFile(path.join(outDir, 'blank.png'), path.join(outDir, 'puzzle.png'));
 
   // solved.png uses the existing SVG path (colored cards + labels)
@@ -537,7 +504,6 @@ async function main() {
   await fs.writeFile(path.join(outDir, 'solved.png'), solvedPng);
 
   // Write minimal blank.svg (card backgrounds, no embedded images — for reference only)
-  const blankSvg = buildBlankSvg(layout, grid, null);
   await fs.writeFile(path.join(outDir, 'blank.svg'), blankSvg, 'utf8');
 
   console.log('[matching-factory] wrote files:');

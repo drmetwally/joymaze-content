@@ -15,6 +15,7 @@ import { WordSearchReveal } from '../components/WordSearchReveal.jsx';
 import { DotToDoReveal } from '../components/DotToDoReveal.jsx';
 import { BrandWatermark } from '../components/BrandWatermark.jsx';
 import { WordSearchJoyoOverlay } from '../components/WordSearchJoyoOverlay.jsx';
+import { MatchingStickerOverlay } from '../components/MatchingStickerOverlay.jsx';
 
 export const activityChallengeSchema = {
   imagePath: '',
@@ -44,6 +45,7 @@ export const activityChallengeSchema = {
   highlightColor: '#FFD700',
   dotWaypoints: null,
   dotColor: '#FF6B35',
+  matchRects: null,
   theme: '',
   sourceImageWidth: 1080,
   sourceImageHeight: 1920,
@@ -355,6 +357,7 @@ export const ActivityChallenge = ({
   highlightColor = activityChallengeSchema.highlightColor,
   dotWaypoints = null,
   dotColor = activityChallengeSchema.dotColor,
+  matchRects = null,
   theme = activityChallengeSchema.theme,
   sourceImageWidth = activityChallengeSchema.sourceImageWidth,
   sourceImageHeight = activityChallengeSchema.sourceImageHeight,
@@ -590,6 +593,8 @@ export const ActivityChallenge = ({
         mazeStartFraction={mazeStartFraction}
         mazeFinishFraction={mazeFinishFraction}
         wordRects={wordRects}
+        matchRects={matchRects}
+        theme={theme}
       /> : null}
       {showBrandWatermark ? <BrandWatermark text="joymaze.com" position="bottom-center" /> : null}
     </AbsoluteFill>
@@ -607,6 +612,8 @@ const PuzzleJoyoLayer = ({
   mazeStartFraction,
   mazeFinishFraction,
   wordRects,
+  matchRects,
+  theme,
 }) => {
   const isMaze = puzzleType === 'maze';
   const isWordSearch = puzzleType === 'word-search';
@@ -615,7 +622,7 @@ const PuzzleJoyoLayer = ({
   const celebrateStart = solveStart + solveFrames - Math.round(fps * 1.8);
   const isCelebrating = isSolving && frame >= celebrateStart;
 
-  // Word-search has its own dedicated overlay — render it and bail out early
+  // Word-search has its own dedicated overlay
   if (isWordSearch) {
     return (
       <WordSearchJoyoOverlay
@@ -626,6 +633,22 @@ const PuzzleJoyoLayer = ({
         solveFrames={solveFrames}
         frame={frame}
         fps={fps}
+      />
+    );
+  }
+
+  // Matching has its own sticker overlay
+  if (isMatching) {
+    return (
+      <MatchingStickerOverlay
+        matchRects={matchRects ?? []}
+        theme={theme ?? ''}
+        frame={frame}
+        fps={fps}
+        challengeFrames={challengeFrames}
+        solveStart={solveStart}
+        solveFrames={solveFrames}
+        frameBounds={frameBounds}
       />
     );
   }
