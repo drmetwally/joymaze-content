@@ -27,13 +27,13 @@ const HOOK_OVERRIDE = hookIdx !== -1 ? args[hookIdx + 1] : null;
 const PUZZLE_TYPES = ['maze', 'matching', 'quiz', 'dot-to-dot', 'spot-the-difference', 'tracing', 'word-search'];
 
 const STATIC_DEFAULT_HOOKS = {
-  maze: 'Can you solve this maze in 10 seconds?',
-  matching: 'Can you spot every match in 10 seconds?',
-  quiz: 'Can you solve this before time runs out?',
-  'dot-to-dot': 'Can you guess it before the reveal?',
-  'spot-the-difference': 'Can you spot them all in 10 seconds?',
-  tracing: 'Can you trace this before time runs out?',
-  'word-search': 'Can you find every word before time runs out?',
+  maze: { text: 'Can you solve this maze in 10 seconds?', style: 'challenge' },
+  matching: { text: 'Can you spot every match in 10 seconds?', style: 'challenge' },
+  quiz: { text: 'Can you solve this before time runs out?', style: 'challenge' },
+  'dot-to-dot': { text: 'Can you guess it before the reveal?', style: 'challenge' },
+  'spot-the-difference': { text: 'Can you spot them all in 10 seconds?', style: 'challenge' },
+  tracing: { text: 'Can you trace this before time runs out?', style: 'challenge' },
+  'word-search': { text: 'Can you find every word before time runs out?', style: 'challenge' },
 };
 
 const ACTIVITY_LABELS = {
@@ -58,9 +58,32 @@ const TIMING_DEFAULTS = {
 
 const TRANSITION_DURATION_SEC = 0.6;
 
+const CHALLENGE_SFX_MAP = {
+  maze: {
+    challengeAudioPath: 'assets/audio/masters/maze_music_loop_01.wav',
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/maze/maze_success_chime_01.wav',
+    solveAudioPath: 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
+  },
+  'word-search': {
+    challengeAudioPath: 'assets/audio/masters/wordsearch_music_loop_01.wav',
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/wordsearch/search_shimmer_01.wav',
+    solveAudioPath: 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
+  },
+  default: {
+    challengeAudioPath: 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
+    tickAudioPath: 'assets/sfx/countdown/countdown_tick_soft_01.wav',
+    transitionCueAudioPath: 'assets/sfx/brand/cta_hit_01.wav',
+    solveAudioPath: 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3',
+  },
+};
+
 function log(msg) {
   console.log(`[activity-video] ${msg}`);
 }
+
+let hooksPoolData = null;
 
 async function loadActivityIntelligence() {
   let competitor = null;
@@ -85,6 +108,9 @@ async function loadActivityIntelligence() {
   } catch {}
   try {
     perfWeights = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'performance-weights.json'), 'utf-8'));
+  } catch {}
+  try {
+    hooksPoolData = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'hooks-activity.json'), 'utf-8'));
   } catch {}
 
   const challengeTypes = new Set(['challenge_hook', 'curiosity_gap', 'pattern_interrupt', 'curiosity_hook']);
@@ -124,10 +150,12 @@ async function loadActivityIntelligence() {
 const activityIntelligence = await loadActivityIntelligence();
 
 function pickHook(activityType, intelligence = activityIntelligence) {
-  if (intelligence?.hookCandidates?.length) {
-    return intelligence.hookCandidates[Math.floor(Math.random() * intelligence.hookCandidates.length)];
+  const pool = hooksPoolData?.hooks?.[activityType];
+  const eligible = pool ? pool.filter((h) => h.performance_score >= 0) : [];
+  if (eligible.length > 0) {
+    return eligible[Math.floor(Math.random() * eligible.length)];
   }
-  return STATIC_DEFAULT_HOOKS[activityType] || 'Can you solve this before time runs out?';
+  return STATIC_DEFAULT_HOOKS[activityType] || { text: 'Can you solve this before time runs out?', style: 'challenge' };
 }
 
 function normalizePuzzleType(activityType) {
@@ -173,7 +201,7 @@ async function findFirstExisting(paths) {
   return null;
 }
 
-async function resolveAudioPaths() {
+async function resolveAudioPaths(activityType) {
   if (NO_MUSIC) {
     return {
       challengeAudioPath: '',
@@ -183,26 +211,34 @@ async function resolveAudioPaths() {
     };
   }
 
+  const preferred = CHALLENGE_SFX_MAP[activityType] || CHALLENGE_SFX_MAP.default;
   const challengeAudio = await findFirstExisting([
+    path.join(ROOT, preferred.challengeAudioPath),
     path.join(AUDIO_DIR, 'background.mp3'),
     path.join(SFX_DIR, 'nature', 'evening_ambience.mp3'),
     path.join(SFX_DIR, 'nature', 'garden_ambience.mp3'),
     path.join(AUDIO_DIR, 'Twinkle - The Grey Room _ Density & Time.mp3'),
   ]);
 
+  const tickAudio = await findFirstExisting([
+    path.join(ROOT, preferred.tickAudioPath),
+  ]);
+
   const transitionCue = await findFirstExisting([
+    path.join(ROOT, preferred.transitionCueAudioPath),
     path.join(SFX_DIR, 'emotional', 'gentle_chime.mp3'),
     path.join(AUDIO_DIR, 'hook-jingle.mp3'),
   ]);
 
   const solveAudio = await findFirstExisting([
+    path.join(ROOT, preferred.solveAudioPath),
     path.join(AUDIO_DIR, 'crayon.mp3'),
     path.join(AUDIO_DIR, 'outro-jingle.mp3'),
   ]);
 
   return {
     challengeAudioPath: challengeAudio ? path.relative(ROOT, challengeAudio).replace(/\\/g, '/') : '',
-    tickAudioPath: '',
+    tickAudioPath: tickAudio ? path.relative(ROOT, tickAudio).replace(/\\/g, '/') : '',
     transitionCueAudioPath: transitionCue ? path.relative(ROOT, transitionCue).replace(/\\/g, '/') : '',
     solveAudioPath: solveAudio ? path.relative(ROOT, solveAudio).replace(/\\/g, '/') : '',
   };
@@ -367,7 +403,7 @@ async function stagePuzzleAssets({ sourceId, imagePath, meta, activityType }) {
   };
 }
 
-function buildRenderProps({ meta, sourceId, activityType, stagedAssets, hookText, audioPaths }) {
+function buildRenderProps({ meta, sourceId, activityType, stagedAssets, hookText, hookStyle, audioPaths }) {
   const timing = getTimingDefaults(activityType);
 
   return {
@@ -375,6 +411,7 @@ function buildRenderProps({ meta, sourceId, activityType, stagedAssets, hookText
     blankImagePath: stagedAssets.blankImagePath,
     solvedImagePath: stagedAssets.solvedImagePath,
     hookText,
+    hookStyle,
     titleText: hookText,
     activityLabel: stagedAssets.activityLabel,
     puzzleType: activityType,
@@ -481,8 +518,12 @@ async function processItem(meta, sourceId) {
     return false;
   }
 
-  const hookText = HOOK_OVERRIDE || meta.hookText || pickHook(activityType, activityIntelligence);
-  const audioPaths = await resolveAudioPaths();
+  const poolHook = pickHook(activityType, activityIntelligence);
+  const hook = HOOK_OVERRIDE ? { text: HOOK_OVERRIDE, style: 'challenge' } : poolHook;
+
+  const hookText = hook.text;
+  const hookStyle = hook.style;
+  const audioPaths = await resolveAudioPaths(activityType);
   const stagedAssets = await stagePuzzleAssets({ sourceId, imagePath, meta, activityType });
   const inputProps = buildRenderProps({
     meta,
@@ -490,6 +531,7 @@ async function processItem(meta, sourceId) {
     activityType,
     stagedAssets,
     hookText,
+    hookStyle,
     audioPaths,
   });
 

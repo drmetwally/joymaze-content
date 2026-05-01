@@ -13,7 +13,6 @@ import { WipeReveal } from '../components/WipeReveal.jsx';
 import { MazeSolverReveal } from '../components/MazeSolverReveal.jsx';
 import { WordSearchReveal } from '../components/WordSearchReveal.jsx';
 import { DotToDoReveal } from '../components/DotToDoReveal.jsx';
-import { JoyoWatermark } from '../components/JoyoWatermark.jsx';
 import { BrandWatermark } from '../components/BrandWatermark.jsx';
 
 export const activityChallengeSchema = {
@@ -21,6 +20,7 @@ export const activityChallengeSchema = {
   blankImagePath: '',
   solvedImagePath: '',
   hookText: 'Can you solve this maze in 10 seconds?',
+  hookStyle: 'challenge',
   titleText: '',
   activityLabel: 'MAZE',
   puzzleType: 'maze',
@@ -131,9 +131,39 @@ const ThemeEmojiBadge = ({ frameBounds, emoji }) => (
   </div>
 );
 
-const TitleStrip = ({ title, countdown, visible, pulse }) => {
+const TitleStrip = ({ title, countdown, visible, pulse, hookStyle }) => {
   const opacity = visible ? 1 : 0;
   const y = visible ? 0 : -24;
+
+  const variantMap = {
+    challenge: {
+      background: 'linear-gradient(180deg, rgba(14,20,38,0.95) 0%, rgba(22,30,52,0.90) 100%)',
+      boxShadow: pulse ? '0 0 54px rgba(255,215,70,0.28)' : '0 18px 48px rgba(0,0,0,0.30)',
+      titleSize: 60,
+    },
+    urgent: {
+      background: 'linear-gradient(180deg, rgba(28,8,8,0.96) 0%, rgba(44,12,8,0.92) 100%)',
+      boxShadow: pulse ? '0 0 54px rgba(255,80,40,0.30)' : '0 18px 48px rgba(0,0,0,0.30)',
+      titleSize: 60,
+    },
+    playful: {
+      background: 'linear-gradient(180deg, rgba(220,70,30,0.92) 0%, rgba(240,100,40,0.88) 100%)',
+      boxShadow: pulse ? '0 0 54px rgba(255,220,50,0.25)' : '0 18px 48px rgba(0,0,0,0.30)',
+      titleSize: 60,
+    },
+    curiosity: {
+      background: 'linear-gradient(180deg, rgba(18,8,40,0.95) 0%, rgba(28,12,60,0.92) 100%)',
+      boxShadow: pulse ? '0 0 54px rgba(50,240,220,0.22)' : '0 18px 48px rgba(0,0,0,0.30)',
+      titleSize: 60,
+    },
+    bold: {
+      background: '#000000',
+      boxShadow: '0 18px 48px rgba(0,0,0,0.30)',
+      titleSize: 72,
+    },
+  };
+
+  const v = variantMap[hookStyle] || variantMap.challenge;
 
   return (
     <div
@@ -148,9 +178,9 @@ const TitleStrip = ({ title, countdown, visible, pulse }) => {
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 38,
-        background: 'linear-gradient(180deg, rgba(16,18,26,0.94) 0%, rgba(25,28,39,0.88) 100%)',
+        background: v.background,
         border: '3px solid rgba(255,255,255,0.12)',
-        boxShadow: pulse ? '0 0 54px rgba(255, 221, 120, 0.24)' : '0 18px 48px rgba(0, 0, 0, 0.30)',
+        boxShadow: v.boxShadow,
         transform: `translateY(${y}px) scale(${pulse ? 1.02 : 1})`,
         opacity,
         overflow: 'hidden',
@@ -188,7 +218,7 @@ const TitleStrip = ({ title, countdown, visible, pulse }) => {
           textAlign: 'center',
           color: '#FFFFFF',
           fontFamily: 'Arial Black, Arial, sans-serif',
-          fontSize: 60,
+          fontSize: v.titleSize,
           fontWeight: 900,
           lineHeight: 1.02,
           padding: '0 56px 0 168px',
@@ -301,6 +331,7 @@ export const ActivityChallenge = ({
   blankImagePath = '',
   solvedImagePath = '',
   hookText = activityChallengeSchema.hookText,
+  hookStyle = activityChallengeSchema.hookStyle,
   titleText = '',
   activityLabel = activityChallengeSchema.activityLabel,
   puzzleType = activityChallengeSchema.puzzleType,
@@ -464,6 +495,7 @@ export const ActivityChallenge = ({
           countdown={countdownLabel}
           visible={stripVisible}
           pulse={pulseStrength}
+          hookStyle={hookStyle}
         />
       </div>
 
@@ -546,8 +578,153 @@ export const ActivityChallenge = ({
         </Sequence>
       ) : null}
 
-      {showJoyo ? <JoyoWatermark visible /> : null}
+      {showJoyo ? <PuzzleJoyoLayer
+        puzzleType={puzzleType}
+        frameBounds={frameBounds}
+        frame={frame}
+        fps={fps}
+        challengeFrames={challengeFrames}
+        solveStart={solveStart}
+        solveFrames={solveFrames}
+        mazeStartFraction={mazeStartFraction}
+        mazeFinishFraction={mazeFinishFraction}
+      /> : null}
       {showBrandWatermark ? <BrandWatermark text="joymaze.com" position="bottom-center" /> : null}
     </AbsoluteFill>
+  );
+};
+
+const PuzzleJoyoLayer = ({
+  puzzleType,
+  frameBounds,
+  frame,
+  fps,
+  challengeFrames,
+  solveStart,
+  solveFrames,
+  mazeStartFraction,
+  mazeFinishFraction,
+}) => {
+  const isMaze = puzzleType === 'maze';
+  const isSolving = frame >= solveStart;
+  const celebrateStart = solveStart + solveFrames - Math.round(fps * 1.8);
+  const isCelebrating = isSolving && frame >= celebrateStart;
+
+  const startX = mazeStartFraction
+    ? frameBounds.x + mazeStartFraction.x * frameBounds.width
+    : frameBounds.x + 12;
+  const startY = mazeStartFraction
+    ? frameBounds.y + mazeStartFraction.y * frameBounds.height
+    : frameBounds.y + 12;
+
+  const startSpring = spring({ frame: Math.max(0, frame), fps, config: { stiffness: 300, damping: 12 } });
+  const startScale = Math.min(1, startSpring);
+  const startBob = Math.sin((frame / fps) * Math.PI * 2 / 1.4) * 5;
+
+  const finishX = mazeFinishFraction
+    ? frameBounds.x + mazeFinishFraction.x * frameBounds.width
+    : frameBounds.x + frameBounds.width - 72;
+  const finishY = mazeFinishFraction
+    ? frameBounds.y + mazeFinishFraction.y * frameBounds.height
+    : frameBounds.y + frameBounds.height - 72;
+  const trophyPulse = 1 + Math.sin((frame / fps) * Math.PI * 2 / 1.2) * 0.06;
+
+  const fadeFrames = 12;
+  const runningOpacity = isCelebrating
+    ? Math.max(0, 1 - (frame - celebrateStart) / fadeFrames)
+    : isSolving ? 0 : 1;
+  const celebOpacity = isCelebrating
+    ? Math.min(1, (frame - celebrateStart) / fadeFrames)
+    : 0;
+
+  const celebX = frameBounds.x + frameBounds.width / 2;
+  const celebY = frameBounds.y + frameBounds.height - 100;
+  const celebSpring = spring({ frame: Math.max(0, frame - celebrateStart), fps, config: { stiffness: 320, damping: 10 } });
+  const celebScale = Math.min(1, celebSpring);
+
+  const nonMazeCelebOpacity = !isMaze && isCelebrating ? 1 : 0;
+
+  const TrophyMarker = ({ x, y }) => (
+    <div style={{
+      position: 'absolute',
+      left: x,
+      top: y,
+      transform: `translate(-50%, -50%) scale(${trophyPulse})`,
+      width: 72,
+      height: 72,
+      borderRadius: '50%',
+      background: 'radial-gradient(circle, #FFE066 0%, #FFB800 60%, #CC8800 100%)',
+      border: '3px solid rgba(255,255,255,0.7)',
+      boxShadow: '0 0 18px rgba(255,200,0,0.6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: 38,
+      zIndex: 8,
+    }}>🏆</div>
+  );
+
+  return (
+    <>
+      {isMaze && frame < solveStart && (
+        <>
+          <div style={{
+            position: 'absolute',
+            left: startX,
+            top: startY,
+            transform: `translate(-50%, -50%) scale(${startScale})`,
+            transformOrigin: 'bottom center',
+            zIndex: 9,
+          }}>
+            <div style={{ transform: `translateY(${startBob}px)` }}>
+              <Img src={staticFile('assets/images/joyo_running.png')} style={{ width: 90, height: 90 }} />
+            </div>
+          </div>
+          <TrophyMarker x={finishX} y={finishY} />
+        </>
+      )}
+
+      {isMaze && (
+        <>
+          <div style={{
+            position: 'absolute',
+            left: isCelebrating ? startX : startX,
+            top: isCelebrating ? startY : startY,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9,
+            opacity: isCelebrating ? runningOpacity : (isSolving ? 0 : 1),
+          }}>
+            {!isCelebrating && (
+              <div style={{ transform: `translateY(${startBob}px)` }}>
+                <Img src={staticFile('assets/images/joyo_running.png')} style={{ width: 90, height: 90 }} />
+              </div>
+            )}
+          </div>
+          <div style={{
+            position: 'absolute',
+            left: celebX,
+            top: celebY,
+            transform: `translate(-50%, -50%) scale(${celebScale})`,
+            zIndex: 9,
+            opacity: celebOpacity,
+          }}>
+            <Img src={staticFile('assets/images/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
+          </div>
+        </>
+      )}
+
+      {!isMaze && (
+        <div style={{
+          position: 'absolute',
+          left: frameBounds.x + frameBounds.width / 2,
+          top: frameBounds.y + frameBounds.height - 100,
+          transform: 'translate(-50%, -50%)',
+          zIndex: 9,
+          opacity: nonMazeCelebOpacity,
+        }}>
+          <Img src={staticFile('assets/images/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
+        </div>
+      )}
+    </>
   );
 };
