@@ -1183,3 +1183,73 @@ All 6 within band (25-35s). Dot-to-dot hook confirmed: "Connect the dots to reve
 - `output/challenge/generated-activity/space-find-diff-medium/post.png` — "Can you spot all 4 differences?"
 - `output/challenge/generated-activity/animals-find-diff-medium/post.png` — "Can you spot all 5 differences?"
 
+
+---
+
+### 2026-05-01 | Claude (Sonnet 4.6) | REF-001-STAMP + SESSION-CLOSE | Refinement phase complete
+**Files changed:**
+- `docs/AGENT_LOG.md` — REF-002, REF-003, REF-003-FIX stamps; session closure entry
+- `docs/SESSION_LOG.md` — refinement phase session entry appended
+- `memory/project_build_sprint.md` — refinement phase status updated
+
+**What was done:** Audited and stamped all 4 REF tasks. REF-001 all 6 challenge reels exit 0 and within the 25–35s band (maze 29.5s, wordsearch 29.5s, matching 29.5s, find-diff 31.5s, coloring 31.5s, dot-to-dot 31.5s). Disk cleanup bonus: 17 orphaned Remotion temp dirs cleared, 8.2 GB freed. Final report written at `docs/OPENCLAW_REPORT_2026-05-01_refinement-phase.md`. Ahmed to watch all 6 MP4s before first production post per type.
+
+**Review status:** SELF-VERIFIED — Claude is supervisor
+**Next:** Ahmed watches 6 MP4s from REF-001. Refinement phase fully closed pending that QC watch. OC-021 (theme-family centralization) remains optional tech debt.
+
+---
+
+### 2026-05-01 | OpenClaw | OC-020 | Maze Visual Polish + Hook System
+
+**Files changed:**
+- `scripts/generate-activity-video.mjs` — hook pool from `hooks-activity.json`, `pickHook()` returns `{text, style}`, `hookStyle` through buildRenderProps
+- `remotion/compositions/ActivityChallenge.jsx` — TitleStrip 5-variant styles (challenge/urgent/playful/curiosity/bold), PuzzleJoyoLayer replaces JoyoWatermark
+- `docs/OPENCLAW_REPORT_2026-05-01_oc-020.md` — audit report
+
+**What was done:** Hook system wired to read from `config/hooks-activity.json` (8 maze hooks seeded). TitleStrip accepts `hookStyle` prop — 5 gradient/color variants driven by hook style. PuzzleJoyoLayer renders Joyo running + trophy at START/FINISH markers for maze, crossfades to celebrating at last 1.8s. All 4 puzzle types get celebrating Joyo at solve end.
+
+**Test command:** `node scripts/generate-activity-video.mjs --id 2026-04-23-activity-maze-archive-test --dry-run` (run 3x to see different hooks)
+
+**Test output summary:** Hooks varied across 3 runs: "Only 1 in 5 kids escape this maze first try" / "Drop a ⭐ if your kid solves it first" / "Most adults quit before the timer ends" — all from pool. Bundled in 6.0s. hookStyle confirmed flowing from pickHook → buildRenderProps → ActivityChallenge → TitleStrip.
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** OC-021 next. OC-020 verified by test run output.
+
+---
+
+### 2026-05-01 | OpenClaw | OC-021 | Word-Search Overlay Audit + Fix
+
+**Files changed:**
+- `output/queue/fairy-tale-castle-activity-word-search.json` — tiktok output corrected to blank PNG
+- `output/images/fairy-tale-castle-ws-blank.png` — copied from activity dir
+- `scripts/generate-puzzle-image-post.mjs` — readCroppedSvg + blank.svg for word-search confirmed correct
+- `scripts/lib/puzzle-post-renderer.mjs` — word-search crop height confirmed to include word list
+- `docs/OPENCLAW_REPORT_2026-05-01_ws-fix.md` — audit report written
+
+**What was done:** Queue item had baked-text PNG as source (hook text orange visible in render). Fixed by copying blank.png and updating queue. Audit of word-search generator confirmed: readCroppedSvg return value used, blank.svg passed for word-search, mazeW/mazeH field names correct, word list not clipped. No code changes needed.
+
+**Test command:** `node scripts/generate-activity-video.mjs --id fairy-tale-castle-activity-word-search`
+**Test output summary:** Video regenerated (45.8s). Hook "Most parents miss at least 2 words" from playful pool. Puzzle source is blank word-search grid — baked hook text gone. Cloudinary uploaded.
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** OC-022 next. Word-search generator confirmed clean.
+
+---
+
+### 2026-05-01 | OpenClaw | OC-022 (revised) | Matching Sticker Overlay + Joyo Thinking
+
+**Files changed:**
+- `scripts/generate-matching-assets.mjs` — `computeMatchRects()` outputs normalized card positions to matching.json; reverted sharp PNG compositing
+- `scripts/generate-activity-video.mjs` — loads matching.json from stage dir, maps matchRects to video pixel coords, passes through buildRenderProps
+- `remotion/compositions/ActivityChallenge.jsx` — `matchRects` prop, MatchingStickerOverlay delegation in PuzzleJoyoLayer
+- `remotion/components/MatchingStickerOverlay.jsx` — new: sticker overlay as Remotion layers (staticFile paths), Joyo thinking→celebrating crossfade at 1.8s
+- `output/queue/2026-05-01-activity-matching-test-01.json` — test queue item
+- `docs/OPENCLAW_REPORT_2026-05-01_oc-022.md` — audit report
+
+**What was done:** Direction clarified: stickers render as Remotion overlay layers, NOT baked into PNG at generation time. Generator outputs `matchRects: [{gridIndex, xNorm, yNorm, wNorm, hNorm}]` to matching.json (only allowed generator change). MatchingStickerOverlay renders 12 sticker images via staticFile + Joyo thinking during challenge, celebrating at solve end. Sticker paths confirmed at `public/assets/stickers/matching/<theme>/<name>.png`.
+
+**Test command:** `node scripts/generate-matching-assets.mjs --theme Animals --title "Animals Match" --slug test-matching-sticker-wiring` then `node scripts/generate-activity-video.mjs --id 2026-05-01-activity-matching-test-01`
+**Test output summary:** matching.json includes matchRects (12 entries). Hook "Can you remember where every match is hiding?" from curiosity pool. Video rendered 29.1s, 618 frames. Bundled in 4.0s. No corner watermark.
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** DONE — OC-020/021/022 sequence complete. Next: Ahmed reviews renders and marks tasks verified in TASKS.md.

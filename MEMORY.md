@@ -469,4 +469,4 @@ Protection rules:
 
 ---
 
-*Last updated: 2026-04-27 — Phase 0 gate updated, X cooldown extended to 2026-05-07, AGENT_LOG.md introduced, 3 OpenClaw tasks queued (OC-001/002/003), pool file corruption root-caused and specced for fix.*
+*Last updated: 2026-05-01 — OC-020 (hook system + TitleStrip variants + maze Joyo) COMPLETE. OC-021 (word-search audit) COMPLETE — no code changes needed. OC-022 (matching sticker overlay) COMPLETE — stickers as Remotion overlay layers, Joyo thinking→celebrating.*
