@@ -98,6 +98,21 @@ function shuffleInPlace(items, rng) {
 
 // ── Themed item pool ───────────────────────────────────────────────────────────
 
+function resolveStickerTheme(themeFamily) {
+  const map = {
+    animals: 'animals',
+    ocean: 'ocean',
+    space: 'space',
+    dinosaurs: 'dinosaurs',
+    farm: 'farm',
+    vehicles: 'vehicles',
+    fairy: 'animals',
+    jungle: 'animals',
+    default: 'animals',
+  };
+  return map[themeFamily] || 'animals';
+}
+
 async function loadWordPack(themeStr, maxLen = 20) {
   try {
     const packs = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'wordsearch-word-packs.json'), 'utf-8'));
@@ -193,13 +208,60 @@ function cardBackPattern() {
   </defs>`;
 }
 
-function buildBlankSvg(layout, grid) {
+async function loadStickerIndex() {
+  try {
+    return JSON.parse(await fs.readFile(path.join(ROOT, 'assets', 'stickers', 'matching', 'index.json'), 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+async function resolveStickerAssignments(selectedPairs, grid, stickerTheme, rng) {
+  const index = await loadStickerIndex();
+  if (!index?.themes?.[stickerTheme]) return null;
+
+  const names = index.themes[stickerTheme];
+  if (names.length < selectedPairs.length) return null;
+
+  const shuffled = shuffleInPlace([...names], rng);
+  const selected = shuffled.slice(0, selectedPairs.length);
+
+  const pairStickerMap = {};
+  selectedPairs.forEach((label, i) => { pairStickerMap[i] = selected[i]; });
+
+  const assignments = {};
+  for (let i = 0; i < grid.length; i++) {
+    const label = grid[i].item;
+    const pairIdx = selectedPairs.indexOf(label);
+    if (pairIdx === -1) continue;
+    const stickerName = pairStickerMap[pairIdx];
+    if (!stickerName) continue;
+    const stickerPath = path.join(ROOT, 'assets', 'stickers', 'matching', stickerTheme, `${stickerName}.png`);
+    try {
+      const buf = await fs.readFile(stickerPath);
+      const b64 = buf.toString('base64');
+      assignments[i] = `data:image/png;base64,${b64}`;
+    } catch {
+      // missing PNG — card renders with pattern background
+    }
+  }
+  return assignments;
+}
+
+function buildBlankSvg(layout, grid, stickerAssignments) {
   const { cardSize, offsetX, offsetY, gap, cols, rows } = layout;
   const patterns = cardBackPattern();
 
-  const cards = grid.map(cell => {
+  const cards = grid.map((cell, idx) => {
     const x = offsetX + cell.col * (cardSize + gap);
     const y = offsetY + cell.row * (cardSize + gap);
+    const sticker = stickerAssignments?.[idx];
+    if (sticker) {
+      const scale = (cardSize - 60) / 400;
+      const scaled = 400 * scale;
+      const inset = (cardSize - scaled) / 2;
+      return `  <image href="${sticker}" x="${x + inset}" y="${y + inset}" width="${scaled}" height="${scaled}" preserveAspectRatio="xMidYMid meet"/>`;
+    }
     return `  <rect x="${x}" y="${y}" width="${cardSize}" height="${cardSize}" rx="14" fill="url(#cardback)" stroke="#C8C4B0" stroke-width="2.5"/>`;
   }).join('\n');
 
@@ -259,10 +321,58 @@ ${labels}
 
 // ── Output helpers ─────────────────────────────────────────────────────────────
 
-async function writeSvgPng(svg, outSvgPath, outPngPath) {
-  await fs.writeFile(outSvgPath, svg, 'utf8');
-  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
-  await fs.writeFile(outPngPath, pngBuffer);
+async function buildMatchingPuzzleImage(layout, grid, stickerAssignments, outPath) {
+  // Create white canvas
+  const canvas = sharp({
+    create: {
+      width: CANVAS_W,
+      height: CANVAS_H,
+      channels: 4,
+      background: { r: 255, g: 255, b: 255, alpha: 1 },
+    },
+  });
+
+  const composites = [];
+
+  for (let i = 0; i < grid.length; i++) {
+    const cell = grid[i];
+    const x = layout.offsetX + cell.col * (layout.cardSize + layout.gap);
+    const y = layout.offsetY + cell.row * (layout.cardSize + layout.gap);
+    const cardSize = layout.cardSize;
+
+    // Draw card background (cardback pattern — off-white with dots)
+    composites.push({
+      input: Buffer.from(
+        `<svg width="${cardSize}" height="${cardSize}">
+          <rect width="${cardSize}" height="${cardSize}" fill="#E8E4D4" rx="14"/>
+          <circle cx="10" cy="10" r="3" fill="#C8C4B0"/>
+          <circle cx="30" cy="10" r="3" fill="#C8C4B0"/>
+          <circle cx="10" cy="30" r="3" fill="#C8C4B0"/>
+          <circle cx="30" cy="30" r="3" fill="#C8C4B0"/>
+        </svg>`
+      ),
+      blend: 'over',
+      top: Math.round(y),
+      left: Math.round(x),
+    });
+
+    // Composite sticker image if available
+    const stickerB64 = stickerAssignments?.[i];
+    if (stickerB64) {
+      const stickerBuf = Buffer.from(stickerB64.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+      const pad = Math.round(cardSize * 0.12);
+      const insetSize = cardSize - pad * 2;
+      const stickerImg = sharp(stickerBuf).resize(insetSize, insetSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
+      composites.push({
+        input: await stickerImg.toBuffer(),
+        blend: 'over',
+        top: Math.round(y + pad),
+        left: Math.round(x + pad),
+      });
+    }
+  }
+
+  await canvas.composite(composites).png().toFile(outPath);
 }
 
 function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, folderRel }) {
@@ -381,12 +491,22 @@ async function main() {
     seedHint: `${TITLE}|${THEME}|${DIFFICULTY}`,
   });
 
+  const stickerTheme = resolveStickerTheme(family);
+  const stickerAssignments = await resolveStickerAssignments(selectedPairs, grid, stickerTheme, rng);
+  if (stickerAssignments) {
+    const stickerCount = Object.keys(stickerAssignments).length;
+    console.log(`[matching-factory] stickerTheme: ${stickerTheme} (${stickerCount} cards wired)`);
+  } else {
+    console.log(`[matching-factory] stickerTheme: ${stickerTheme} (no PNGs found — using card backs)`);
+  }
+
   const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, folderRel });
   const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel });
 
   console.log(`[matching-factory] title      : ${TITLE}`);
   console.log(`[matching-factory] theme      : ${THEME}`);
   console.log(`[matching-factory] family    : ${family}`);
+  console.log(`[matching-factory] stickerTheme: ${stickerTheme}`);
   console.log(`[matching-factory] outDir    : ${outDir}`);
   console.log(`[matching-factory] seed      : ${seed}`);
   console.log(`[matching-factory] difficulty: ${DIFFICULTY}`);
@@ -400,16 +520,25 @@ async function main() {
 
   await fs.mkdir(outDir, { recursive: true });
 
-  const blankSvg = buildBlankSvg(layout, grid);
-  const solvedSvg = buildSolvedSvg(layout, pairs, grid);
-
+  // Write JSON sidecars
   await Promise.all([
     fs.writeFile(path.join(outDir, 'matching.json'), JSON.stringify(matchingJson, null, 2)),
     fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2)),
   ]);
-  await writeSvgPng(blankSvg, path.join(outDir, 'blank.svg'), path.join(outDir, 'blank.png'));
-  await writeSvgPng(solvedSvg, path.join(outDir, 'solved.svg'), path.join(outDir, 'solved.png'));
+
+  // Build blank.png with sticker images composited via sharp
+  await buildMatchingPuzzleImage(layout, grid, stickerAssignments, path.join(outDir, 'blank.png'));
   await fs.copyFile(path.join(outDir, 'blank.png'), path.join(outDir, 'puzzle.png'));
+
+  // solved.png uses the existing SVG path (colored cards + labels)
+  const solvedSvg = buildSolvedSvg(layout, pairs, grid);
+  await fs.writeFile(path.join(outDir, 'solved.svg'), solvedSvg, 'utf8');
+  const solvedPng = await sharp(Buffer.from(solvedSvg)).png().toBuffer();
+  await fs.writeFile(path.join(outDir, 'solved.png'), solvedPng);
+
+  // Write minimal blank.svg (card backgrounds, no embedded images — for reference only)
+  const blankSvg = buildBlankSvg(layout, grid, null);
+  await fs.writeFile(path.join(outDir, 'blank.svg'), blankSvg, 'utf8');
 
   console.log('[matching-factory] wrote files:');
   for (const file of ['activity.json', 'matching.json', 'blank.svg', 'blank.png', 'solved.svg', 'solved.png', 'puzzle.png']) {

@@ -1,0 +1,17 @@
+{
+  "id": "2026-05-01-matching-test-01",
+  "type": "image",
+  "category": "activity-matching",
+  "categoryName": "Matching",
+  "subject": "Animals Match",
+  "hookText": "How fast can your kid crack this puzzle?",
+  "outputs": {
+    "tiktok": "2026-05-01-matching-test-01-blank.png"
+  },
+  "imagePath": "output/challenge/generated-activity/test-matching-sticker-wiring/blank.png",
+  "blankImagePath": "output/challenge/generated-activity/test-matching-sticker-wiring/blank.png",
+  "solvedImagePath": "output/challenge/generated-activity/test-matching-sticker-wiring/solved.png",
+  "matchingJsonPath": "output/challenge/generated-activity/test-matching-sticker-wiring/matching.json",
+  "showJoyo": true,
+  "showBrandWatermark": false
+}

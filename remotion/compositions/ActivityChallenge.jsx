@@ -14,6 +14,7 @@ import { MazeSolverReveal } from '../components/MazeSolverReveal.jsx';
 import { WordSearchReveal } from '../components/WordSearchReveal.jsx';
 import { DotToDoReveal } from '../components/DotToDoReveal.jsx';
 import { BrandWatermark } from '../components/BrandWatermark.jsx';
+import { WordSearchJoyoOverlay } from '../components/WordSearchJoyoOverlay.jsx';
 
 export const activityChallengeSchema = {
   imagePath: '',
@@ -588,6 +589,7 @@ export const ActivityChallenge = ({
         solveFrames={solveFrames}
         mazeStartFraction={mazeStartFraction}
         mazeFinishFraction={mazeFinishFraction}
+        wordRects={wordRects}
       /> : null}
       {showBrandWatermark ? <BrandWatermark text="joymaze.com" position="bottom-center" /> : null}
     </AbsoluteFill>
@@ -604,11 +606,29 @@ const PuzzleJoyoLayer = ({
   solveFrames,
   mazeStartFraction,
   mazeFinishFraction,
+  wordRects,
 }) => {
   const isMaze = puzzleType === 'maze';
+  const isWordSearch = puzzleType === 'word-search';
+  const isMatching = puzzleType === 'matching';
   const isSolving = frame >= solveStart;
   const celebrateStart = solveStart + solveFrames - Math.round(fps * 1.8);
   const isCelebrating = isSolving && frame >= celebrateStart;
+
+  // Word-search has its own dedicated overlay — render it and bail out early
+  if (isWordSearch) {
+    return (
+      <WordSearchJoyoOverlay
+        frameBounds={frameBounds}
+        wordRects={wordRects ?? []}
+        challengeFrames={challengeFrames}
+        solveStart={solveStart}
+        solveFrames={solveFrames}
+        frame={frame}
+        fps={fps}
+      />
+    );
+  }
 
   const startX = mazeStartFraction
     ? frameBounds.x + mazeStartFraction.x * frameBounds.width
@@ -617,10 +637,7 @@ const PuzzleJoyoLayer = ({
     ? frameBounds.y + mazeStartFraction.y * frameBounds.height
     : frameBounds.y + 12;
 
-  const startSpring = spring({ frame: Math.max(0, frame), fps, config: { stiffness: 300, damping: 12 } });
-  const startScale = Math.min(1, startSpring);
   const startBob = Math.sin((frame / fps) * Math.PI * 2 / 1.4) * 5;
-
   const finishX = mazeFinishFraction
     ? frameBounds.x + mazeFinishFraction.x * frameBounds.width
     : frameBounds.x + frameBounds.width - 72;
@@ -628,7 +645,6 @@ const PuzzleJoyoLayer = ({
     ? frameBounds.y + mazeFinishFraction.y * frameBounds.height
     : frameBounds.y + frameBounds.height - 72;
   const trophyPulse = 1 + Math.sin((frame / fps) * Math.PI * 2 / 1.2) * 0.06;
-
   const fadeFrames = 12;
   const runningOpacity = isCelebrating
     ? Math.max(0, 1 - (frame - celebrateStart) / fadeFrames)
@@ -636,11 +652,13 @@ const PuzzleJoyoLayer = ({
   const celebOpacity = isCelebrating
     ? Math.min(1, (frame - celebrateStart) / fadeFrames)
     : 0;
-
   const celebX = frameBounds.x + frameBounds.width / 2;
   const celebY = frameBounds.y + frameBounds.height - 100;
+
   const celebSpring = spring({ frame: Math.max(0, frame - celebrateStart), fps, config: { stiffness: 320, damping: 10 } });
   const celebScale = Math.min(1, celebSpring);
+  const startSpring = spring({ frame: Math.max(0, frame), fps, config: { stiffness: 300, damping: 12 } });
+  const startScale = Math.min(1, startSpring);
 
   const nonMazeCelebOpacity = !isMaze && isCelebrating ? 1 : 0;
 
@@ -666,6 +684,7 @@ const PuzzleJoyoLayer = ({
 
   return (
     <>
+      {/* Maze: Joyo running + trophy during challenge, crossfade to celebrating at end */}
       {isMaze && frame < solveStart && (
         <>
           <div style={{
@@ -688,8 +707,8 @@ const PuzzleJoyoLayer = ({
         <>
           <div style={{
             position: 'absolute',
-            left: isCelebrating ? startX : startX,
-            top: isCelebrating ? startY : startY,
+            left: startX,
+            top: startY,
             transform: 'translate(-50%, -50%)',
             zIndex: 9,
             opacity: isCelebrating ? runningOpacity : (isSolving ? 0 : 1),
@@ -713,7 +732,23 @@ const PuzzleJoyoLayer = ({
         </>
       )}
 
-      {!isMaze && (
+      {/* Matching: Joyo thinking during challenge, celebrating at solve end */}
+      {isMatching && frame < solveStart && (
+        <div style={{
+          position: 'absolute',
+          left: frameBounds.x + frameBounds.width - 120,
+          top: frameBounds.y + frameBounds.height - 140,
+          transform: `translate(-50%, -50%) scale(${startSpring})`,
+          zIndex: 9,
+        }}>
+          <div style={{ transform: `translateY(${Math.sin((frame / fps) * Math.PI * 2 / 1.4) * 5}px)` }}>
+            <Img src={staticFile('assets/mascot/joyo_thinking.png')} style={{ width: 88, height: 88 }} />
+          </div>
+        </div>
+      )}
+
+      {/* All puzzle types: celebrating at last 1.8s of solve */}
+      {(isMatching || !isMaze) && (
         <div style={{
           position: 'absolute',
           left: frameBounds.x + frameBounds.width / 2,
