@@ -1,0 +1,14 @@
+{
+  "type": "image",
+  "category": "activity-word-search",
+  "categoryName": "Activity: Word Search",
+  "subject": "Fairy Tale Castle Word Search",
+  "hookText": "There is always one word people miss. Can your kid find it?",
+  "outputs": {
+    "tiktok": "fairy-tale-castle-ws-blank.png"
+  },
+  "solvedImagePath": "output/challenge/generated-activity/2026-04-30-slot03-fairy-tale-castle-word-search/solved.png",
+  "wordsearchJsonPath": "output/challenge/generated-activity/2026-04-30-slot03-fairy-tale-castle-word-search/wordsearch.json",
+  "showJoyo": true,
+  "showBrandWatermark": false
+}
