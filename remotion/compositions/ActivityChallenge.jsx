@@ -677,7 +677,7 @@ const PuzzleJoyoLayer = ({
             zIndex: 9,
           }}>
             <div style={{ transform: `translateY(${startBob}px)` }}>
-              <Img src={staticFile('assets/images/joyo_running.png')} style={{ width: 90, height: 90 }} />
+              <Img src={staticFile('assets/mascot/joyo_running.png')} style={{ width: 90, height: 90 }} />
             </div>
           </div>
           <TrophyMarker x={finishX} y={finishY} />
@@ -696,7 +696,7 @@ const PuzzleJoyoLayer = ({
           }}>
             {!isCelebrating && (
               <div style={{ transform: `translateY(${startBob}px)` }}>
-                <Img src={staticFile('assets/images/joyo_running.png')} style={{ width: 90, height: 90 }} />
+                <Img src={staticFile('assets/mascot/joyo_running.png')} style={{ width: 90, height: 90 }} />
               </div>
             )}
           </div>
@@ -708,7 +708,7 @@ const PuzzleJoyoLayer = ({
             zIndex: 9,
             opacity: celebOpacity,
           }}>
-            <Img src={staticFile('assets/images/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
+            <Img src={staticFile('assets/mascot/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
           </div>
         </>
       )}
@@ -722,7 +722,7 @@ const PuzzleJoyoLayer = ({
           zIndex: 9,
           opacity: nonMazeCelebOpacity,
         }}>
-          <Img src={staticFile('assets/images/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
+          <Img src={staticFile('assets/mascot/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
         </div>
       )}
     </>

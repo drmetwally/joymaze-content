@@ -279,6 +279,8 @@ async function loadSolverProps(stageDir) {
   const solverProps = {
     pathWaypoints: null,
     pathColor: undefined,
+    mazeStartFraction: null,
+    mazeFinishFraction: null,
     wordRects: null,
     highlightColor: undefined,
     dotWaypoints: null,
@@ -289,7 +291,8 @@ async function loadSolverProps(stageDir) {
   if (await fileExists(pathJson)) {
     try {
       const data = JSON.parse(await fs.readFile(pathJson, 'utf-8'));
-      solverProps.pathWaypoints = (data.waypoints || []).map((point) => {
+      const waypoints = data.waypoints || [];
+      solverProps.pathWaypoints = waypoints.map((point) => {
         const mapped = mapContainPoint({
           x: point.x,
           y: point.y,
@@ -298,6 +301,10 @@ async function loadSolverProps(stageDir) {
         });
         return { x: mapped.x, y: mapped.y };
       });
+      if (waypoints.length > 0) {
+        solverProps.mazeStartFraction = { x: waypoints[0].x, y: waypoints[0].y };
+        solverProps.mazeFinishFraction = { x: waypoints[waypoints.length - 1].x, y: waypoints[waypoints.length - 1].y };
+      }
       if (data.pathColor) solverProps.pathColor = data.pathColor;
     } catch {
       // ignore malformed sidecar, degrade cleanly
@@ -423,9 +430,11 @@ function buildRenderProps({ meta, sourceId, activityType, stagedAssets, hookText
     transitionCueAudioPath: audioPaths.transitionCueAudioPath,
     solveAudioPath: audioPaths.solveAudioPath,
     showJoyo: meta.showJoyo ?? true,
-    showBrandWatermark: meta.showBrandWatermark ?? true,
+    showBrandWatermark: meta.showBrandWatermark ?? false,
     pathWaypoints: stagedAssets.pathWaypoints,
     pathColor: stagedAssets.pathColor,
+    mazeStartFraction: stagedAssets.mazeStartFraction,
+    mazeFinishFraction: stagedAssets.mazeFinishFraction,
     wordRects: stagedAssets.wordRects,
     highlightColor: stagedAssets.highlightColor,
     dotWaypoints: stagedAssets.dotWaypoints,
