@@ -10,6 +10,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const OUTPUT_ROOT = path.join(ROOT, 'output', 'challenge', 'generated-activity');
 
+const difficultyDefaults = {
+  easy: { size: 10, words: 6, directions: ['right', 'down'] },
+  medium: { size: 12, words: 8, directions: ['right', 'down'] },
+  hard: { size: 14, words: 10, directions: ['right', 'down', 'diag-down-right', 'diag-up-right'] },
+  difficult: { size: 15, words: 11, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right'] },
+  extreme: { size: 16, words: 12, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right', 'diag-down-left', 'diag-up-left'] },
+};
+
 const CANVAS_W = 1700;
 const CANVAS_H = 2200;
 const BG_COLOR = '#FFFFFF';
@@ -30,7 +38,12 @@ const TITLE = getArg('--title', 'Garden Word Search');
 const THEME = getArg('--theme', TITLE);
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
 const COUNTDOWN_SEC = Number(getArg('--countdown', '17'));
-const SOLVE_DURATION_SEC = 15;
+// Adaptive timing: 1.5s per word minimum, floor of 15s
+const WORD_COUNT_FOR_TIMING = difficultyDefaults[DIFFICULTY]?.words ?? 8;
+const ADAPTIVE_COUNTDOWN = Math.max(Math.round(WORD_COUNT_FOR_TIMING * 1.5), 15);
+const FINAL_COUNTDOWN = Number.isFinite(Number(getArg('--countdown', ''))) ? Number(getArg('--countdown', '17')) : ADAPTIVE_COUNTDOWN;
+// Adaptive solve: 1.8s per word minimum, floor of 18s, no cap
+const ADAPTIVE_SOLVE = Math.max(WORD_COUNT_FOR_TIMING * 1.8, 18);
 const DEFAULT_CHALLENGE_AUDIO_VOLUME = 0.1;
 const DEFAULT_TICK_AUDIO_VOLUME = 0.3;
 const DEFAULT_TRANSITION_CUE_VOLUME = 0.24;
@@ -39,14 +52,6 @@ const SEED_ARG = getArg('--seed');
 const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
 const WORDS_ARG = getArg('--words');
-
-const difficultyDefaults = {
-  easy: { size: 10, words: 6, directions: ['right', 'down'] },
-  medium: { size: 12, words: 8, directions: ['right', 'down'] },
-  hard: { size: 14, words: 10, directions: ['right', 'down', 'diag-down-right', 'diag-up-right'] },
-  difficult: { size: 15, words: 11, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right'] },
-  extreme: { size: 16, words: 12, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right', 'diag-down-left', 'diag-up-left'] },
-};
 
 function slugify(input) {
   return String(input || '')
@@ -304,7 +309,7 @@ async function main() {
 
   const hookTitle = await buildChallengeHook({
     puzzleType: 'word-search',
-    countdownSec: COUNTDOWN_SEC,
+    countdownSec: FINAL_COUNTDOWN,
     wordsCount: words.length,
     seedHint: `${TITLE}|${THEME}|${DIFFICULTY}|${words.join(',')}`,
   });
@@ -313,7 +318,7 @@ async function main() {
 
   const activityJson = {
     type: 'challenge', puzzleType: 'word-search', difficulty: DIFFICULTY, theme: THEME, titleText: hookTitle, hookText: hookTitle,
-    ctaText: 'Tag a kid who can find them all', activityLabel: 'WORD SEARCH', countdownSec: COUNTDOWN_SEC, hookDurationSec: 2.5, holdAfterSec: SOLVE_DURATION_SEC,
+    ctaText: 'Tag a kid who can find them all', activityLabel: 'WORD SEARCH', countdownSec: FINAL_COUNTDOWN, hookDurationSec: 2.5, holdAfterSec: ADAPTIVE_SOLVE,
     imagePath: 'puzzle.png', blankImage: 'blank.png', solvedImage: 'solved.png', highlightColor: HIGHLIGHT_COLOR,
     challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME, tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME, transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME, solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
     showJoyo: true, showBrandWatermark: false, sourceFolder: folderRel,

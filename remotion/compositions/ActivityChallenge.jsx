@@ -462,30 +462,32 @@ export const ActivityChallenge = ({
         )}
       </AbsoluteFill>
 
-      {normalizedType === 'maze' && mazeStartFraction ? (
-        <PuzzleBadge
-          x={frameBounds.x + mazeStartFraction.x * frameBounds.width}
-          y={frameBounds.y + mazeStartFraction.y * frameBounds.height}
-          text="▶ START"
-          bg="#FFFFFF"
-          color="#1F7A3A"
-          border="#49C16D"
-          rotate={-6}
-        />
-      ) : null}
+      {/* Maze: food reward at exit bottom during challenge */}
+      {isMaze && (
+        <div style={{
+          position: 'absolute',
+          left: frameBounds.x + frameBounds.width / 2,
+          top: frameBounds.y + frameBounds.height - 30,
+          transform: `translate(-50%, -50%) scale(${trophyPulse})`,
+          zIndex: 8,
+        }}>
+          <div style={{
+            width: 72,
+            height: 72,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, #FFE066 0%, #FFB800 60%, #CC8800 100%)',
+            border: '3px solid rgba(255,255,255,0.7)',
+            boxShadow: '0 0 18px rgba(255,200,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: 38 }}>🍎</span>
+          </div>
+        </div>
+      )}
 
-      {normalizedType === 'maze' && mazeFinishFraction ? (
-        <PuzzleBadge
-          x={frameBounds.x + mazeFinishFraction.x * frameBounds.width}
-          y={frameBounds.y + mazeFinishFraction.y * frameBounds.height}
-          text="★ FINISH"
-          bg="#FFF7D6"
-          color="#8A5B00"
-          border="#F2C94C"
-          rotate={6}
-        />
-      ) : null}
-
+      {/* Word-search theme badge */}
       {normalizedType === 'word-search' ? <ThemeEmojiBadge frameBounds={frameBounds} emoji={themeEmoji} /> : null}
 
       <div
@@ -718,7 +720,7 @@ const PuzzleJoyoLayer = ({
             transformOrigin: 'bottom center',
             zIndex: 9,
           }}>
-            <div style={{ transform: `translateY(${startBob}px)` }}>
+            <div style={{ transform: `translateY(${startBob}px) scaleX(-1)` }}>
               <Img src={staticFile('assets/mascot/joyo_running.png')} style={{ width: 90, height: 90 }} />
             </div>
           </div>
