@@ -128,13 +128,9 @@ function stickerHtml(meta, cfg) {
 }
 
 function wordSearchFooterHtml(meta, cfg) {
-  if (meta.puzzleType !== 'word-search' || !meta.layout?.wordsTop) return '';
-  const fit = fittedCropLayout(meta.layout);
-  const y = fit.zoneTop + (((meta.layout.wordsTop - fit.cropY) / fit.cropH) * fit.fittedH) - 30;
-  const cardH = fit.fittedH;
-  const footerH = 32;
-  const bottomY = cardH - footerH;
-  return `<div class="word-label-zone" style="position:absolute;left:0;right:0;bottom:${footerH}px;top:auto;height:${footerH}px;"><div class="word-label-divider"></div><div class="word-label-text">FIND THESE WORDS</div></div>`;
+  // The word list is already baked into the word-search SVG and rendered with the cropped viewBox.
+  // No separate footer overlay needed — returning empty avoids a misplaced duplicate label.
+  return '';
 }
 
 export async function buildPostHtml(svgContent, titleText, cfg, meta = {}) {

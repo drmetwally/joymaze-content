@@ -5,6 +5,7 @@ import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 import { buildChallengeHook } from './lib/challenge-hooks.mjs';
+import { pickAsset } from './lib/asset-library.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -395,6 +396,41 @@ async function main() {
   if (family === 'ocean') { factories = OCEAN_FACTORIES; palette = OCEAN_PALETTE; }
   else if (family === 'space') { factories = SPACE_FACTORIES; palette = SPACE_PALETTE; }
   else { factories = ANIMAL_FACTORIES; palette = ANIMAL_PALETTE; }
+
+  // ── Asset library check ─────────────────────────────────────────────────────
+  // If an illustrated PNG exists in the library for this theme, use it as the
+  // coloring page background and skip programmatic SVG shape generation.
+  // Falls back to SVG shapes if no library asset is available.
+  const libraryPngPath = await pickAsset(family, 'scene');
+  if (libraryPngPath) {
+    console.log(`[coloring-factory] using library asset: ${libraryPngPath}`);
+    // Use illustrated PNG as blank.png (pre-colored) + colored.png (same, for ASMR end state)
+    const blankImg = await sharp(libraryPngPath).metadata().then(m => ({ w: m.width, h: m.height }));
+    const blankBuf = await fs.readFile(libraryPngPath);
+    await fs.mkdir(outDir, { recursive: true });
+    await Promise.all([
+      fs.writeFile(path.join(outDir, 'blank.png'), blankBuf),
+      fs.writeFile(path.join(outDir, 'colored.png'), blankBuf),
+      fs.writeFile(path.join(outDir, 'puzzle.png'), blankBuf),
+    ]);
+    const activityJson = {
+      type: 'challenge', puzzleType: PUZZLE_TYPE, difficulty: DIFFICULTY, theme: THEME,
+      titleText: `Color the ${THEME}!`, hookText: `Color the ${THEME}!`,
+      ctaText: 'Show us your coloring in the comments!',
+      activityLabel: 'COLORING PAGE', countdownSec: COUNTDOWN_SEC, hookDurationSec: 2.5,
+      holdAfterSec: SOLVE_DURATION_SEC, blankImage: 'blank.png', solvedImage: 'colored.png',
+      imagePath: 'puzzle.png', challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
+      tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME, transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
+      solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME, showJoyo: true, showBrandWatermark: false,
+      sourceFolder: folderRel,
+    };
+    await fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2));
+    console.log('[coloring-factory] wrote files (library PNG path):');
+    for (const f of ['activity.json', 'blank.png', 'colored.png', 'puzzle.png']) {
+      console.log(`  - ${path.join(outDir, f)}`);
+    }
+    return;
+  }
 
   // Build slots — fill some with themed objects, leave rest empty
   const totalSlots = SLOT_COLS * SLOT_ROWS; // 12

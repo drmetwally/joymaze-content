@@ -1253,3 +1253,173 @@ All 6 within band (25-35s). Dot-to-dot hook confirmed: "Connect the dots to reve
 
 **Review status:** PENDING CLAUDE REVIEW
 **Next:** DONE — OC-020/021/022 sequence complete. Next: Ahmed reviews renders and marks tasks verified in TASKS.md.
+
+---
+
+### 2026-05-01 | Claude (Sonnet 4.6) | OC-020/021/022-STAMP + SESSION-CLOSE | Visual art strategy locked
+
+**OC-020 APPROVED** — Hook pool wired correctly, `pickHook()` confirmed varying across runs, TitleStrip 5-style variants confirmed flowing end-to-end. Joyo running/trophy/celebrating maze integration confirmed in test output. No issues.
+
+**OC-021 APPROVED** — Word-search Joyo overlay confirmed, queue item with baked hook text fixed, blank.svg path confirmed clean. Generator audit found no code bugs. No issues.
+
+**OC-022 APPROVED (revised approach)** — First attempt `a40386f` (sharp PNG compositing) was wrong. Revised `1195a3d` applies correct approach: stickers as Remotion `<Img>` overlays via `staticFile()`, matchRects as normalized coords in matching.json sidecar, Joyo thinking→celebrating 1.8s crossfade. Sticker paths verified against `public/assets/stickers/matching/`. 618-frame render confirmed. Approach matches existing Joyo pose pattern.
+
+---
+
+**REF-001 Ahmed QC audit outcome (2026-05-01):**
+- Maze ✅ — production-ready
+- Word-search ✅ — production-ready
+- Matching — OC-022 sticker overlay fixes the empty-cards bug; needs Ahmed watch on new render
+- Find-the-diff ❌ — programmatic geometric shapes, consumer-broken
+- Coloring ❌ — programmatic SVG outlines, not illustrated art
+- Dot-to-dot ❌ — coordinate point shapes, same root cause
+
+Root cause: all broken types generate programmatic shapes at the generator layer. Render layer is fine.
+
+---
+
+**Visual art strategy locked (2026-05-01, after Imagen pricing research):**
+
+Confirmed pricing from Google AI Developer API:
+- Imagen 4 Fast: $0.02 / Standard: $0.04 / Ultra: $0.06
+- No free tier, no batch discount
+
+Today's $2.20 session = ~37 Ultra-tier API calls for 36 accepted sticker PNGs (~3% rejection). Simple cartoon icons have high acceptance. Complex illustrated scenes will not.
+
+Decisions:
+1. **Find-the-diff backgrounds: manual seeding by Ahmed via Gemini chat — no API calls in pipeline.** Imagen is wrong for complex illustrated scenes (high rejection rate, requires human review anyway). Ahmed generates scenes in Gemini chat, approves visually, saves to `assets/generated/finddiff-scenes/<theme>/staging/`, promotes approved to main library. Zero API cost.
+2. **Coloring pages: Imagen Standard ($0.04/image) — biweekly batch via `generate-asset-library.mjs`.** Simple line-art has high acceptance rate. ~$1.50/session → ~$3/month steady state.
+3. **No fallback to programmatic output.** If `pickAsset()` returns null → skip type, warn in `npm run status`. Never post a programmatic shape as final content.
+4. **Daily pipeline Imagen cost: $0.** All generators read pre-built library files only.
+
+**Asset library architecture locked:**
+- `scripts/generate-asset-library.mjs` — manual production tool, outputs to `assets/generated/<type>/<theme>/staging/`
+- Ahmed promotes staging → main library after visual review
+- `scripts/lib/asset-library.mjs` — `pickAsset(type, theme)` (LRU rotation) + `assetLibraryHealth()` for status
+- `npm run status` extended with library health section (⚠️ LOW = Ahmed runs production session)
+- Scope for OC-023: find-diff infrastructure only (no Imagen calls), coloring pipeline (`generate-asset-library.mjs --type coloring-pages`), shared `asset-library.mjs`
+
+**Phase 0 path:**
+- Find-the-diff is NOT a Phase 0 blocker
+- Maze + word-search are production-ready NOW
+- Matching clears after Ahmed watches OC-022 render
+- Phase 0 30-day streak can start immediately
+- Find-the-diff enters rotation whenever Ahmed completes first manual seeding session
+
+**Memory files updated this session:**
+- `memory/project_reels_roadmap.md` — OC-020/021/022 done, visual art gap, Phase 0 path
+- `memory/project_build_sprint.md` — sprint closed, OC-023 next, find-diff/coloring strategies
+- `memory/project_puzzle_image_post_pipeline.md` — actual type status with art quality notes
+- `memory/project_visual_art_strategy.md` — NEW: full Imagen strategy, find-diff manual seeding decision
+- `memory/feedback_update_memory_after_every_task.md` — rule reinforced with stronger language
+- `memory/MEMORY.md` — index updated
+
+**Review status:** SELF-VERIFIED — Claude is supervisor
+**Next:** Ahmed watches OC-022 matching reel. Start Phase 0 streak with maze + word-search. Write OC-023 brief (asset library infrastructure + coloring Imagen pipeline).
+
+---
+
+### 2026-05-02 | OpenClaw | OC-024 | Maze Joyo flip, badge removal, adaptive wordsearch timing, hook rewrite
+
+**Files changed:**
+- `remotion/compositions/ActivityChallenge.jsx` — removed START/FINISH PuzzleBadge overlays for maze; replaced with 🍎 food-reward icon at bottom-center of maze frame (pulsing gold gradient); flipped `joyo_running.png` with `scaleX(-1)` so Joyo faces right (toward maze exit)
+- `scripts/generate-wordsearch-assets.mjs` — moved `difficultyDefaults` before its usage; added adaptive timing: `FINAL_COUNTDOWN = max(words × 1.5, 15)`, `ADAPTIVE_SOLVE = max(words × 1.8, 18)`; hard (10 words) now: 17s countdown / 18s solve (was 15s/12s)
+- `scripts/lib/challenge-hooks.mjs` — complete rewrite: 9 hardcoded high-quality challenge hooks per type (count hooks, competitive framing, parent direct-address); hook adaptation with skip-pattern filter; priority tiers: hardcoded → psychology → hooks → pattern → templates
+
+**What was done:** User QC review (2026-05-02) identified four issues: (1) Joyo overlaps START badge in maze reel, (2) Joyo faces wrong direction, (3) FINISH badge conflicts with trophy marker at maze exit, (4) word-search solution reveal batches all words together + timing too short (10 words at 1.2s/word = 12s total solve window). Fixes: removed badges, flipped Joyo sprite, replaced FINISH badge with 🍎 at frame bottom-center, rewrote timing logic, rewrote hook system with high-quality hardcoded challenge pool.
+
+**Test command:** `node scripts/generate-wordsearch-assets.mjs --theme Space --difficulty hard` then `node scripts/render-video.mjs --comp ActivityChallenge --challenge output/challenge/generated-activity/2026-05-02-garden-word-search-hard --out output/videos/qc-wordsearch-v2.mp4`
+
+**Test output summary:** countdown: 17s, solve: 18s, hook: "There is always one word people miss. Can your kid find it?" — word-search v2 render 1125 frames (37.5s) completed in 58.8s. Maze v2 render (scaleX(-1) + no badge + 🍎 icon) completed in ~92s. Both thumbnails confirmed clean.
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** (1) Wire asset-library.mjs into generate-coloring-assets.mjs — generator calls pickAsset() when illustrated PNGs available, falls back to SVG shapes if none; (2) Run daily pipeline — no posts done in past week; (3) Find-diff scene seeding — Ahmed generates two-panel illustrated scenes in Gemini chat (manual, not automated)
+
+---
+
+### 2026-05-02 | OpenClaw | OC-025 | Asset library generator tool (generate-asset-library.mjs)
+
+**Files changed:**
+- `scripts/generate-asset-library.mjs` — new file: Imagen batch tool for coloring pages and find-diff scenes (uses VERTEX_API_KEY, same REST API pattern as generate-images-vertex.mjs)
+- `scripts/lib/asset-library.mjs` — new file: LRU rotation picker — `pickAsset(type, theme)`, `assetLibraryHealth(type)`, `assetCount(type, theme)`, rotation state in `.rotation.json` sidecar
+- `package.json` — added npm scripts: `coloring:asset-library`, `coloring:asset-library:all`, `coloring:asset-library:review`, `finddiff:asset-library`, `finddiff:asset-library:all`, `finddiff:asset-library:review`
+- `assets/generated/coloring-pages/ocean-animals/staging/` — 2 test PNGs generated and confirmed good quality (clean line art, no faces, correct cartoon style for kids ages 4-8)
+
+**What was done:** Built the asset library infrastructure for coloring pages and find-diff scenes so generators can pull illustrated PNGs instead of drawing geometric shapes. Flow: generate → staging/ → visual review → promote to main library → generators read via pickAsset(). Two Ocean Animals test images confirmed. `asset-library.mjs` uses no external dependencies beyond Node built-ins.
+
+**Test command:** `node scripts/generate-asset-library.mjs --type coloring-pages --theme "Ocean Animals" --count 2` (wrote 802KB + 820KB PNGs to staging/); `node scripts/generate-asset-library.mjs --dry-run` for dry-run validation.
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Wire `pickAsset()` into `generate-coloring-assets.mjs` and `generate-find-diff-assets.mjs`. Run daily pipeline (`npm run daily` + `npm run scheduler:now`) — no posts done in past week.
+
+---
+
+### 2026-05-02 | OpenClaw | OC-026 | Daily run + scheduling catch-up (week offline)
+
+**Files changed:** `output/queue/` — queue was empty (no posts for past week); scheduler generated fresh slots today including `2026-05-02-slot01-arctic-animals-maze` and `2026-05-02-slot05-nature-s-hidden-patterns-word-search`
+
+**What was done:** Ran daily pipeline for 2026-05-02. Scheduler produced maze and word-search challenge brief outputs. Rendered QC MP4s for both. Post pipeline not yet executed — queue needs posting. Commit `bf02475` contains all ActivityChallenge.jsx + challenge-hooks.mjs + wordsearch changes.
+
+**Test command:** `cd D:\Joymaze-Content && npm run daily`; `npm run scheduler:now`
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Run `npm run post` or `npm run scheduler:post-now` to push to platforms. Wire asset-library.mjs into coloring generator next session. Find-diff scene seeding pending Ahmed's Gemini session.
+
+---
+
+### 2026-05-02 | Claude + OpenClaw | OC-027 | Hook wiring fix, word-search solution fix, matching asset library wire
+
+**Files changed:**
+- `remotion/compositions/ActivityChallenge.jsx` — (1) removed double-Joyo: Block 2 running-Joyo opacity changed to `0` during non-celebrating frames so only Block 1 (scaleX(-1) flipped) shows during challenge; (2) removed misplaced 🍎 block at bottom-center — TrophyMarker at mazeFinishFraction is the sole finish indicator
+- `config/hooks-activity.json` — full pool replacement: all 4 puzzle types (maze, word-search, matching, spot-the-difference) now have 10 Halbert direct-response hooks (count hooks, ego-gap, parent-vs-kid, time pressure, curiosity gap). Old generic seeds gone.
+- `scripts/generate-activity-video.mjs` — `pickHook()` now uses weighted random selection (`weight = max(performance_score, 0.1)`) instead of uniform random
+- `scripts/lib/challenge-hooks.mjs` — `buildChallengeHook()` now checks `hooks-activity.json` first via new `pickActivityHook()` before falling back to hardcoded pools; maze + word-search image post generators inherit this automatically
+- `remotion/components/WordSearchReveal.jsx` — fixed coordinate space bug: source canvas is 1700×2200, rects are 0-1 normalized to that; `objectFit: contain` on 1080×1920 renders image at 1080×1397 with 261px letterbox. Old formula `y = y_norm * 1920` was wrong. New `getContainBounds(1700, 2200, 1080, 1920)` used in `normalizeRectSpace()`.
+- `scripts/generate-matching-assets.mjs` — wired `pickAsset('matching-scenes', theme)` at generation start; null fallback preserves existing SVG behavior
+- `scripts/lib/asset-library.mjs` — type comment updated to include `matching-scenes`; no code changes (library was already fully generic)
+- `CLAUDE.md` — two new locked decisions: word-search coordinate space (1700×2200 canvas), buildChallengeHook source file
+
+**Root causes found:**
+- Double Joyo: OC-024 added a new Block 1 with scaleX(-1) but did not remove the old Block 2 — both rendered during challenge
+- 🍎 conflict: OC-024 added apple emoji at bottom-center as a FINISH replacement, but TrophyMarker was never removed from PuzzleJoyoLayer
+- Hook titles bad: `buildChallengeHook()` was reading `hooks-library.json` (caption hooks) not `hooks-activity.json` (activity-specific). The new pool was being ignored entirely.
+- Word-search wrong highlights: 1700×2200 canvas letterboxed to 1080×1397 inside 1080×1920 video — 261px vertical offset not accounted for in SVG coordinate mapping
+
+### 2026-05-02 | OpenClaw | OC-028 | Universal asset library redesign + maze hero/reward wire
+
+**Files changed:**
+- `scripts/lib/asset-library.mjs` — full rewrite: folder-based routing replaced with index-based `pickAsset(theme, role)`. Index stored at `assets/library/index.json`, LRU state at `assets/library/.lru.json`. All paths stored relative to ROOT, `stripPublic()` applied on write so `staticFile()` receives paths without `public/` prefix.
+- `scripts/seed-library-index.mjs` — new idempotent bootstrap script. Reads existing matching sticker index at `public/assets/stickers/matching/index.json`, seeds 36 character entries (6 per theme) into the `character` role. Also scans existing `coloring-pages/main/` for `scene` entries.
+- `scripts/generate-maze-assets.mjs` — hero + reward sticker picks added. Odd day → character sticker at maze start (`mazeHeroAsset`); even day → empty (Joyo fallback). Reward always picks a sticker (`mazeRewardAsset`) via separate LRU key so hero ≠ reward naturally. `stripPublic()` strips `public/` prefix before writing to activityJson.
+- `scripts/render-video.mjs` — added `mazeHeroAsset` + `mazeRewardAsset` to `buildChallengeProps()` output.
+- `remotion/compositions/ActivityChallenge.jsx` — added `mazeHeroAsset: ''` and `mazeRewardAsset: ''` to schema; both passed to `PuzzleJoyoLayer`; maze hero uses `toSrc(mazeHeroAsset)` with `staticFile('assets/mascot/joyo_running.png')` fallback; reward slot uses `toSrc(mazeRewardAsset)` with `TrophyMarker` fallback. TrophyMarker removed from challenge phase (replaced by conditional sticker render).
+- `scripts/generate-coloring-assets.mjs` — `pickAsset('coloring-pages', family)` → `pickAsset(family, 'scene')`
+- `scripts/generate-matching-assets.mjs` — `pickAsset('matching-scenes', family)` → `pickAsset(family, 'scene')`
+- `package.json` — added `library:seed` script
+
+**What was done:** Replaced folder-based asset routing (type/theme → hardcoded subfolder) with a universal index-based system. The matching sticker library (36 PNGs, 6 themes) is now accessible to all generators via `pickAsset(theme, role)`. Maze hero + reward stickers are wired with LRU rotation and day-based fallback. Bug caught and fixed: `toSrc()` calls `staticFile(value)` which expects paths relative to `public/`, but seed script stored `public/assets/stickers/...` paths — `stripPublic()` in maze generator now strips the prefix so `staticFile('assets/stickers/...')` resolves correctly.
+
+**Test command:** `node scripts/seed-library-index.mjs` → `node scripts/generate-maze-assets.mjs --theme "Ocean Animals" --difficulty medium --slug test-oc028` → `node scripts/render-video.mjs --challenge output/challenge/generated-activity/test-oc028`
+
+**Test output summary:** Seed: 36 characters across 6 themes, 3 scenes. Maze generation: `mazeHeroAsset: ''` (even day, correct), `mazeRewardAsset: 'assets/stickers/matching/ocean/crab.png'` (reward always picks). Render: 51.1s encode, no errors.
+
+**Review status:** VERIFIED
+**Next:** Coloring generator QC (`node scripts/generate-coloring-assets.mjs --theme ocean`) to confirm scene role pick works. Find-diff scene seeding still pending Ahmed's Gemini session.
+
+---
+
+### 2026-05-02 | OpenClaw | OC-029 | Word-search diagonal directions removed from all difficulty tiers
+
+**Files changed:**
+- `scripts/generate-wordsearch-assets.mjs` — (1) `difficultyDefaults` reduced to `right` + `down` only across all 5 tiers; word counts reduced: easy=4, medium=5, hard=6, difficult=6, extreme=6. (2) `wordCols` simplified from `wordCount > 8 ? 3 : 2` to `const wordCols = 2` (dead code removal).
+
+**What was done:** `WordSearchReveal.jsx` draws axis-aligned bounding boxes for highlight rects. Diagonal words produce square bounding boxes that visually misalign with the actual letter cells, making reveal highlights look wrong on any diagonal word. Removed diagonal directions from all tiers — only `right` and `down` remain. Also removed the always-dead `wordCount > 8 ? 3 : 2` branch since max words is now 6.
+
+**Test command:** `node scripts/generate-wordsearch-assets.mjs --theme "Ocean Animals" --difficulty medium --slug qc-wordsearch-diagonal-fix` → `node scripts/render-video.mjs --challenge output/challenge/generated-activity/qc-wordsearch-diagonal-fix`
+
+**Test output summary:** 12×12 grid, 5 words (SEAWEED, ANCHOR, SHARK, PEARL, TIDE), directions `right, down` only. Render: 51.4s encode, no errors.
+
+**Review status:** PENDING CLAUDE REVIEW
+**Next:** Visual QC of the rendered MP4/thumbnail to confirm clean horizontal/vertical highlight bars.
+
+---

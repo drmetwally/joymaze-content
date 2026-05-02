@@ -1,0 +1,56 @@
+{
+  "version": "1.1",
+  "last_generated": "2026-05-02",
+  "refresh_cadence": "weekly",
+  "notes": "Pool replaced 2026-05-02 with Halbert direct-response hooks. Intelligence expansion via generate-hooks.mjs (Mondays). Never delete entries — set performance_score to -1 to retire. Type must match puzzleType in activity.json exactly.",
+  "hooks": {
+    "maze": [
+      { "text": "Only 3 kids beat this maze clean", "style": "challenge", "hook_type": "social_proof", "performance_score": 0, "source": "copywriter" },
+      { "text": "The exit is there. Clock is ticking.", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "Your kid will finish before you do", "style": "playful", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "Adults always find this harder than expected", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Something's hiding at the end. Find it.", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Nobody escapes this maze in one try", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Beat your kid through this. Dare you.", "style": "challenge", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "1 in 4 adults give up here", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "10 seconds to escape. Clock starts now.", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "The exit hides where you'd never look", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" }
+    ],
+    "word-search": [
+      { "text": "3 words in here nobody ever finds", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Your kid spots one you always miss", "style": "playful", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "Sharp eyes still miss the last word", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "One word always hides till the end", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "All the words are here. Prove it.", "style": "challenge", "hook_type": "challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "1 in 6 parents find them all", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "One word is hidden backwards. Find it.", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Your eyes are faster than your parents'", "style": "playful", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "Looks easy. That last word breaks you.", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Most kids miss the same word twice", "style": "challenge", "hook_type": "social_proof", "performance_score": 0, "source": "copywriter" }
+    ],
+    "matching": [
+      { "text": "Memory fades fast. Find the pairs first.", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "1 in 5 kids nails this clean", "style": "challenge", "hook_type": "social_proof", "performance_score": 0, "source": "copywriter" },
+      { "text": "Kids beat adults at this. Every time.", "style": "playful", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "You'll forget one. You always forget one.", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Every match is hiding in plain sight", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Zero mistakes in 10 seconds. Prove it.", "style": "bold", "hook_type": "challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "3 pairs here fool adults every time", "style": "challenge", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Your memory is better than you think", "style": "playful", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "Matches disappear when the clock hits zero", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "One match here will trick your eyes", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" }
+    ],
+    "spot-the-difference": [
+      { "text": "7 differences. Most people only find 4.", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Your kid catches what you walk past", "style": "playful", "hook_type": "parent_challenge", "performance_score": 0, "source": "copywriter" },
+      { "text": "These look identical. They're not.", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "One difference stays invisible. Find it.", "style": "curiosity", "hook_type": "curiosity_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Clock hits zero. Find them all first.", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "1 in 8 adults finds every difference", "style": "challenge", "hook_type": "social_proof", "performance_score": 0, "source": "copywriter" },
+      { "text": "The last one fools the sharpest eyes", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Sharp eyes find what blurry eyes miss", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" },
+      { "text": "Differences vanish when the reveal hits", "style": "urgent", "hook_type": "time_pressure", "performance_score": 0, "source": "copywriter" },
+      { "text": "Stare long enough. Your brain quits.", "style": "bold", "hook_type": "ego_gap", "performance_score": 0, "source": "copywriter" }
+    ]
+  }
+}

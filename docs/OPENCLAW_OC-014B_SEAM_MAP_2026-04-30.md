@@ -76,7 +76,15 @@ The ASMR lane expects:
 
 So there is no shared contract yet. Right now they are parallel systems.
 
-### 2. Coloring filename mismatch
+### 2. Maze filename mismatch (added by Claude audit)
+
+`generate-asmr-video.mjs` expects **`maze.png`** as the blank maze asset for ASMR (lines 1105, 1261, 1321 — the file pairs are `['blank.png', 'colored.png']` for coloring and `['maze.png', 'solved.png']` for maze).
+
+The new deterministic maze generator writes **`blank.png`**, not `maze.png`.
+
+This must be fixed in OC-014B before any maze bridge will work. Recommended approach: update the ASMR maze file resolution to accept `blank.png` (canonical new name) with `maze.png` as a legacy fallback.
+
+### 3. Coloring filename mismatch
 There is a real naming mismatch across the current ASMR lane:
 - `generate-asmr-video.mjs` Remotion path expects **`blank.png` + `colored.png`** for coloring
 - `scripts/render-video.mjs` generic `activityJsonToProps()` defaults to **`blank.png` + `solved.png`**
@@ -84,7 +92,7 @@ There is a real naming mismatch across the current ASMR lane:
 
 This needs to be normalized before integration work starts, or future agents will create the wrong files.
 
-### 3. Word-search ASMR is stale product-wise
+### 4. Word-search ASMR is stale product-wise
 The code still supports word-search ASMR:
 - `WordSearchReveal.jsx`
 - `extract-wordsearch-path.mjs`
@@ -92,7 +100,7 @@ The code still supports word-search ASMR:
 
 But per the clarified product direction, this should no longer drive roadmap effort. It can stay in code for now, but should be treated as dormant and removed from active planning/rotation.
 
-### 4. ASMR brief generator still reflects the old product mix
+### 5. ASMR brief generator still reflects the old product mix
 `generate-asmr-brief.mjs` still defaults to a rotation that includes word-search and dot-to-dot. The new direction is narrower: prioritize the visually satisfying lanes, especially maze and coloring.
 
 ---

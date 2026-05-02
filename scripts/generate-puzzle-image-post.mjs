@@ -209,6 +209,26 @@ async function readCroppedSvg(activityDir, puzzleType) {
   const meta = await fs.readFile(metaFile, 'utf8').then(JSON.parse).catch(() => null);
   if (!meta?.layout && !meta?.panels) return { svgContent: svgRaw, layoutMeta: null };
   const src = meta.layout ?? meta.panels;
+
+  // Word-search: crop viewBox to include the grid AND the word list below it.
+  // wordsearch.json stores mazeW/mazeH (not panelW/panelH used by maze/coloring).
+  if (puzzleType === 'word-search') {
+    const { offsetX, offsetY, mazeW, mazeH, wordsTop, wordCols } = src;
+    const wordCount = Array.isArray(meta.words) ? meta.words.length : 8;
+    const wordRows = Math.ceil(wordCount / (wordCols || 2));
+    const lineH = 64;
+    const textBasePad = 80; // padding below last word baseline
+    const wordsBottom = (wordsTop || offsetY + mazeH + 110) + wordRows * lineH + textBasePad;
+    const cropX = offsetX - pad;
+    const cropY = offsetY - pad;
+    const cropW = mazeW + pad * 2;
+    const cropH = wordsBottom - cropY;
+    const croppedSvg = svgRaw.replace(/viewBox="[^"]*"/, `viewBox="${cropX} ${cropY} ${cropW} ${cropH}"`);
+    // layoutMeta for word-search: use the grid dimensions only (used by fittedCropLayout in renderer)
+    const layoutMeta = { offsetX, offsetY, mazeW, mazeH, canvasW: src.canvasW, canvasH: src.canvasH, cropPad: pad };
+    return { svgContent: croppedSvg, layoutMeta };
+  }
+
   const { offsetX, offsetY, panelW: mazeW, panelH: mazeH } = src;
   return {
     svgContent: svgRaw.replace(/viewBox="[^"]*"/, `viewBox="${offsetX - pad} ${offsetY - pad} ${mazeW + pad * 2} ${mazeH + pad * 2}"`),
@@ -221,8 +241,9 @@ async function buildPostImage(activityDir, activity, outputPath, type) {
   const theme = activity.theme || THEME;
   // For matching, use solved.svg (labeled face-up cards) as the social post image
   const svgFile = type === 'matching' ? 'solved.svg' : 'blank.svg';
-  const svgRaw = await fs.readFile(path.join(activityDir, svgFile), 'utf8');
-  const { layoutMeta } = await readCroppedSvg(activityDir, type);
+  const { svgContent, layoutMeta } = await readCroppedSvg(activityDir, type);
+  // Use the cropped SVG when available; fall back to raw file for types without a crop (e.g. matching)
+  const svgToRender = svgContent || await fs.readFile(path.join(activityDir, svgFile), 'utf8');
   const postMeta = {
     difficulty: activity.difficulty || DIFFICULTY,
     ageMin: 5,
@@ -231,7 +252,7 @@ async function buildPostImage(activityDir, activity, outputPath, type) {
     puzzleType: type,
     layout: layoutMeta,
   };
-  await renderPuzzlePost(svgRaw, titleText, theme, outputPath, postMeta);
+  await renderPuzzlePost(svgToRender, titleText, theme, outputPath, postMeta);
 }
 
 async function processOne(config) {

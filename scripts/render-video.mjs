@@ -481,27 +481,34 @@ async function challengeJsonToProps(activity, activityDir) {
     sourceImageWidth = mazeData.layout?.canvasW ?? sourceImageWidth;
     sourceImageHeight = mazeData.layout?.canvasH ?? sourceImageHeight;
     const layout = mazeData.layout || {};
-    const cropPad = layout.cropPad ?? 32;
-    const cropX = layout.offsetX - cropPad;
-    const cropY = layout.offsetY - cropPad;
-    const cropW = layout.mazeW + cropPad * 2;
-    const cropH = layout.mazeH + cropPad * 2;
     const cols = mazeData.cols || 1;
     const rows = mazeData.rows || 1;
     const cellW = layout.mazeW / cols;
     const cellH = layout.mazeH / rows;
     const entry = mazeData.entry || mazeData.entrance;
     const exit = mazeData.exit;
+    // Normalize to full canvas (same reference as path.json waypoints).
+    // Snap to outer maze wall for edge cells so icon sits at the opening.
+    const snapX = (col) => col === 0 ? layout.offsetX
+      : col === cols - 1 ? layout.offsetX + layout.mazeW
+      : layout.offsetX + col * cellW + cellW / 2;
+    const snapY = (row) => row === 0 ? layout.offsetY
+      : row === rows - 1 ? layout.offsetY + layout.mazeH
+      : layout.offsetY + row * cellH + cellH / 2;
     if (entry) {
+      const onHoriz = entry.col === 0 || entry.col === cols - 1;
+      const onVert = entry.row === 0 || entry.row === rows - 1;
       mazeStartFraction = {
-        x: (layout.offsetX + entry.col * cellW + cellW / 2 - cropX) / cropW,
-        y: (layout.offsetY + entry.row * cellH + cellH / 2 - cropY) / cropH,
+        x: (onHoriz ? snapX(entry.col) : layout.offsetX + entry.col * cellW + cellW / 2) / sourceImageWidth,
+        y: (onVert ? snapY(entry.row) : layout.offsetY + entry.row * cellH + cellH / 2) / sourceImageHeight,
       };
     }
     if (exit) {
+      const onHoriz = exit.col === 0 || exit.col === cols - 1;
+      const onVert = exit.row === 0 || exit.row === rows - 1;
       mazeFinishFraction = {
-        x: (layout.offsetX + exit.col * cellW + cellW / 2 - cropX) / cropW,
-        y: (layout.offsetY + exit.row * cellH + cellH / 2 - cropY) / cropH,
+        x: (onHoriz ? snapX(exit.col) : layout.offsetX + exit.col * cellW + cellW / 2) / sourceImageWidth,
+        y: (onVert ? snapY(exit.row) : layout.offsetY + exit.row * cellH + cellH / 2) / sourceImageHeight,
       };
     }
   } catch { /* no maze.json */ }
@@ -549,6 +556,8 @@ async function challengeJsonToProps(activity, activityDir) {
     sourceImageHeight,
     mazeStartFraction,
     mazeFinishFraction,
+    mazeHeroAsset: activity.mazeHeroAsset ?? '',
+    mazeRewardAsset: activity.mazeRewardAsset ?? '',
   };
 }
 

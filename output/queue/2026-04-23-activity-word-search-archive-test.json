@@ -1,0 +1,13 @@
+{
+  "id": "2026-04-23-activity-word-search-archive-test",
+  "type": "image",
+  "category": "activity-word-search",
+  "categoryName": "Activity: Word Search",
+  "subject": "wordsearch spring animals",
+  "hookText": "Can you find every word before time runs out?",
+  "outputs": {
+    "tiktok": "2026-04-23-activity-word-search-archive-test.png"
+  },
+  "showJoyo": true,
+  "showBrandWatermark": true
+}

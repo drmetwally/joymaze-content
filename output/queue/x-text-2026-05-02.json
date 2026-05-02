@@ -1,0 +1,42 @@
+[
+  {
+    "type": "story-hook",
+    "tweet1": "My kid just asked me to draw a maze with them. I said yes. Now we're 17 minutes in and the room is silent.",
+    "scheduledHour": 13,
+    "reply1": "The silence is broken only by the occasional 'don't go that way' or 'you're so close'.",
+    "replies": [
+      "The silence is broken only by the occasional 'don't go that way' or 'you're so close'.",
+      "And then, the inevitable question: 'can you help me just this once?'",
+      "In that moment, I realized something. It's not about the maze. It's about the journey."
+    ]
+  },
+  {
+    "type": "puzzle",
+    "tweet1": "I have a face and two hands but no arms or legs. What am I?",
+    "scheduledHour": 17,
+    "reply1": "Think carefully... drop your guess below 👇 — answer drops in a few hours",
+    "replies": [
+      "Think carefully... drop your guess below 👇 — answer drops in a few hours"
+    ],
+    "answer_tweet": "The answer is: a clock! Hands but no arms — gets everyone! Did you get it?",
+    "answer_scheduledHour": 21
+  },
+  {
+    "type": "insight",
+    "tweet1": "Most kids solve a maze faster on the second attempt than any adult on the first.",
+    "scheduledHour": 21,
+    "reply1": "Try this: next time your kid is stuck, don't give them the answer. Give them a gentle nudge and say 'you're closer than you think'.",
+    "replies": [
+      "Try this: next time your kid is stuck, don't give them the answer. Give them a gentle nudge and say 'you're closer than you think'."
+    ]
+  },
+  {
+    "type": "identity",
+    "tweet1": "You're the parent who paused the show because you heard them say 'wait, I almost have it'.",
+    "scheduledHour": 23,
+    "reply1": "And in that moment, you knew you'd made the right choice. The show could wait. Their curiosity couldn't.",
+    "replies": [
+      "And in that moment, you knew you'd made the right choice. The show could wait. Their curiosity couldn't."
+    ]
+  }
+]

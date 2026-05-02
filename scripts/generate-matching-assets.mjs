@@ -5,6 +5,20 @@ import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 import { buildChallengeHook } from './lib/challenge-hooks.mjs';
+import { pickAsset } from './lib/asset-library.mjs';
+
+// ── Asset library convention ──────────────────────────────────────────────────
+// Scene images for matching puzzle backgrounds live at:
+//   assets/generated/matching-scenes/<theme>/main/*.png
+//
+// Drop Imagen-generated scene PNGs (1700×2200, portrait) into the appropriate
+// theme folder under main/ to have them automatically picked up.
+// Run `node scripts/generate-asset-library.mjs --type matching-scenes` to
+// promote from staging/ → main/ after review.
+//
+// If no scene images exist for a theme, the generator falls back to the
+// programmatic SVG card-back layout (white background + pattern fill).
+// ─────────────────────────────────────────────────────────────────────────────
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -248,9 +262,15 @@ async function resolveStickerAssignments(selectedPairs, grid, stickerTheme, rng)
   return assignments;
 }
 
-function buildBlankSvg(layout, grid, stickerAssignments) {
+function buildBlankSvg(layout, grid, stickerAssignments, sceneBgDataUrl = null) {
   const { cardSize, offsetX, offsetY, gap, cols, rows } = layout;
   const patterns = cardBackPattern();
+
+  // If a pre-made scene image exists, use it as the canvas background.
+  // Otherwise fall back to solid BG_COLOR (white).
+  const bgLayer = sceneBgDataUrl
+    ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
+    : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
 
   const cards = grid.map((cell, idx) => {
     const x = offsetX + cell.col * (cardSize + gap);
@@ -267,12 +287,12 @@ function buildBlankSvg(layout, grid, stickerAssignments) {
 
   return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
 ${patterns}
-  <rect width="100%" height="100%" fill="${BG_COLOR}"/>
+${bgLayer}
 ${cards}
 </svg>`;
 }
 
-function buildSolvedSvg(layout, pairs, grid) {
+function buildSolvedSvg(layout, pairs, grid, sceneBgDataUrl = null) {
   const { cardSize, offsetX, offsetY, gap } = layout;
   const patterns = cardBackPattern();
 
@@ -310,9 +330,13 @@ function buildSolvedSvg(layout, pairs, grid) {
     });
   }).join('\n');
 
+  const bgLayer = sceneBgDataUrl
+    ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
+    : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
+
   return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
 ${patterns}
-  <rect width="100%" height="100%" fill="${BG_COLOR}"/>
+${bgLayer}
 ${cards}
 ${lines}
 ${labels}
@@ -464,6 +488,23 @@ async function main() {
     console.log(`[matching-factory] stickerTheme: ${stickerTheme} (no PNGs found — using card backs)`);
   }
 
+  // ── Asset library: check for a pre-made scene background ─────────────────────
+  // pickAsset returns an absolute path to a PNG in assets/generated/matching-scenes/<theme>/main/
+  // or null if no images exist for this theme. Fallback = white SVG background.
+  const scenePath = await pickAsset(family, 'scene');
+  let sceneBgDataUrl = null;
+  if (scenePath) {
+    try {
+      const buf = await fs.readFile(scenePath);
+      sceneBgDataUrl = `data:image/png;base64,${buf.toString('base64')}`;
+      console.log(`[matching-factory] scene bg    : ${path.relative(ROOT, scenePath)}`);
+    } catch {
+      console.log(`[matching-factory] scene bg    : failed to load ${scenePath} — using default`);
+    }
+  } else {
+    console.log(`[matching-factory] scene bg    : none (assets/generated/matching-scenes/${family}/main/ is empty)`);
+  }
+
   const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, folderRel });
   const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel });
 
@@ -490,21 +531,18 @@ async function main() {
     fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2)),
   ]);
 
-  // Build blank.png — cardback pattern only (stickers render as overlays in Remotion)
-  const blankSvg = buildBlankSvg(layout, grid, null);
+  // Build blank.png — scene background (if available) + card stickers as overlays in Remotion
+  const blankSvg = buildBlankSvg(layout, grid, null, sceneBgDataUrl);
   await fs.writeFile(path.join(outDir, 'blank.svg'), blankSvg, 'utf8');
   const blankPng = await sharp(Buffer.from(blankSvg)).png().toBuffer();
   await fs.writeFile(path.join(outDir, 'blank.png'), blankPng);
   await fs.copyFile(path.join(outDir, 'blank.png'), path.join(outDir, 'puzzle.png'));
 
-  // solved.png uses the existing SVG path (colored cards + labels)
-  const solvedSvg = buildSolvedSvg(layout, pairs, grid);
+  // solved.png — same scene background + colored cards + connection labels
+  const solvedSvg = buildSolvedSvg(layout, pairs, grid, sceneBgDataUrl);
   await fs.writeFile(path.join(outDir, 'solved.svg'), solvedSvg, 'utf8');
   const solvedPng = await sharp(Buffer.from(solvedSvg)).png().toBuffer();
   await fs.writeFile(path.join(outDir, 'solved.png'), solvedPng);
-
-  // Write minimal blank.svg (card backgrounds, no embedded images — for reference only)
-  await fs.writeFile(path.join(outDir, 'blank.svg'), blankSvg, 'utf8');
 
   console.log('[matching-factory] wrote files:');
   for (const file of ['activity.json', 'matching.json', 'blank.svg', 'blank.png', 'solved.svg', 'solved.png', 'puzzle.png']) {

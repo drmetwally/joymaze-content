@@ -179,12 +179,36 @@ function buildFallbackTemplates({ puzzleType, countdownSec, wordsCount }) {
   ];
 }
 
+// ── Weighted random from hooks-activity.json pool ───────────────────────────
+// Returns {text, style} or null.  Mirrors pickHook() in generate-activity-video.mjs.
+async function pickActivityHook(puzzleType) {
+  const data = await readJson('config/hooks-activity.json');
+  // hooks-activity.json key matches puzzleType exactly (maze, word-search, matching, …)
+  const pool = data?.hooks?.[puzzleType];
+  const eligible = pool ? pool.filter((h) => h.performance_score >= 0) : [];
+  if (eligible.length === 0) return null;
+  // Weighted random: weight = max(performance_score, 0.1) so all entries have a chance.
+  const weights = eligible.map((h) => Math.max(h.performance_score, 0.1));
+  const total = weights.reduce((s, w) => s + w, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < eligible.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return eligible[i];
+  }
+  return eligible[eligible.length - 1];
+}
+
 export async function buildChallengeHook({ puzzleType, countdownSec, wordsCount = null, seedHint = '' }) {
   const [hooksData, psychologyTriggers, contentIntelligence] = await Promise.all([
     readJson('config/hooks-library.json'),
     readJson('config/psychology-triggers.json'),
     readJson('config/content-intelligence.json'),
   ]);
+
+  // Priority 0: hooks-activity.json curated pool (Halbert direct-response, puzzle-specific)
+  // Returns {text, style} — use .text as the hook string if available.
+  const activityHook = await pickActivityHook(puzzleType);
+  if (activityHook?.text) return activityHook.text;
 
   // Priority 1: hardcoded challenge pool (highest quality, always relevant)
   const hardcodedPool = getChallengeHooks(puzzleType, countdownSec, wordsCount);

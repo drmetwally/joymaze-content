@@ -1,0 +1,15 @@
+{
+  "id": "2026-04-23-activity-maze-archive-test",
+  "type": "image",
+  "category": "activity-maze",
+  "categoryName": "Maze",
+  "subject": "Butterfly Garden",
+  "hookText": "Can you solve this maze in 10 seconds?",
+  "outputs": {
+    "tiktok": "2026-04-23-activity-maze-archive-test.png",
+    "solved": "2026-04-23-activity-maze-archive-test-solved.png"
+  },
+  "pathJsonPath": "output/archive/asmr/maze-butterfly-garden/path.json",
+  "showJoyo": true,
+  "showBrandWatermark": true
+}

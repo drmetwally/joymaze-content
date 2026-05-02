@@ -11,11 +11,11 @@ const ROOT = path.resolve(__dirname, '..');
 const OUTPUT_ROOT = path.join(ROOT, 'output', 'challenge', 'generated-activity');
 
 const difficultyDefaults = {
-  easy: { size: 10, words: 6, directions: ['right', 'down'] },
-  medium: { size: 12, words: 8, directions: ['right', 'down'] },
-  hard: { size: 14, words: 10, directions: ['right', 'down', 'diag-down-right', 'diag-up-right'] },
-  difficult: { size: 15, words: 11, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right'] },
-  extreme: { size: 16, words: 12, directions: ['right', 'left', 'down', 'up', 'diag-down-right', 'diag-up-right', 'diag-down-left', 'diag-up-left'] },
+  easy: { size: 10, words: 4, directions: ['right', 'down'] },
+  medium: { size: 12, words: 5, directions: ['right', 'down'] },
+  hard: { size: 14, words: 6, directions: ['right', 'down'] },
+  difficult: { size: 15, words: 6, directions: ['right', 'down'] },
+  extreme: { size: 16, words: 6, directions: ['right', 'down'] },
 };
 
 const CANVAS_W = 1700;
@@ -204,7 +204,7 @@ function buildLayout(size, wordCount) {
   const gridX = Math.round((CANVAS_W - gridSizePx) / 2);
   const gridY = topMargin;
   const wordsTop = gridY + gridSizePx + 110;
-  const wordCols = wordCount > 8 ? 3 : 2;
+  const wordCols = 2;
   return { cell, gridSizePx, gridX, gridY, wordsTop, wordCols };
 }
 

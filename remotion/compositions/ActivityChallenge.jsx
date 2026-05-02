@@ -51,6 +51,8 @@ export const activityChallengeSchema = {
   sourceImageHeight: 1920,
   mazeStartFraction: null,
   mazeFinishFraction: null,
+  mazeHeroAsset: '',
+  mazeRewardAsset: '',
 };
 
 const toSrc = (value) => {
@@ -270,6 +272,8 @@ const SolveReveal = ({
   dotWaypoints,
   dotColor,
   fallbackImagePath,
+  sourceImageWidth,
+  sourceImageHeight,
 }) => {
   const normalizedType = puzzleType === 'spot-the-difference' ? 'matching' : puzzleType;
 
@@ -299,6 +303,8 @@ const SolveReveal = ({
         highlightColor={highlightColor}
         startFrame={0}
         durationFrames={durationFrames}
+        sourceImageWidth={sourceImageWidth}
+        sourceImageHeight={sourceImageHeight}
       />
     );
   }
@@ -363,6 +369,8 @@ export const ActivityChallenge = ({
   sourceImageHeight = activityChallengeSchema.sourceImageHeight,
   mazeStartFraction = activityChallengeSchema.mazeStartFraction,
   mazeFinishFraction = activityChallengeSchema.mazeFinishFraction,
+  mazeHeroAsset = '',
+  mazeRewardAsset = '',
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width: videoWidth, height: videoHeight } = useVideoConfig();
@@ -462,30 +470,6 @@ export const ActivityChallenge = ({
         )}
       </AbsoluteFill>
 
-      {/* Maze: food reward at exit bottom during challenge */}
-      {isMaze && (
-        <div style={{
-          position: 'absolute',
-          left: frameBounds.x + frameBounds.width / 2,
-          top: frameBounds.y + frameBounds.height - 30,
-          transform: `translate(-50%, -50%) scale(${trophyPulse})`,
-          zIndex: 8,
-        }}>
-          <div style={{
-            width: 72,
-            height: 72,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, #FFE066 0%, #FFB800 60%, #CC8800 100%)',
-            border: '3px solid rgba(255,255,255,0.7)',
-            boxShadow: '0 0 18px rgba(255,200,0,0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: 38 }}>🍎</span>
-          </div>
-        </div>
-      )}
 
       {/* Word-search theme badge */}
       {normalizedType === 'word-search' ? <ThemeEmojiBadge frameBounds={frameBounds} emoji={themeEmoji} /> : null}
@@ -529,6 +513,8 @@ export const ActivityChallenge = ({
           dotWaypoints={dotWaypoints}
           dotColor={dotColor}
           fallbackImagePath={sourceImagePath}
+          sourceImageWidth={sourceImageWidth}
+          sourceImageHeight={sourceImageHeight}
         />
       </Sequence>
 
@@ -597,6 +583,8 @@ export const ActivityChallenge = ({
         wordRects={wordRects}
         matchRects={matchRects}
         theme={theme}
+        mazeHeroAsset={mazeHeroAsset}
+        mazeRewardAsset={mazeRewardAsset}
       /> : null}
       {showBrandWatermark ? <BrandWatermark text="joymaze.com" position="bottom-center" /> : null}
     </AbsoluteFill>
@@ -613,6 +601,8 @@ const PuzzleJoyoLayer = ({
   solveFrames,
   mazeStartFraction,
   mazeFinishFraction,
+  mazeHeroAsset = '',
+  mazeRewardAsset = '',
   wordRects,
   matchRects,
   theme,
@@ -709,49 +699,61 @@ const PuzzleJoyoLayer = ({
 
   return (
     <>
-      {/* Maze: Joyo running + trophy during challenge, crossfade to celebrating at end */}
+      {/* Maze: hero sticker (or joyo_running.png) at start — challenge phase only (scale-in on entry) */}
       {isMaze && frame < solveStart && (
-        <>
-          <div style={{
-            position: 'absolute',
-            left: startX,
-            top: startY,
+        <div
+          style={{
+            position: 'absolute', left: startX, top: startY,
             transform: `translate(-50%, -50%) scale(${startScale})`,
-            transformOrigin: 'bottom center',
-            zIndex: 9,
-          }}>
-            <div style={{ transform: `translateY(${startBob}px) scaleX(-1)` }}>
-              <Img src={staticFile('assets/mascot/joyo_running.png')} style={{ width: 90, height: 90 }} />
-            </div>
+            transformOrigin: 'bottom center', zIndex: 9,
+          }}
+        >
+          <div style={{ transform: `translateY(${startBob}px) scaleX(-1)` }}>
+            <Img
+              src={mazeHeroAsset ? toSrc(mazeHeroAsset) : staticFile('assets/mascot/joyo_running.png')}
+              style={{ width: 90, height: 90 }}
+            />
           </div>
-          <TrophyMarker x={finishX} y={finishY} />
-        </>
+        </div>
       )}
 
+      {/* Maze: reward sticker (or trophy) at finish — stays through solve, disappears when celebrating */}
+      {isMaze && !isCelebrating && (
+        mazeRewardAsset ? (
+          <div style={{
+            position: 'absolute', left: finishX, top: finishY,
+            transform: `translate(-50%, -50%) scale(${trophyPulse})`,
+            width: 80, height: 80, zIndex: 8,
+          }}>
+            <Img src={toSrc(mazeRewardAsset)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
+        ) : (
+          <TrophyMarker x={finishX} y={finishY} />
+        )
+      )}
+
+      {/* Maze solve phase: hero stays at start, fades when celebrating; joyo_celebrating appears at center */}
       {isMaze && (
         <>
-          <div style={{
-            position: 'absolute',
-            left: startX,
-            top: startY,
-            transform: 'translate(-50%, -50%)',
-            zIndex: 9,
-            opacity: isCelebrating ? runningOpacity : (isSolving ? 0 : 1),
-          }}>
-            {!isCelebrating && (
+          <div
+            style={{
+              position: 'absolute', left: startX, top: startY,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 9,
+              opacity: frame < solveStart ? 0 : isCelebrating ? runningOpacity : 1,
+            }}
+          >
+            {mazeHeroAsset ? (
+              <div style={{ transform: `translateY(${startBob}px) scaleX(-1)` }}>
+                <Img src={toSrc(mazeHeroAsset)} style={{ width: 90, height: 90 }} />
+              </div>
+            ) : (
               <div style={{ transform: `translateY(${startBob}px)` }}>
                 <Img src={staticFile('assets/mascot/joyo_running.png')} style={{ width: 90, height: 90 }} />
               </div>
             )}
           </div>
-          <div style={{
-            position: 'absolute',
-            left: celebX,
-            top: celebY,
-            transform: `translate(-50%, -50%) scale(${celebScale})`,
-            zIndex: 9,
-            opacity: celebOpacity,
-          }}>
+          <div style={{ position: 'absolute', left: celebX, top: celebY, transform: `translate(-50%, -50%) scale(${celebScale})`, zIndex: 9, opacity: celebOpacity }}>
             <Img src={staticFile('assets/mascot/joyo_celebrating.png')} style={{ width: 110, height: 110 }} />
           </div>
         </>

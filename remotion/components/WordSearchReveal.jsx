@@ -5,23 +5,54 @@ import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, static
 // After all words are outlined, cross-fades to the solved image.
 //
 // Props:
-//   blankPath      — path to blank word search image
-//   solvedPath     — path to solved image (fully highlighted)
-//   rects          — [{x1,y1,x2,y2}] in normalized 0-1 range (from wordsearch.json)
-//   highlightColor — color of the marker stroke (hex, from wordsearch.json)
-//   startFrame     — frame at which reveal begins
-//   durationFrames — total frames for the full reveal sequence
+//   blankPath         — path to blank word search image
+//   solvedPath        — path to solved image (fully highlighted)
+//   rects             — [{x1,y1,x2,y2}] coordinates in one of two spaces:
+//                         • normalized 0-1 relative to sourceImageWidth/sourceImageHeight
+//                         • absolute video pixel coords (when values > 1.5)
+//   highlightColor    — color of the marker stroke (hex, from wordsearch.json)
+//   startFrame        — frame at which reveal begins
+//   durationFrames    — total frames for the full reveal sequence
+//   sourceImageWidth  — original image width (default 1700 for word-search generator output)
+//   sourceImageHeight — original image height (default 2200 for word-search generator output)
+//
+// Coordinate space assumption:
+//   rects with all values ≤ 1.5 are treated as normalized 0-1 fractions relative to
+//   sourceImageWidth × sourceImageHeight.  Because the image is displayed with
+//   objectFit:contain inside the VW × VH video canvas, we must compute the
+//   letterbox offset and rendered scale before converting to SVG pixel coords.
+//   Values > 1.5 are already in video pixel space (produced by mapContainPoint in
+//   generate-activity-video.mjs) and are used as-is.
 
-const normalizeRectSpace = (rect, VW, VH) => {
+// Compute the contain-fit rendered bounds of a source image within a video canvas.
+// Returns { offsetX, offsetY, renderWidth, renderHeight }.
+const getContainBounds = (imageWidth, imageHeight, videoWidth, videoHeight) => {
+  const imageAspect = imageWidth / imageHeight;
+  const videoAspect = videoWidth / videoHeight;
+  if (imageAspect > videoAspect) {
+    const renderWidth = videoWidth;
+    const renderHeight = videoWidth / imageAspect;
+    return { offsetX: 0, offsetY: (videoHeight - renderHeight) / 2, renderWidth, renderHeight };
+  }
+  const renderHeight = videoHeight;
+  const renderWidth = videoHeight * imageAspect;
+  return { offsetX: (videoWidth - renderWidth) / 2, offsetY: 0, renderWidth, renderHeight };
+};
+
+// Convert a rect to SVG pixel coords, accounting for objectFit:contain letterboxing.
+const normalizeRectSpace = (rect, VW, VH, srcW, srcH) => {
   const looksNormalized = [rect.x1, rect.y1, rect.x2, rect.y2].every((value) => Math.abs(value) <= 1.5);
   if (looksNormalized) {
+    // Normalized 0-1 relative to source image dims — must account for letterbox offset.
+    const { offsetX, offsetY, renderWidth, renderHeight } = getContainBounds(srcW, srcH, VW, VH);
     return {
-      x1: rect.x1 * VW,
-      y1: rect.y1 * VH,
-      x2: rect.x2 * VW,
-      y2: rect.y2 * VH,
+      x1: offsetX + rect.x1 * renderWidth,
+      y1: offsetY + rect.y1 * renderHeight,
+      x2: offsetX + rect.x2 * renderWidth,
+      y2: offsetY + rect.y2 * renderHeight,
     };
   }
+  // Already in video pixel coords (produced by mapContainPoint) — use as-is.
   return rect;
 };
 
@@ -54,10 +85,12 @@ function MarkerTip({ tipX, tipY, videoWidth, videoHeight }) {
 export const WordSearchReveal = ({
   blankPath,
   solvedPath,
-  rects          = [],
-  highlightColor = '#FFD700',
-  startFrame     = 0,
-  durationFrames = 780,
+  rects             = [],
+  highlightColor    = '#FFD700',
+  startFrame        = 0,
+  durationFrames    = 780,
+  sourceImageWidth  = 1700,
+  sourceImageHeight = 2200,
 }) => {
   const frame = useCurrentFrame();
   const { width: VW, height: VH } = useVideoConfig();
@@ -85,7 +118,7 @@ export const WordSearchReveal = ({
     if (localWordFrame < 0) return null;
 
     const expandProgress = Math.min(localWordFrame / EXPAND_FRAMES, 1);
-    const rect = normalizeRectSpace(rawRect, VW, VH);
+    const rect = normalizeRectSpace(rawRect, VW, VH, sourceImageWidth, sourceImageHeight);
     const inset = 7;
     const x = rect.x1 + inset;
     const y = rect.y1 + inset;

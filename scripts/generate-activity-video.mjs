@@ -153,7 +153,16 @@ function pickHook(activityType, intelligence = activityIntelligence) {
   const pool = hooksPoolData?.hooks?.[activityType];
   const eligible = pool ? pool.filter((h) => h.performance_score >= 0) : [];
   if (eligible.length > 0) {
-    return eligible[Math.floor(Math.random() * eligible.length)];
+    // Weighted random: weight = max(performance_score, 0.1) so all entries have a non-zero chance.
+    // Higher performance_score entries surface more often once we have real data.
+    const weights = eligible.map((h) => Math.max(h.performance_score, 0.1));
+    const total = weights.reduce((s, w) => s + w, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < eligible.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return eligible[i];
+    }
+    return eligible[eligible.length - 1];
   }
   return STATIC_DEFAULT_HOOKS[activityType] || { text: 'Can you solve this before time runs out?', style: 'challenge' };
 }

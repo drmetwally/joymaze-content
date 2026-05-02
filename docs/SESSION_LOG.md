@@ -4,6 +4,27 @@
 
 ---
 
+## 2026-04-30 — [Agent: Claude] — OC-011 audit closed + dual-track roadmap locked
+
+**OC-011 audit outcome:**
+- All OC-010 (Puppeteer migration) and OC-011 (polish pass) entries stamped in AGENT_LOG.md
+- FINISH sticker coordinate system bug diagnosed and fixed in `scripts/lib/puzzle-post-renderer.mjs`: `stickerHtml()` was using post-level origin offsets (60px padding + 160px title zone) inside card-relative coordinates, causing FINISH to overflow `.maze-card overflow:hidden` bounds and be invisible at post scale
+- 2-line fix: removed both constants → `zoneLeft = (824-fittedW)/2`, `zoneTop = (1258-fittedH)/2`
+- Verified on Ocean Animals medium + Space hard — both stickers correctly placed
+- Maze + word-search image posts: PRODUCTION READY
+
+**Roadmap locked (2026-04-30):**
+- Dual track: (1) daily posting runs now, (2) build sprint continues in parallel
+- Sprint 1 (this week): OC-012 challenge reel tuning, OC-013 word-search solve validation, OC-014 ASMR live test, OC-015 reel wiring to daily scheduler
+- Sprint 2 (next week): OC-016 matching generator, OC-017 find-the-difference generator, OC-018 coloring image post wrapper
+- Sprint 3 (week 3): OC-019 tracing/dot-to-dot, OC-020 crossword, OC-021 theme-family detection centralization
+- Story + Animal Facts: production-ready engines, content throughput only (no engine work)
+- Phase 0 gate target: ~3-4 weeks once all puzzle lanes + reel lanes live
+
+**OC-012 handoff written:** `docs/OPENCLAW_TASK_OC-012.md` — challenge reel visual tuning, self-contained brief for OpenClaw
+
+---
+
 ## 2026-04-29 — [Agent: OpenClaw] — Finish deterministic puzzle-post Phase 1 automation
 
 **Files changed:** `scripts/generate-puzzle-image-post.mjs`, `scripts/generate-prompts.mjs`, `scripts/import-raw.mjs`, `scripts/daily-scheduler.mjs`, `package.json`, `docs/PUZZLE_IMAGE_POST_AUTOMATION_PLAN_2026-04-29.md`, `docs/TASKS.md`, `docs/AGENT_LOG.md`, `docs/DAILY_CHEATSHEET.md`, `docs/DAILY_WORKFLOW.md`
@@ -24,6 +45,28 @@
 - caption dry-run for both queue items
 
 **Current operator change:** `npm run daily` now already handles maze + word-search post generation when those slot categories are assigned. Human work remains focused on the non-deterministic/manual puzzle lanes and the other content systems.
+
+**End-of-session follow-up:** Wrapper polish continued after the initial automation landed. The current accepted direction is still Sharp-first: footer copy was removed, title fitting improved, and first-pass theme-family decor buckets were added. Imagen was discussed as a possible future outer-frame/margin-art layer, but not adopted yet because deterministic puzzle readability and printable solvability remain the priority.
+
+---
+
+## 2026-04-29 — [Agent: Claude] — Art wrapper audit + plan review for puzzle image posts
+
+**Files changed:** `docs/TASKS.md`
+
+**What was done:**
+- Audited OpenClaw's art wrapper rebuild in `scripts/generate-puzzle-image-post.mjs` (commits `d8a959f`, `03e48a5`)
+- All 3 previously flagged bugs confirmed fixed: subject field, eager raw bindings, canvas coupling comment
+- Modular wrapper structure confirmed: `renderCornerDecor`, `renderMarginMotif`, `renderStartMarkerSvg`, `renderFinishMarkerSvg`, `pickTitleText`, `shortenForZone`, `getThemeDecor`, `getStyleKit` all clean
+- Audited OpenClaw's A1–A8 plan for Sharp ceiling pass
+
+**Remaining gaps for next wrapper pass:**
+1. No footer CTA band — 260px dead space below puzzle (y=1240–1500) — was in spec, not implemented
+2. Finish marker overflow bug — `left=910`, marker=150px wide → clips at x=1060 outside 1000px canvas
+3. 5 of 10 theme families done — missing: dinosaurs, jungle/safari, fairy/princess, vehicles, food/kitchen
+4. Paper texture/grain not implemented (A6 partial)
+
+**TASK-OC-008 marked done.** Sharp decision gate (A8) pending A7 comparison pack generation.
 
 ---
 
@@ -2361,3 +2404,216 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - Reworked maze solve drawing to interpolate continuously along segments so the pencil slides instead of hopping.
 - Strengthened word-search solve visibility and added a moving marker tip around the outline.
 - Re-rendered the final videos after these changes.
+
+## 2026-04-30 - Claude (Sonnet 4.6) - OC-010/011 full audit + FINISH sticker bug fix
+
+- Ran live renders for Ocean Animals maze (medium) and Dogs & Poodles word-search (medium) to audit OC-010/011 work.
+- Stamped all 4 pending AGENT_LOG entries: TASK-OC-010-PUPPETEER, TASK-OC-010-PUPPETEER-FULL, TASK-OC-010-FONTS all APPROVED; TASK-OC-011 PARTIALLY APPROVED pending the FINISH sticker fix.
+- Diagnosed FINISH sticker absence: `stickerHtml()` was adding post-level origin offsets (60px outer padding + 160px title zone) to coordinates injected inside `.maze-card` (a card-relative `position:relative` container), pushing FINISH ~1274px into a 1286px `overflow:hidden` card — invisible. Fixed by removing the offset constants from `zoneLeft` and `zoneTop`. Verified fix on Ocean Animals and Space hard — START and FINISH now correctly track maze entrance/exit grid positions.
+- Answered all OC-011 architectural flags: 60px gutters keep, word list stays SVG, theme-family detection centralization deferred to OC-013 backlog, stroke weights accepted.
+- Puzzle post pipeline (maze + word-search) is now production-ready. OC-010 and OC-011 both fully closed.
+
+---
+## 2026-04-30 (session 2) — OC-013 audit
+
+- OC-013 completed by OpenClaw and submitted for Claude audit (commit 73a7d17).
+- Audited all 3 fixes: fraction math correct, `getContainBounds()`/`fitContainBounds()` consistent across jsx+render-video, "FIND THESE WORDS" fully stripped from SVG generator (grep confirmed), `wordSearchFooterHtml()` added to post renderer, theme emoji badge wired.
+- Bonus work: `resolveWordPackFamily()` now wires to `config/wordsearch-word-packs.json` (replaces stale inline fallback bank); `fitContainBounds()` extracted as shared helper for all 4 puzzle types.
+- Watchlist: two theme mappers now exist (`getThemeConfig()` in post renderer, `getPrimaryThemeEmoji()` in ActivityChallenge.jsx) — safe now, centralize in OC-021.
+- AGENT_LOG stamped APPROVED. TASKS.md OC-013 marked done.
+- Next: OC-014 (ASMR live test — drop blank.png + colored.png → render). Ahmed must watch oc-013-maze.mp4 + oc-013-wordsearch.mp4 before first production post.
+
+---
+## 2026-04-30 (session 3) — Sprint 2 puzzle engine fixes + OC-018 coloring approval
+
+### OC-016 + OC-017 round-2 fixes (Claude)
+- Identified two remaining critical bugs from visual PNG review after b6b8134 fix round.
+- Fix 1 (matching): `buildSolvedSvg` rendered `${lines}` before `${cards}` — cards painted over lines, leaving only tiny stubs. Fixed by swapping render order to cards-first, lines-second. Commit a287772.
+- Fix 2 (find-diff): `buildScene` ignored `slot.color` entirely, using `palette[randInt(mulberry32(seed + i*31), ...)]` — both panels rendered with different random colors; color_change diffs had zero visual effect. Fixed with `const color = slot.color`. Commit a287772.
+- Both generators re-verified via PNG read: matching connection lines visible and crossing non-adjacent pairs; find-diff blank panels near-identical; diffs detectable. Both APPROVED.
+
+### OC-018 coloring generator (OpenClaw + Claude fix)
+- OpenClaw delivered `generate-coloring-assets.mjs` + image post plumbing. Pre-flight label truncation fix applied (JELLYFISH now renders in full).
+- Claude review found critical bug: `buildScene` computed white fill for blank mode but passed `slot.color` to all factories — blank and colored images were identical (both showed palette colors).
+- Fixed: `const drawFill = colored ? slot.color : '#FFFFFF'` passed to each factory. Commit 90473f9.
+- Verified: blank.png = clean coloring page (white fills, thick black outlines); colored.png = same shapes with palette fills. ASMR TTB wipe bridge works without any changes to render-video.mjs.
+- OC-018 APPROVED. Sprint 2 fully closed.
+
+### Sprint 2 status
+- OC-016 ✅ OC-017 ✅ OC-018 ✅ — maze, matching, find-diff, coloring generators all production-ready.
+- Next: Sprint 3 — OC-019 dot-to-dot spec review before OpenClaw starts, then OC-020 crossword (most complex).
+
+---
+## 2026-05-01 (session 4) — OC-019 dot-to-dot approval + build sprint closure + REF handoff
+
+### OC-019 dot-to-dot (OpenClaw + Claude fixes)
+- OpenClaw delivered `generate-dottodot-assets.mjs` with 6 ocean shapes, 5 animal shapes, 5 space shapes, `dots.json` contract, 7-file output.
+- Claude visual review found two bugs: (1) raw coordinates mapped directly to drawing area — shapes with non-full-range coords left large empty canvas margins (space UFO: top 40% empty); (2) r=10 dots too small at social thumbnail scale.
+- Fix 1: added `normalizeShape()` — auto-scales each shape's bounding box to fill 84% of drawing area (8% PAD each side), called in both `buildSvgLine` and `buildSvgDots`. Commit bab97d6.
+- Fix 2: increased dot radius 10→15. Commit bab97d6.
+- Verified: ocean seahorse (21 dots) fills drawing area, S-curve recognizable; space UFO (17 dots) fills area, teardrop shape legible. Both APPROVED.
+- countdownSec=17 for easy/medium (33.5s total, in-band), 20 for hard.
+
+### Build sprint closure
+- OC-020 (crossword) DROPPED permanently — not a JoyMaze brand activity (not in app or books).
+- All 6 generators approved: maze ✅ word-search ✅ matching ✅ find-diff ✅ coloring ✅ dot-to-dot ✅
+- Build sprint is COMPLETE. No new generators.
+
+### Refinement phase handoff
+- Wrote `docs/OPENCLAW_TASK_REFINEMENT_PHASE.md` — 4 REF tasks (REF-004 → REF-002 → REF-003 → REF-001), exact commands, audit gates.
+- REF-004: Test ASMR coloring bridge (`--comp AsmrReveal --challenge <coloring-folder>`).
+- REF-002: Syntax check all scheduler scripts, dry-run all 6 puzzle types via `generate-puzzle-image-post.mjs`.
+- REF-003: Generate post.png for 6 types × 3 themes (18 images); Claude visual audit.
+- REF-001: Render challenge reels for all 6 types; Ahmed QC watch before first production post.
+- OC-021 (theme-family centralization) deferred as optional cleanup after all 4 REFs close.
+- AGENT_LOG entry appended. Awaiting OpenClaw to start REF-004.
+
+---
+## 2026-05-01 — Refinement phase complete (REF-001–004)
+
+### REF-004 ✅
+- Coloring ASMR bridge works with no code changes. `activityJsonToProps()` resolves `colored.png` from `solvedImage` field directly. Documentation note added to `generate-asmr-brief.mjs`.
+- ⚠️ Production note: bridge renders 5.5s from challenge activity.json (challenge timing). Production coloring ASMR should use native `generate-asmr-video.mjs` path for proper ASMR duration.
+
+### REF-002 ✅
+- All 14 scheduler scripts syntax clean. Three missing type aliases fixed in `generate-puzzle-image-post.mjs`: matching, find-diff/finddiff, dot-to-dot/dottodot. All 6 types callable via `--type`. Minimal scheduler run exit 0 (4 steps, 15s).
+
+### REF-003 ✅
+- 18 posts (6 types × 3 themes) generated and audited. 5 fixes applied:
+  1. Word-search grid overflow — footer repositioned to card bottom absolute
+  2. Matching post used blank face-down cards — switched to solved.svg (labeled pairs)
+  3. Dot-to-dot generic subtitle — now theme-specific ("...ocean animal", "...space shape", etc.)
+  4. Find-diff hook count used actual diffCount — already correct via diffLabel()
+  5. Find-diff separator hardcoded "FIND 5 DIFFERENCES" — changed to generic "FIND THE DIFFERENCES"
+- Also fixed: svgRaw initialization order bug in readCroppedSvg() found during generation.
+- All 18 posts production-ready.
+
+### REF-001 ✅ (⚠️ Ahmed QC pending)
+- All 6 challenge reels exit 0: maze 29.5s, wordsearch 29.5s, matching 29.5s, find-diff 31.5s, coloring 31.5s, dot-to-dot 31.5s. All within 25–35s locked band.
+- Disk bonus: 17 orphaned Remotion temp dirs cleaned → 8.2 GB freed.
+- Ahmed must watch all 6 MP4s before first production post per type.
+
+### State
+- Refinement phase fully closed pending Ahmed's QC watch on 6 MP4s.
+- Final report: `docs/OPENCLAW_REPORT_2026-05-01_refinement-phase.md`
+- OC-021 (theme-family centralization) remains optional deferred tech debt.
+
+---
+
+### 2026-05-01 — REF-001 QC audit + Visual art overhaul planning
+
+- Ahmed audited all 6 REF-001 MP4s. Verdict: maze + wordsearch structurally OK, all 4 others broken (empty matching cards, primitive-shape find-diff/coloring, raw dot-to-dot).
+- Root cause confirmed: puzzle generators output programmatic canvas shapes, not illustrated art. Problem is at generation layer, not render layer.
+- Strategic decisions locked:
+  - Coloring + dot-to-dot DROPPED from challenge reel format. Generators serve image posts + ASMR only.
+  - Challenge reel becomes 4-type format: maze, word-search, matching, find-the-diff.
+  - Joyo shifts from corner watermark to contextual character (pose-specific per puzzle type).
+  - Hook system upgraded to typed pool with intelligence expansion (same pattern as prompt generator).
+- 5 Joyo poses generated and copied to `assets/mascot/`: running, magnifying, celebrating, pointing, thinking.
+- Seeded `config/hooks-activity.json` with 8 high-quality hooks per type (4 types, 32 total).
+- OC task specs written: OC-020 (maze + hook system), OC-021 (word search), OC-022 (matching).
+- Next: OC executes 020 → 021 → 022 in sequence. Ahmed generates matching sticker PNGs when OC-022 is ready.
+- Matching sticker library generated via Imagen 4.0 (`scripts/generate-matching-stickers.mjs`): 36 PNGs across 6 themes (animals, ocean, space, dinosaurs, farm, vehicles), all visually verified clean. Stored at `assets/stickers/matching/`. OC-022 can consume immediately.
+- All 6 puzzle generators approved and pipeline production-ready.
+
+---
+## 2026-05-01 — Asset reuse strategy locked
+
+**Context:** $2.20 Imagen spend today on matching sticker production. Discussed scaling this to all puzzle types.
+
+**Key decisions locked:**
+
+1. **No fallback to programmatic output.** If asset library is empty, the pipeline skips that puzzle type entirely and warns Ahmed. A missing post is better than a broken-looking one. No programmatic fallback code path.
+
+2. **True cost per accepted image is higher than API price.** Imagen rejects/fails require retries. Actual cost per accepted PNG is ~$0.10–0.13 (vs $0.061 raw API rate). Budget and timeline estimates must use $0.12/accepted image.
+
+3. **Manual seeding every ~2 weeks for rotation assets (coloring, find-diff).** Ahmed runs a production session, reviews output in staging, promotes good images to library. Not automated. Human quality gate is the feature, not a workaround.
+
+4. **Stable assets are one-time only.** Maze START/FINISH markers (12 PNGs), dot-to-dot shape illustrations (~30 PNGs): generate once, reuse forever. No refresh needed.
+
+**Asset library architecture (locked for OC-023 brief):**
+- `generate-asset-library.mjs` — production tool (manual run), outputs to `assets/generated/<type>/<theme>/staging/`
+- Ahmed reviews staging → moves approved images to `assets/generated/<type>/<theme>/`
+- `scripts/lib/asset-library.mjs` — `pickAsset(type, theme)` picks least-recently-used; returns `null` if empty (no fallback)
+- `npm run status` shows library health per type/theme — yellow = time for production session
+- Index tracks `usedCount` + `lastUsed` per file for rotation fairness
+
+**Estimated biweekly seeding sessions:**
+- Find-diff: ~15 accepted scenes/session (~125 API calls at ~$0.06 = ~$7.50, accept ~50%) = ~$7.50 per session
+- Coloring: ~20 accepted pages/session (higher acceptance rate) = ~$3.00 per session
+- Maze markers: one-time ~$1.50, done
+- Dot-to-dot shapes: one-time ~$3.60, done when dot-to-dot upgrade runs
+
+**Daily pipeline Imagen cost (steady state): $0.** All generators read from library files only.
+**Monthly Imagen budget: ~$20–30/month** (biweekly find-diff + coloring sessions).
+
+**Next move decided:** Start Phase 0 streak NOW with maze + word-search reels. Phase 0 requires 1 challenge reel/day — type doesn't matter. Find-diff library can be built in parallel. OC-023 brief is next after Ahmed watches OC-022 matching reel output.
+
+---
+## 2026-05-01 — Asset strategy revised after web research (Imagen pricing confirmed)
+
+**Confirmed pricing (Google AI Developer API official):**
+- Imagen 4 Fast: $0.02/image
+- Imagen 4 Standard: $0.04/image
+- Imagen 4 Ultra: $0.06/image
+- No free tier, no batch discount on image generation
+
+**Today's $2.20 matching session explained:** ~37 Ultra-tier calls ($0.06), ~36 accepted = ~3% rejection rate. Sticker icons are simple enough that Imagen handles them cleanly. This is NOT representative of complex illustrated scenes.
+
+**Find-the-diff via Imagen API: REJECTED.** Ahmed correctly identified that complex illustrated scenes require many retries — Imagen's known failure modes (spatial relationships, scene coherence, object consistency) are exactly the problems find-the-diff hits hardest. API cost + Ahmed's review time = wrong tool.
+
+**Find-the-diff correct approach: manual library seeding.** Ahmed generates background scenes in Gemini chat (not API), approves visually in real time, saves good ones to `assets/generated/finddiff-scenes/<theme>/staging/`. Zero API cost. Runs whenever Ahmed has 20 minutes. Not on a forced schedule.
+
+**Coloring pages via Imagen API: APPROVED.** Simple flat line-art has high acceptance rate. Imagen 4 Standard ($0.04/image), biweekly session of ~20 accepted pages ≈ $1–1.50 per session → ~$3/month. Manageable.
+
+**Revised monthly Imagen budget (steady state): ~$3/month** (coloring pages API only). One-time setup: ~$2 (maze markers + dot-to-dot shapes).
+
+**Daily pipeline Imagen cost: $0.** No runtime calls. All generators read from pre-built library files. If library empty → skip type, warn in `npm run status`, never fall back to programmatic output.
+
+**OC-023 brief scope (revised):**
+- Find-the-diff: file-based library infrastructure only (pickAsset, staging folder, status health, no Imagen calls in pipeline)
+- Coloring: `generate-asset-library.mjs --type coloring-pages` with Imagen Standard
+- Both: shared `scripts/lib/asset-library.mjs` (pickAsset + health check)
+- `npm run status` extended with library health section
+
+**Phase 0 path clear:** Find-the-diff is NOT a Phase 0 blocker. Maze + word-search + matching (after OC-022 Ahmed watch) cover the daily 1-reel target. Find-the-diff enters rotation whenever Ahmed has first manual seeding session done.
+
+---
+
+## 2026-05-02 — [Agent: Claude + OC-026] — Maze/word-search visual fixes + hook pool replacement + OC-026
+
+**ActivityChallenge.jsx fixes (Claude direct):**
+- Double Joyo bug: PuzzleJoyoLayer had two isMaze blocks both rendering running Joyo during challenge. Fixed Block 2 opacity to `0` (non-celebrating) so only Block 1 (flipped, scaleX(-1)) shows during challenge.
+- 🍎/🏆 conflict: Removed the 🍎 block from main component. TrophyMarker in PuzzleJoyoLayer at actual mazeFinishFraction is the correct finish indicator.
+
+**Hook pool replaced (Claude direct):**
+- All 4 puzzle types in `config/hooks-activity.json` replaced with Halbert direct-response hooks (count hooks, ego-gap, parent challenge, time pressure, curiosity gap). Old generic seeds gone.
+
+**OC-026 findings and fixes:**
+- Hook wiring: `pickHook()` had no weighting (uniform random). `buildChallengeHook()` in `scripts/lib/challenge-hooks.mjs` was reading `hooks-library.json` (captions pool) not `hooks-activity.json`. Both fixed — weighted random + activity pool priority.
+- Word-search solution: source canvas is 1700×2200; rects are 0-1 normalized to that. `objectFit: contain` on 1080×1920 renders to 1080×1397 with 261px letterbox — old formula `y = y_norm * 1920` placed highlights ~261px off at edges. Fixed with proper `getContainBounds()` math in `WordSearchReveal.jsx`.
+- Matching asset library: `generate-matching-assets.mjs` now calls `pickAsset('matching-scenes', theme)` with null fallback. Drop scenes to `assets/generated/matching-scenes/<theme>/staging/` then promote.
+
+**Next:** Re-render QC videos for maze and word-search to verify all fixes. Seed matching-scenes library for first theme.
+
+---
+
+## 2026-05-02 — [Claude] — OC-028 review + maze hero/reward position + sticker persistence
+
+**OC-028 review:**
+- Verified all 7 files correctly wired by OpenClaw. Found one bug: `public/` prefix stored in activity.json paths, causing `staticFile('public/assets/...')` → double-prefix. Fixed 2-line stripPublic in `generate-maze-assets.mjs`. QC render passed.
+
+**Maze hero/reward position fix (canvas normalization):**
+- Root cause: `mazeStartFraction`/`mazeFinishFraction` in `render-video.mjs` were normalized to `cropW×cropH` (sub-region) but blank.png is the full canvas. Path waypoints use `canvasW×canvasH`. Mismatch = icons offset from actual openings.
+- Fix: removed cropX/cropY/cropW/cropH, normalized fractions to `sourceImageWidth/sourceImageHeight`. Also added edge-snap so icons sit at the maze wall opening (not cell center).
+
+**Sticker persistence through solve:**
+- Hero + reward both disappeared when solve started (both gated on `frame < solveStart`).
+- Fix: reward moved to separate `!isCelebrating` block; hero solve-phase block opacity changed from `0` to `frame < solveStart ? 0 : isCelebrating ? runningOpacity : 1`.
+- Now: hero + reward visible through solve, reward disappears + hero fades + joyo_celebrating appears at celebrate.
+
+**Cheatsheet updates:** Matching theme list updated to 6 sticker library themes; dogs/poodles batch section removed.
+
+**Daily pipeline ran.**
+
+**Next:** QC renders for maze v3 + word-search v3 (priority 2).

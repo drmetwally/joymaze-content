@@ -1,0 +1,10 @@
+{
+  "ocean:character": [
+    "public/assets/stickers/matching/ocean/turtle.png",
+    "public/assets/stickers/matching/ocean/dolphin.png",
+    "public/assets/stickers/matching/ocean/fish.png",
+    "public/assets/stickers/matching/ocean/crab.png",
+    "public/assets/stickers/matching/ocean/seahorse.png",
+    "public/assets/stickers/matching/ocean/octopus.png"
+  ]
+}

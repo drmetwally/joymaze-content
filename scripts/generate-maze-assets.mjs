@@ -5,6 +5,7 @@ import path from 'path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 import { buildChallengeHook } from './lib/challenge-hooks.mjs';
+import { pickAsset } from './lib/asset-library.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -15,8 +16,8 @@ const CANVAS_H = 2200;
 const DEFAULT_PATH_COLOR = '#22BB44';
 const WALL_COLOR = '#121827';
 const BG_COLOR = '#FFFFFF';
-const SOLUTION_STROKE = 24;
-const WALL_STROKE = 7;
+const SOLUTION_STROKE = 36;
+const WALL_STROKE = 12;
 
 const args = process.argv.slice(2);
 const hasFlag = (flag) => args.includes(flag);
@@ -422,6 +423,27 @@ async function main() {
     countdownSec: COUNTDOWN_SEC,
     seedHint: `${TITLE}|${THEME}|${DIFFICULTY}|${SHAPE}`,
   });
+
+  // ── Hero + reward character picks ────────────────────────────────────────────
+  // Hero: character sticker. Separate LRU keys mean hero ≠ reward naturally.
+  // Odd day → character sticker at start; even day → joyo_running.png (empty string)
+  // Reward: always a character sticker (separate pick from same pool)
+  const useCharacterHero = new Date().getDate() % 2 === 1;
+  const family = (() => {
+    const s = String(THEME || '').toLowerCase();
+    if (s.includes('ocean') || s.includes('sea') || s.includes('fish') || s.includes('arctic')) return 'ocean';
+    if (s.includes('space') || s.includes('rocket') || s.includes('planet')) return 'space';
+    if (s.includes('dino') || s.includes('jurassic') || s.includes('trex')) return 'dinosaurs';
+    if (s.includes('farm')) return 'farm';
+    if (s.includes('vehicle')) return 'vehicles';
+    return 'animals';
+  })();
+  const stripPublic = (p) => p.replace(/^public\//, '');
+  const heroChar = useCharacterHero ? (await pickAsset(family, 'character')) : null;
+  const mazeHeroAsset = heroChar ? stripPublic(path.relative(ROOT, heroChar).replace(/\\/g, '/')) : '';
+  const rewardChar = await pickAsset(family, 'character');
+  const mazeRewardAsset = rewardChar ? stripPublic(path.relative(ROOT, rewardChar).replace(/\\/g, '/')) : '';
+
   const { mazeJson, pathJson, activityJson } = buildMetadata({
     seed,
     title: TITLE,
@@ -437,6 +459,9 @@ async function main() {
     folderRel,
     hookTitle,
   });
+  // Inject hero + reward sticker paths into activityJson
+  activityJson.mazeHeroAsset = mazeHeroAsset;
+  activityJson.mazeRewardAsset = mazeRewardAsset;
   const benchmarkJson = summarizeReferenceComparison(SHAPE, DIFFICULTY, ROWS, COLS);
 
   console.log(`[maze-factory] title       : ${TITLE}`);

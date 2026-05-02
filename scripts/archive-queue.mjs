@@ -26,6 +26,8 @@ const ASMR_DIR = path.join(ROOT, 'output', 'asmr');
 const STORIES_DIR = path.join(ROOT, 'output', 'stories');
 const VIDEOS_DIR = path.join(ROOT, 'output', 'videos');
 const PROMPTS_DIR = path.join(ROOT, 'output', 'prompts');
+const CHALLENGE_DIR = path.join(ROOT, 'output', 'challenge');
+const GENERATED_ACTIVITY_DIR = path.join(CHALLENGE_DIR, 'generated-activity');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -55,6 +57,30 @@ async function fileExists(filePath) {
   } catch {
     return false;
   }
+}
+
+async function moveDir(src, dest) {
+  await fs.mkdir(path.dirname(dest), { recursive: true });
+  await fs.rename(src, dest).catch(async err => {
+    if (err.code === 'EXDEV') {
+      await fs.cp(src, dest, { recursive: true });
+      await fs.rm(src, { recursive: true, force: true });
+    } else {
+      throw err;
+    }
+  });
+}
+
+async function getFolderDate(folderPath, metadataFiles = []) {
+  for (const file of metadataFiles) {
+    try {
+      const meta = JSON.parse(await fs.readFile(path.join(folderPath, file), 'utf-8'));
+      const date = (meta.generatedAt || meta.createdAt || '').slice(0, 10);
+      if (date) return date;
+    } catch {}
+  }
+  const stat = await fs.stat(folderPath);
+  return stat.mtime.toISOString().slice(0, 10);
 }
 
 async function main() {
@@ -210,14 +236,7 @@ async function main() {
       const dest = path.join(ARCHIVE_DIR, 'asmr', entry.name);
       console.log(`  Archive ASMR: ${entry.name} → archive/asmr/`);
       if (!DRY_RUN) {
-        await fs.mkdir(path.join(ARCHIVE_DIR, 'asmr'), { recursive: true });
-        await fs.rename(folderPath, dest).catch(async err => {
-          if (err.code === 'EXDEV') {
-            // Cross-device: recursive copy + remove
-            await fs.cp(folderPath, dest, { recursive: true });
-            await fs.rm(folderPath, { recursive: true, force: true });
-          } else throw err;
-        });
+        await moveDir(folderPath, dest);
       }
       asmrArchived++;
     }
@@ -249,17 +268,57 @@ async function main() {
       const dest = path.join(ARCHIVE_DIR, 'stories', entry.name);
       console.log(`  Archive story: ${entry.name} → archive/stories/`);
       if (!DRY_RUN) {
-        await fs.mkdir(path.join(ARCHIVE_DIR, 'stories'), { recursive: true });
-        await fs.rename(folderPath, dest).catch(async err => {
-          if (err.code === 'EXDEV') {
-            await fs.cp(folderPath, dest, { recursive: true });
-            await fs.rm(folderPath, { recursive: true, force: true });
-          } else throw err;
-        });
+        await moveDir(folderPath, dest);
       }
       storiesArchived++;
     }
   } catch { /* no stories dir */ }
+
+  // Sweep challenge brief folders — output/challenge/{slug}/ → output/archive/challenge/
+  let challengeArchived = 0;
+  try {
+    const challengeEntries = await fs.readdir(CHALLENGE_DIR, { withFileTypes: true });
+    for (const entry of challengeEntries) {
+      if (!entry.isDirectory() || entry.name === 'generated-activity') continue;
+      const folderPath = path.join(CHALLENGE_DIR, entry.name);
+      const folderDate = await getFolderDate(folderPath, ['activity.json']);
+
+      if (!ARCHIVE_ALL && folderDate >= TODAY) {
+        console.log(`  Skip challenge: ${entry.name} (today — ${folderDate})`);
+        continue;
+      }
+
+      const dest = path.join(ARCHIVE_DIR, 'challenge', entry.name);
+      console.log(`  Archive challenge: ${entry.name} → archive/challenge/`);
+      if (!DRY_RUN) {
+        await moveDir(folderPath, dest);
+      }
+      challengeArchived++;
+    }
+  } catch { /* no challenge dir */ }
+
+  // Sweep generated challenge-activity folders — output/challenge/generated-activity/{slug}/ → output/archive/challenge-generated/
+  let generatedActivitiesArchived = 0;
+  try {
+    const generatedEntries = await fs.readdir(GENERATED_ACTIVITY_DIR, { withFileTypes: true });
+    for (const entry of generatedEntries) {
+      if (!entry.isDirectory()) continue;
+      const folderPath = path.join(GENERATED_ACTIVITY_DIR, entry.name);
+      const folderDate = await getFolderDate(folderPath, ['activity.json', 'puzzle.json', 'maze.json', 'wordsearch.json']);
+
+      if (!ARCHIVE_ALL && folderDate >= TODAY) {
+        console.log(`  Skip generated activity: ${entry.name} (today — ${folderDate})`);
+        continue;
+      }
+
+      const dest = path.join(ARCHIVE_DIR, 'challenge-generated', entry.name);
+      console.log(`  Archive generated activity: ${entry.name} → archive/challenge-generated/`);
+      if (!DRY_RUN) {
+        await moveDir(folderPath, dest);
+      }
+      generatedActivitiesArchived++;
+    }
+  } catch { /* no generated activity dir */ }
 
   // Sweep loose video files — output/videos/*.mp4 → output/archive/videos/
   let videosArchived = 0;
@@ -334,7 +393,7 @@ async function main() {
 
   // Summary
   console.log('\n--- Summary ---');
-  if (archived === 0 && rawArchived === 0 && asmrArchived === 0 && storiesArchived === 0 && videosArchived === 0 && promptsArchived === 0 && xTextArchived === 0) {
+  if (archived === 0 && rawArchived === 0 && asmrArchived === 0 && storiesArchived === 0 && challengeArchived === 0 && generatedActivitiesArchived === 0 && videosArchived === 0 && promptsArchived === 0 && xTextArchived === 0) {
     console.log('Nothing to archive. All items are from today.');
   } else {
     for (const [date, count] of Object.entries(summary).sort()) {
@@ -343,10 +402,12 @@ async function main() {
     if (rawArchived > 0) console.log(`  raw files: ${rawArchived} image(s)`);
     if (asmrArchived > 0) console.log(`  asmr briefs: ${asmrArchived} folder(s)`);
     if (storiesArchived > 0) console.log(`  story episodes: ${storiesArchived} folder(s)`);
+    if (challengeArchived > 0) console.log(`  challenge briefs: ${challengeArchived} folder(s)`);
+    if (generatedActivitiesArchived > 0) console.log(`  generated challenge activities: ${generatedActivitiesArchived} folder(s)`);
     if (videosArchived > 0) console.log(`  videos: ${videosArchived} file(s)`);
     if (promptsArchived > 0) console.log(`  prompts: ${promptsArchived} file(s)`);
     if (xTextArchived > 0) console.log(`  x-text posts: ${xTextArchived} file(s)`);
-    console.log(`\nArchived: ${archived} queue + ${rawArchived} raw + ${asmrArchived} ASMR + ${storiesArchived} stories + ${videosArchived} videos + ${promptsArchived} prompts + ${xTextArchived} x-text${DRY_RUN ? ' (dry run)' : ''}`);
+    console.log(`\nArchived: ${archived} queue + ${rawArchived} raw + ${asmrArchived} ASMR + ${storiesArchived} stories + ${challengeArchived} challenge briefs + ${generatedActivitiesArchived} generated challenge activities + ${videosArchived} videos + ${promptsArchived} prompts + ${xTextArchived} x-text${DRY_RUN ? ' (dry run)' : ''}`);
   }
   if (skipped > 0) console.log(`Skipped: ${skipped} item(s)`);
   console.log('');
