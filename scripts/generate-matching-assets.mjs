@@ -183,7 +183,14 @@ function buildMatchingPairs(pairs, grid) {
 function buildLayout(cols, rows) {
   const MARGIN = 80;
   const gap = 18;
-  const cardSize = Math.floor((CANVAS_W - MARGIN - (cols - 1) * gap) / cols);
+  // Reduce cardSize until the full grid fits within CANVAS_W with MARGIN padding on each side.
+  // 4 columns at 391px = 1564px + 3×18 = 1618px > 1540px available → clip right edge.
+  // Shrink until grid + margins fits cleanly so no cards clip at render time.
+  const availableW = CANVAS_W - MARGIN * 2;
+  let cardSize = Math.floor(availableW / cols);
+  while (cols * cardSize + (cols - 1) * gap > availableW && cardSize > 60) {
+    cardSize -= 2;
+  }
   const totalW = cols * cardSize + (cols - 1) * gap;
   const totalH = rows * cardSize + (rows - 1) * gap;
   const offsetX = Math.round((CANVAS_W - totalW) / 2);
@@ -401,7 +408,7 @@ function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, fold
   };
 }
 
-function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel }) {
+function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel, matchRects }) {
   return {
     type: 'challenge',
     puzzleType: PUZZLE_TYPE,
@@ -424,6 +431,7 @@ function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel }) {
     showJoyo: true,
     showBrandWatermark: false,
     sourceFolder: folderRel,
+    matchRects,
   };
 }
 
@@ -506,7 +514,7 @@ async function main() {
   }
 
   const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, folderRel });
-  const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel });
+  const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel, matchRects: matchingJson.matchRects });
 
   console.log(`[matching-factory] title      : ${TITLE}`);
   console.log(`[matching-factory] theme      : ${THEME}`);

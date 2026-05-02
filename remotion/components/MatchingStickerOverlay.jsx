@@ -60,11 +60,11 @@ export function MatchingStickerOverlay({
   const celebrateStart = solveStart + solveFrames - Math.round(fps * 1.8);
   const isCelebrating = isSolving && frame >= celebrateStart;
 
-  // Think → celebrate crossfade
+  // Think → celebrate crossfade at end of solve phase only
   const fadeFrames = 12;
   const thinkOpacity = isCelebrating
     ? Math.max(0, 1 - (frame - celebrateStart) / fadeFrames)
-    : isSolving ? 0 : 1;
+    : 1;
   const celebOpacity = isCelebrating
     ? Math.min(1, (frame - celebrateStart) / fadeFrames)
     : 0;
@@ -78,24 +78,37 @@ export function MatchingStickerOverlay({
 
   return (
     <>
-      {/* Sticker images overlaid on each card */}
+      {/* Sticker images overlaid on each card, with colored backing circle for contrast */}
       {matchRects.map((rect, i) => {
         const stickerSrc = getStickerAsset(rect.gridIndex, themeKey);
         return (
-          <Img
-            key={`sticker-${i}`}
-            src={staticFile(stickerSrc)}
+          <div
+            key={`sticker-wrap-${i}`}
             style={{
               position: 'absolute',
               left: rect.x,
               top: rect.y,
               width: rect.w,
               height: rect.h,
-              objectFit: 'contain',
-              zIndex: 6,
+              borderRadius: rect.w * 0.12,
+              backgroundColor: 'rgba(255,255,255,0.85)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              zIndex: 5,
               pointerEvents: 'none',
             }}
-          />
+          >
+            <Img
+              key={`sticker-${i}`}
+              src={staticFile(stickerSrc)}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                zIndex: 6,
+                pointerEvents: 'none',
+              }}
+            />
+          </div>
         );
       })}
 

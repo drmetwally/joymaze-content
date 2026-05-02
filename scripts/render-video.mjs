@@ -474,6 +474,22 @@ async function challengeJsonToProps(activity, activityDir) {
     if (wsData.highlightColor) highlightColor = wsData.highlightColor;
   } catch { /* no wordsearch.json */ }
 
+  // Load matchRects from matching.json
+  let matchRects = null;
+  try {
+    const matchingData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'matching.json'), 'utf-8'));
+    sourceImageWidth = CANVAS_W;
+    sourceImageHeight = CANVAS_H;
+    const { width: renderW, height: renderH, offsetX, offsetY } = fitContainBounds(CANVAS_W, CANVAS_H);
+    matchRects = (matchingData.matchRects || []).map(r => ({
+      gridIndex: r.gridIndex,
+      x: offsetX + r.xNorm * renderW,
+      y: offsetY + r.yNorm * renderH,
+      w: r.wNorm * renderW,
+      h: r.hNorm * renderH,
+    }));
+  } catch { /* no matching.json */ }
+
   // Load maze sticker fractions
   let mazeStartFraction = null, mazeFinishFraction = null;
   try {
@@ -549,6 +565,7 @@ async function challengeJsonToProps(activity, activityDir) {
     pathWaypoints,
     pathColor: activity.pathColor ?? pathColor,
     wordRects,
+    matchRects,
     highlightColor: activity.highlightColor ?? highlightColor,
     dotWaypoints,
     dotColor: activity.dotColor ?? dotColor,

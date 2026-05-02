@@ -6,5 +6,9 @@
     "public/assets/stickers/matching/ocean/crab.png",
     "public/assets/stickers/matching/ocean/seahorse.png",
     "public/assets/stickers/matching/ocean/octopus.png"
+  ],
+  "ocean:scene": [
+    "assets/generated/coloring-pages/ocean/ocean.png",
+    "assets/generated/coloring-pages/ocean/ocean-animals-1.png"
   ]
 }
