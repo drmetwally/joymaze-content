@@ -38,10 +38,24 @@ const THEME_STICKERS = {
   vehicles:   ['car','bus','train','airplane','boat','bicycle'],
 };
 
-function getStickerAsset(gridIndex, themeKey) {
+const OCEAN_STICKER_MAP = {
+  DOLPHIN:  'dolphin',
+  FISH:     'fish',
+  CRAB:     'crab',
+  OCTOPUS:  'octopus',
+  TURTLE:   'turtle',
+  SEAHORSE: 'seahorse',
+};
+
+function getStickerAsset(label, themeKey) {
+  if (themeKey === 'ocean' && OCEAN_STICKER_MAP[label]) {
+    return `assets/stickers/matching/ocean/${OCEAN_STICKER_MAP[label]}.png`;
+  }
+  // Other themes: fall back to position-cycling (theme may not have explicit map)
   const stickerList = THEME_STICKERS[themeKey] || THEME_STICKERS.animals;
-  const name = stickerList[gridIndex % stickerList.length];
-  return `assets/stickers/matching/${themeKey}/${name}.png`;
+  // Derive a stable sticker from the label string
+  const idx = label.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % stickerList.length;
+  return `assets/stickers/matching/${themeKey}/${stickerList[idx]}.png`;
 }
 
 // Progressively drawing connection line
@@ -173,8 +187,8 @@ export const MatchingReveal = ({
         const rectA = rectByIndex[pair.positions[0]];
         const rectB = rectByIndex[pair.positions[1]];
         if (!rectA || !rectB) return null;
-        const stickerA = getStickerAsset(pair.positions[0], themeKey);
-        const stickerB = getStickerAsset(pair.positions[1], themeKey);
+        const stickerA = getStickerAsset(pair.label, themeKey);
+        const stickerB = getStickerAsset(pair.label, themeKey);
         return [
           <FaceUpCard key={`fa-${pair.id}`} rect={rectA} label={pair.label} stickerSrc={stickerA} debugId={`A-${pair.id}`} />,
           <FaceUpCard key={`fb-${pair.id}`} rect={rectB} label={pair.label} stickerSrc={stickerB} debugId={`B-${pair.id}`} />,
