@@ -441,7 +441,7 @@ export const ActivityChallenge = ({
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
   // For matching, hook phase (Phase 1) runs from frame 0 — delay strip visibility until Phase 2
-  const matchingHookFrames = normalizedType === 'matching' ? Math.round(2.5 * fps) : 0;
+  const matchingHookFrames = normalizedType === 'matching' ? 0 : 0;
   const phase1End = matchingHookFrames;
   const phase2End = phase1End + challengeFrames;
   const stripVisible = frame >= matchingHookFrames && frame < solveStart;
