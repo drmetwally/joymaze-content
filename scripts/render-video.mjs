@@ -477,7 +477,7 @@ async function challengeJsonToProps(activity, activityDir) {
   const CANVAS_W = 1700, CANVAS_H = 2200;
 
   // Load matchRects from matching.json
-  let matchRects = null, matchPairs = null, matchConnections = null;
+  let matchRects = null, matchPairs = null, matchConnections = null, pairOrder = null;
   try {
     const matchingData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'matching.json'), 'utf-8'));
     sourceImageWidth = CANVAS_W;
@@ -491,6 +491,7 @@ async function challengeJsonToProps(activity, activityDir) {
       h: r.hNorm * renderH,
     }));
     matchPairs = matchingData.pairs || [];
+    pairOrder = matchingData.pairOrder || [];
     matchConnections = (matchingData.connections || []).map(c => ({
       x1: offsetX + c.x1 / CANVAS_W * renderW,
       y1: offsetY + c.y1 / CANVAS_H * renderH,
@@ -578,6 +579,7 @@ async function challengeJsonToProps(activity, activityDir) {
     matchRects,
     matchPairs,
     matchConnections,
+    pairOrder,
     highlightColor: activity.highlightColor ?? highlightColor,
     dotWaypoints,
     dotColor: activity.dotColor ?? dotColor,

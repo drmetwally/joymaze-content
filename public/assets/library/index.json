@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "themes": {
+    "animals": {
+      "character": [
+        "public/assets/stickers/matching/animals/cat.png",
+        "public/assets/stickers/matching/animals/dog.png",
+        "public/assets/stickers/matching/animals/rabbit.png",
+        "public/assets/stickers/matching/animals/elephant.png",
+        "public/assets/stickers/matching/animals/lion.png",
+        "public/assets/stickers/matching/animals/penguin.png"
+      ]
+    },
+    "ocean": {
+      "character": [
+        "public/assets/stickers/matching/ocean/fish.png",
+        "public/assets/stickers/matching/ocean/crab.png",
+        "public/assets/stickers/matching/ocean/seahorse.png",
+        "public/assets/stickers/matching/ocean/octopus.png",
+        "public/assets/stickers/matching/ocean/turtle.png",
+        "public/assets/stickers/matching/ocean/dolphin.png"
+      ],
+      "scene": [
+        "assets/generated/coloring-pages/ocean/ocean-animals-1.png",
+        "assets/generated/coloring-pages/ocean/ocean.png"
+      ]
+    },
+    "space": {
+      "character": [
+        "public/assets/stickers/matching/space/rocket.png",
+        "public/assets/stickers/matching/space/planet.png",
+        "public/assets/stickers/matching/space/astronaut.png",
+        "public/assets/stickers/matching/space/star.png",
+        "public/assets/stickers/matching/space/ufo.png",
+        "public/assets/stickers/matching/space/moon.png"
+      ]
+    },
+    "dinosaurs": {
+      "character": [
+        "public/assets/stickers/matching/dinosaurs/trex.png",
+        "public/assets/stickers/matching/dinosaurs/triceratops.png",
+        "public/assets/stickers/matching/dinosaurs/stegosaurus.png",
+        "public/assets/stickers/matching/dinosaurs/pterodactyl.png",
+        "public/assets/stickers/matching/dinosaurs/brachiosaurus.png",
+        "public/assets/stickers/matching/dinosaurs/raptor.png"
+      ]
+    },
+    "farm": {
+      "character": [
+        "public/assets/stickers/matching/farm/cow.png",
+        "public/assets/stickers/matching/farm/pig.png",
+        "public/assets/stickers/matching/farm/chicken.png",
+        "public/assets/stickers/matching/farm/horse.png",
+        "public/assets/stickers/matching/farm/sheep.png",
+        "public/assets/stickers/matching/farm/duck.png"
+      ]
+    },
+    "vehicles": {
+      "character": [
+        "public/assets/stickers/matching/vehicles/car.png",
+        "public/assets/stickers/matching/vehicles/bus.png",
+        "public/assets/stickers/matching/vehicles/train.png",
+        "public/assets/stickers/matching/vehicles/airplane.png",
+        "public/assets/stickers/matching/vehicles/boat.png",
+        "public/assets/stickers/matching/vehicles/bicycle.png"
+      ]
+    },
+    "ocean-animals": {
+      "scene": [
+        "assets/generated/coloring-pages/ocean-animals/ocean-animals-1.png"
+      ]
+    }
+  }
+}

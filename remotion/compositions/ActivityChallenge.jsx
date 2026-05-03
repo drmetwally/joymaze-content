@@ -393,6 +393,7 @@ export const ActivityChallenge = ({
   matchRects = null,
   matchPairs = null,
   matchConnections = null,
+  pairOrder = null,
   theme = activityChallengeSchema.theme,
   sourceImageWidth = activityChallengeSchema.sourceImageWidth,
   sourceImageHeight = activityChallengeSchema.sourceImageHeight,
@@ -441,6 +442,8 @@ export const ActivityChallenge = ({
   );
   // For matching, hook phase (Phase 1) runs from frame 0 — delay strip visibility until Phase 2
   const matchingHookFrames = normalizedType === 'matching' ? Math.round(2.5 * fps) : 0;
+  const phase1End = matchingHookFrames;
+  const phase2End = phase1End + challengeFrames;
   const stripVisible = frame >= matchingHookFrames && frame < solveStart;
   const frameBounds = getContainBounds(sourceImageWidth, sourceImageHeight, videoWidth, videoHeight);
   const themeEmoji = getPrimaryThemeEmoji(theme, normalizedType);
@@ -540,11 +543,14 @@ export const ActivityChallenge = ({
           matchRects={matchRects ?? []}
           matchPairs={matchPairs ?? []}
           matchConnections={matchConnections ?? []}
+          pairOrder={pairOrder ?? []}
           hookFrames={Math.round(2.5 * fps)}
           challengeFrames={challengeFrames}
           solveFrames={solveFrames}
           fps={fps}
           theme={theme ?? ''}
+          titleText={title}
+          countdownSec={countdownSec}
         />
       ) : (
 
@@ -582,8 +588,8 @@ export const ActivityChallenge = ({
 
       {tickAudioPath
         ? Array.from({ length: tickCount }).map((_, index) => {
-            const from = index * fps;
-            if (from >= challengeFrames) {
+            const from = phase1End + index * fps;
+            if (from >= phase2End) {
               return null;
             }
             return (
@@ -596,8 +602,8 @@ export const ActivityChallenge = ({
 
       {tickAudioPath
         ? Array.from({ length: fastTickCount }).map((_, index) => {
-            const from = fastTickStart + index * fastTickInterval;
-            if (from >= challengeFrames || from % fps === 0) {
+            const from = phase1End + fastTickStart + index * fastTickInterval;
+            if (from >= phase2End || from % fps === 0) {
               return null;
             }
             return (

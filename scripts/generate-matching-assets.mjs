@@ -299,16 +299,9 @@ function buildBlankSvg(layout, grid, stickerAssignments, sceneBgDataUrl = null) 
     ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
     : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
 
-  const cards = grid.map((cell, idx) => {
+  const cards = grid.map((cell) => {
     const x = offsetX + cell.col * (cardSize + gap);
     const y = offsetY + cell.row * (cardSize + gap);
-    const sticker = stickerAssignments?.[idx];
-    if (sticker) {
-      const scale = (cardSize - 60) / 400;
-      const scaled = 400 * scale;
-      const inset = (cardSize - scaled) / 2;
-      return `  <image href="${sticker}" x="${x + inset}" y="${y + inset}" width="${scaled}" height="${scaled}" preserveAspectRatio="xMidYMid meet"/>`;
-    }
     return `  <rect x="${x}" y="${y}" width="${cardSize}" height="${cardSize}" rx="14" fill="url(#cardback)" stroke="#C8C4B0" stroke-width="2.5"/>`;
   }).join('\n');
 
@@ -388,7 +381,7 @@ function computeMatchRects(grid, layout) {
   });
 }
 
-function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, folderRel }) {
+function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, pairOrder, folderRel }) {
   const matchRects = computeMatchRects(grid, layout);
   return {
     version: 1,
@@ -425,6 +418,7 @@ function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, fold
         x2: cb.x, y2: cb.y,
       };
     }),
+    pairOrder,
   };
 }
 
@@ -487,34 +481,48 @@ async function main() {
   const shuffled = shuffleInPlace([...filteredPool], rng);
   const selectedPairs = shuffled.slice(0, PAIRS);
 
-  // Build grid: total cards = PAIRS * 2, fill row by row
-  const totalCards = PAIRS * 2;
-  const gridRows = Math.ceil(totalCards / COLS);
-  const actualCols = COLS;
-  const actualRows = gridRows;
+  // 8-card layout: 4 cols × 2 rows (max 8 cards).
+  // Ocean theme: max 4 valid pairs (FISH, DOLPHIN, CRAB, OCTOPUS, TURTLE, SEAHORSE → use 4).
+  // For 4 pairs in 4 cols × 2 rows: each column gets 1 pair (row 0 + row 1 card).
+  const actualCols = 4;
+  const actualRows = 2;
+  const gridPairs = family === 'ocean' ? Math.min(PAIRS, 4) : PAIRS;
 
-  // Create card items: two copies of each pair label, shuffled into grid positions
-  const cardLabels = [...selectedPairs, ...selectedPairs];
-  shuffleInPlace(cardLabels, rng);
-  const grid = buildGrid(cardLabels, actualCols);
+  // cardLabels: two copies of each of the gridPairs labels, shuffled.
+  const pairSlice = selectedPairs.slice(0, gridPairs);
+  const cardLabels = shuffleInPlace([...pairSlice, ...pairSlice], rng);
 
-  // Shuffle position indices so pairs are placed non-adjacently across the grid
-  const positionIndices = Array.from({ length: totalCards }, (_, i) => i);
-  shuffleInPlace(positionIndices, rng);
+  // row0[i] = grid index for column i (row 0): 0,1,2,3
+  // row1[i] = grid index for column i (row 1): 4,5,6,7
+  const row0 = [0, 1, 2, 3];
+  const row1 = [4, 5, 6, 7];
+  shuffleInPlace(row0, rng);
+  shuffleInPlace(row1, rng);
 
-  const pairs = selectedPairs.map((label, i) => {
-    const posA = positionIndices[i];
-    const posB = positionIndices[PAIRS + i];
-    const cellA = grid[posA];
-    const cellB = grid[posB];
+  // gridRow0[i] = column i in row 0,  gridRow1[i] = column i in row 1
+  const gridRow0 = cardLabels.slice(0, actualCols).map((item, i) => ({ index: row0[i], row: 0, col: i, item }));
+  const gridRow1 = cardLabels.slice(actualCols, actualCols * 2).map((item, i) => ({ index: row1[i], row: 1, col: i, item }));
+  const grid = [...gridRow0, ...gridRow1];
+
+  // Pair i: column colOrder[i] in both rows
+  // colOrder shuffles which column each pair occupies
+  const colOrder = [0, 1, 2, 3];
+  shuffleInPlace(colOrder, rng);
+
+  const pairs = pairSlice.map((label, i) => {
+    const col = colOrder[i];
     return {
       id: i,
       label,
-      positions: [cellA.index, cellB.index],
-      centerA: { x: cellA.col, y: cellA.row },
-      centerB: { x: cellB.col, y: cellB.row },
+      positions: [col, 4 + col],  // row0[col], row1[col]
+      centerA: { x: col, y: 0 },
+      centerB: { x: col, y: 1 },
     };
   });
+
+  // pairOrder: all pairs have same yMidpoint (0+1)/2=0.5, but sort by label as stable tiebreaker
+  const pairOrder = pairs.map((_p, i) => i);
+
   const layout = buildLayout(actualCols, actualRows);
 
   const hookTitle = await buildChallengeHook({
@@ -550,7 +558,7 @@ async function main() {
     console.log(`[matching-factory] scene bg    : none (assets/generated/matching-scenes/${family}/main/ is empty)`);
   }
 
-  const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, folderRel });
+  const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, pairOrder, folderRel });
   const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel, matchRects: matchingJson.matchRects });
 
   console.log(`[matching-factory] title      : ${TITLE}`);
