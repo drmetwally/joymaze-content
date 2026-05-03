@@ -13,6 +13,7 @@ import { WipeReveal } from '../components/WipeReveal.jsx';
 import { MazeSolverReveal } from '../components/MazeSolverReveal.jsx';
 import { WordSearchReveal } from '../components/WordSearchReveal.jsx';
 import { DotToDoReveal } from '../components/DotToDoReveal.jsx';
+import { MatchingReveal } from '../components/MatchingReveal.jsx';
 import { BrandWatermark } from '../components/BrandWatermark.jsx';
 import { WordSearchJoyoOverlay } from '../components/WordSearchJoyoOverlay.jsx';
 import { MatchingStickerOverlay } from '../components/MatchingStickerOverlay.jsx';
@@ -271,6 +272,11 @@ const SolveReveal = ({
   highlightColor,
   dotWaypoints,
   dotColor,
+  matchRects,
+  matchPairs,
+  matchConnections,
+  theme,
+  fps,
   fallbackImagePath,
   sourceImageWidth,
   sourceImageHeight,
@@ -322,6 +328,27 @@ const SolveReveal = ({
     );
   }
 
+  // matching uses a dedicated 3-phase reveal: show pairs → countdown → solve with lines
+  if (normalizedType === 'matching') {
+    const hookF  = Math.round(2.5 * fps); // 75 frames
+    const chalF  = Math.round((durationFrames || 15) * fps);
+    const solvF = Math.round((durationFrames || 12) * fps);
+    return (
+      <MatchingReveal
+        blankPath={blankImagePath}
+        solvedPath={solvedImagePath}
+        matchRects={matchRects ?? []}
+        matchPairs={matchPairs ?? []}
+        matchConnections={matchConnections ?? []}
+        hookFrames={hookF}
+        challengeFrames={chalF}
+        solveFrames={solvF}
+        fps={fps}
+        theme={theme ?? ''}
+      />
+    );
+  }
+
   return (
     <WipeReveal
       blankPath={blankImagePath}
@@ -364,6 +391,8 @@ export const ActivityChallenge = ({
   dotWaypoints = null,
   dotColor = activityChallengeSchema.dotColor,
   matchRects = null,
+  matchPairs = null,
+  matchConnections = null,
   theme = activityChallengeSchema.theme,
   sourceImageWidth = activityChallengeSchema.sourceImageWidth,
   sourceImageHeight = activityChallengeSchema.sourceImageHeight,
@@ -410,7 +439,9 @@ export const ActivityChallenge = ({
     [1, 1.08, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
-  const stripVisible = frame < solveStart;
+  // For matching, hook phase (Phase 1) runs from frame 0 — delay strip visibility until Phase 2
+  const matchingHookFrames = normalizedType === 'matching' ? Math.round(2.5 * fps) : 0;
+  const stripVisible = frame >= matchingHookFrames && frame < solveStart;
   const frameBounds = getContainBounds(sourceImageWidth, sourceImageHeight, videoWidth, videoHeight);
   const themeEmoji = getPrimaryThemeEmoji(theme, normalizedType);
   const pulseStrength = frame >= transitionStart && frame < solveStart;
@@ -500,6 +531,23 @@ export const ActivityChallenge = ({
         />
       ) : null}
 
+
+      {/* Matching reels use a dedicated 3-phase reveal rendered at top level (not inside Sequence) */}
+      {normalizedType === 'matching' ? (
+        <MatchingReveal
+          blankPath={blankImagePath || imagePath}
+          solvedPath={solvedImagePath}
+          matchRects={matchRects ?? []}
+          matchPairs={matchPairs ?? []}
+          matchConnections={matchConnections ?? []}
+          hookFrames={Math.round(2.5 * fps)}
+          challengeFrames={challengeFrames}
+          solveFrames={solveFrames}
+          fps={fps}
+          theme={theme ?? ''}
+        />
+      ) : (
+
       <Sequence from={solveStart} durationInFrames={solveFrames}>
         <SolveReveal
           blankImagePath={blankImagePath || imagePath}
@@ -512,11 +560,17 @@ export const ActivityChallenge = ({
           highlightColor={highlightColor}
           dotWaypoints={dotWaypoints}
           dotColor={dotColor}
+          matchRects={matchRects ?? []}
+          matchPairs={matchPairs ?? []}
+          matchConnections={matchConnections ?? []}
+          theme={theme}
+          fps={fps}
           fallbackImagePath={sourceImagePath}
           sourceImageWidth={sourceImageWidth}
           sourceImageHeight={sourceImageHeight}
         />
       </Sequence>
+      )}
 
       {challengeAudioPath ? (
         <Audio

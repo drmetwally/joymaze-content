@@ -247,21 +247,41 @@ async function resolveStickerAssignments(selectedPairs, grid, stickerTheme, rng)
   const shuffled = shuffleInPlace([...names], rng);
   const selected = shuffled.slice(0, selectedPairs.length);
 
+  // Build label→sticker mapping: each pair label gets exactly one matching sticker.
+  // Ocean uses explicit verified mapping; other themes use exact name match.
   const pairStickerMap = {};
-  selectedPairs.forEach((label, i) => { pairStickerMap[i] = selected[i]; });
+  if (stickerTheme === 'ocean') {
+    const oceanLabelToSticker = {
+      DOLPHIN:  'dolphin',
+      FISH:     'fish',
+      CRAB:     'crab',
+      OCTOPUS:  'octopus',
+      TURTLE:   'turtle',
+      SEAHORSE: 'seahorse',
+    };
+    for (const label of selectedPairs) {
+      if (oceanLabelToSticker[label]) pairStickerMap[label] = oceanLabelToSticker[label];
+    }
+  } else {
+    const usedStickers = new Set();
+    for (const label of selectedPairs) {
+      const l = label.toLowerCase();
+      if (names.some(n => n.toLowerCase() === l) && !usedStickers.has(l)) {
+        pairStickerMap[label] = l;
+        usedStickers.add(l);
+      }
+    }
+  }
 
   const assignments = {};
   for (let i = 0; i < grid.length; i++) {
     const label = grid[i].item;
-    const pairIdx = selectedPairs.indexOf(label);
-    if (pairIdx === -1) continue;
-    const stickerName = pairStickerMap[pairIdx];
+    const stickerName = pairStickerMap[label];
     if (!stickerName) continue;
     const stickerPath = path.join(ROOT, 'assets', 'stickers', 'matching', stickerTheme, `${stickerName}.png`);
     try {
       const buf = await fs.readFile(stickerPath);
-      const b64 = buf.toString('base64');
-      assignments[i] = `data:image/png;base64,${b64}`;
+      assignments[i] = `data:image/png;base64,${buf.toString('base64')}`;
     } catch {
       // missing PNG — card renders with pattern background
     }
@@ -447,7 +467,24 @@ async function main() {
   // Load themed word pool and sample pairs
   const family = resolveThemeFamily(THEME);
   const pool = await loadWordPack(family, PAIRS * 3);
-  const shuffled = shuffleInPlace([...pool], rng);
+
+  // For ocean: only keep labels whose name exactly matches a sticker PNG file.
+  // DOLPHIN→dolphin, FISH→fish, CRAB→crab, OCTOPUS→octopus,
+  // TURTLE→turtle, SEAHORSE→seahorse are verified. Labels like PEARL,
+  // ANCHOR, TRIDENT have no sticker PNGs and are excluded.
+  const oceanLabelToSticker = {
+    DOLPHIN:  'dolphin',
+    FISH:     'fish',
+    CRAB:     'crab',
+    OCTOPUS:  'octopus',
+    TURTLE:   'turtle',
+    SEAHORSE: 'seahorse',
+  };
+  const filteredPool = family === 'ocean'
+    ? pool.filter(l => oceanLabelToSticker[l] != null)
+    : pool;
+
+  const shuffled = shuffleInPlace([...filteredPool], rng);
   const selectedPairs = shuffled.slice(0, PAIRS);
 
   // Build grid: total cards = PAIRS * 2, fill row by row

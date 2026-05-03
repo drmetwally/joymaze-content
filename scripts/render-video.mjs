@@ -474,8 +474,10 @@ async function challengeJsonToProps(activity, activityDir) {
     if (wsData.highlightColor) highlightColor = wsData.highlightColor;
   } catch { /* no wordsearch.json */ }
 
+  const CANVAS_W = 1700, CANVAS_H = 2200;
+
   // Load matchRects from matching.json
-  let matchRects = null;
+  let matchRects = null, matchPairs = null, matchConnections = null;
   try {
     const matchingData = JSON.parse(await fs.readFile(path.resolve(activityDir, 'matching.json'), 'utf-8'));
     sourceImageWidth = CANVAS_W;
@@ -487,6 +489,14 @@ async function challengeJsonToProps(activity, activityDir) {
       y: offsetY + r.yNorm * renderH,
       w: r.wNorm * renderW,
       h: r.hNorm * renderH,
+    }));
+    matchPairs = matchingData.pairs || [];
+    matchConnections = (matchingData.connections || []).map(c => ({
+      x1: offsetX + c.x1 / CANVAS_W * renderW,
+      y1: offsetY + c.y1 / CANVAS_H * renderH,
+      x2: offsetX + c.x2 / CANVAS_W * renderW,
+      y2: offsetY + c.y2 / CANVAS_H * renderH,
+      label: c.label,
     }));
   } catch { /* no matching.json */ }
 
@@ -566,6 +576,8 @@ async function challengeJsonToProps(activity, activityDir) {
     pathColor: activity.pathColor ?? pathColor,
     wordRects,
     matchRects,
+    matchPairs,
+    matchConnections,
     highlightColor: activity.highlightColor ?? highlightColor,
     dotWaypoints,
     dotColor: activity.dotColor ?? dotColor,
