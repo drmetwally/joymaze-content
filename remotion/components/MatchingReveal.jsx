@@ -2,18 +2,12 @@ import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, spring
 
 // ─── MatchingReveal ────────────────────────────────────────────────────────────
 // 3-phase matching puzzle reveal:
-//   Phase 1 (0 → hookFrames):          all pairs face-up — solved backdrop image
-//   Phase 2 (hookFrames → hook+challenge): face-down cards + countdown strip
-//   Phase 3 (hook+challenge → end):   sticker reward reveal
-//                                      Pairs revealed one-by-one left→right.
-//                                      Unrevealed pairs = blank card-backs.
-//                                      Revealed pair = both cards spring in together.
+//   Phase 1 (0 → hookFrames):          all pairs face-up — ocean scene visible through gaps
+//   Phase 2 (hookFrames → hook+challenge): face-down cards over ocean scene
+//   Phase 3 (hook+challenge → end):   sticker reward reveal — pairs spring in one-by-one
 //
-// Timing:
-//   Pair k (k=0..N-1) revealed when solveProgress >= (k+1)/N
-//   appearFrame(k) = solveStart + (k+1)/N * solveFrames
-//   solveFrames=360, N=6 → 60 frames/pair = 2.0s per pair.
-//   All 6 pairs revealed in 12s; last ~3s shows fully-solved board.
+// The ocean scene is the bottom layer in all phases (objectFit:'cover').
+// Card backs + sticker overlays render on top.
 
 const OCEAN_STICKER_MAP = {
   DOLPHIN:  'dolphin',
@@ -42,7 +36,7 @@ function getStickerAsset(label, themeKey) {
   return `assets/stickers/matching/${themeKey}/${fallback[themeKey] || 'cat'}.png`;
 }
 
-// ── Revealed face-up card with spring pop-in ────────────────────────────────────
+// ── Revealed face-up card (transparent — ocean shows through) ─────────────────
 function RevealedCard({ rect, label, stickerSrc, appearFrame }) {
   const frame = useCurrentFrame();
   const revealed = frame >= appearFrame;
@@ -75,7 +69,7 @@ function RevealedCard({ rect, label, stickerSrc, appearFrame }) {
   );
 }
 
-// ── Blank card back (unrevealed in P3) ─────────────────────────────────────────
+// ── Blank card back (opaque — hides ocean in card area) ────────────────────────
 function BlankCardBack({ rect }) {
   const { x, y, w, h } = rect;
   const radius = w * 0.12;
@@ -119,16 +113,16 @@ function TitleStrip({ title, countdownLabel }) {
 
 // ── MatchingReveal ────────────────────────────────────────────────────────────
 export const MatchingReveal = ({
-  blankPath,    // face-down card PNG (used in P2)
-  solvedPath,   // all-cards-face-up PNG (used for card art reference)
-  sceneBackgroundPath = null, // DEPRECATED — background now comes from blankPath
+  blankPath,    // face-down card PNG (used for card back texture in P2)
+  solvedPath,   // all-cards-face-up PNG (unused — sticker positions from matchRects)
+  sceneBackgroundPath = 'assets/generated/coloring-pages/ocean/ocean-animals-1.png',
   matchRects    = [],
   matchPairs    = [],
   matchConnections = [],
-  pairOrder     = [],   // reveal order: indices into matchPairs, left→right
-  hookFrames    = 75,   // Phase 1 duration
-  challengeFrames = 450, // Phase 2 duration
-  solveFrames  = 360,  // Phase 3 duration
+  pairOrder     = [],
+  hookFrames    = 75,   // Phase 1 duration (2.5s)
+  challengeFrames = 450, // Phase 2 duration (15s countdown)
+  solveFrames   = 360,  // Phase 3 duration (12s reveal)
   fps           = 30,
   theme         = '',
   titleText     = '',
@@ -159,10 +153,6 @@ export const MatchingReveal = ({
   const rectByIndex = {};
   matchRects.forEach(r => { rectByIndex[r.gridIndex] = r; });
 
-  // ── Reveal logic ───────────────────────────────────────────────────────────
-  // P3: pairs revealed left→right as solveProgress crosses each threshold.
-  // Unrevealed pairs → blank card-backs.
-  // Revealed pairs → spring-in sticker cards at same positions as P1.
   const N = Math.max(1, matchPairs.length);
 
   // Pair k (k=0..N-1) revealed when solveProgress >= (k+1)/N
@@ -179,30 +169,30 @@ export const MatchingReveal = ({
     return Math.round(solveStart + (k + 1) / N * solveFrames);
   };
 
-  // Build set of revealed pair ids
-  const revealedPairIds = new Set();
-  matchPairs.forEach(p => { if (isPairRevealed(p.id)) revealedPairIds.add(p.id); });
-
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <AbsoluteFill style={{ pointerEvents: 'none' }}>
 
-      {/* Screen background: blankPath has the ocean scene + card backs composited.
-          P2 renders it as-is. P1 shows scene behind face-up sticker overlays.
-          P3 shows scene behind blank backs + revealed sticker cards.
-          Use objectFit:'fill' so the scene fills the entire frame (no letterboxing). */}
-      {blankPath && (isPhase1 || isPhase2 || isSolving) && (
-        <Img src={staticFile(blankPath)} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill' }} />
+      {/* ── BOTTOM LAYER: ocean scene (all phases) ────────────────────────── */}
+      {/* Ocean PNG covers the full frame. Card backs + stickers go on top.
+          Ocean content is dense enough to show through card gaps and reveal areas. */}
+      {sceneBackgroundPath && (isPhase1 || isPhase2 || isSolving) && (
+        <Img
+          src={staticFile(sceneBackgroundPath)}
+          style={{
+            position: 'absolute',
+            top: 0, left: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover',
+          }}
+        />
       )}
 
-      {/* ── P1: all 12 cards face-up as explicit overlays (same system as P3) ── */}
-      {/* No solvedImage dependency — guarantees P1 and P3 sticker positions match exactly */}
+      {/* ── P1: all 12 cards face-up (ocean visible through gaps) ─────────── */}
       {isPhase1 && matchRects.map((r) => {
         const rect = rectByIndex[r.gridIndex];
         if (!rect) return null;
         const label = matchPairs.find(p => p.positions.includes(r.gridIndex))?.label;
         if (!label) return null;
-        // P1: card is always visible (appearFrame = -infinity)
         return (
           <RevealedCard
             key={`p1-${r.gridIndex}`}
@@ -214,19 +204,16 @@ export const MatchingReveal = ({
         );
       })}
 
-      {/* Phase 2: face-down cards (blankPath PNG as background, SVG overlay for clean card backs) */}
-      {isPhase2 && blankPath && (
-        <Img src={staticFile(blankPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-      )}
+      {/* ── P2: face-down card backs (opaque, hide ocean in card area) ───────── */}
       {isPhase2 && matchRects.map((r) => {
         const rect = rectByIndex[r.gridIndex];
         if (!rect) return null;
         return <BlankCardBack key={`bd-${r.gridIndex}`} rect={rect} />;
       })}
 
-      {/* Phase 3: all cards start face-down (blank SVG overlays for unrevealed) */}
+      {/* ── P3: unrevealed pairs = blank backs; revealed = spring-in stickers ── */}
       {isSolving && matchPairs.map((pair) => {
-        // Unrevealed: blank card-back
+        // Unrevealed: opaque blank card back (hides ocean in that card's area)
         if (!isPairRevealed(pair.id)) {
           return pair.positions.map((pos, pi) => {
             const rect = rectByIndex[pos];
@@ -234,7 +221,7 @@ export const MatchingReveal = ({
             return <BlankCardBack key={`hidden-${pair.id}-${pi}`} rect={rect} />;
           });
         }
-        // Revealed: spring-in sticker card overlay
+        // Revealed: transparent sticker overlay (ocean shows through)
         const appearF = pairAppearFrame(pair.id);
         return pair.positions.map((pos, pi) => {
           const rect = rectByIndex[pos];
