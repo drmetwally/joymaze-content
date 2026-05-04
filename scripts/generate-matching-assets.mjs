@@ -298,11 +298,11 @@ function buildBlankSvg(layout, grid, stickerAssignments, sceneBgDataUrl = null) 
   const { cardSize, offsetX, offsetY, gap, cols, rows } = layout;
   const patterns = cardBackPattern();
 
-  // If a pre-made scene image exists, use it as the canvas background.
-  // Otherwise fall back to solid BG_COLOR (white).
+  // Scene background: visible through card gaps and behind card backs.
+  // Used as the shared background in P2 and P3.
   const bgLayer = sceneBgDataUrl
     ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
-    : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
+    : `  <rect width="100%" height="100%" fill="#F5F1E8"/>`;
 
   const cards = grid.map((cell) => {
     const x = offsetX + cell.col * (cardSize + gap);
@@ -357,7 +357,7 @@ function buildSolvedSvg(layout, pairs, grid, sceneBgDataUrl = null) {
 
   const bgLayer = sceneBgDataUrl
     ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
-    : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
+    : `  <rect width="100%" height="100%" fill="#F5F1E8"/>`;
 
   return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
 ${patterns}
