@@ -1,19 +1,19 @@
 import { Img, interpolate, spring, staticFile } from 'remotion';
 
-// ─── MatchingStickerOverlay ────────────────────────────────────────────────────
+// G��G��G�� MatchingStickerOverlay G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 // Renders sticker images on top of the matching card grid.
 // Also renders Joyo (thinking during challenge, celebrating at solve end).
 //
 // Props:
-//   matchRects    — [{ x, y, w, h, gridIndex }] in video pixel coords
-//   theme         — theme string (e.g. "Ocean Animals", "Dinosaurs")
-//   frame         — current frame
-//   fps           — frames per second
-//   challengeFrames — frame at which countdown ends
-//   solveStart    — frame at which solve reveal begins
-//   solveFrames   — total solve phase frames
+//   matchRects    G�� [{ x, y, w, h, gridIndex }] in video pixel coords
+//   theme         G�� theme string (e.g. "Ocean Animals", "Dinosaurs")
+//   frame         G�� current frame
+//   fps           G�� frames per second
+//   challengeFrames G�� frame at which countdown ends
+//   solveStart    G�� frame at which solve reveal begins
+//   solveFrames   G�� total solve phase frames
 
-// Map theme string → sticker library key
+// Map theme string G�� sticker library key
 function resolveStickerThemeKey(themeStr) {
   const t = String(themeStr || '').toLowerCase();
   if (t.includes('ocean') || t.includes('sea') || t.includes('fish') || t.includes('marine')) return 'ocean';
@@ -26,7 +26,7 @@ function resolveStickerThemeKey(themeStr) {
 }
 
 // The 6 sticker names per theme (must match assets/stickers/matching/index.json)
-const STICKER_NAMES = ['cat','dog','rabbit','elephant','lion','penguin']; // animals — used for all themes as fallback
+const STICKER_NAMES = ['cat','dog','rabbit','elephant','lion','penguin']; // animals G�� used for all themes as fallback
 const THEME_STICKERS = {
   animals:    ['cat','dog','rabbit','elephant','lion','penguin'],
   ocean:      ['fish','crab','seahorse','octopus','turtle','dolphin'],
@@ -55,7 +55,10 @@ export function MatchingStickerOverlay({
 }) {
   if (!matchRects?.length) return null;
 
-  // P3+: MatchingReveal handles all reveals — don't double-render stickers
+  // P1: MatchingReveal already renders face-up stickers — don't double-render them here.
+  if (frame < solveStart) return null;
+
+  // P3+: MatchingReveal handles all reveals too.
   if (frame >= solveStart) return null;
 
   const themeKey = resolveStickerThemeKey(theme);
@@ -63,7 +66,7 @@ export function MatchingStickerOverlay({
   const celebrateStart = solveStart + solveFrames - Math.round(fps * 1.8);
   const isCelebrating = isSolving && frame >= celebrateStart;
 
-  // Think → celebrate crossfade at end of solve phase only
+  // Think G�� celebrate crossfade at end of solve phase only
   const fadeFrames = 12;
   const thinkOpacity = isCelebrating
     ? Math.max(0, 1 - (frame - celebrateStart) / fadeFrames)
