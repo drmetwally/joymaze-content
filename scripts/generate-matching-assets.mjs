@@ -55,7 +55,7 @@ const SLUG_ARG = getArg('--slug');
 const OUT_DIR_ARG = getArg('--out-dir');
 
 const PUZZLE_TYPE = 'matching';
-const COUNTDOWN_SEC = Number(getArg('--countdown', '15'));
+const COUNTDOWN_SEC = Number(getArg('--countdown', '10'));
 const SOLVE_DURATION_SEC = 12;
 const DEFAULT_CHALLENGE_AUDIO_VOLUME = 0.11;
 const DEFAULT_TICK_AUDIO_VOLUME = 0.3;
@@ -442,7 +442,7 @@ function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel, mat
     ctaText: 'Tag a kid who found all the pairs!',
     activityLabel: 'MATCHING',
     countdownSec: COUNTDOWN_SEC,
-    hookDurationSec: 2.5,
+    hookDurationSec: 5,
     holdAfterSec: SOLVE_DURATION_SEC,
     imagePath: 'puzzle.png',
     blankImage: 'blank.png',

@@ -330,9 +330,9 @@ const SolveReveal = ({
 
   // matching uses a dedicated 3-phase reveal: show pairs → countdown → solve with lines
   if (normalizedType === 'matching') {
-    const hookF  = Math.round(2.5 * fps); // 75 frames
-    const chalF  = Math.round((durationFrames || 15) * fps);
-    const solvF = Math.round((durationFrames || 12) * fps);
+    const hookF  = Math.round((inputProps.hookDurationSec ?? 5) * fps); // 150 frames for 5s P1
+    const chalF  = Math.round((inputProps.countdownSec    ?? 10) * fps); // 300 frames for 10s P2
+    const solvF  = Math.round((inputProps.holdAfterSec     ?? 12) * fps); // 360 frames for 12s P3
     return (
       <MatchingReveal
         blankPath={blankImagePath}
@@ -544,7 +544,7 @@ export const ActivityChallenge = ({
           matchPairs={matchPairs ?? []}
           matchConnections={matchConnections ?? []}
           pairOrder={pairOrder ?? []}
-          hookFrames={Math.round(2.5 * fps)}
+          hookFrames={Math.round(hookDurationSec * fps)}
           challengeFrames={challengeFrames}
           solveFrames={solveFrames}
           fps={fps}
