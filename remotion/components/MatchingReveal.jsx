@@ -121,7 +121,7 @@ function TitleStrip({ title, countdownLabel }) {
 export const MatchingReveal = ({
   blankPath,    // face-down card PNG (used in P2)
   solvedPath,   // all-cards-face-up PNG (used for card art reference)
-  sceneBackgroundPath = null, // ocean scene image for screen background (P1 + P3)
+  sceneBackgroundPath = null, // DEPRECATED — background now comes from blankPath
   matchRects    = [],
   matchPairs    = [],
   matchConnections = [],
