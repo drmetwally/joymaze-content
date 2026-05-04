@@ -4,11 +4,15 @@ import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, spring
 // 3-phase matching puzzle reveal:
 //   Phase 1 (0 → hookFrames):          all pairs face-up with ocean stickers + labels
 //   Phase 2 (hookFrames → hook+challenge): face-down cards + dynamic countdown strip
-//   Phase 3 (hook+challenge → end):   top→bottom sweep reveal with progressive orange lines
+//   Phase 3 (hook+challenge → end):   sweep reveal — top cards always visible,
+//                                      orange line draws from top→bottom,
+//                                      bottom card springs up when line reaches it
 //
-// Phase 3 sweep: each pair revealed when solveProgress crosses (k+1)/N threshold.
-// Top-row card always visible. Orange line draws from top-card center downward.
-// When line reaches bottom-card center → bottom card flips to reveal — single moment.
+// Sweep spec:
+//   - Pair k revealed when solveProgress >= (k+1)/N
+//   - Line starts at pair's top-card center, draws toward bottom-card center
+//   - Line progress = how far through the pair's own window (k/N → (k+1)/N)
+//   - Bottom card snaps/springs when line tip reaches its center (solveProgress = (k+1)/N)
 
 const OCEAN_STICKER_MAP = {
   DOLPHIN:  'dolphin',
@@ -37,7 +41,7 @@ function getStickerAsset(label, themeKey) {
   return `assets/stickers/matching/${themeKey}/${fallback[themeKey] || 'cat'}.png`;
 }
 
-// ── SVG connection line that draws progressively ─────────────────────────────
+// ── SVG connection line that draws progressively from top card → bottom card ──
 function ConnectionLine({ x1, y1, x2, y2, progress }) {
   if (progress <= 0) return null;
   const cx = x1 + (x2 - x1) * Math.min(progress, 1);
@@ -75,7 +79,7 @@ function FaceDownCard({ rect }) {
   );
 }
 
-// ── Title strip (always visible across all phases) ─────────────────────────────
+// ── Title strip: title + countdown in a single horizontal row ────────────────
 function TitleStrip({ title, countdownLabel }) {
   return (
     <div style={{ position: 'absolute', top: 42, left: 28, right: 28 }}>
@@ -86,13 +90,13 @@ function TitleStrip({ title, countdownLabel }) {
         boxShadow: '0 18px 48px rgba(0,0,0,0.32)',
         padding: '0 34px',
         height: 172,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24,
       }}>
         <div style={{ fontSize: 58, fontWeight: 900, color: '#FFFFFF', fontFamily: 'Arial Black, Arial, sans-serif', textAlign: 'center' }}>
           {title}
         </div>
         {countdownLabel && (
-          <div style={{ fontSize: 82, fontWeight: 900, color: '#FFD700', fontFamily: 'Arial Black, Arial, sans-serif', marginTop: 4 }}>
+          <div style={{ fontSize: 82, fontWeight: 900, color: '#FFD700', fontFamily: 'Arial Black, Arial, sans-serif' }}>
             {countdownLabel}
           </div>
         )}
@@ -107,7 +111,7 @@ export const MatchingReveal = ({
   solvedPath,
   matchRects       = [],
   matchPairs        = [],
-  matchConnections  = [],
+  matchConnections  = [],  // each: { x1, y1, x2, y2, label } — NO from/to
   pairOrder        = [],   // reveal order: indices into matchPairs, top→bottom
   hookFrames        = 75,  // Phase 1 duration
   challengeFrames  = 450, // Phase 2 duration
@@ -118,6 +122,9 @@ export const MatchingReveal = ({
   countdownSec     = 15,   // Phase 2 total seconds (for countdown math)
 }) => {
   const frame = useCurrentFrame();
+  const videoConfig = useVideoConfig();
+  const vfps = videoConfig?.fps ?? fps;
+
   const phase1End   = hookFrames;
   const phase2End   = phase1End + challengeFrames;
   const solveStart  = phase2End;
@@ -144,19 +151,25 @@ export const MatchingReveal = ({
   matchRects.forEach(r => { rectByIndex[r.gridIndex] = r; });
 
   // ── Phase 3 sweep logic ──────────────────────────────────────────────────
-  // Grid layout: 4 cols × 2 rows. Top row: positions 0–3, Bottom row: 4–7
-  // pairOrder = indices into matchPairs[] in top→bottom reveal order
-  // Pair k is revealed when solveProgress >= (k+1)/N
-  // Top-row card of each pair is always visible in Phase 3.
-  // Bottom-row card flips when its pair's reveal threshold is crossed.
+  // Grid: 6 cols × 2 rows. Top row: positions 0–5, bottom row: positions 6–11
+  // pairOrder = indices into matchPairs[] in left→right reveal order
+  // Pair k revealed when solveProgress >= (k+1)/N
+  // Line for pair k: draws from top-card pixel center → bottom-card pixel center
+  //   progress = how far through pair k's own window (0 at k/N, 1 at (k+1)/N)
+  // Bottom card springs up when solveProgress >= (k+1)/N (at the threshold frame)
   const N = Math.max(1, matchPairs.length);
 
-  const isTopCard = (pos) => pos < 4;  // row 0 = top row in 4×2 grid
+  const isTopCard = (pos) => pos < 6;  // row 0 = top row in 6×2 grid (col 0–5)
 
-  const getPairProgress = (pairIdx) => {
+  // lineProgress for pair k: 0 before k/N, 0→1 between k/N and (k+1)/N, 1 after
+  const getLineProgress = (pairIdx) => {
     const k = pairOrder.indexOf(pairIdx);
     if (k < 0) return 0;
-    return Math.max(0, (solveProgress - (k) / N) / (1 / N));
+    const revealAt = (k + 1) / N;          // solveProgress when pair k is revealed
+    if (solveProgress < k / N) return 0;   // before this pair's window even starts
+    if (solveProgress >= revealAt) return 1; // already revealed → line complete
+    // Within pair k's window: scale 0→1
+    return (solveProgress - k / N) / (1 / N);
   };
 
   const isPairRevealed = (pairIdx) => {
@@ -164,6 +177,12 @@ export const MatchingReveal = ({
     if (k < 0) return false;
     return solveProgress >= (k + 1) / N;
   };
+
+  // Build a connection map: pair id → {x1,y1,x2,y2} using label to match
+  // matchConnections entries: { x1, y1, x2, y2, label }
+  // matchPairs have: { id, label, positions: [topPos, bottomPos] }
+  const connByLabel = {};
+  matchConnections.forEach(c => { connByLabel[c.label] = c; });
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -184,23 +203,23 @@ export const MatchingReveal = ({
         <Img src={staticFile(solvedPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       )}
 
-      {/* ── Phase 2: face-down cards rendered as SVG overlays (clean, no baked stickers) ── */}
+      {/* ── Phase 2: face-down SVG overlay cards (clean card-back pattern) ── */}
       {isPhase2 && matchRects.map((r) => {
         const rect = rectByIndex[r.gridIndex];
         if (!rect) return null;
         return <FaceDownCard key={`bd-${r.gridIndex}`} rect={rect} />;
       })}
 
-      {/* ── Phase 1 + Phase 3: face-up cards (sweep reveals bottom cards) ── */}
+      {/* ── Phase 1 + Phase 3: face-up card overlays ── */}
       {(isPhase1 || isSolving) && matchPairs.map((pair) => {
         return pair.positions.map((pos, pi) => {
-          // Top-row cards: always visible in Phase 1 + Phase 3
+          // Top-row cards (positions 0–5): always visible in P1 + P3
           if (isTopCard(pos)) {
             const rect = rectByIndex[pos];
             if (!rect) return null;
             return <FaceUpCard key={`${pair.id}-${pi}`} rect={rect} label={pair.label} stickerSrc={getStickerAsset(pair.label, themeKey)} />;
           }
-          // Bottom-row cards: visible in Phase 1; in Phase 3, revealed by sweep
+          // Bottom-row cards (positions 6–11): visible in P1; in P3, spring in when revealed
           if (isSolving && !isPairRevealed(pair.id)) return null;
           const rect = rectByIndex[pos];
           if (!rect) return null;
@@ -208,25 +227,22 @@ export const MatchingReveal = ({
         });
       })}
 
-      {/* ── Phase 3: progressive connection lines ── */}
+      {/* ── Phase 3: progressive orange connection lines ── */}
       {isSolving && matchPairs.map((pair, i) => {
-        const conn = matchConnections.find(c =>
-          c.from === pair.positions[0] || c.to === pair.positions[0] ||
-          c.from === pair.positions[1] || c.to === pair.positions[1]
-        );
+        const conn = connByLabel[pair.label];
         if (!conn) return null;
-        const pProgress = Math.min(Math.max(getPairProgress(pair.id), 0), 1);
+        const lineProgress = Math.min(Math.max(getLineProgress(pair.id), 0), 1);
         return (
           <ConnectionLine
             key={`conn-${i}`}
             x1={conn.x1} y1={conn.y1}
             x2={conn.x2} y2={conn.y2}
-            progress={pProgress}
+            progress={lineProgress}
           />
         );
       })}
 
-      {/* ── Title strip: always visible ── */}
+      {/* ── Title strip: always visible (title + countdown in horizontal row) ── */}
       {titleText && (
         <TitleStrip title={titleText} countdownLabel={countdownLabel} />
       )}
