@@ -119,8 +119,9 @@ function TitleStrip({ title, countdownLabel }) {
 
 // ── MatchingReveal ────────────────────────────────────────────────────────────
 export const MatchingReveal = ({
-  blankPath,    // face-down card PNG (used in P2; for P3 we use SVG overlays)
-  solvedPath,   // all-cards-face-up PNG (used in P1 only)
+  blankPath,    // face-down card PNG (used in P2)
+  solvedPath,   // all-cards-face-up PNG (used for card art reference)
+  sceneBackgroundPath = null, // ocean scene image for screen background (P1 + P3)
   matchRects    = [],
   matchPairs    = [],
   matchConnections = [],
@@ -186,6 +187,11 @@ export const MatchingReveal = ({
   return (
     <AbsoluteFill style={{ backgroundColor: '#F5F1E8', pointerEvents: 'none' }}>
 
+      {/* Screen background: ocean scene image, fills frame in P1 and P3 */}
+      {sceneBackgroundPath && (isPhase1 || isSolving) && (
+        <Img src={staticFile(sceneBackgroundPath)} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      )}
+
       {/* ── P1: all 12 cards face-up as explicit overlays (same system as P3) ── */}
       {/* No solvedImage dependency — guarantees P1 and P3 sticker positions match exactly */}
       {isPhase1 && matchRects.map((r) => {
@@ -205,7 +211,7 @@ export const MatchingReveal = ({
         );
       })}
 
-      {/* Phase 2: face-down cards (blankPath PNG) + SVG overlay for clean card backs */}
+      {/* Phase 2: face-down cards (blankPath PNG as background, SVG overlay for clean card backs) */}
       {isPhase2 && blankPath && (
         <Img src={staticFile(blankPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       )}
