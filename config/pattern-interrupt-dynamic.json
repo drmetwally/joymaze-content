@@ -1,40 +1,12 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-20",
+    "last_updated": "2026-05-04",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries": 20,
     "description": "Dynamic extension of PATTERN_INTERRUPT_POOL in generate-prompts.mjs. Entry shape matches hardcoded pool exactly — only lifecycle fields added."
   },
   "interrupts": [
-    {
-      "subtype": "myth-bust",
-      "topic": "Myth: All screen time is equal. Fact: Interactive learning apps engage different brain regions than passive viewing, fostering active learning.",
-      "visual": "A split image: one side showing a child passively watching a screen, the other showing a child actively interacting with a tablet, with brain activity highlighted metaphorically.",
-      "added_week": "2026-04-10",
-      "source": "intelligence_refresh",
-      "confidence": 0.9,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 4,
-      "brand_safe": true,
-      "rationale": "Directly confronts parental screen time guilt by distinguishing between types of screen engagement, offering permission and understanding."
-    },
-    {
-      "subtype": "did-you-know",
-      "topic": "Did you know? Strong fine motor skills developed through activities like tracing and coloring are directly linked to early reading and writing readiness.",
-      "visual": "A child's hand tracing lines or coloring, with subtle visual cues like letters or words emerging from the activity.",
-      "added_week": "2026-04-10",
-      "source": "intelligence_refresh",
-      "confidence": 0.88,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 4,
-      "brand_safe": true,
-      "rationale": "Highlights a lesser-known but crucial benefit of JoyMaze activities, connecting physical engagement to academic success, appealing to parents' desire for their child's development."
-    },
     {
       "subtype": "surprising-stat",
       "topic": "Surprising stat: Children who regularly engage in creative activities like coloring and drawing score significantly higher on divergent thinking tests – the bedrock of innovation.",
@@ -45,23 +17,9 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Highlights the profound, long-term cognitive benefits of creative play, appealing to parents who want to foster their child's future success."
-    },
-    {
-      "subtype": "counterintuitive",
-      "topic": "Counterintuitive: You don't need a forest to teach nature appreciation. Even a simple 'leaf hunt' in your backyard can spark a lifelong love for the planet.",
-      "visual": "A child examining a leaf closely in a small backyard, with a magnifying glass, contrasting with a grand forest scene in the background.",
-      "added_week": "2026-04-12",
-      "source": "competitor_analysis",
-      "confidence": 0.8,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Relieves pressure on parents to create elaborate experiences for Earth Day/nature themes, offering an accessible, low-prep solution that aligns with competitor trends."
     },
     {
       "subtype": "myth-bust",
@@ -73,7 +31,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Directly addresses screen time guilt by validating digital activities as effective for skill development."
     },
@@ -87,7 +45,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Provides a surprising, specific cognitive benefit of a core JoyMaze activity, appealing to parents seeking learning outcomes."
     },
@@ -101,7 +59,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Connects trending nature themes to educational benefits in a surprising, visually appealing way, ideal for coloring content."
     },
@@ -115,7 +73,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -129,7 +87,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -143,7 +101,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -157,7 +115,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -171,7 +129,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -185,7 +143,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Addresses parental pressure regarding toy complexity, highlighting the value of simple, accessible tools for development."
     },
@@ -199,7 +157,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Connects printable activities to tangible academic benefits, addressing parental desire for effective learning tools."
     },
@@ -213,7 +171,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Offers a manageable solution to screen time guilt with a quantifiable, surprising benefit."
     },
@@ -227,7 +185,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Challenges a common parental instinct to 'help' immediately, promoting deeper learning and character development."
     },
@@ -241,7 +199,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -255,7 +213,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -269,7 +227,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -283,7 +241,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -297,7 +255,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Content gap from competitor analysis"
     },
@@ -311,7 +269,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Connects to trending nature themes and provides a compelling, data-backed benefit that parents value."
     },
@@ -325,7 +283,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Highlights the often-underestimated mental health benefits of a core activity, resonating with parents seeking calm for their children."
     },
@@ -339,7 +297,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Addresses a common parenting belief and reframes the value of JoyMaze's core activities in terms of crucial developmental skills."
     },
@@ -353,9 +311,51 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Challenges a common parenting assumption, offering permission to simplify and trust in a child's innate creativity, aligning with the brand's 'less is more' approach."
+    },
+    {
+      "subtype": "myth-bust",
+      "topic": "Myth: All digital activities are passive. Fact: Interactive tracing and puzzle apps actively engage motor skills and problem-solving, building neural pathways just like physical play.",
+      "visual": "Split screen: one side shows a child passively watching a screen, the other shows a child actively tracing/solving on a tablet, with brain activity highlighted.",
+      "added_week": "2026-05-04",
+      "source": "intelligence_refresh",
+      "confidence": 0.9,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Directly addresses parental screen time guilt by reframing interactive digital play as active learning, a key emotional barrier."
+    },
+    {
+      "subtype": "did-you-know",
+      "topic": "Did you know? Even 10 minutes of focused nature observation (like identifying bugs or leaves in a printable) can boost a child's concentration span by up to 20%.",
+      "visual": "A child intently focused on a printable with nature elements (e.g., a bug or leaf), with a subtle graphic showing a 'concentration boost' meter.",
+      "added_week": "2026-05-04",
+      "source": "trend_analysis",
+      "confidence": 0.85,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Connects to trending nature themes and provides a specific, surprising benefit that parents value (concentration), validating screen-free learning."
+    },
+    {
+      "subtype": "counterintuitive",
+      "topic": "Counterintuitive: The best way to 'make time' for yourself isn't to add more to your schedule. It's to give them something truly engaging, so you don't have to.",
+      "visual": "A parent enjoying a quiet, calm moment (e.g., sipping coffee, reading a book) while their child is deeply absorbed in an activity on a tablet or printable.",
+      "added_week": "2026-05-04",
+      "source": "intelligence_refresh",
+      "confidence": 0.85,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Offers permission and a practical solution to the common parental struggle of finding personal time, reframing engagement as a gift to both child and parent."
     }
   ]
 }

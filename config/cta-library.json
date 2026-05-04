@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-04-27",
+    "last_updated": "2026-05-04",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_platform_per_type": 8,
     "description": "Winning CTA patterns by platform and content type. Merged with hardcoded CTAS in generate-captions.mjs."
@@ -17,7 +17,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-07",
           "times_used": 0,
-          "decay_weeks": 6,
+          "decay_weeks": 7,
           "brand_safe": true
         },
         {
@@ -28,7 +28,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 3,
           "brand_safe": true
         }
       ],
@@ -41,7 +41,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-12",
           "times_used": 0,
-          "decay_weeks": 4,
+          "decay_weeks": 5,
           "brand_safe": true
         }
       ],
@@ -55,7 +55,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-20",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         },
         {
@@ -66,7 +66,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 0,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ]
@@ -81,7 +81,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 0,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ],
@@ -96,7 +96,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 3,
           "brand_safe": true
         },
         {
@@ -107,7 +107,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 0,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ]
@@ -123,7 +123,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 3,
           "brand_safe": true
         }
       ]
@@ -139,7 +139,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 3,
           "brand_safe": true
         },
         {
@@ -150,7 +150,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 0,
+          "decay_weeks": 1,
           "brand_safe": true
         }
       ]

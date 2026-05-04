@@ -1,58 +1,53 @@
 {
-  "generated": "2026-04-20",
-  "valid_until": "2026-04-27",
+  "generated": "2026-05-04",
+  "valid_until": "2026-05-11",
   "sources": [
     "seasonal_calendar"
   ],
   "trending_themes": [
     {
-      "theme": "Garden/Flowers",
-      "score": 180
-    },
-    {
-      "theme": "Ocean/Underwater",
-      "score": 150
-    },
-    {
-      "theme": "Forest/Woodland",
-      "score": 150
-    },
-    {
-      "theme": "Bugs/Insects",
-      "score": 150
-    },
-    {
       "theme": "Pets/Home",
-      "score": 30
+      "score": 150
+    },
+    {
+      "theme": "Garden/Flowers",
+      "score": 150
     },
     {
       "theme": "Birds/Sky",
+      "score": 150
+    },
+    {
+      "theme": "Camping/Outdoors",
+      "score": 30
+    },
+    {
+      "theme": "Sports/Games",
       "score": 30
     }
   ],
   "boost_themes": [
+    "Pets/Home",
     "Garden/Flowers",
-    "Ocean/Underwater",
-    "Forest/Woodland",
-    "Bugs/Insects",
-    "Pets/Home"
+    "Birds/Sky",
+    "Camping/Outdoors",
+    "Sports/Games"
   ],
   "rising_searches": [
-    "earth day activities for kids",
-    "nature printables",
     "mothers day printables",
-    "mothers day activities for kids"
+    "mothers day activities for kids",
+    "memorial day activities for kids"
   ],
   "upcoming_moments": [
     {
-      "event": "Earth Day",
-      "date": "2026-04-21",
-      "days_away": 2
+      "event": "Mother's Day",
+      "date": "2026-05-11",
+      "days_away": 7
     },
     {
-      "event": "Mother's Day",
-      "date": "2026-05-10",
-      "days_away": 21
+      "event": "Memorial Day",
+      "date": "2026-05-26",
+      "days_away": 22
     }
   ],
   "caption_keywords": [
@@ -60,7 +55,7 @@
     "printable",
     "quiet time",
     "ages 4-8",
-    "earth day activities for kids",
-    "mothers day printables"
+    "mothers day printables",
+    "memorial day activities for kids"
   ]
 }
