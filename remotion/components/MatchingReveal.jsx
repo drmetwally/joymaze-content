@@ -1,18 +1,19 @@
-import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, spring, staticFile, Sequence } from 'remotion';
+import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig, interpolate, spring, staticFile } from 'remotion';
 
 // ─── MatchingReveal ────────────────────────────────────────────────────────────
 // 3-phase matching puzzle reveal:
-//   Phase 1 (0 → hookFrames):          all pairs face-up with ocean stickers + labels
-//   Phase 2 (hookFrames → hook+challenge): face-down cards + dynamic countdown strip
-//   Phase 3 (hook+challenge → end):   sweep reveal — top cards always visible,
-//                                      orange line draws from top→bottom,
-//                                      bottom card springs up when line reaches it
+//   Phase 1 (0 → hookFrames):          all pairs face-up — solved backdrop image
+//   Phase 2 (hookFrames → hook+challenge): face-down cards + countdown strip
+//   Phase 3 (hook+challenge → end):   sticker reward reveal
+//                                      Pairs revealed one-by-one left→right.
+//                                      Unrevealed pairs = blank card-backs.
+//                                      Revealed pair = both cards spring in together.
 //
-// Sweep spec:
-//   - Pair k revealed when solveProgress >= (k+1)/N
-//   - Line starts at pair's top-card center, draws toward bottom-card center
-//   - Line progress = how far through the pair's own window (k/N → (k+1)/N)
-//   - Bottom card snaps/springs when line tip reaches its center (solveProgress = (k+1)/N)
+// Timing:
+//   Pair k (k=0..N-1) revealed when solveProgress >= (k+1)/N
+//   appearFrame(k) = solveStart + (k+1)/N * solveFrames
+//   solveFrames=360, N=6 → 60 frames/pair = 2.0s per pair.
+//   All 6 pairs revealed in 12s; last ~3s shows fully-solved board.
 
 const OCEAN_STICKER_MAP = {
   DOLPHIN:  'dolphin',
@@ -41,27 +42,31 @@ function getStickerAsset(label, themeKey) {
   return `assets/stickers/matching/${themeKey}/${fallback[themeKey] || 'cat'}.png`;
 }
 
-// ── SVG connection line that draws progressively from top card → bottom card ──
-function ConnectionLine({ x1, y1, x2, y2, progress }) {
-  if (progress <= 0) return null;
-  const cx = x1 + (x2 - x1) * Math.min(progress, 1);
-  const cy = y1 + (y2 - y1) * Math.min(progress, 1);
-  return (
-    <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', zIndex: 9 }}>
-      <line x1={x1} y1={y1} x2={cx} y2={cy} stroke="#FF8C00" strokeWidth="8" strokeLinecap="round" opacity="0.95" />
-      <line x1={x1} y1={y1} x2={cx} y2={cy} stroke="#FFB347" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
-    </svg>
-  );
-}
+// ── Revealed face-up card with spring pop-in ────────────────────────────────────
+function RevealedCard({ rect, label, stickerSrc, appearFrame }) {
+  const frame = useCurrentFrame();
+  const revealed = frame >= appearFrame;
+  const scale = interpolate(frame, [appearFrame, appearFrame + 14], [0.3, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
-// ── Face-up card: white card with label + ocean sticker ───────────────────────
-function FaceUpCard({ rect, label, stickerSrc }) {
+  if (!revealed || scale <= 0) return null;
+
   const { x, y, w, h } = rect;
   const radius = w * 0.12;
   const labelSize = Math.max(9, w * 0.1);
   const imgSize = w * 0.52;
+
   return (
-    <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, borderRadius: radius, backgroundColor: '#FFFDF5', border: '4px solid #C8860A', boxShadow: '0 6px 20px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 7, overflow: 'hidden', pointerEvents: 'none' }}>
+    <div style={{
+      position: 'absolute', left: x, top: y, width: w, height: h,
+      borderRadius: radius,
+      backgroundColor: '#FFFDF5',
+      border: '4px solid #C8860A',
+      boxShadow: '0 6px 20px rgba(0,0,0,0.22)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      zIndex: 8, overflow: 'hidden', pointerEvents: 'none',
+      transform: `scale(${scale})`,
+      transformOrigin: 'center center',
+    }}>
       <div style={{ fontSize: labelSize, fontWeight: 900, color: '#1A1A2E', fontFamily: 'Arial Black, Arial, sans-serif', textAlign: 'center', lineHeight: 1.05, padding: '0 4px', marginBottom: 4 }}>
         {label}
       </div>
@@ -70,16 +75,23 @@ function FaceUpCard({ rect, label, stickerSrc }) {
   );
 }
 
-// ── Face-down card: patterned card back ───────────────────────────────────────
-function FaceDownCard({ rect }) {
+// ── Blank card back (unrevealed in P3) ─────────────────────────────────────────
+function BlankCardBack({ rect }) {
   const { x, y, w, h } = rect;
   const radius = w * 0.12;
   return (
-    <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, borderRadius: radius, background: 'repeating-linear-gradient(135deg, #6B4E2A 0, #8B6340 8px, #7A5A35 8px, #7A5A35 16px)', border: '3px solid #C8860A', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', zIndex: 6, overflow: 'hidden', pointerEvents: 'none' }} />
+    <div style={{
+      position: 'absolute', left: x, top: y, width: w, height: h,
+      borderRadius: radius,
+      background: 'repeating-linear-gradient(135deg, #6B4E2A 0, #8B6340 8px, #7A5A35 8px, #7A5A35 16px)',
+      border: '3px solid #C8860A',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      zIndex: 6, overflow: 'hidden', pointerEvents: 'none',
+    }} />
   );
 }
 
-// ── Title strip: title + countdown in a single horizontal row ────────────────
+// ── Title strip: title + countdown in a single horizontal row ─────────────────
 function TitleStrip({ title, countdownLabel }) {
   return (
     <div style={{ position: 'absolute', top: 42, left: 28, right: 28 }}>
@@ -107,38 +119,34 @@ function TitleStrip({ title, countdownLabel }) {
 
 // ── MatchingReveal ────────────────────────────────────────────────────────────
 export const MatchingReveal = ({
-  blankPath,
-  solvedPath,
-  matchRects       = [],
-  matchPairs        = [],
-  matchConnections  = [],  // each: { x1, y1, x2, y2, label } — NO from/to
-  pairOrder        = [],   // reveal order: indices into matchPairs, top→bottom
-  hookFrames        = 75,  // Phase 1 duration
-  challengeFrames  = 450, // Phase 2 duration
-  solveFrames      = 360, // Phase 3 duration
-  fps              = 30,
-  theme            = '',
-  titleText        = '',
-  countdownSec     = 15,   // Phase 2 total seconds (for countdown math)
+  blankPath,    // face-down card PNG (used in P2; for P3 we use SVG overlays)
+  solvedPath,   // all-cards-face-up PNG (used in P1 only)
+  matchRects    = [],
+  matchPairs    = [],
+  matchConnections = [],
+  pairOrder     = [],   // reveal order: indices into matchPairs, left→right
+  hookFrames    = 75,   // Phase 1 duration
+  challengeFrames = 450, // Phase 2 duration
+  solveFrames  = 360,  // Phase 3 duration
+  fps           = 30,
+  theme         = '',
+  titleText     = '',
+  countdownSec  = 15,
 }) => {
   const frame = useCurrentFrame();
-  const videoConfig = useVideoConfig();
-  const vfps = videoConfig?.fps ?? fps;
 
-  const phase1End   = hookFrames;
-  const phase2End   = phase1End + challengeFrames;
-  const solveStart  = phase2End;
+  const phase1End  = hookFrames;
+  const phase2End  = phase1End + challengeFrames;
+  const solveStart = phase2End;
 
-  const isPhase1   = frame < phase1End;
-  const isPhase2   = frame >= phase1End && frame < phase2End;
-  const isSolving  = frame >= solveStart;
+  const isPhase1  = frame < phase1End;
+  const isPhase2  = frame >= phase1End && frame < phase2End;
+  const isSolving = frame >= solveStart;
 
-  // Phase 3 overall progress 0→1
   const solveProgress = isSolving
     ? Math.min((frame - solveStart) / solveFrames, 1)
     : 0;
 
-  // Dynamic countdown label for Phase 2
   const countdownRemaining = isPhase2
     ? Math.max(1, Math.ceil(countdownSec * (1 - (frame - phase1End) / challengeFrames)))
     : null;
@@ -150,99 +158,91 @@ export const MatchingReveal = ({
   const rectByIndex = {};
   matchRects.forEach(r => { rectByIndex[r.gridIndex] = r; });
 
-  // ── Phase 3 sweep logic ──────────────────────────────────────────────────
-  // Grid: 6 cols × 2 rows. Top row: positions 0–5, bottom row: positions 6–11
-  // pairOrder = indices into matchPairs[] in left→right reveal order
-  // Pair k revealed when solveProgress >= (k+1)/N
-  // Line for pair k: draws from top-card pixel center → bottom-card pixel center
-  //   progress = how far through pair k's own window (0 at k/N, 1 at (k+1)/N)
-  // Bottom card springs up when solveProgress >= (k+1)/N (at the threshold frame)
+  // ── Reveal logic ───────────────────────────────────────────────────────────
+  // P3: pairs revealed left→right as solveProgress crosses each threshold.
+  // Unrevealed pairs → blank card-backs.
+  // Revealed pairs → spring-in sticker cards at same positions as P1.
   const N = Math.max(1, matchPairs.length);
 
-  const isTopCard = (pos) => pos < 6;  // row 0 = top row in 6×2 grid (col 0–5)
-
-  // lineProgress for pair k: 0 before k/N, 0→1 between k/N and (k+1)/N, 1 after
-  const getLineProgress = (pairIdx) => {
-    const k = pairOrder.indexOf(pairIdx);
-    if (k < 0) return 0;
-    const revealAt = (k + 1) / N;          // solveProgress when pair k is revealed
-    if (solveProgress < k / N) return 0;   // before this pair's window even starts
-    if (solveProgress >= revealAt) return 1; // already revealed → line complete
-    // Within pair k's window: scale 0→1
-    return (solveProgress - k / N) / (1 / N);
-  };
-
+  // Pair k (k=0..N-1) revealed when solveProgress >= (k+1)/N
   const isPairRevealed = (pairIdx) => {
     const k = pairOrder.indexOf(pairIdx);
     if (k < 0) return false;
     return solveProgress >= (k + 1) / N;
   };
 
-  // Build a connection map: pair id → {x1,y1,x2,y2} using label to match
-  // matchConnections entries: { x1, y1, x2, y2, label }
-  // matchPairs have: { id, label, positions: [topPos, bottomPos] }
-  const connByLabel = {};
-  matchConnections.forEach(c => { connByLabel[c.label] = c; });
+  // Frame at which pair k's cards should spring in
+  const pairAppearFrame = (pairIdx) => {
+    const k = pairOrder.indexOf(pairIdx);
+    if (k < 0) return solveStart + solveFrames + 999;
+    return Math.round(solveStart + (k + 1) / N * solveFrames);
+  };
+
+  // Build set of revealed pair ids
+  const revealedPairIds = new Set();
+  matchPairs.forEach(p => { if (isPairRevealed(p.id)) revealedPairIds.add(p.id); });
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <AbsoluteFill style={{ backgroundColor: '#F5F1E8', pointerEvents: 'none' }}>
 
-      {/* Phase 1: solved backdrop (all cards visible, sticker labels clear) */}
-      {isPhase1 && solvedPath && (
-        <Img src={staticFile(solvedPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-      )}
-
-      {/* Phase 2: face-down cards */}
-      {isPhase2 && blankPath && (
-        <Img src={staticFile(blankPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-      )}
-
-      {/* Phase 3: solved backdrop */}
-      {isSolving && solvedPath && (
-        <Img src={staticFile(solvedPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-      )}
-
-      {/* ── Phase 2: face-down SVG overlay cards (clean card-back pattern) ── */}
-      {isPhase2 && matchRects.map((r) => {
+      {/* ── P1: all 12 cards face-up as explicit overlays (same system as P3) ── */}
+      {/* No solvedImage dependency — guarantees P1 and P3 sticker positions match exactly */}
+      {isPhase1 && matchRects.map((r) => {
         const rect = rectByIndex[r.gridIndex];
         if (!rect) return null;
-        return <FaceDownCard key={`bd-${r.gridIndex}`} rect={rect} />;
-      })}
-
-      {/* ── Phase 1 + Phase 3: face-up card overlays ── */}
-      {(isPhase1 || isSolving) && matchPairs.map((pair) => {
-        return pair.positions.map((pos, pi) => {
-          // Top-row cards (positions 0–5): always visible in P1 + P3
-          if (isTopCard(pos)) {
-            const rect = rectByIndex[pos];
-            if (!rect) return null;
-            return <FaceUpCard key={`${pair.id}-${pi}`} rect={rect} label={pair.label} stickerSrc={getStickerAsset(pair.label, themeKey)} />;
-          }
-          // Bottom-row cards (positions 6–11): visible in P1; in P3, spring in when revealed
-          if (isSolving && !isPairRevealed(pair.id)) return null;
-          const rect = rectByIndex[pos];
-          if (!rect) return null;
-          return <FaceUpCard key={`${pair.id}-${pi}`} rect={rect} label={pair.label} stickerSrc={getStickerAsset(pair.label, themeKey)} />;
-        });
-      })}
-
-      {/* ── Phase 3: progressive orange connection lines ── */}
-      {isSolving && matchPairs.map((pair, i) => {
-        const conn = connByLabel[pair.label];
-        if (!conn) return null;
-        const lineProgress = Math.min(Math.max(getLineProgress(pair.id), 0), 1);
+        const label = matchPairs.find(p => p.positions.includes(r.gridIndex))?.label;
+        if (!label) return null;
+        // P1: card is always visible (appearFrame = -infinity)
         return (
-          <ConnectionLine
-            key={`conn-${i}`}
-            x1={conn.x1} y1={conn.y1}
-            x2={conn.x2} y2={conn.y2}
-            progress={lineProgress}
+          <RevealedCard
+            key={`p1-${r.gridIndex}`}
+            rect={rect}
+            label={label}
+            stickerSrc={getStickerAsset(label, themeKey)}
+            appearFrame={-9999}
           />
         );
       })}
 
-      {/* ── Title strip: always visible (title + countdown in horizontal row) ── */}
+      {/* Phase 2: face-down cards (blankPath PNG) + SVG overlay for clean card backs */}
+      {isPhase2 && blankPath && (
+        <Img src={staticFile(blankPath)} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      )}
+      {isPhase2 && matchRects.map((r) => {
+        const rect = rectByIndex[r.gridIndex];
+        if (!rect) return null;
+        return <BlankCardBack key={`bd-${r.gridIndex}`} rect={rect} />;
+      })}
+
+      {/* Phase 3: all cards start face-down (blank SVG overlays for unrevealed) */}
+      {isSolving && matchPairs.map((pair) => {
+        // Unrevealed: blank card-back
+        if (!isPairRevealed(pair.id)) {
+          return pair.positions.map((pos, pi) => {
+            const rect = rectByIndex[pos];
+            if (!rect) return null;
+            return <BlankCardBack key={`hidden-${pair.id}-${pi}`} rect={rect} />;
+          });
+        }
+        // Revealed: spring-in sticker card overlay
+        const appearF = pairAppearFrame(pair.id);
+        return pair.positions.map((pos, pi) => {
+          const rect = rectByIndex[pos];
+          if (!rect) return null;
+          return (
+            <RevealedCard
+              key={`${pair.id}-${pi}`}
+              rect={rect}
+              label={pair.label}
+              stickerSrc={getStickerAsset(pair.label, themeKey)}
+              appearFrame={appearF}
+            />
+          );
+        });
+      })}
+
+      {/* Title strip: always visible */}
       {titleText && (
         <TitleStrip title={titleText} countdownLabel={countdownLabel} />
       )}
