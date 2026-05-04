@@ -29,7 +29,7 @@ export const activityChallengeSchema = {
   puzzleType: 'maze',
   countdownSec: 10,
   hookDurationSec: 0.6,
-  holdAfterSec: 12,
+  holdAfterSec: 14,
   challengeAudioPath: '',
   tickAudioPath: '',
   transitionCueAudioPath: '',
