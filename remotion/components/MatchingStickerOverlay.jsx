@@ -55,6 +55,9 @@ export function MatchingStickerOverlay({
 }) {
   if (!matchRects?.length) return null;
 
+  // P3+: MatchingReveal handles all reveals — don't double-render stickers
+  if (frame >= solveStart) return null;
+
   const themeKey = resolveStickerThemeKey(theme);
   const isSolving = frame >= solveStart;
   const celebrateStart = solveStart + solveFrames - Math.round(fps * 1.8);
