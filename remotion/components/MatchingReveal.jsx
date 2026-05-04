@@ -53,7 +53,7 @@ function RevealedCard({ rect, label, stickerSrc, appearFrame }) {
     <div style={{
       position: 'absolute', left: x, top: y, width: w, height: h,
       borderRadius: radius,
-      backgroundColor: 'transparent',
+      backgroundColor: '#FFFFFF',
       border: '4px solid #C8860A',
       boxShadow: '0 6px 20px rgba(0,0,0,0.22)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
