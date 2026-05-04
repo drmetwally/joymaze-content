@@ -302,7 +302,7 @@ function buildBlankSvg(layout, grid, stickerAssignments, sceneBgDataUrl = null) 
   // Used as the shared background in P2 and P3.
   const bgLayer = sceneBgDataUrl
     ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
-    : `  <rect width="100%" height="100%" fill="#F5F1E8"/>`;
+    : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
 
   const cards = grid.map((cell) => {
     const x = offsetX + cell.col * (cardSize + gap);
@@ -357,7 +357,7 @@ function buildSolvedSvg(layout, pairs, grid, sceneBgDataUrl = null) {
 
   const bgLayer = sceneBgDataUrl
     ? `  <image href="${sceneBgDataUrl}" x="0" y="0" width="${CANVAS_W}" height="${CANVAS_H}" preserveAspectRatio="xMidYMid slice"/>`
-    : `  <rect width="100%" height="100%" fill="#F5F1E8"/>`;
+    : `  <rect width="100%" height="100%" fill="${BG_COLOR}"/>`;
 
   return `<svg width="${CANVAS_W}" height="${CANVAS_H}" viewBox="0 0 ${CANVAS_W} ${CANVAS_H}" xmlns="http://www.w3.org/2000/svg">
 ${patterns}
@@ -431,7 +431,7 @@ function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, pair
   };
 }
 
-function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel, matchRects, sceneImagePath }) {
+function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel, matchRects }) {
   return {
     type: 'challenge',
     puzzleType: PUZZLE_TYPE,
@@ -447,7 +447,6 @@ function buildActivityJson({ title, theme, difficulty, hookTitle, folderRel, mat
     imagePath: 'puzzle.png',
     blankImage: 'blank.png',
     solvedImage: 'solved.png',
-    sceneImagePath: sceneImagePath ?? null,
     challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
     tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME,
     transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
@@ -543,24 +542,20 @@ async function main() {
   // ── Asset library: check for a pre-made scene background ─────────────────────
   // pickAsset returns an absolute path to a PNG in assets/generated/matching-scenes/<theme>/main/
   // or null if no images exist for this theme. Fallback = white SVG background.
-  // Ocean scene PNG as background for Remotion's sceneBackgroundPath prop.
-  // Copies the known ocean scene PNG to the output folder so Remotion can reference it.
-  // Falls back gracefully if the copy fails (background.png won't be written).
+  // Ocean scene PNG — embedded as base64 in blank.svg/solved.svg for sharp to composite.
+  // ENOENT on copy is expected intermittently on Windows; SVG output is unaffected.
   const oceanScenePath = path.join(ROOT, 'assets', 'generated', 'coloring-pages', 'ocean', 'ocean-animals-1.png');
   let sceneBgDataUrl = null;
-  let sceneImagePathRel = null;
   try {
     const buf = await fs.readFile(oceanScenePath);
     sceneBgDataUrl = `data:image/png;base64,${buf.toString('base64')}`;
-    await fs.copyFile(oceanScenePath, path.join(outDir, 'background.png'));
-    sceneImagePathRel = `${folderRel}/background.png`;
     console.log(`[matching-factory] scene bg    : ${path.relative(ROOT, oceanScenePath)}`);
   } catch (err) {
     console.log(`[matching-factory] scene bg    : none (ocean PNG unavailable: ${err.code})`);
   }
 
   const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, pairOrder, folderRel });
-  const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel, matchRects: matchingJson.matchRects, sceneImagePath: sceneImagePathRel });
+  const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel, matchRects: matchingJson.matchRects });
 
   console.log(`[matching-factory] title      : ${TITLE}`);
   console.log(`[matching-factory] theme      : ${THEME}`);

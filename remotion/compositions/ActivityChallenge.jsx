@@ -337,7 +337,6 @@ const SolveReveal = ({
       <MatchingReveal
         blankPath={blankImagePath}
         solvedPath={solvedImagePath}
-        sceneBackgroundPath={sceneImagePath}
         matchRects={matchRects ?? []}
         matchPairs={matchPairs ?? []}
         matchConnections={matchConnections ?? []}
@@ -395,7 +394,6 @@ export const ActivityChallenge = ({
   matchPairs = null,
   matchConnections = null,
   pairOrder = null,
-  sceneImagePath = null,
   theme = activityChallengeSchema.theme,
   sourceImageWidth = activityChallengeSchema.sourceImageWidth,
   sourceImageHeight = activityChallengeSchema.sourceImageHeight,

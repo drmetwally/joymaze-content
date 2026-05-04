@@ -185,11 +185,14 @@ export const MatchingReveal = ({
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <AbsoluteFill style={{ backgroundColor: '#F5F1E8', pointerEvents: 'none' }}>
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
 
-      {/* Screen background: ocean scene image, fills frame in P1 and P3 */}
-      {sceneBackgroundPath && (isPhase1 || isSolving) && (
-        <Img src={staticFile(sceneBackgroundPath)} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      {/* Screen background: blankPath has the ocean scene + card backs composited.
+          P2 renders it as-is. P1 shows scene behind face-up sticker overlays.
+          P3 shows scene behind blank backs + revealed sticker cards.
+          Use objectFit:'fill' so the scene fills the entire frame (no letterboxing). */}
+      {blankPath && (isPhase1 || isPhase2 || isSolving) && (
+        <Img src={staticFile(blankPath)} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill' }} />
       )}
 
       {/* ── P1: all 12 cards face-up as explicit overlays (same system as P3) ── */}

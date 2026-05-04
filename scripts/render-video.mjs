@@ -555,7 +555,6 @@ async function challengeJsonToProps(activity, activityDir) {
     imagePath: toRelative(activity.imagePath ?? 'puzzle.png'),
     blankImagePath: await resolveImage(activity.blankImage ?? 'blank.png'),
     solvedImagePath: await resolveImage(activity.solvedImage ?? 'solved.png'),
-    sceneImagePath: activity.sceneImagePath ? toRelative(activity.sceneImagePath) : null,
     puzzleType: activity.puzzleType ?? 'maze',
     theme: activity.theme ?? '',
     hookText: activity.hookText ?? 'Can your kid solve this?',
