@@ -53,17 +53,8 @@ export const StoryHookScene = ({
   const visibleCount = Math.min(words.length, Math.floor(frame / FRAMES_PER_WORD) + 1);
   const visibleWords = words.slice(0, visibleCount);
 
-  // Background music under jingle — fades in gently
-  const bgVolume = interpolate(frame, [0, 20], [0, 0.12], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-
   return (
     <AbsoluteFill style={{ background: 'linear-gradient(180deg, #103a61 0%, #081421 100%)' }}>
-      {backgroundMusicPath ? (
-        <Audio src={resolveAssetSrc(backgroundMusicPath)} volume={bgVolume} />
-      ) : null}
       {jinglePath ? <Audio src={resolveAssetSrc(jinglePath)} volume={0.85} /> : null}
       {hookNarrationPath ? <Audio src={resolveAssetSrc(hookNarrationPath)} volume={1} /> : null}
 

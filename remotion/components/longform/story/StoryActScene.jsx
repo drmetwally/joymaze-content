@@ -66,11 +66,11 @@ const PillCaption = ({ text }) => {
   );
 };
 
-// Ken Burns direction pool — cycles by sceneIndex so consecutive scenes feel different
+// Ken Burns direction pool — gentle, no entry pop
 const KB_MOVES = [
-  { startX: 0, endX: -34, startY: 0, endY: -10, startS: 1.02, endS: 1.12 },
-  { startX: 0, endX: 34,  startY: 0, endY: 10,  startS: 1.02, endS: 1.12 },
-  { startX: 0, endX: 0,   startY: 0, endY: -14, startS: 1.03, endS: 1.14 },
+  { startX: 0, endX: -20, startY: 0, endY: -8, startS: 1.0, endS: 1.06 },
+  { startX: 0, endX: 20,  startY: 0, endY: 8,  startS: 1.0, endS: 1.06 },
+  { startX: 0, endX: 0,   startY: 0, endY: -10, startS: 1.0, endS: 1.07 },
 ];
 
 export const StoryActScene = ({
@@ -103,31 +103,8 @@ export const StoryActScene = ({
 
   const totalScale = kbScale;
 
-  // 4.2 — Music ducking during narration
-  const musicVolume = narrationPath
-    ? interpolate(
-        frame,
-        [0, 8, durationInFrames - 60, durationInFrames - 30],
-        [0.22, 0.06, 0.06, 0.22],
-        { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-      )
-    : 0.22;
-
-  // 5.1 — COMPLETION_SATISFACTION: subtle brightness on last 20 frames
-  const brightnessPulse = psychologyTrigger === 'COMPLETION_SATISFACTION'
-    ? interpolate(
-        frame,
-        [durationInFrames - 20, durationInFrames - 10, durationInFrames],
-        [1, 1.03, 1],
-        { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-      )
-    : 1;
-
-  // 5.3 — Heartbeat on Act 3 climax (reduced amplitude)
-  const climaxPulse =
-    isClimaxScene && psychologyTrigger === 'COMPLETION_SATISFACTION'
-      ? 1 + 0.02 * Math.sin((frame / 30) * 2 * Math.PI * 1.1)
-      : 1;
+  const brightnessPulse = 1;
+  const climaxPulse = 1;
 
   return (
     // No opacity envelope — hard cut transitions (no fade-to-black between scenes)
@@ -205,9 +182,6 @@ export const StoryActScene = ({
       )}
 
       {narrationPath ? <Audio src={resolveAssetSrc(narrationPath)} /> : null}
-      {backgroundMusicPath ? (
-        <Audio src={resolveAssetSrc(backgroundMusicPath)} volume={musicVolume} />
-      ) : null}
       {sfxPath ? (
         <Audio
           src={resolveAssetSrc(sfxPath)}
