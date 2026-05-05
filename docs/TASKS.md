@@ -1,5 +1,5 @@
 # JoyMaze — Persistent Task Board
-Last updated: 2026-04-27
+Last updated: 2026-05-05
 
 > This file is the single source of truth for in-progress and queued work.
 > Claude reads this at session start and updates status as tasks complete.
@@ -63,6 +63,24 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [~] **TASK-OC-007 — Deterministic Maze Asset Factory** — Phase 1 started 2026-04-29. `scripts/generate-maze-assets.mjs` now generates first-party rectangular maze assets (`maze.json`, `path.json`, `blank.svg`, `solved.svg`, `blank.png`, `solved.png`, `activity.json`) and a fresh generated folder already dry-loads plus preview-renders through `ActivityChallenge` with solver waypoints active. Remaining work: inspect visual quality against benchmark references, tune line/margin/difficulty feel, add npm scripts + docs closure review, then expand shape support beyond rectangular/square while keeping `shape` first-class in the contract.
 - [x] **TASK-OC-008 — Puzzle image-post workflow structure** — DONE 2026-04-29. Contract mapped, manifest seam defined and live, Phase 1 integration complete. Art wrapper rebuilt with modular Sharp layers (corner decor, margin motifs, start/goal markers, title system). All 3 Claude-audit bugs fixed. Two visual gaps remain for next wrapper pass: (1) no footer CTA band — 260px dead space below puzzle, (2) finish marker clips at right edge (left=910, marker=150px wide, canvas=1000px). Theme families partial: 5 of 10 done (ocean, space, animals, colors/shapes, workshop) — missing dinosaurs, jungle/safari, fairy/princess, vehicles, food/kitchen. Sharp decision gate (A8) pending comparison pack generation (A7).
 - [x] **TASK-OC-009 — Maze + Word Search image-post integration** — started 2026-04-29, finished first Phase 1 implementation on 2026-04-29. `scripts/generate-puzzle-image-post.mjs` now supports direct generation and manifest-driven generation, builds a polished wrapped `post.png`, copies it into `output/raw/{maze|wordsearch}/`, writes import sidecars, and can target all supported daily slots from `activity-manifest-YYYY-MM-DD.json`. `import-raw.mjs` preserves richer sidecar metadata (`difficulty`, `theme`, `sourceFolder`, `puzzleType`, `titleText`, `ctaText`). Validation completed through `generate-prompts --save` -> manifest-driven puzzle-post generation -> `import-raw` -> `generate-captions --dry-run` for both a maze slot and a word-search slot.
+
+## STORY ENGINE — NEXT LOCKED WORK (2026-05-05)
+
+- [ ] **STORY-ENGINE-001 — Lane validation pass on 48-seed bank**
+  - Run intentional live generations for `homecoming`, `parent_bond`, `loyalty`, and `survival`.
+  - Goal: verify the bank keeps producing genuinely different emotional spines instead of collapsing into one repeated story shape.
+  - Success bar: at least 2 strong outputs per priority lane.
+
+- [ ] **STORY-ENGINE-002 — Cross-slide style consistency pass**
+  - Focus on style continuity between reel slides, not basic VO/render plumbing and not species continuity unless it regresses.
+  - Goal: reduce visual looseness across slides after hero/species continuity improvements.
+
+- [ ] **STORY-ENGINE-003 — Stop benchmark verification**
+  - Treat the current story-engine wave as done enough to stop only when all are true:
+    - 3 consecutive clean runs
+    - 2 strong outputs each for `homecoming`, `parent_bond`, `loyalty`, `survival`
+    - no major hero/species drift
+    - no broken handoff across intelligence -> bank -> story gen -> reel image gen -> reel audio -> render
 
 ## ACTIVE SPRINT — DUAL TRACK (2026-04-30)
 

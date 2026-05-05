@@ -91,3 +91,30 @@
   - `--lane parent_bond` selected the swan/cygnet protection seed.
   - `--lane survival` selected the puffin/last-fish storm-return seed.
 - This indicates the expanded bank plus lane bias is producing materially different emotional spines instead of collapsing into one repeated shape.
+
+### 2026-05-05 | OpenClaw | Story Engine next-step lock + scheduler/model routing follow-up
+
+**Status:** NEXT WORK DECIDED, ENVIRONMENT STABILIZED
+
+**Story Engine next work locked:**
+- Do not spend the next pass on additional plumbing or on matching-engine work.
+- The next Story Reel V2 pass should focus on **quality validation**, not architecture.
+- Priority order:
+  1. Run focused lane-validation on the expanded **48-seed** bank for `homecoming`, `parent_bond`, `loyalty`, and `survival`.
+  2. Tighten **cross-slide visual style consistency**. Species continuity is much better now; remaining weakness is style looseness between slides.
+  3. Stop when fundamentals are boring: **3 consecutive clean runs**, **2 strong outputs per priority lane**, no major hero/species drift, and no broken handoff across `intelligence-refresh -> apply-intelligence -> story-source-bank -> generate-story-ideas -> generate-story-reel-images -> generate-story-reel-audio -> render-video`.
+
+**Daily automation/environment decisions completed:**
+- `npm run daily` is now the canonical full daily pipeline.
+- `scripts/daily-scheduler.mjs` now acts as a thin timing wrapper around that same canonical flow.
+- Windows scheduled task audit confirmed the live production trigger is `\Joymaze Daily` at **9:00 AM** running `scripts/daily-scheduler.mjs --now` from `D:\Joymaze-Content`.
+- Duplicate-risk audit found the only real danger was a stray long-lived scheduler daemon. That stray process was killed, leaving one clean 9 AM trigger.
+
+**OpenClaw model-routing decision completed:**
+- User chose the safer direct API integration path, not Gemini CLI OAuth.
+- Final desired order was applied as:
+  - primary: `openai-codex/gpt-5.4`
+  - fallback 1: `minimax/MiniMax-M2.7`
+  - fallback 2: `google/gemini-2.5-pro-preview-05-06`
+  - fallback 3: `google/gemini-2.5-flash-preview-04-17`
+- Gemini 3 was investigated, but that lane depends on the separate `google-gemini-cli` OAuth provider and was intentionally not adopted.
