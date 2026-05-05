@@ -30,13 +30,9 @@ const SLIDES_ARG = getArg('--slides');
 function buildDefaultReelSlideOrder(slides = []) {
   const count = Array.isArray(slides) ? slides.length : 0;
   if (count <= 5) return Array.from({ length: count }, (_, i) => i + 1);
-  const picks = [
-    1,
-    2,
-    Math.max(3, Math.ceil(count / 2)),
-    Math.max(Math.ceil(count / 2) + 1, count - 1),
-    count,
-  ];
+  const picks = count >= 8
+    ? [1, 3, 5, Math.max(7, count - 1), count]
+    : [1, 2, Math.max(3, Math.ceil(count / 2)), Math.max(Math.ceil(count / 2) + 1, count - 1), count];
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 
