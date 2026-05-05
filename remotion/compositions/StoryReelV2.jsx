@@ -1,17 +1,13 @@
 import { AbsoluteFill, Audio, Sequence, staticFile } from 'remotion';
 import { StoryHookScene } from '../components/longform/story/StoryHookScene.jsx';
 import { StoryActScene } from '../components/longform/story/StoryActScene.jsx';
-import { StoryOutroScene } from '../components/longform/story/StoryOutroScene.jsx';
 
 export const storyReelV2Schema = {
   slides: [],
   hookQuestion: '',
   flashForwardImagePath: '',
   backgroundMusicPath: '',
-  outroTeaser: '',
-  outroTitle: 'New episode every week!',
   hookDurationFrames: 150,
-  outroDurationFrames: 120,
 };
 
 const resolveAssetSrc = (src) => {
@@ -25,9 +21,7 @@ export const StoryReelV2 = ({
   hookQuestion = '',
   flashForwardImagePath = '',
   backgroundMusicPath = '',
-  outroTeaser = '',
   hookDurationFrames = 150,
-  outroDurationFrames = 120,
 }) => {
   const actSlides = slides.filter((slide) => slide?.imagePath);
   let cursor = hookDurationFrames;
@@ -42,8 +36,6 @@ export const StoryReelV2 = ({
     cursor += durationFrames;
     return entry;
   });
-  const outroFrom = cursor;
-
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f0a06' }}>
       {backgroundMusicPath ? (
@@ -70,6 +62,7 @@ export const StoryReelV2 = ({
               imagePath: slide.imagePath,
               narration: slide.captionText,
             }}
+            narrationPath={slide.narrationPath || ''}
             backgroundMusicPath={backgroundMusicPath}
             psychologyTrigger={slide.psychologyTrigger || ''}
             isClimaxScene={Boolean(slide.isClimaxScene)}
@@ -77,12 +70,6 @@ export const StoryReelV2 = ({
         </Sequence>
       ))}
 
-      <Sequence from={outroFrom} durationInFrames={outroDurationFrames}>
-        <StoryOutroScene
-          backgroundMusicPath={backgroundMusicPath}
-          nextEpisodeTeaser={outroTeaser}
-        />
-      </Sequence>
     </AbsoluteFill>
   );
 };

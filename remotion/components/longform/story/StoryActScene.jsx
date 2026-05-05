@@ -68,12 +68,9 @@ const PillCaption = ({ text }) => {
 
 // Ken Burns direction pool — cycles by sceneIndex so consecutive scenes feel different
 const KB_MOVES = [
-  { startX: 0,   endX: -50, startY: 0,   endY: -20, startS: 1.0,  endS: 1.16 },
-  { startX: 0,   endX: 50,  startY: 0,   endY: 20,  startS: 1.0,  endS: 1.16 },
-  { startX: -30, endX: 30,  startY: 0,   endY: 0,   startS: 1.08, endS: 1.0  },
-  { startX: 30,  endX: -30, startY: 0,   endY: 0,   startS: 1.08, endS: 1.0  },
-  { startX: 0,   endX: 0,   startY: 20,  endY: -20, startS: 1.0,  endS: 1.18 },
-  { startX: 0,   endX: 0,   startY: -20, endY: 20,  startS: 1.18, endS: 1.0  },
+  { startX: 0, endX: -34, startY: 0, endY: -10, startS: 1.02, endS: 1.12 },
+  { startX: 0, endX: 34,  startY: 0, endY: 10,  startS: 1.02, endS: 1.12 },
+  { startX: 0, endX: 0,   startY: 0, endY: -14, startS: 1.03, endS: 1.14 },
 ];
 
 export const StoryActScene = ({
@@ -94,7 +91,7 @@ export const StoryActScene = ({
   const imageSrc = resolveAssetSrc(scene.imagePath || '');
 
   // Ken Burns over FULL scene duration — no cycling, one continuous motion per scene
-  const kbIndex = (scene.sceneIndex ?? 1) % KB_MOVES.length;
+  const kbIndex = Math.max(0, ((scene.sceneIndex ?? 1) - 1) % KB_MOVES.length);
   const kb = KB_MOVES[kbIndex];
   const kbProgress = interpolate(frame, [0, durationInFrames], [0, 1], {
     extrapolateLeft: 'clamp',
@@ -104,12 +101,7 @@ export const StoryActScene = ({
   const kbX = kb.startX + (kb.endX - kb.startX) * kbProgress;
   const kbY = kb.startY + (kb.endY - kb.startY) * kbProgress;
 
-  // Entrance scale — subtle push-in on scene open (no opacity fade — hard cut transitions)
-  const entranceScale = interpolate(frame, [0, 12], [0.97, 1.0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const totalScale = entranceScale * kbScale;
+  const totalScale = kbScale;
 
   // 4.2 — Music ducking during narration
   const musicVolume = narrationPath

@@ -157,10 +157,9 @@ async function main() {
     const dur = await getAudioDuration(clipPath);
     console.log(`done (${dur ? dur.toFixed(2) + 's' : '?'})`);
 
-    // Map back to the original slide index (1-based), stored as file:// URL so
-    // StoryActScene's Audio element accesses the file directly without staticFile() resolution.
-    const absPath = path.resolve(ROOT, clipPath).replace(/\\/g, '/');
-    narrationMap[reelOrder[i] - 1] = `file:///${absPath}`;
+    // Map back to the original slide index (1-based) using a repo-relative path
+    // so Remotion can serve the generated audio from the copied publicDir bundle.
+    narrationMap[reelOrder[i] - 1] = path.relative(ROOT, clipPath).replace(/\\/g, '/');
 
   }
   // Write narrationPath entries into story.json slides
@@ -174,7 +173,7 @@ async function main() {
   const updatedStory = {
     ...story,
     slides: updatedSlides,
-    introNarrationPath: `file:///${path.resolve(ROOT, introPath).replace(/\\/g, '/')}`,
+    introNarrationPath: path.relative(ROOT, introPath).replace(/\\/g, '/'),
   };
 
   await fs.writeFile(storyPath, `${JSON.stringify(updatedStory, null, 2)}\n`);

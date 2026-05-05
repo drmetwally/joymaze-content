@@ -155,18 +155,20 @@ export const MatchingReveal = ({
 
   const N = Math.max(1, matchPairs.length);
 
-  // Pair k (k=0..N-1) revealed when solveProgress >= (k+1)/N
+  // Pair k (k=0..N-1) revealed when solveProgress >= k/N so the final pair has
+  // real on-screen hold time instead of appearing on the final frame.
   const isPairRevealed = (pairIdx) => {
     const k = pairOrder.indexOf(pairIdx);
     if (k < 0) return false;
-    return solveProgress >= (k + 1) / N;
+    return solveProgress >= k / N;
   };
 
-  // Frame at which pair k's cards should spring in
+  // Frame at which pair k's cards should spring in. First pair starts at solveStart,
+  // final pair still gets visible hold before the clip ends.
   const pairAppearFrame = (pairIdx) => {
     const k = pairOrder.indexOf(pairIdx);
     if (k < 0) return solveStart + solveFrames + 999;
-    return Math.round(solveStart + (k + 1) / N * solveFrames);
+    return Math.round(solveStart + (k / N) * solveFrames);
   };
 
   return (

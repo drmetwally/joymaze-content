@@ -5,7 +5,7 @@
  *
  * Generates complete Archetype 8 "Joyo's Story Corner" episode concepts:
  * - Story title + theme
- * - 7-slide narration (hypnotic writing style, short punchy sentences)
+ * - 8-slide narration (hook, body escalation, emotional resolution, echo)
  * - Per-slide image prompt for Gemini/ChatGPT generation
  * - Outputs a ready-to-use story.json + companion image-prompts.md
  *
@@ -223,27 +223,21 @@ Beat 1 is the only chance to stop a scroll. The first sentence must create an un
 
 ## NARRATION RULES — CRITICAL
 
-Each slide's narration is read aloud at TTS speed 0.85. Target: 3–4 seconds per slide.
+Each slide's narration is read aloud at TTS speed 0.85. The reel must feel like a real narrated story, not clipped captions.
 
-**HARD LIMIT: 15 words maximum per slide (all sentences combined). No exceptions.**
+**TARGET: 18–28 words per slide.**
+**Beat 1 hard cap: 16 words. Beat 8 hard cap: 14 words.**
 
-At 15 words and speed 0.85, TTS produces ~3.5–4.0s of audio — exactly the target.
-Count your words after writing each slide. If you are at 16, cut one word. Do not negotiate.
-
-Examples of complete beats at ≤15 words (different animals — do not copy these characters):
-- Beat 1 (fox): "The bridge was gone. Pip was the only one who knew another way." (13 words)
-- Beat 3 (turtle): "She carried the stone herself. Each step slower than the last." (11 words)
-- Beat 5 (crow): "He dropped it. The wind took it. He watched it disappear." (11 words)
-- Beat 8 (rabbit): "She still leaves a carrot at the hollow root. Every winter." (11 words)
-
-These examples prove full story beats are achievable within the limit. There is no reason to exceed it.
+Use enough language to create a meaningful narrated beat. Short-form does not mean emotionally empty.
 
 Other rules:
-- 1–2 sentences only. Never 3.
-- Beat 1: ONE sentence maximum. Make it the hook.
-- Beat 5: Short, heavy sentences. The emotional bottom is felt in silence between words, not in length.
-- Beat 8: ONE sentence only. Must work without any context. This is your share trigger.
-- No passive voice. No adverbs. No adjective stacking.
+- 1–2 sentences per slide. Never 3.
+- Beat 1: ONE sentence maximum. Immediate danger, tension, or open loop.
+- Beats 2–6: give enough detail that the viewer feels progression, not summary.
+- Beat 5: the emotional bottom must breathe. Let the sentence feel heavy, not rushed.
+- Beat 7: resolution must show change, not just success.
+- Beat 8: ONE sentence only. No CTA. No moral. No "more story" energy. It should feel like the world continues after the reel loops.
+- No passive voice. Minimal adverbs. No adjective stacking.
 - NEVER state the moral. The story does the work.
 
 ## IMAGE PROMPT RULES — CRITICAL
@@ -313,7 +307,7 @@ Return a single JSON object with this exact structure — no extra text:
   "episode": <number>,
   "theme": "One sentence describing the story and its emotional payoff",
   "hookQuestion": "A short curiosity-gap question or open-loop line for the reel hook. 8-14 words, answered only by the ending.",
-  "outroEcho": "A very short emotional echo or teaser line for the ending card.",
+  "outroEcho": "A very short emotional echo line that can support the final story beat if needed.",
   "style": "Art style to use consistently across all ${styleRefCount} slides (e.g., 'soft watercolor, wet-on-wet edges, warm pastel palette, visible paper grain')",
   "character": "Consistent physical description of the main character — species, size, color, distinctive markings, eye color/size, any unique feature. This description will be referenced in every image_prompt.",
   "slides": [
@@ -327,9 +321,9 @@ Return a single JSON object with this exact structure — no extra text:
   ]
 }
 
-Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–8s. ACT 3 slides: 7–8s. Final slide: 8–10s.
+Duration is in seconds. ACT 1 slides: 6–7s. ACT 2 slides: 7–9s. ACT 3 slides: 7–9s. Final slide: 7–8s.
 - hookQuestion: must create an open loop with stakes, and must not simply restate slide 1.
-- outroEcho: 4-8 words, warm and memorable, not a CTA.${psychTriggers ? `
+- outroEcho: 4-8 words, warm and memorable, not a CTA. It may be unused by the reel compositor if the ending loops directly.${psychTriggers ? `
 
 ## PSYCHOLOGY LAYER — STORY TRIGGERS
 
@@ -437,6 +431,8 @@ The story must:
 6. End with a payoff that makes parents want to screenshot and share the final slide
 7. Also write a separate hookQuestion for short-form reels. It should be 8-14 words, create a curiosity gap, and be answered only by the final beat.
 8. Also write a separate outroEcho that is only 4-8 words, emotionally resonant, and not a CTA.
+9. Most important: the story must feel narratable. Build a true hook, body escalation, and resolution across the reel-worthy beats — not eight clipped summaries.
+10. Use the intelligence inputs aggressively: strongest hooks, emotional patterning, and top-performing thematic overlaps should shape copy choices, not just theme choice.
 
 Story arcs that travel well for short-form:
 - A small animal solves a big problem through cleverness, not strength
@@ -455,13 +451,9 @@ function slugify(title) {
 function buildDefaultReelSlideOrder(slides = []) {
   const count = Array.isArray(slides) ? slides.length : 0;
   if (count <= 5) return Array.from({ length: count }, (_, i) => i + 1);
-  const picks = [
-    1,
-    2,
-    Math.max(3, Math.ceil(count / 2)),
-    Math.max(Math.ceil(count / 2) + 1, count - 1),
-    count,
-  ];
+  const picks = count >= 8
+    ? [1, 3, 5, Math.max(7, count - 1), count]
+    : [1, 2, Math.max(3, Math.ceil(count / 2)), Math.max(Math.ceil(count / 2) + 1, count - 1), count];
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 

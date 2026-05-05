@@ -165,13 +165,9 @@ async function storyJsonToProps(story, storyDir) {
 function buildDefaultReelSlideOrder(slides = []) {
   const count = Array.isArray(slides) ? slides.length : 0;
   if (count <= 5) return Array.from({ length: count }, (_, i) => i + 1);
-  const picks = [
-    1,
-    2,
-    Math.max(3, Math.ceil(count / 2)),
-    Math.max(Math.ceil(count / 2) + 1, count - 1),
-    count,
-  ];
+  const picks = count >= 8
+    ? [1, 3, 5, Math.max(7, count - 1), count]
+    : [1, 2, Math.max(3, Math.ceil(count / 2)), Math.max(Math.ceil(count / 2) + 1, count - 1), count];
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 
@@ -197,7 +193,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
       : '';
     const captionText = slide.narration ?? slide.caption ?? '';
     const wordCount = captionText.split(/\s+/).filter(Boolean).length;
-    const durationFrames = Math.max(75, Math.min(Math.round((2.4 + wordCount * 0.11) * fps), 126));
+    const durationFrames = Math.max(108, Math.min(Math.round((4.4 + wordCount * 0.16) * fps), 210));
     const act = slide.act ?? (index < 2 ? 1 : index < selectedSlides.length - 2 ? 2 : 3);
     return {
       sceneIndex: index + 1,
@@ -233,8 +229,6 @@ async function storyJsonToReelV2Props(story, storyDir) {
   const flashForwardCaption = flashForwardSlide?.narration ?? flashForwardSlide?.caption ?? '';
   const hookQuestion = story.hookQuestion ?? story.hook ?? flashForwardCaption ?? 'What happens next?';
   const hookWordCount = hookQuestion.split(/\s+/).filter(Boolean).length;
-  const outroTeaser = story.outroEcho ?? story.outroTeaser ?? story.title ?? 'Watch for the ending.';
-  const outroWordCount = outroTeaser.split(/\s+/).filter(Boolean).length;
   const musicPath = story.musicPath !== undefined
     ? story.musicPath
     : await resolveAudio('story');
@@ -244,9 +238,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
     hookQuestion,
     flashForwardImagePath,
     backgroundMusicPath: musicPath,
-    outroTeaser,
-    hookDurationFrames: story.hookDurationFrames ?? Math.max(75, Math.min(Math.round((1.9 + hookWordCount * 0.09) * fps), 105)),
-    outroDurationFrames: story.outroDurationFrames ?? Math.max(60, Math.min(Math.round((1.6 + outroWordCount * 0.07) * fps), 90)),
+    hookDurationFrames: story.hookDurationFrames ?? Math.max(90, Math.min(Math.round((2.3 + hookWordCount * 0.11) * fps), 126)),
   };
 }
 
