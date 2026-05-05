@@ -29,6 +29,7 @@ const HOOKS_FILE         = path.join(ROOT, 'config', 'hooks-library.json');
 const CTAS_FILE          = path.join(ROOT, 'config', 'cta-library.json');
 const INTERRUPTS_FILE    = path.join(ROOT, 'config', 'pattern-interrupt-dynamic.json');
 const X_POST_TOPICS_FILE = path.join(ROOT, 'config', 'x-post-topics-dynamic.json');
+const STORY_SOURCE_BANK_FILE = path.join(ROOT, 'config', 'story-source-bank.json');
 const ARCHIVE_DIR        = path.join(ROOT, 'output', 'archive');
 const QUEUE_DIR          = path.join(ROOT, 'output', 'queue');
 const PERF_WEIGHTS_FILE  = path.join(ROOT, 'config', 'performance-weights.json');
@@ -418,6 +419,73 @@ async function applyNewXPostTopics(newTopics, current) {
 }
 
 // ────────────────────────────────────────────────────────────────────
+// STORY SOURCE BANK
+// ────────────────────────────────────────────────────────────────────
+
+async function applyNewStorySourceSeeds(newSeeds, current) {
+  if (!newSeeds?.length || !current?.seeds) return { added: 0, pool: current };
+
+  const MAX = current._meta?.max_entries || 120;
+  const today = new Date().toISOString().slice(0, 10);
+  const existingNorm = new Set(
+    current.seeds.map((s) => normalize(`${s.title || ''} ${s.coreEvent || ''}`))
+  );
+
+  let added = 0;
+  for (const seed of newSeeds) {
+    if (!seed?.brand_safe) continue;
+    if (!seed.title || !seed.animal || !seed.coreEvent || !seed.lane) continue;
+
+    const norm = normalize(`${seed.title} ${seed.coreEvent}`);
+    if (existingNorm.has(norm)) continue;
+
+    if (current.seeds.length >= MAX) {
+      const evictable = current.seeds
+        .filter(e => !isProtected(e))
+        .sort((a, b) => evictionScore(b) - evictionScore(a));
+      if (!evictable.length) continue;
+      const victim = evictable[0];
+      current.seeds = current.seeds.filter((e) => e.id !== victim.id);
+    }
+
+    const entry = {
+      id: seed.id || `story_seed_${today.replace(/-/g, '')}_${String(added + 1).padStart(3, '0')}`,
+      title: seed.title,
+      animal: seed.animal,
+      sourceType: seed.sourceType || 'intelligence_refresh',
+      lane: seed.lane,
+      coreEvent: seed.coreEvent,
+      emotionalPattern: seed.emotionalPattern || '',
+      stakes: seed.stakes || '',
+      endingType: seed.endingType || '',
+      visualHooks: Array.isArray(seed.visualHooks) ? seed.visualHooks.slice(0, 6) : [],
+      seasonTags: Array.isArray(seed.seasonTags) ? seed.seasonTags.slice(0, 6) : [],
+      trendTags: Array.isArray(seed.trendTags) ? seed.trendTags.slice(0, 6) : [],
+      reelSuitability: seed.reelSuitability ?? 0.8,
+      freshness: seed.freshness ?? 0.8,
+      confidence: seed.confidence ?? 0.75,
+      added_week: today,
+      times_used: 0,
+      last_used: null,
+      decay_weeks: 0,
+      brand_safe: true,
+      source: seed.source || 'intelligence_refresh',
+      rationale: seed.rationale || '',
+    };
+
+    if (!DRY_RUN) {
+      current.seeds.push(entry);
+      existingNorm.add(norm);
+    }
+    console.log(`  ${DRY_RUN ? '[DRY] Would add' : 'Added'} story seed [${entry.lane}/${entry.animal}]: "${entry.title.slice(0, 70)}"`);
+    added++;
+  }
+
+  current._meta.last_updated = today;
+  return { added, pool: current };
+}
+
+// ────────────────────────────────────────────────────────────────────
 // PATTERN INTERRUPT POOL
 // ────────────────────────────────────────────────────────────────────
 
@@ -500,7 +568,7 @@ function agePool(entries, fieldKey = 'name') {
   return { kept, pruned };
 }
 
-function runAgingPass(themesPool, hooksLibrary, ctaLibrary, patternPool) {
+function runAgingPass(themesPool, hooksLibrary, ctaLibrary, patternPool, storySourceBank = null) {
   let totalPruned = 0;
 
   // Age themes
@@ -536,6 +604,13 @@ function runAgingPass(themesPool, hooksLibrary, ctaLibrary, patternPool) {
   patternPool.interrupts = interrupts;
   intPruned.forEach(t => console.log(`  Aged out interrupt: "${String(t).slice(0, 60)}"`));
   totalPruned += intPruned.length;
+
+  if (storySourceBank?.seeds) {
+    const { kept: seeds, pruned: seedsPruned } = agePool(storySourceBank.seeds, 'title');
+    storySourceBank.seeds = seeds;
+    seedsPruned.forEach(t => console.log(`  Aged out story seed: "${String(t).slice(0, 60)}"`));
+    totalPruned += seedsPruned.length;
+  }
 
   return totalPruned;
 }
@@ -690,12 +765,13 @@ async function main() {
   if (status === 'entropy_blocked') console.log('  (Forcing past entropy block as requested)');
 
   // 2. Load current dynamic pools
-  const [themesPool, hooksLibrary, ctaLibrary, patternPool, xPostTopics] = await Promise.all([
+  const [themesPool, hooksLibrary, ctaLibrary, patternPool, xPostTopics, storySourceBank] = await Promise.all([
     loadJson(THEME_DYNAMIC_FILE),
     loadJson(HOOKS_FILE),
     loadJson(CTAS_FILE),
     loadJson(INTERRUPTS_FILE),
     loadJson(X_POST_TOPICS_FILE),
+    loadJson(STORY_SOURCE_BANK_FILE),
   ]);
 
   if (!themesPool || !hooksLibrary || !ctaLibrary || !patternPool) {
@@ -706,10 +782,13 @@ async function main() {
   if (!xPostTopics) {
     console.warn('  Warning: x-post-topics-dynamic.json missing — X topic seeds will not be updated.');
   }
+  if (!storySourceBank) {
+    console.warn('  Warning: story-source-bank.json missing — story source seeds will not be updated.');
+  }
 
   // 3. Weekly aging pass (always runs — independent of new intelligence)
   console.log('\n--- Aging pass ---');
-  const pruned = runAgingPass(themesPool, hooksLibrary, ctaLibrary, patternPool);
+  const pruned = runAgingPass(themesPool, hooksLibrary, ctaLibrary, patternPool, storySourceBank);
   console.log(`  Total entries pruned: ${pruned}`);
 
   // 4. Update performance scores from recent analytics
@@ -734,6 +813,9 @@ async function main() {
   const { added: xTopicsAdded } = xPostTopics
     ? await applyNewXPostTopics(intelligence.new_x_post_topics, xPostTopics)
     : { added: 0 };
+  const { added: storySeedsAdded } = storySourceBank
+    ? await applyNewStorySourceSeeds(intelligence.new_story_source_seeds, storySourceBank)
+    : { added: 0 };
 
   // 6. Write updated pools
   console.log('\n--- Writing updated pools ---');
@@ -744,6 +826,7 @@ async function main() {
     writeJson(INTERRUPTS_FILE, patternPool, 'pattern-interrupt-dynamic.json'),
   ];
   if (xPostTopics) writes.push(writeJson(X_POST_TOPICS_FILE, xPostTopics, 'x-post-topics-dynamic.json'));
+  if (storySourceBank) writes.push(writeJson(STORY_SOURCE_BANK_FILE, storySourceBank, 'story-source-bank.json'));
   await Promise.all(writes);
 
   // 7. Mark intelligence as applied
@@ -760,6 +843,7 @@ async function main() {
   console.log(`  CTAs:       +${ctasAdded} added`);
   console.log(`  Interrupts: +${interruptsAdded} added`);
   console.log(`  X topics:   +${xTopicsAdded} added`);
+  console.log(`  Story seeds:+${storySeedsAdded} added`);
   console.log(`  Pruned (aging): ${pruned}`);
   if (DRY_RUN) console.log('\n  [DRY RUN] No files were written.');
 }

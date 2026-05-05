@@ -114,9 +114,14 @@ async function loadStyleContext() {
     psychTriggers = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'psychology-triggers.json'), 'utf-8'));
   } catch {}
 
+  let storySourceBank = null;
+  try {
+    storySourceBank = JSON.parse(await fs.readFile(path.join(ROOT, 'config', 'story-source-bank.json'), 'utf-8'));
+  } catch {}
+
   const videoViralityRules = await loadVideoViralityRules();
 
-  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers, videoViralityRules };
+  return { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers, storySourceBank, videoViralityRules };
 }
 
 // Extract only Archetype 8 section from archetypes doc
@@ -347,7 +352,75 @@ Stories activate two triggers simultaneously. Apply both:
 - Image prompts: use warm, slightly nostalgic lighting (golden hour, morning window light, firelight) to reinforce the emotional register` : ''}`;
 }
 
-function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes) {
+function scoreStorySeed(seed, themeSeed, trends) {
+  let score = (seed.reelSuitability ?? 0.75) * 3 + (seed.freshness ?? 0.75) * 2 + (seed.confidence ?? 0.7) * 2;
+  const hay = `${seed.title || ''} ${seed.animal || ''} ${seed.coreEvent || ''} ${(seed.visualHooks || []).join(' ')} ${(seed.trendTags || []).join(' ')}`.toLowerCase();
+  if (themeSeed) {
+    const terms = String(themeSeed).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    score += terms.filter((t) => hay.includes(t)).length * 1.5;
+  }
+  const trendTerms = (trends?.trending_themes || []).slice(0, 6).flatMap((t) => String(t.theme || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+  score += trendTerms.filter((t) => hay.includes(t)).length * 0.25;
+  return score;
+}
+
+function selectStorySourceSeeds(storySourceBank, themeSeed, trends, limit = 6) {
+  const seeds = Array.isArray(storySourceBank?.seeds) ? storySourceBank.seeds : [];
+  return seeds
+    .filter((seed) => seed?.brand_safe !== false && seed?.title && seed?.animal && seed?.coreEvent)
+    .sort((a, b) => scoreStorySeed(b, themeSeed, trends) - scoreStorySeed(a, themeSeed, trends))
+    .slice(0, limit);
+}
+
+function buildStorySourceBankBlock(storySourceBank, themeSeed, trends) {
+  const selected = selectStorySourceSeeds(storySourceBank, themeSeed, trends, 6);
+  if (!selected.length) return '';
+  const lines = selected.map((seed) => {
+    const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
+    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}`;
+  });
+  return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. Do not copy it mechanically; expand it into a stronger original reel story with a real hook/body/resolution.\n${lines.join('\n')}`;
+}
+
+function buildOutlinePrompt(episodeNum, themeSeed, storySourceBank, trends) {
+  const bankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends);
+  const themeBlock = themeSeed
+    ? `\nTheme seed from the user: "${themeSeed}". If possible, choose the source-bank seed that best matches it.`
+    : '';
+
+  return `Build a STORY OUTLINE ONLY for Joyo's Story Corner Episode ${episodeNum}.${themeBlock}${bankBlock}
+
+Return ONLY JSON with this exact structure:
+{
+  "sourceBankId": "seed id you selected, or null if none",
+  "title": "specific evocative title",
+  "theme": "one sentence emotional promise",
+  "hookQuestion": "8-14 words",
+  "outroEcho": "4-8 words",
+  "style": "one visual style line",
+  "character": "full reusable protagonist description",
+  "storyLane": "rescue|homecoming|loyalty|survival|parent_bond|migration|friendship",
+  "beatPlan": [
+    "Beat 1 vivid hook moment",
+    "Beat 2 stakes",
+    "Beat 3 attempt",
+    "Beat 4 deepening",
+    "Beat 5 lowest moment",
+    "Beat 6 turn",
+    "Beat 7 resolution",
+    "Beat 8 echo image"
+  ]
+}
+
+Rules:
+- Pick one source-bank seed if available and make it the spine.
+- Keep the protagonist a non-human animal.
+- The beatPlan must escalate cleanly and feel narratable, not like summaries.
+- Beat 5 must hurt. Beat 8 must be screenshot-worthy.
+- No markdown fences. JSON only.`;
+}
+
+function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes, storySourceBank = null, outline = null) {
   // Characters banned due to overuse (update this list as new species accumulate)
   const BANNED_CHARACTERS = ['firefly', 'fireflies'];
 
@@ -359,6 +432,12 @@ function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights
 
   const themeBlock = themeSeed
     ? `\n\nTheme seed from the user: "${themeSeed}" — build a story around this idea.`
+    : '';
+
+  const storySourceBankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends);
+
+  const outlineBlock = outline
+    ? `\n\nMANDATORY STORY OUTLINE — use this as the exact emotional spine for the final story. Keep the same protagonist identity, core escalation, and ending image. Expand it into stronger narrated beats, do not flatten it back into summary copy:\n${JSON.stringify(outline, null, 2)}`
     : '';
 
   // Inject live trend data
@@ -447,13 +526,66 @@ Story arcs that travel well for short-form:
 - A lost creature finds their way home
 - Two very different characters become unexpected friends
 - A creature who feels like a burden discovers they are the key
-- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${themeBlock}
+- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${storySourceBankBlock}${themeBlock}${outlineBlock}
+
+Before you finalize, self-check every image_prompt:
+- protagonist name appears in every prompt
+- protagonist name appears within the first 14 words
+- at least 3 character descriptor words are repeated from the character field
+- prompt ends with 9:16 portrait ratio instruction
 
 Return ONLY the JSON. No explanation. No markdown fences.`;
 }
 
 function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function parseJsonResponse(raw) {
+  return JSON.parse(String(raw || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim());
+}
+
+function validateOutline(outline) {
+  if (!outline || typeof outline !== 'object') {
+    throw new Error('Outline payload was empty.');
+  }
+  if (!Array.isArray(outline.beatPlan) || outline.beatPlan.length !== SLIDE_COUNT) {
+    throw new Error(`Expected outline beatPlan with ${SLIDE_COUNT} items.`);
+  }
+  if (!outline.character || String(outline.character).split(/\s+/).length < 6) {
+    throw new Error('Outline character description is too weak.');
+  }
+}
+
+function repairStoryConsistency(story) {
+  if (!story || !Array.isArray(story.slides)) return story;
+  const character = String(story.character || '').trim();
+  const characterName = character.split(/[—,-]/)[0]?.trim();
+  if (!character || !characterName) return story;
+
+  story.slides = story.slides.map((slide) => {
+    let prompt = String(slide.image_prompt || '').trim();
+    if (!prompt) return slide;
+
+    const intro = `${character}. `;
+    const hasName = prompt.toLowerCase().includes(characterName.toLowerCase());
+    const firstWords = prompt.split(/\s+/).slice(0, 14).join(' ').toLowerCase();
+    const earlyName = firstWords.includes(characterName.toLowerCase());
+
+    if (!hasName) {
+      prompt = `${intro}${prompt}`;
+    } else if (!earlyName) {
+      prompt = `${intro}${prompt}`;
+    }
+
+    if (!/Generate at 9:16 portrait ratio \(1080×1920 pixels\)\.?$/i.test(prompt)) {
+      prompt = `${prompt.replace(/\.*\s*$/, '')}. Generate at 9:16 portrait ratio (1080×1920 pixels).`;
+    }
+
+    return { ...slide, image_prompt: prompt };
+  });
+
+  return story;
 }
 
 function validateGeneratedStory(story) {
@@ -563,6 +695,8 @@ async function saveStory(story, episodeNum) {
     hook: story.hook || null,         // Legacy intro hook
     hookQuestion: story.hookQuestion || story.hook || null,
     outroEcho: story.outroEcho || null,
+    storySourceBankId: story.storySourceBankId || story.sourceBankId || null,
+    storyLane: story.storyLane || null,
     reelSlideOrder,
     slides: story.slides.map(s => ({
       image: s.image,
@@ -622,7 +756,7 @@ async function main() {
   console.log('=== Joyo\'s Story Corner — Idea Generator ===\n');
 
   const episodeNum = await getNextEpisode();
-  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers, videoViralityRules }] = await Promise.all([
+  const [existing, { styleGuide, archetypes, trends, weights, competitor, hooksData, dynamicThemes, psychTriggers, storySourceBank, videoViralityRules }] = await Promise.all([
     getExistingStories(),
     loadStyleContext(),
   ]);
@@ -633,13 +767,17 @@ async function main() {
   if (hooksData?.hooks?.length) console.log(`  Hooks library loaded: ${hooksData.hooks.length} hooks`);
   if (dynamicThemes?.themes?.length) console.log(`  Dynamic themes loaded: ${dynamicThemes.themes.length} themes`);
   if (psychTriggers) console.log(`  Psychology triggers loaded: ${Object.keys(psychTriggers.triggers || {}).length} triggers`);
+  if (storySourceBank?.seeds?.length) console.log(`  Story source bank loaded: ${storySourceBank.seeds.length} seeds`);
 
   const systemPrompt = buildSystemPrompt(styleGuide, archetypes, psychTriggers, videoViralityRules);
-  const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes);
+  const outlinePrompt = buildOutlinePrompt(episodeNum, THEME_SEED, storySourceBank, trends);
+  const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes, storySourceBank);
 
   if (DRY_RUN) {
     console.log('=== SYSTEM PROMPT ===\n');
     console.log(systemPrompt);
+    console.log('\n=== OUTLINE PROMPT ===\n');
+    console.log(outlinePrompt);
     console.log('\n=== USER PROMPT ===\n');
     console.log(userPrompt);
     return;
@@ -662,30 +800,62 @@ async function main() {
 
     let attempts = 0;
     let story = null;
+    let lastError = null;
 
     while (attempts < 3 && !story) {
       attempts++;
       try {
+        const retryFixBlock = lastError
+          ? `\n\nIMPORTANT RETRY FIX: The previous attempt failed validation with this exact issue: ${lastError}. Correct that failure explicitly in this attempt.`
+          : '';
+
+        const outlineResponse = await groq.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: (i === 0 ? outlinePrompt : outlinePrompt + `\n\nMake this outline DIFFERENT from: ${stories.map(s => s.title).join(', ')}`) + retryFixBlock },
+          ],
+          temperature: 0.7,
+          max_tokens: 1800,
+        });
+
+        const outline = parseJsonResponse(outlineResponse.choices[0].message.content);
+        validateOutline(outline);
+
+        const finalUserPrompt = buildUserPrompt(
+          episodeNum + i,
+          existing,
+          THEME_SEED,
+          trends,
+          weights,
+          competitor,
+          hooksData,
+          dynamicThemes,
+          storySourceBank,
+          outline
+        ) + (i === 0 ? '' : `\n\nMake this concept DIFFERENT from: ${stories.map(s => s.title).join(', ')}`) + retryFixBlock;
+
         const response = await groq.chat.completions.create({
           model: 'llama-3.3-70b-versatile',
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: i === 0 ? userPrompt : userPrompt + `\n\nMake this concept DIFFERENT from: ${stories.map(s => s.title).join(', ')}` },
+            { role: 'user', content: finalUserPrompt },
           ],
-          temperature: 0.85,
+          temperature: 0.82,
           max_tokens: 5000,
         });
 
-        const raw = response.choices[0].message.content.trim();
-        // Strip markdown fences if present
-        const jsonStr = raw.replace(/^```json?\s*/i, '').replace(/\s*```$/i, '').trim();
-        story = JSON.parse(jsonStr);
+        story = repairStoryConsistency(parseJsonResponse(response.choices[0].message.content));
 
         validateGeneratedStory(story);
 
         story.episode = episodeNum + i;
+        story.storySourceBankId = outline.sourceBankId || null;
+        story.storyLane = outline.storyLane || null;
+        story.storyOutline = outline.beatPlan;
         stories.push(story);
       } catch (err) {
+        lastError = err.message;
         if (attempts < 3) {
           console.log(`  Attempt ${attempts} failed (${err.message}), retrying...`);
           await new Promise(r => setTimeout(r, 2000));
