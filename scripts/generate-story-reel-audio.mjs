@@ -12,8 +12,9 @@
  *   output/stories/<epXX-slug>/
  *     tts/
  *       intro.wav              — "Episode N. Title."
+ *       hook.wav               — reel hook question VO
  *       reel_01.wav, reel_02.wav, ...  — one per reel slide (in reel order)
- *   story.json updated with narrationPath per reel slide + introNarrationPath
+ *   story.json updated with narrationPath per reel slide + hookNarrationPath + introNarrationPath
  *
  * Usage:
  *   node scripts/generate-story-reel-audio.mjs --story ep12-the-kitten-who-lit-the-mother-s-garden
@@ -146,6 +147,15 @@ async function main() {
   const introDur = await getAudioDuration(introPath);
   console.log(`done (${introDur ? introDur.toFixed(2) + 's' : '?'})`);
 
+  const hookText = story.hookQuestion ?? story.hook ?? '';
+  const hookPath = path.join(ttsDir, 'hook.wav');
+  if (hookText) {
+    process.stdout.write(`  [Hook]: "${hookText}"... `);
+    await generateFn(hookText, hookPath);
+    const hookDur = await getAudioDuration(hookPath);
+    console.log(`done (${hookDur ? hookDur.toFixed(2) + 's' : '?'})`);
+  }
+
   // Generate per-slide reel narration
   const narrationMap = {};
   for (let i = 0; i < reelSlides.length; i++) {
@@ -173,6 +183,7 @@ async function main() {
   const updatedStory = {
     ...story,
     slides: updatedSlides,
+    hookNarrationPath: hookText ? path.relative(ROOT, hookPath).replace(/\\/g, '/') : (story.hookNarrationPath ?? ''),
     introNarrationPath: path.relative(ROOT, introPath).replace(/\\/g, '/'),
   };
 

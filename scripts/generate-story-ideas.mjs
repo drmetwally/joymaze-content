@@ -256,6 +256,7 @@ Each image_prompt is fed directly to Gemini or ChatGPT. Vague prompts produce ne
    - Current expression (ears flat, eyes wide, mouth slightly open)
    - Current posture/action (wings spread mid-flight, curled in a ball, leaning forward)
    - Size reference: is the character tiny against the scene or filling the frame?
+   - The protagonist must stay the SAME non-human animal in every slide. Never let the image model substitute a child, woman, man, doll, or generic human figure for the hero.
 
 3. **TIME OF DAY + LIGHTING** — Must progress across slides, never repeat:
    - Each act should have a distinct light: golden hour → dusk → full night → pre-dawn → dawn
@@ -273,6 +274,10 @@ Each image_prompt is fed directly to Gemini or ChatGPT. Vague prompts produce ne
    - Instead: "soft watercolor, wet-on-wet edges, visible paper grain" or "3D Pixar render, subsurface skin scatter, soft rim light"
 
 6. **CHARACTER REPETITION** — Every image_prompt must include the character's full physical description inline, not just their name. Do NOT write "Luna hovers above the river." Write "Luna — a firefly the size of a thumbnail, mahogany body, iridescent wings with faint blue veins, soft amber glow from her abdomen, oversized green eyes — hovers above the river." The AI generating the image has no memory between slides. Write every prompt as if it is the first one.
+   - The protagonist name must stay identical across all slides. Never rename the hero.
+   - The protagonist must be the FIRST named subject in every prompt, not introduced after the background or a crowd shot.
+   - The first character clause of every prompt must explicitly restate the species and the body markers that prove it is not human, for example: feathers + beak + wings for a bird, paws + tail + whiskers for a kitten.
+   - If other characters appear, label them separately so the hero remains visually dominant.
 
 7. **OUTPUT DIMENSIONS** — Story slides render into a 1080×1920 video frame. Every image_prompt must end with: "Generate at 9:16 portrait ratio (1080×1920 pixels)." A native 9:16 source fills the video frame without letterboxing. Do NOT include any instruction to leave blank space at the bottom — the video compositor handles watermarks separately.
 
@@ -284,6 +289,9 @@ Each image_prompt is fed directly to Gemini or ChatGPT. Vague prompts produce ne
 - Two slides with the same time of day and lighting
 - Referring to the character by name only — always describe them fully inline
 - Any instruction about leaving bottom space blank — the compositor handles that
+- Any ambiguity that could let the model swap the animal hero for a human subject
+- Pronoun-only prompts where the species is never restated
+- Opening the prompt with a crowd, landscape, or side character before the hero is named
 
 ### BAD PROMPT (produces same image as 4 other slides):
 "Luna flying among the wildflowers, her light flickering, with other fireflies flying and sparkling around her, in a whimsical and dreamy atmosphere."
@@ -309,14 +317,14 @@ Return a single JSON object with this exact structure — no extra text:
   "hookQuestion": "A short curiosity-gap question or open-loop line for the reel hook. 8-14 words, answered only by the ending.",
   "outroEcho": "A very short emotional echo line that can support the final story beat if needed.",
   "style": "Art style to use consistently across all ${styleRefCount} slides (e.g., 'soft watercolor, wet-on-wet edges, warm pastel palette, visible paper grain')",
-  "character": "Consistent physical description of the main character — species, size, color, distinctive markings, eye color/size, any unique feature. This description will be referenced in every image_prompt.",
+  "character": "Consistent physical description of the main character — species, size, color, distinctive markings, eye color/size, any unique feature. This exact description should be reusable inline inside every image_prompt.",
   "slides": [
     {
       "image": "01.png",
       "act": 1,
       "narration": "Slide narration text here. Short sentences.",
       "duration": 7,
-      "image_prompt": "CAMERA FRAMING + ANGLE. Character FULL PHYSICAL DESCRIPTION (inline, every slide) + expression + posture + position in frame. Specific scene environment (named foreground element + named background). Time of day + named light source + sky color. Other characters if any (species, position, expression). Art style. Generate at 9:16 portrait ratio (1080×1920 pixels)."
+      "image_prompt": "CAMERA FRAMING + ANGLE. Protagonist NAME + FULL PHYSICAL DESCRIPTION (inline, every slide, explicitly non-human animal traits visible) + expression + posture + position in frame. Specific scene environment (named foreground element + named background). Time of day + named light source + sky color. Other characters if any (species, position, expression) but the hero remains dominant. Art style. Generate at 9:16 portrait ratio (1080×1920 pixels)."
     }
   ]
 }
@@ -446,6 +454,60 @@ Return ONLY the JSON. No explanation. No markdown fences.`;
 
 function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function validateGeneratedStory(story) {
+  if (!story || typeof story !== 'object') {
+    throw new Error('Story payload was empty.');
+  }
+  if (!Array.isArray(story.slides) || story.slides.length !== SLIDE_COUNT) {
+    throw new Error(`Expected ${SLIDE_COUNT} slides, got ${story.slides?.length}`);
+  }
+
+  const character = String(story.character || '').trim();
+  const characterName = character.split(/[—,-]/)[0]?.trim();
+  const descriptorWords = new Set(
+    character
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((word) => word.length >= 4)
+  );
+
+  if (!character || descriptorWords.size < 4) {
+    throw new Error('Character description is too weak for image consistency.');
+  }
+
+  story.slides.forEach((slide, index) => {
+    const prompt = String(slide.image_prompt || '').trim();
+    if (!prompt) {
+      throw new Error(`Slide ${index + 1} is missing image_prompt.`);
+    }
+    const wordCount = prompt.split(/\s+/).filter(Boolean).length;
+    if (wordCount < 24) {
+      throw new Error(`Slide ${index + 1} image_prompt too short (${wordCount} words).`);
+    }
+    if (characterName && !prompt.toLowerCase().includes(characterName.toLowerCase())) {
+      throw new Error(`Slide ${index + 1} image_prompt is missing protagonist name.`);
+    }
+    if (characterName) {
+      const firstWords = prompt.split(/\s+/).slice(0, 14).join(' ').toLowerCase();
+      if (!firstWords.includes(characterName.toLowerCase())) {
+        throw new Error(`Slide ${index + 1} image_prompt does not introduce the hero early enough.`);
+      }
+    }
+    const promptWords = new Set(
+      prompt
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter((word) => word.length >= 4)
+    );
+    const overlap = [...descriptorWords].filter((word) => promptWords.has(word)).length;
+    if (overlap < Math.min(3, descriptorWords.size)) {
+      throw new Error(`Slide ${index + 1} image_prompt does not repeat enough hero descriptors.`);
+    }
+  });
 }
 
 function buildDefaultReelSlideOrder(slides = []) {
@@ -619,10 +681,7 @@ async function main() {
         const jsonStr = raw.replace(/^```json?\s*/i, '').replace(/\s*```$/i, '').trim();
         story = JSON.parse(jsonStr);
 
-        // Validate structure
-        if (!story.slides || story.slides.length !== SLIDE_COUNT) {
-          throw new Error(`Expected ${SLIDE_COUNT} slides, got ${story.slides?.length}`);
-        }
+        validateGeneratedStory(story);
 
         story.episode = episodeNum + i;
         stories.push(story);

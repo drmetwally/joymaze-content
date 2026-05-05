@@ -236,6 +236,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
   return {
     slides: slides.map(({ imageRef, ...rest }) => rest),
     hookQuestion,
+    hookNarrationPath: story.hookNarrationPath ?? '',
     flashForwardImagePath,
     backgroundMusicPath: musicPath,
     hookDurationFrames: story.hookDurationFrames ?? Math.max(90, Math.min(Math.round((2.3 + hookWordCount * 0.11) * fps), 126)),
@@ -638,9 +639,8 @@ function computeDuration(inputProps, compId) {
   }
   if (compId === 'StoryReelV2') {
     const hookFrames = inputProps.hookDurationFrames ?? fps * 5;
-    const outroFrames = inputProps.outroDurationFrames ?? fps * 4;
     const slideFrames = inputProps.slides?.reduce((s, sl) => s + (sl.durationFrames ?? fps * 4), 0) ?? fps * 16;
-    return hookFrames + slideFrames + outroFrames;
+    return hookFrames + slideFrames;
   }
   if (compId === 'AnimalFactsSongShort') {
     const hookFrames = Math.round(Math.min(Math.max(inputProps.episode?.hookNarrationDurationSec || 4, 3), 5) * fps);

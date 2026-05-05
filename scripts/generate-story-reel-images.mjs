@@ -112,6 +112,21 @@ function adaptPromptForImagen(prompt) {
     .trim();
 }
 
+function extractHeroClause(prompt) {
+  const match = prompt.match(/([A-Z][a-zA-Z]+)\s*[—-]\s*([^—-]{12,220})\s*[—-]/);
+  if (!match) return '';
+  return `${match[1]} — ${match[2].trim()}`;
+}
+
+function buildImagenPrompt(prompt) {
+  const adapted = adaptPromptForImagen(prompt);
+  const heroClause = extractHeroClause(prompt);
+  const heroGuard = heroClause
+    ? `Important continuity rule: ${heroClause}. Render this named protagonist only as that exact non-human animal with the described visible body traits. No humans, no dolls, no mammal substitution, no species swap. `
+    : 'Important continuity rule: keep the protagonist exactly as described, as a non-human animal only. No humans, dolls, mammal substitution, or species swap. ';
+  return `Children's story illustration. No text, no logos, no watermark. ${heroGuard}The named protagonist must remain the first and dominant subject in frame. ${adapted}`;
+}
+
 async function generateWithImagen(prompt) {
   const apiKey = process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY;
   if (!apiKey) {
@@ -120,7 +135,7 @@ async function generateWithImagen(prompt) {
 
   const url = `${BASE_URL}/models/${MODEL}:predict?key=${apiKey}`;
   const body = {
-    instances: [{ prompt: `Children's story illustration. No text, no logos, no watermark. ${adaptPromptForImagen(prompt)}` }],
+    instances: [{ prompt: buildImagenPrompt(prompt) }],
     parameters: { sampleCount: 1 },
   };
 

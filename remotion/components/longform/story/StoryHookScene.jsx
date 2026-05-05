@@ -21,6 +21,7 @@ const resolveAssetSrc = (src) => {
 
 export const StoryHookScene = ({
   hookQuestion = '',
+  hookNarrationPath = '',
   jinglePath = '',
   backgroundMusicPath = '',
   flashForwardSrc = '',
@@ -64,6 +65,7 @@ export const StoryHookScene = ({
         <Audio src={resolveAssetSrc(backgroundMusicPath)} volume={bgVolume} />
       ) : null}
       {jinglePath ? <Audio src={resolveAssetSrc(jinglePath)} volume={0.85} /> : null}
+      {hookNarrationPath ? <Audio src={resolveAssetSrc(hookNarrationPath)} volume={1} /> : null}
 
       {/* Flash forward: full-screen, full duration, Ken Burns */}
       {flashForwardSrc ? (
