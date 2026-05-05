@@ -51,9 +51,26 @@ const POST_LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : Infinity
 // ── Cloud media fallback ────────────────────────────────────────────────────
 // If the local file doesn't exist (e.g. running in GitHub Actions), download
 // from Cloudinary to a temp file and return that path instead.
+//
+// GUARD: If Cloudinary env vars are missing, skip cloud fallback entirely and
+// let the caller decide whether to throw or proceed without the file.
 async function resolveMedia(localPath, cloudUrl) {
   if (existsSync(localPath)) return localPath;
-  if (!cloudUrl) throw new Error(`Local file missing and no cloudUrl: ${localPath}`);
+  if (!cloudUrl) {
+    // No cloud URL recorded — either the file was never uploaded or credentials
+    // were absent. Emit a warning and return the (missing) local path so the
+    // caller can decide how to handle the gap.
+    console.warn(`resolveMedia: file not found and no cloudUrl fallback: ${localPath}`);
+    return localPath;
+  }
+
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey    = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!cloudName || !apiKey || !apiSecret) {
+    console.warn(`resolveMedia: Cloudinary env vars not set — skipping cloud fetch for ${localPath}`);
+    return localPath;
+  }
 
   const ext = path.extname(localPath) || '.bin';
   const tempPath = path.join(tmpdir(), `joymaze-${Date.now()}${ext}`);
@@ -769,7 +786,6 @@ async function postContent(metadata) {
       console.log(`    ${platform}: already posted, skipping`);
       continue;
     }
-
     if (!metadata.captions?.[platform]) {
       console.log(`    ${platform}: no caption, skipping`);
       continue;
@@ -779,7 +795,6 @@ async function postContent(metadata) {
     const isVideo = metadata.type === 'video';
     let mediaPath;
     let mediaLabel;
-
     if (isVideo) {
       const videoFile = metadata.platforms?.[platform]?.video || metadata.outputFile;
       if (!videoFile) {
@@ -799,6 +814,12 @@ async function postContent(metadata) {
       const cloudFallback = metadata.cloudUrls?.[config.imageKey];
       mediaPath = await resolveMedia(localImage, cloudFallback);
       mediaLabel = imageFilename;
+    }
+
+    // Guard: resolved path does not exist (local + cloud fallback both failed/missing)
+    if (!existsSync(mediaPath)) {
+      console.log(`    ${platform}: media file not found locally, skipping -- run generate-images.mjs to produce assets`);
+      continue;
     }
 
     const caption = metadata.captions[platform];
@@ -826,7 +847,7 @@ async function postContent(metadata) {
       };
       results.push({ platform, status: 'posted', ...result });
     } catch (err) {
-      console.log(`    ${platform}: FAILED — ${err.message}`);
+      console.log(`    ${platform}: FAILED -- ${err.message}`);
       metadata.platforms[platform] = {
         ...metadata.platforms[platform],
         status: 'failed',
@@ -871,7 +892,9 @@ async function main() {
 
   const jsonFiles = queueFiles.filter(f => f.endsWith('.json'));
   if (jsonFiles.length === 0) {
-    console.log('Queue is empty. Run generate-images.mjs and generate-captions.mjs first.');
+    // Empty queue — not an error; the daily pipeline may simply have nothing scheduled
+    // on a given day. Exit gracefully rather than throwing.
+    console.log('Queue is empty. Nothing to post.');
     process.exit(0);
   }
 
