@@ -204,6 +204,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
       imageRef: rawImageRef,
       imagePath,
       captionText,
+      narrationPath: slide.narrationPath || '',
       durationFrames,
       psychologyTrigger: act === 1 ? 'CURIOSITY_GAP' : act === 2 ? 'IDENTITY_MIRROR' : 'COMPLETION_SATISFACTION',
       isClimaxScene: index === selectedSlides.length - 2,

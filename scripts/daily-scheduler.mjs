@@ -281,6 +281,13 @@ async function runDailyJob() {
       log(`  Story: ${path.relative(ROOT, storyFolder)}`);
       const reelImagesOk = await runScript('generate-story-reel-images.mjs', ['--story', storyFolder], 180_000);
       if (reelImagesOk) {
+        // Generate VO narration audio for the reel slides (Kokoro default — free)
+        const reelAudioOk = await runScript('generate-story-reel-audio.mjs', ['--story', storyFolder], 60_000);
+        if (reelAudioOk) {
+          log('Story Reel V2 audio generated — narrating slides via Kokoro TTS');
+        } else {
+          log('Story Reel V2 audio skipped — proceeding without narration');
+        }
         const reelRenderOk = await runScript('render-video.mjs', ['--comp', 'StoryReelV2', '--story', storyFolder], 180_000);
         if (reelRenderOk) {
           log('Story Reel V2 rendered → output/videos/');
