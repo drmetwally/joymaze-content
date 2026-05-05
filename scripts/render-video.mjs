@@ -544,10 +544,14 @@ async function challengeJsonToProps(activity, activityDir) {
     if (dotsData.dotColor) dotColor = dotsData.dotColor;
   } catch { /* no dots.json */ }
 
+  const blankImageResolved = await resolveImage(activity.blankImage ?? 'blank.png');
+  const solvedImageResolved = await resolveImage(activity.solvedImage ?? 'solved.png');
+  const primaryImageResolved = await resolveImage(activity.imagePath ?? 'puzzle.png');
+
   return {
-    imagePath: toRelative(activity.imagePath ?? 'puzzle.png'),
-    blankImagePath: await resolveImage(activity.blankImage ?? 'blank.png'),
-    solvedImagePath: await resolveImage(activity.solvedImage ?? 'solved.png'),
+    imagePath: primaryImageResolved || blankImageResolved || solvedImageResolved,
+    blankImagePath: blankImageResolved,
+    solvedImagePath: solvedImageResolved,
     puzzleType: activity.puzzleType ?? 'maze',
     theme: activity.theme ?? '',
     hookText: activity.hookText ?? 'Can your kid solve this?',
