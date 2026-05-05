@@ -12,11 +12,11 @@
     "assets/generated/coloring-pages/ocean/ocean-animals-1.png"
   ],
   "animals:character": [
-    "public/assets/stickers/matching/animals/rabbit.png",
-    "public/assets/stickers/matching/animals/elephant.png",
     "public/assets/stickers/matching/animals/lion.png",
     "public/assets/stickers/matching/animals/penguin.png",
     "public/assets/stickers/matching/animals/cat.png",
-    "public/assets/stickers/matching/animals/dog.png"
+    "public/assets/stickers/matching/animals/dog.png",
+    "public/assets/stickers/matching/animals/rabbit.png",
+    "public/assets/stickers/matching/animals/elephant.png"
   ]
 }
