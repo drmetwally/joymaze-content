@@ -17,9 +17,21 @@
       "emotionalPattern": "lost -> fear -> memory cue -> brave return -> belonging",
       "stakes": "If the swallow fails, night falls before home is found.",
       "endingType": "return_home",
-      "visualHooks": ["storm sky", "small bird against distance", "nest at dawn"],
-      "seasonTags": ["spring", "migration", "mother's day"],
-      "trendTags": ["Birds/Sky", "Pets/Home", "Nature"],
+      "visualHooks": [
+        "storm sky",
+        "small bird against distance",
+        "nest at dawn"
+      ],
+      "seasonTags": [
+        "spring",
+        "migration",
+        "mother's day"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Pets/Home",
+        "Nature"
+      ],
       "reelSuitability": 0.92,
       "freshness": 0.88,
       "confidence": 0.88,
@@ -40,9 +52,20 @@
       "emotionalPattern": "separation -> panic -> failed attempt -> herd response -> safety",
       "stakes": "The calf is too small to cross alone before the current strengthens.",
       "endingType": "group_rescue",
-      "visualHooks": ["rising river", "small calf beside huge adults", "trunks reaching in water"],
-      "seasonTags": ["rainy season", "summer"],
-      "trendTags": ["Safari and Jungle", "Animals", "Nature"],
+      "visualHooks": [
+        "rising river",
+        "small calf beside huge adults",
+        "trunks reaching in water"
+      ],
+      "seasonTags": [
+        "rainy season",
+        "summer"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Animals",
+        "Nature"
+      ],
       "reelSuitability": 0.93,
       "freshness": 0.84,
       "confidence": 0.9,
@@ -63,9 +86,18 @@
       "emotionalPattern": "pressure -> endurance -> near collapse -> relief -> reunion",
       "stakes": "If the parent moves too soon, the egg freezes.",
       "endingType": "devotion_payoff",
-      "visualHooks": ["ice wind", "tiny egg on feet", "partner returning through snow"],
-      "seasonTags": ["winter"],
-      "trendTags": ["Arctic Animals", "Family"],
+      "visualHooks": [
+        "ice wind",
+        "tiny egg on feet",
+        "partner returning through snow"
+      ],
+      "seasonTags": [
+        "winter"
+      ],
+      "trendTags": [
+        "Arctic Animals",
+        "Family"
+      ],
       "reelSuitability": 0.89,
       "freshness": 0.82,
       "confidence": 0.91,
@@ -86,9 +118,18 @@
       "emotionalPattern": "disorientation -> failed search -> guide appears -> trust -> reunion",
       "stakes": "The calf cannot surface safely alone in the chop.",
       "endingType": "guided_reunion",
-      "visualHooks": ["storm chop", "silver backs breaking water", "mother call answered"],
-      "seasonTags": ["summer"],
-      "trendTags": ["Ocean/Underwater", "Animals"],
+      "visualHooks": [
+        "storm chop",
+        "silver backs breaking water",
+        "mother call answered"
+      ],
+      "seasonTags": [
+        "summer"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Animals"
+      ],
       "reelSuitability": 0.9,
       "freshness": 0.8,
       "confidence": 0.87,
@@ -109,9 +150,19 @@
       "emotionalPattern": "threat -> urgency -> repeated effort -> last risky trip -> dry shelter",
       "stakes": "If she is too slow, the shelter floods before the final kitten is moved.",
       "endingType": "protective_homecoming",
-      "visualHooks": ["rain beginning", "kitten carried by scruff", "last empty box"],
-      "seasonTags": ["rainy season", "spring"],
-      "trendTags": ["Pets/Home", "Cats"],
+      "visualHooks": [
+        "rain beginning",
+        "kitten carried by scruff",
+        "last empty box"
+      ],
+      "seasonTags": [
+        "rainy season",
+        "spring"
+      ],
+      "trendTags": [
+        "Pets/Home",
+        "Cats"
+      ],
       "reelSuitability": 0.95,
       "freshness": 0.86,
       "confidence": 0.89,
@@ -132,9 +183,19 @@
       "emotionalPattern": "birth -> overwhelm -> wrong turn -> instinct -> breakthrough",
       "stakes": "Every wrong direction costs precious time before predators notice.",
       "endingType": "instinct_survival",
-      "visualHooks": ["moonlit sand", "giant footprints", "first wave lift"],
-      "seasonTags": ["summer", "night"],
-      "trendTags": ["Ocean/Underwater", "Sea Turtles"],
+      "visualHooks": [
+        "moonlit sand",
+        "giant footprints",
+        "first wave lift"
+      ],
+      "seasonTags": [
+        "summer",
+        "night"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Sea Turtles"
+      ],
       "reelSuitability": 0.94,
       "freshness": 0.9,
       "confidence": 0.93,
@@ -155,9 +216,19 @@
       "emotionalPattern": "routine -> hope -> disappointment -> persistence -> reunion",
       "stakes": "Emotionally grounded stakes, built on waiting and faith rather than danger.",
       "endingType": "reunion",
-      "visualHooks": ["sunset gate", "paw by path", "running child silhouette"],
-      "seasonTags": ["back to school", "autumn"],
-      "trendTags": ["Pets/Home", "Dogs"],
+      "visualHooks": [
+        "sunset gate",
+        "paw by path",
+        "running child silhouette"
+      ],
+      "seasonTags": [
+        "back to school",
+        "autumn"
+      ],
+      "trendTags": [
+        "Pets/Home",
+        "Dogs"
+      ],
       "reelSuitability": 0.88,
       "freshness": 0.78,
       "confidence": 0.86,
@@ -178,9 +249,18 @@
       "emotionalPattern": "movement -> danger -> separation -> courage -> family regrouped",
       "stakes": "The gosling is exposed and cannot keep pace with the flock.",
       "endingType": "family_regroup",
-      "visualHooks": ["wet road", "tiny gosling under huge sky", "parent turning back"],
-      "seasonTags": ["spring"],
-      "trendTags": ["Birds/Sky", "Nature"],
+      "visualHooks": [
+        "wet road",
+        "tiny gosling under huge sky",
+        "parent turning back"
+      ],
+      "seasonTags": [
+        "spring"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Nature"
+      ],
       "reelSuitability": 0.9,
       "freshness": 0.81,
       "confidence": 0.87,
@@ -201,9 +281,18 @@
       "emotionalPattern": "curiosity -> separation -> fear -> memory clue -> home found",
       "stakes": "Night settles before the cub can find the den again.",
       "endingType": "instinctive_return",
-      "visualHooks": ["fern tunnel", "distant den glow", "nose to earth"],
-      "seasonTags": ["autumn"],
-      "trendTags": ["Forest/Woodland", "Animals"],
+      "visualHooks": [
+        "fern tunnel",
+        "distant den glow",
+        "nose to earth"
+      ],
+      "seasonTags": [
+        "autumn"
+      ],
+      "trendTags": [
+        "Forest/Woodland",
+        "Animals"
+      ],
       "reelSuitability": 0.91,
       "freshness": 0.85,
       "confidence": 0.88,
@@ -224,9 +313,19 @@
       "emotionalPattern": "drift -> risk -> care ritual -> exhaustion -> calm safety",
       "stakes": "If the pup drifts too far, the cold current takes it away.",
       "endingType": "protective_rest",
-      "visualHooks": ["kelp wrap", "small paws touching", "floating at sunset"],
-      "seasonTags": ["summer", "night"],
-      "trendTags": ["Ocean/Underwater", "Parenting"],
+      "visualHooks": [
+        "kelp wrap",
+        "small paws touching",
+        "floating at sunset"
+      ],
+      "seasonTags": [
+        "summer",
+        "night"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Parenting"
+      ],
       "reelSuitability": 0.9,
       "freshness": 0.84,
       "confidence": 0.9,
@@ -247,9 +346,20 @@
       "emotionalPattern": "fragile calm -> hidden threat -> protective closeness -> safe crossing -> relief",
       "stakes": "If the cygnets slip into open water too soon, they are exposed before they can keep up.",
       "endingType": "protective_crossing",
-      "visualHooks": ["white feathers above black water", "cygnets tucked on mother's back", "reeds parting at dawn"],
-      "seasonTags": ["spring", "early summer"],
-      "trendTags": ["Birds/Sky", "Nature", "Parenting"],
+      "visualHooks": [
+        "white feathers above black water",
+        "cygnets tucked on mother's back",
+        "reeds parting at dawn"
+      ],
+      "seasonTags": [
+        "spring",
+        "early summer"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Nature",
+        "Parenting"
+      ],
       "reelSuitability": 0.95,
       "freshness": 0.89,
       "confidence": 0.92,
@@ -270,9 +380,20 @@
       "emotionalPattern": "play -> trap -> panic -> group effort -> exhausted relief",
       "stakes": "The deeper the calf struggles, the harder it becomes to pull free before night or rising water.",
       "endingType": "group_rescue",
-      "visualHooks": ["muddy riverbank", "trunks reaching downward", "calf leaning into the herd"],
-      "seasonTags": ["summer", "rainy season"],
-      "trendTags": ["Safari and Jungle", "Animals", "Family"],
+      "visualHooks": [
+        "muddy riverbank",
+        "trunks reaching downward",
+        "calf leaning into the herd"
+      ],
+      "seasonTags": [
+        "summer",
+        "rainy season"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Animals",
+        "Family"
+      ],
       "reelSuitability": 0.96,
       "freshness": 0.86,
       "confidence": 0.92,
@@ -293,9 +414,20 @@
       "emotionalPattern": "journey -> injury -> choice -> vigil -> reunion hope",
       "stakes": "If the mate leaves, the injured goose is alone and exposed, if the mate stays, both risk missing the flock.",
       "endingType": "devotion_payoff",
-      "visualHooks": ["empty sky after the flock", "one goose standing guard", "fallen feather on wet grass"],
-      "seasonTags": ["autumn", "migration"],
-      "trendTags": ["Birds/Sky", "Nature", "Love and Loyalty"],
+      "visualHooks": [
+        "empty sky after the flock",
+        "one goose standing guard",
+        "fallen feather on wet grass"
+      ],
+      "seasonTags": [
+        "autumn",
+        "migration"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Nature",
+        "Love and Loyalty"
+      ],
       "reelSuitability": 0.94,
       "freshness": 0.88,
       "confidence": 0.9,
@@ -316,9 +448,20 @@
       "emotionalPattern": "confidence -> storm drift -> exhaustion -> memory cue -> return",
       "stakes": "If she misses the last light of day, every roof begins to look the same.",
       "endingType": "return_home",
-      "visualHooks": ["city roofs at dusk", "single yellow window", "small bird against evening clouds"],
-      "seasonTags": ["autumn", "storm season"],
-      "trendTags": ["Birds/Sky", "Pets/Home", "City Nature"],
+      "visualHooks": [
+        "city roofs at dusk",
+        "single yellow window",
+        "small bird against evening clouds"
+      ],
+      "seasonTags": [
+        "autumn",
+        "storm season"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Pets/Home",
+        "City Nature"
+      ],
       "reelSuitability": 0.93,
       "freshness": 0.9,
       "confidence": 0.89,
@@ -339,9 +482,19 @@
       "emotionalPattern": "birth -> exposure -> endurance -> near failure -> handoff and hope",
       "stakes": "If the chick touches the ice for even a moment too long, the cold wins.",
       "endingType": "endurance_payoff",
-      "visualHooks": ["tiny chick on giant feet", "white horizon with one returning shape", "snow blown sideways"],
-      "seasonTags": ["winter"],
-      "trendTags": ["Arctic Animals", "Family", "Parenting"],
+      "visualHooks": [
+        "tiny chick on giant feet",
+        "white horizon with one returning shape",
+        "snow blown sideways"
+      ],
+      "seasonTags": [
+        "winter"
+      ],
+      "trendTags": [
+        "Arctic Animals",
+        "Family",
+        "Parenting"
+      ],
       "reelSuitability": 0.95,
       "freshness": 0.83,
       "confidence": 0.94,
@@ -362,9 +515,19 @@
       "emotionalPattern": "crowd -> confusion -> frantic calling -> recognition -> reunion",
       "stakes": "If they fail to find each other before the tide turns, the pup is pushed deeper into the colony and away from safety.",
       "endingType": "voice_reunion",
-      "visualHooks": ["crowded rocky colony", "one small pup lifting its head", "foam line at the edge of rocks"],
-      "seasonTags": ["summer"],
-      "trendTags": ["Ocean/Underwater", "Family", "Nature"],
+      "visualHooks": [
+        "crowded rocky colony",
+        "one small pup lifting its head",
+        "foam line at the edge of rocks"
+      ],
+      "seasonTags": [
+        "summer"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Family",
+        "Nature"
+      ],
       "reelSuitability": 0.94,
       "freshness": 0.9,
       "confidence": 0.91,
@@ -385,9 +548,20 @@
       "emotionalPattern": "need -> effort -> setback -> one last push -> feeding relief",
       "stakes": "If the parent turns back empty, the chick waits another freezing night without food.",
       "endingType": "last_trip_payoff",
-      "visualHooks": ["beak full of silver fish", "cliff edge in rain", "burrow mouth glowing warm"],
-      "seasonTags": ["summer", "storm season"],
-      "trendTags": ["Birds/Sky", "Ocean/Underwater", "Parenting"],
+      "visualHooks": [
+        "beak full of silver fish",
+        "cliff edge in rain",
+        "burrow mouth glowing warm"
+      ],
+      "seasonTags": [
+        "summer",
+        "storm season"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Ocean/Underwater",
+        "Parenting"
+      ],
       "reelSuitability": 0.93,
       "freshness": 0.91,
       "confidence": 0.89,
@@ -408,9 +582,20 @@
       "emotionalPattern": "heat -> strain -> searching -> shade found -> calm recovery",
       "stakes": "If they stay in the exposed branches, the joey weakens in the heat.",
       "endingType": "protective_rest",
-      "visualHooks": ["sun-blasted eucalyptus leaves", "tiny joey pressed to fur", "single shaded fork of branches"],
-      "seasonTags": ["summer", "heatwave"],
-      "trendTags": ["Animals", "Parenting", "Climate and Nature"],
+      "visualHooks": [
+        "sun-blasted eucalyptus leaves",
+        "tiny joey pressed to fur",
+        "single shaded fork of branches"
+      ],
+      "seasonTags": [
+        "summer",
+        "heatwave"
+      ],
+      "trendTags": [
+        "Animals",
+        "Parenting",
+        "Climate and Nature"
+      ],
       "reelSuitability": 0.91,
       "freshness": 0.92,
       "confidence": 0.86,
@@ -431,9 +616,20 @@
       "emotionalPattern": "movement -> weakness -> refusal to abandon -> shared effort -> warm shelter",
       "stakes": "If the foal is left behind, the weather and distance become too much.",
       "endingType": "companion_loyalty",
-      "visualHooks": ["muddy path in rain", "small foal leaning against older pony", "barn light through weather"],
-      "seasonTags": ["spring", "rainy season"],
-      "trendTags": ["Pets/Home", "Animals", "Friendship"],
+      "visualHooks": [
+        "muddy path in rain",
+        "small foal leaning against older pony",
+        "barn light through weather"
+      ],
+      "seasonTags": [
+        "spring",
+        "rainy season"
+      ],
+      "trendTags": [
+        "Pets/Home",
+        "Animals",
+        "Friendship"
+      ],
       "reelSuitability": 0.9,
       "freshness": 0.87,
       "confidence": 0.86,
@@ -454,9 +650,20 @@
       "emotionalPattern": "panic -> distance -> hiding -> scent clue -> home found",
       "stakes": "If dawn comes before the rabbit finds the burrow, open ground becomes dangerous.",
       "endingType": "instinctive_return",
-      "visualHooks": ["dark lawn after fireworks", "flattened clover path", "burrow mouth beneath roots"],
-      "seasonTags": ["summer", "night"],
-      "trendTags": ["Pets/Home", "Garden/Flowers", "Nature"],
+      "visualHooks": [
+        "dark lawn after fireworks",
+        "flattened clover path",
+        "burrow mouth beneath roots"
+      ],
+      "seasonTags": [
+        "summer",
+        "night"
+      ],
+      "trendTags": [
+        "Pets/Home",
+        "Garden/Flowers",
+        "Nature"
+      ],
       "reelSuitability": 0.92,
       "freshness": 0.9,
       "confidence": 0.87,
@@ -477,9 +684,20 @@
       "emotionalPattern": "waiting -> doubt -> stillness -> return -> nursing calm",
       "stakes": "If the fawn leaves hiding too early, stillness no longer protects it.",
       "endingType": "returning_parent",
-      "visualHooks": ["tall grass over small ears", "soft dusk line", "mother's silhouette appearing"],
-      "seasonTags": ["spring", "golden hour"],
-      "trendTags": ["Forest/Woodland", "Parenting", "Nature"],
+      "visualHooks": [
+        "tall grass over small ears",
+        "soft dusk line",
+        "mother's silhouette appearing"
+      ],
+      "seasonTags": [
+        "spring",
+        "golden hour"
+      ],
+      "trendTags": [
+        "Forest/Woodland",
+        "Parenting",
+        "Nature"
+      ],
       "reelSuitability": 0.9,
       "freshness": 0.88,
       "confidence": 0.9,
@@ -500,9 +718,19 @@
       "emotionalPattern": "scarcity -> distance -> near loss -> stubborn return -> den reached",
       "stakes": "If the fox loses the trail, the hungry pups wait through another freezing night.",
       "endingType": "survival_return",
-      "visualHooks": ["whiteout snow", "small fox carrying prey", "dark den hole in a drift"],
-      "seasonTags": ["winter"],
-      "trendTags": ["Arctic Animals", "Parenting", "Nature"],
+      "visualHooks": [
+        "whiteout snow",
+        "small fox carrying prey",
+        "dark den hole in a drift"
+      ],
+      "seasonTags": [
+        "winter"
+      ],
+      "trendTags": [
+        "Arctic Animals",
+        "Parenting",
+        "Nature"
+      ],
       "reelSuitability": 0.92,
       "freshness": 0.91,
       "confidence": 0.88,
@@ -512,6 +740,273 @@
       "brand_safe": true,
       "source": "researched_bank",
       "rationale": "Resource scarcity plus return-home tension is a strong survival lane for narration."
+    },
+    {
+      "id": "story_seed_reunion_whale_001",
+      "title": "Beluga Calf Hears the Returning Song",
+      "animal": "beluga whale",
+      "sourceType": "true_story_style",
+      "lane": "homecoming",
+      "coreEvent": "A beluga calf separated in shifting ice keeps answering the wrong calls until one low, familiar song leads it back through the blue dark.",
+      "emotionalPattern": "separation -> false hope -> fear -> recognition -> reunion",
+      "stakes": "If the calf follows the wrong calls too far, the ice closes the path back to its family.",
+      "endingType": "voice_reunion",
+      "visualHooks": [
+        "blue ice tunnel",
+        "small white calf turning toward sound",
+        "family shadows beyond the ice"
+      ],
+      "seasonTags": [
+        "winter"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Arctic Animals",
+        "Family"
+      ],
+      "reelSuitability": 0.94,
+      "freshness": 0.92,
+      "confidence": 0.88,
+      "emotionalIntensity": 0.94,
+      "relatability": 0.87,
+      "virality": 0.89,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Voice-led reunion is easy to narrate and gives a very strong final reveal image."
+    },
+    {
+      "id": "story_seed_parent_gorilla_001",
+      "title": "Gorilla Mother Waits for the Smallest Climber",
+      "animal": "gorilla",
+      "sourceType": "true_story_style",
+      "lane": "parent_bond",
+      "coreEvent": "As the troop moves uphill before rain, a gorilla mother keeps stopping so her smallest baby can climb the slick roots without losing her.",
+      "emotionalPattern": "movement -> struggle -> patience -> near slip -> safe arrival",
+      "stakes": "If the baby loses the climb, the troop keeps moving and the storm reaches them first.",
+      "endingType": "protective_patience",
+      "visualHooks": [
+        "mist in rainforest",
+        "tiny hand on wet roots",
+        "mother looking back over shoulder"
+      ],
+      "seasonTags": [
+        "rainy season"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Family",
+        "Nature"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.9,
+      "confidence": 0.87,
+      "emotionalIntensity": 0.91,
+      "relatability": 0.91,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Waiting and looking back is a deeply readable parent image for mobile video."
+    },
+    {
+      "id": "story_seed_survival_crane_001",
+      "title": "Crane Flies One Wingbeat Behind",
+      "animal": "crane",
+      "sourceType": "true_story_style",
+      "lane": "migration",
+      "coreEvent": "During a long migration, one young crane cannot hold formation in the crosswind and must keep one wingbeat behind the flock without disappearing into the storm.",
+      "emotionalPattern": "journey -> weakness -> drift -> stubborn endurance -> dawn catch-up",
+      "stakes": "If the young crane falls too far back, the flock is gone into cloud and distance.",
+      "endingType": "migration_rejoin",
+      "visualHooks": [
+        "V formation in storm light",
+        "single bird trailing behind",
+        "dawn cloud break"
+      ],
+      "seasonTags": [
+        "autumn",
+        "migration"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Nature"
+      ],
+      "reelSuitability": 0.91,
+      "freshness": 0.91,
+      "confidence": 0.86,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.84,
+      "virality": 0.85,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Migration lag stories carry built-in motion, loneliness, and payoff."
+    },
+    {
+      "id": "story_seed_loyalty_cat_002",
+      "title": "Old Cat Sleeps by the Nursery Door",
+      "animal": "cat",
+      "sourceType": "true_story_style",
+      "lane": "loyalty",
+      "coreEvent": "An old house cat begins sleeping outside the nursery every night after hearing one baby cry she cannot forget.",
+      "emotionalPattern": "quiet routine -> alertness -> watchfulness -> reassurance -> belonging",
+      "stakes": "The danger is emotional rather than physical, a tiny life that feels too new and breakable to leave alone.",
+      "endingType": "devotion_echo",
+      "visualHooks": [
+        "hallway night light",
+        "cat curled by door",
+        "tiny hand on crib rail"
+      ],
+      "seasonTags": [
+        "night",
+        "winter"
+      ],
+      "trendTags": [
+        "Pets/Home",
+        "Cats",
+        "Family"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.88,
+      "confidence": 0.84,
+      "emotionalIntensity": 0.92,
+      "relatability": 0.96,
+      "virality": 0.9,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "This is soft but extremely relatable, a save/share lane for parents with pets."
+    },
+    {
+      "id": "story_seed_survival_beaver_001",
+      "title": "Beaver Kit Keeps the Dam Closed",
+      "animal": "beaver",
+      "sourceType": "true_story_style",
+      "lane": "survival",
+      "coreEvent": "When spring water starts slipping through a weak spot in the dam, the smallest beaver kit keeps dragging branch after branch until the cold leak finally stops.",
+      "emotionalPattern": "crack -> alarm -> repeated effort -> exhaustion -> water held back",
+      "stakes": "If the gap widens before the family returns, the lodge floods.",
+      "endingType": "small_hero_payoff",
+      "visualHooks": [
+        "rushing leak through sticks",
+        "small beaver in muddy water",
+        "still pond at dusk"
+      ],
+      "seasonTags": [
+        "spring"
+      ],
+      "trendTags": [
+        "Forest/Woodland",
+        "Nature",
+        "Animals"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.91,
+      "confidence": 0.85,
+      "emotionalIntensity": 0.89,
+      "relatability": 0.87,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Tiny character solving a real structural problem gives clean progression and payoff."
+    },
+    {
+      "id": "story_seed_homecoming_lamb_001",
+      "title": "Lamb Follows the Bell Through the Fog",
+      "animal": "lamb",
+      "sourceType": "true_story_style",
+      "lane": "homecoming",
+      "coreEvent": "A lamb separated in morning fog stops chasing shapes and follows one soft bell sound back to the flock.",
+      "emotionalPattern": "confusion -> wrong turns -> stillness -> familiar sound -> return",
+      "stakes": "If the fog lifts before the lamb finds the flock, the field becomes too wide and exposed.",
+      "endingType": "sound_guided_return",
+      "visualHooks": [
+        "white fog over grass",
+        "small lamb alone",
+        "dim shape with bell at dawn"
+      ],
+      "seasonTags": [
+        "spring",
+        "morning"
+      ],
+      "trendTags": [
+        "Pets/Home",
+        "Farm Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.9,
+      "confidence": 0.86,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.91,
+      "virality": 0.87,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Sound-led homecoming is extremely legible and tender."
+    },
+    {
+      "id": "story_seed_parent_orangutan_001",
+      "title": "Orangutan Mother Builds One More Nest",
+      "animal": "orangutan",
+      "sourceType": "real_behavior",
+      "lane": "parent_bond",
+      "coreEvent": "At the end of a long day, an orangutan mother keeps weaving leaves into the sleeping nest because her baby is still too restless to settle.",
+      "emotionalPattern": "fatigue -> care ritual -> restlessness -> extra effort -> safe sleep",
+      "stakes": "If the nest stays too loose, the baby cannot sleep safely above the dark forest floor.",
+      "endingType": "care_ritual_payoff",
+      "visualHooks": [
+        "leaf nest high in canopy",
+        "small baby reaching from fur",
+        "hands weaving green branches"
+      ],
+      "seasonTags": [
+        "evening"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Parenting",
+        "Nature"
+      ],
+      "reelSuitability": 0.9,
+      "freshness": 0.92,
+      "confidence": 0.88,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.94,
+      "virality": 0.85,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Night routine and extra parental effort make this emotionally sticky for parents."
+    },
+    {
+      "id": "story_seed_reunion_wolf_001",
+      "title": "Wolf Pup Hears the Pack Answer Back",
+      "animal": "wolf",
+      "sourceType": "true_story_style",
+      "lane": "homecoming",
+      "coreEvent": "A wolf pup answers the empty forest again and again until one returning howl finally reaches him from beyond the ridge.",
+      "emotionalPattern": "calling -> silence -> persistence -> answer -> sprinting reunion",
+      "stakes": "If night fully falls before the answer comes, the pup is alone outside the den range.",
+      "endingType": "call_and_response_reunion",
+      "visualHooks": [
+        "small pup howling in blue dusk",
+        "empty ridge line",
+        "pack silhouettes returning"
+      ],
+      "seasonTags": [
+        "autumn",
+        "dusk"
+      ],
+      "trendTags": [
+        "Forest/Woodland",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.94,
+      "freshness": 0.89,
+      "confidence": 0.87,
+      "emotionalIntensity": 0.93,
+      "relatability": 0.88,
+      "virality": 0.88,
+      "brand_safe": true,
+      "source": "researched_bank",
+      "rationale": "Call-and-answer structure is excellent for short-form narration and payoff."
     }
   ]
 }

@@ -86,3 +86,8 @@
 - Final pass now receives the exact selected seed payload from pass 1, so it is less free to drift away from the chosen stakes/event.
 - `intelligence-refresh.mjs` and `apply-intelligence.mjs` were updated so weekly-added seeds can carry the same richer metadata.
 - Live generation validation succeeded after the bank expansion and selected the new swan/cygnet protection lane for the test story.
+- Follow-up lane-bias testing also succeeded:
+  - `--lane homecoming` selected the pigeon/window-light homecoming seed.
+  - `--lane parent_bond` selected the swan/cygnet protection seed.
+  - `--lane survival` selected the puffin/last-fish storm-return seed.
+- This indicates the expanded bank plus lane bias is producing materially different emotional spines instead of collapsing into one repeated shape.

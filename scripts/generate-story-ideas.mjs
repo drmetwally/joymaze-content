@@ -38,6 +38,8 @@ const themeIdx = args.indexOf('--theme');
 const THEME_SEED = themeIdx !== -1 ? args[themeIdx + 1] : null;
 const countIdx = args.indexOf('--count');
 const COUNT = countIdx !== -1 ? parseInt(args[countIdx + 1], 10) : 1;
+const laneIdx = args.indexOf('--lane');
+const STORY_LANE = laneIdx !== -1 ? args[laneIdx + 1] : null;
 const slidesIdx = args.indexOf('--slides');
 const SLIDE_COUNT = slidesIdx !== -1 ? parseInt(args[slidesIdx + 1], 10) : 8;
 
@@ -352,7 +354,7 @@ Stories activate two triggers simultaneously. Apply both:
 - Image prompts: use warm, slightly nostalgic lighting (golden hour, morning window light, firelight) to reinforce the emotional register` : ''}`;
 }
 
-function scoreStorySeed(seed, themeSeed, trends) {
+function scoreStorySeed(seed, themeSeed, trends, preferredLane = null) {
   let score = (seed.reelSuitability ?? 0.75) * 3
     + (seed.freshness ?? 0.75) * 1.75
     + (seed.confidence ?? 0.7) * 1.5
@@ -361,6 +363,9 @@ function scoreStorySeed(seed, themeSeed, trends) {
     + (seed.virality ?? 0.72) * 1.75;
 
   const hay = `${seed.title || ''} ${seed.animal || ''} ${seed.coreEvent || ''} ${(seed.visualHooks || []).join(' ')} ${(seed.trendTags || []).join(' ')} ${(seed.seasonTags || []).join(' ')} ${seed.lane || ''}`.toLowerCase();
+  if (preferredLane && seed.lane === preferredLane) {
+    score += 3.5;
+  }
   if (themeSeed) {
     const terms = String(themeSeed).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
     score += terms.filter((t) => hay.includes(t)).length * 1.6;
@@ -376,10 +381,10 @@ function getStorySeedById(storySourceBank, id) {
     : null;
 }
 
-function selectStorySourceSeeds(storySourceBank, themeSeed, trends, limit = 6) {
+function selectStorySourceSeeds(storySourceBank, themeSeed, trends, limit = 6, preferredLane = null) {
   const seeds = (Array.isArray(storySourceBank?.seeds) ? storySourceBank.seeds : [])
     .filter((seed) => seed?.brand_safe !== false && seed?.title && seed?.animal && seed?.coreEvent)
-    .map((seed) => ({ ...seed, _score: scoreStorySeed(seed, themeSeed, trends) }))
+    .map((seed) => ({ ...seed, _score: scoreStorySeed(seed, themeSeed, trends, preferredLane) }))
     .sort((a, b) => b._score - a._score);
 
   const byLane = new Map();
@@ -400,8 +405,8 @@ function selectStorySourceSeeds(storySourceBank, themeSeed, trends, limit = 6) {
   return selected.slice(0, limit);
 }
 
-function buildStorySourceBankBlock(storySourceBank, themeSeed, trends) {
-  const selected = selectStorySourceSeeds(storySourceBank, themeSeed, trends, 6);
+function buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferredLane = null) {
+  const selected = selectStorySourceSeeds(storySourceBank, themeSeed, trends, 6, preferredLane);
   if (!selected.length) return '';
   const lines = selected.map((seed) => {
     const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
@@ -416,13 +421,16 @@ function buildSelectedSeedBlock(storySourceBank, outline = null) {
   return `\n\nSELECTED STORY SEED — this is the factual/emotional spine chosen in pass 1. Preserve its core event, stakes, and emotional pattern while making the final story feel richer and more cinematic:\n${JSON.stringify(seed, null, 2)}`;
 }
 
-function buildOutlinePrompt(episodeNum, themeSeed, storySourceBank, trends) {
-  const bankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends);
+function buildOutlinePrompt(episodeNum, themeSeed, storySourceBank, trends, preferredLane = null) {
+  const bankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferredLane);
   const themeBlock = themeSeed
     ? `\nTheme seed from the user: "${themeSeed}". If possible, choose the source-bank seed that best matches it.`
     : '';
+  const laneBlock = preferredLane
+    ? `\nPreferred story lane: "${preferredLane}". Favor source-bank seeds from this lane unless the theme seed clearly points elsewhere.`
+    : '';
 
-  return `Build a STORY OUTLINE ONLY for Joyo's Story Corner Episode ${episodeNum}.${themeBlock}${bankBlock}
+  return `Build a STORY OUTLINE ONLY for Joyo's Story Corner Episode ${episodeNum}.${themeBlock}${laneBlock}${bankBlock}
 
 Return ONLY JSON with this exact structure:
 {
@@ -454,7 +462,7 @@ Rules:
 - No markdown fences. JSON only.`;
 }
 
-function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes, storySourceBank = null, outline = null) {
+function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights, competitor, hooksData, dynamicThemes, storySourceBank = null, outline = null, preferredLane = null) {
   // Characters banned due to overuse (update this list as new species accumulate)
   const BANNED_CHARACTERS = ['firefly', 'fireflies'];
 
@@ -468,7 +476,11 @@ function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights
     ? `\n\nTheme seed from the user: "${themeSeed}" — build a story around this idea.`
     : '';
 
-  const storySourceBankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends);
+  const laneBlock = preferredLane
+    ? `\n\nPREFERRED STORY LANE: ${preferredLane}. Prefer seeds and final story beats that clearly fit this lane unless a much stronger fit emerges from the theme seed.`
+    : '';
+
+  const storySourceBankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferredLane);
   const selectedSeedBlock = buildSelectedSeedBlock(storySourceBank, outline);
 
   const outlineBlock = outline
@@ -561,7 +573,7 @@ Story arcs that travel well for short-form:
 - A lost creature finds their way home
 - Two very different characters become unexpected friends
 - A creature who feels like a burden discovers they are the key
-- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${storySourceBankBlock}${themeBlock}${selectedSeedBlock}${outlineBlock}
+- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${storySourceBankBlock}${themeBlock}${laneBlock}${selectedSeedBlock}${outlineBlock}
 
 Extra final-pass rules when a selected seed is provided:
 - Preserve the seed's core event and stakes, do not swap to a different underlying story.
@@ -810,8 +822,8 @@ async function main() {
   if (storySourceBank?.seeds?.length) console.log(`  Story source bank loaded: ${storySourceBank.seeds.length} seeds`);
 
   const systemPrompt = buildSystemPrompt(styleGuide, archetypes, psychTriggers, videoViralityRules);
-  const outlinePrompt = buildOutlinePrompt(episodeNum, THEME_SEED, storySourceBank, trends);
-  const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes, storySourceBank);
+  const outlinePrompt = buildOutlinePrompt(episodeNum, THEME_SEED, storySourceBank, trends, STORY_LANE);
+  const userPrompt = buildUserPrompt(episodeNum, existing, THEME_SEED, trends, weights, competitor, hooksData, dynamicThemes, storySourceBank, null, STORY_LANE);
 
   if (DRY_RUN) {
     console.log('=== SYSTEM PROMPT ===\n');
@@ -872,7 +884,8 @@ async function main() {
           hooksData,
           dynamicThemes,
           storySourceBank,
-          outline
+          outline,
+          STORY_LANE
         ) + (i === 0 ? '' : `\n\nMake this concept DIFFERENT from: ${stories.map(s => s.title).join(', ')}`) + retryFixBlock;
 
         const response = await groq.chat.completions.create({
