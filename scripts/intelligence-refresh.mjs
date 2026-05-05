@@ -759,6 +759,9 @@ Return ONLY valid JSON matching this exact structure — no markdown fences, no 
       "reelSuitability": 0.85,
       "freshness": 0.8,
       "confidence": 0.8,
+      "emotionalIntensity": 0.85,
+      "relatability": 0.8,
+      "virality": 0.8,
       "brand_safe": true,
       "source": "trend_analysis|competitor_analysis|intelligence_refresh",
       "rationale": "Why this seed belongs in the bank"
@@ -780,7 +783,7 @@ Generate:
 - 2-4 new_ctas across different platforms (patterns you observed, not generic) — include at least 1 for platform "x", type "engagement"
 - 2-4 new_pattern_interrupts (specific, surprising facts — not vague)
 - 4-8 new_x_post_topics: 2 insight (surprising observation a parent couldn't dismiss), 2 identity (scene-entry micro-moment, NOT a trait list), 1-2 story (mid-action scene fragment). Each must feel like something that HAPPENED, not advice. Avoid: school drop-off, maze on the kitchen wall, quiet morning — those are overused angles.
-- 4-6 new_story_source_seeds for Story Reel V2. Prioritize real or true-style animal moments with built-in stakes, especially rescue, homecoming, loyalty, survival, migration, and parent-young bonds. These are not full scripts yet — they are structured source-bank entries the story generator can later expand.
+- 4-6 new_story_source_seeds for Story Reel V2. Prioritize real or true-style animal moments with built-in stakes, especially rescue, homecoming, loyalty, survival, migration, and parent-young bonds. Bias toward mobile-legible, high-save arcs with a strong emotional image and a clear final echo. These are not full scripts yet — they are structured source-bank entries the story generator can later expand.
 - Complete intelligence_summary
 
 Quality bar: every suggestion must be specific enough to act on immediately. "Kids activities" is too vague. "Spring cleanup maze for 5-year-olds with a vacuum cleaner theme" is specific.`;

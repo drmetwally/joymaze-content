@@ -353,23 +353,51 @@ Stories activate two triggers simultaneously. Apply both:
 }
 
 function scoreStorySeed(seed, themeSeed, trends) {
-  let score = (seed.reelSuitability ?? 0.75) * 3 + (seed.freshness ?? 0.75) * 2 + (seed.confidence ?? 0.7) * 2;
-  const hay = `${seed.title || ''} ${seed.animal || ''} ${seed.coreEvent || ''} ${(seed.visualHooks || []).join(' ')} ${(seed.trendTags || []).join(' ')}`.toLowerCase();
+  let score = (seed.reelSuitability ?? 0.75) * 3
+    + (seed.freshness ?? 0.75) * 1.75
+    + (seed.confidence ?? 0.7) * 1.5
+    + (seed.emotionalIntensity ?? 0.78) * 2.25
+    + (seed.relatability ?? 0.75) * 1.75
+    + (seed.virality ?? 0.72) * 1.75;
+
+  const hay = `${seed.title || ''} ${seed.animal || ''} ${seed.coreEvent || ''} ${(seed.visualHooks || []).join(' ')} ${(seed.trendTags || []).join(' ')} ${(seed.seasonTags || []).join(' ')} ${seed.lane || ''}`.toLowerCase();
   if (themeSeed) {
     const terms = String(themeSeed).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-    score += terms.filter((t) => hay.includes(t)).length * 1.5;
+    score += terms.filter((t) => hay.includes(t)).length * 1.6;
   }
   const trendTerms = (trends?.trending_themes || []).slice(0, 6).flatMap((t) => String(t.theme || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
-  score += trendTerms.filter((t) => hay.includes(t)).length * 0.25;
+  score += trendTerms.filter((t) => hay.includes(t)).length * 0.35;
   return score;
 }
 
+function getStorySeedById(storySourceBank, id) {
+  return Array.isArray(storySourceBank?.seeds)
+    ? storySourceBank.seeds.find((seed) => seed.id === id) || null
+    : null;
+}
+
 function selectStorySourceSeeds(storySourceBank, themeSeed, trends, limit = 6) {
-  const seeds = Array.isArray(storySourceBank?.seeds) ? storySourceBank.seeds : [];
-  return seeds
+  const seeds = (Array.isArray(storySourceBank?.seeds) ? storySourceBank.seeds : [])
     .filter((seed) => seed?.brand_safe !== false && seed?.title && seed?.animal && seed?.coreEvent)
-    .sort((a, b) => scoreStorySeed(b, themeSeed, trends) - scoreStorySeed(a, themeSeed, trends))
-    .slice(0, limit);
+    .map((seed) => ({ ...seed, _score: scoreStorySeed(seed, themeSeed, trends) }))
+    .sort((a, b) => b._score - a._score);
+
+  const byLane = new Map();
+  for (const seed of seeds) {
+    if (!byLane.has(seed.lane)) byLane.set(seed.lane, seed);
+  }
+
+  const diversified = [...byLane.values()].sort((a, b) => b._score - a._score);
+  const selected = [];
+  for (const seed of diversified) {
+    if (selected.length >= limit) break;
+    selected.push(seed);
+  }
+  for (const seed of seeds) {
+    if (selected.length >= limit) break;
+    if (!selected.some((entry) => entry.id === seed.id)) selected.push(seed);
+  }
+  return selected.slice(0, limit);
 }
 
 function buildStorySourceBankBlock(storySourceBank, themeSeed, trends) {
@@ -377,9 +405,15 @@ function buildStorySourceBankBlock(storySourceBank, themeSeed, trends) {
   if (!selected.length) return '';
   const lines = selected.map((seed) => {
     const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
-    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}`;
+    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
   });
   return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. Do not copy it mechanically; expand it into a stronger original reel story with a real hook/body/resolution.\n${lines.join('\n')}`;
+}
+
+function buildSelectedSeedBlock(storySourceBank, outline = null) {
+  const seed = outline?.sourceBankId ? getStorySeedById(storySourceBank, outline.sourceBankId) : null;
+  if (!seed) return '';
+  return `\n\nSELECTED STORY SEED — this is the factual/emotional spine chosen in pass 1. Preserve its core event, stakes, and emotional pattern while making the final story feel richer and more cinematic:\n${JSON.stringify(seed, null, 2)}`;
 }
 
 function buildOutlinePrompt(episodeNum, themeSeed, storySourceBank, trends) {
@@ -435,6 +469,7 @@ function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights
     : '';
 
   const storySourceBankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends);
+  const selectedSeedBlock = buildSelectedSeedBlock(storySourceBank, outline);
 
   const outlineBlock = outline
     ? `\n\nMANDATORY STORY OUTLINE — use this as the exact emotional spine for the final story. Keep the same protagonist identity, core escalation, and ending image. Expand it into stronger narrated beats, do not flatten it back into summary copy:\n${JSON.stringify(outline, null, 2)}`
@@ -526,7 +561,12 @@ Story arcs that travel well for short-form:
 - A lost creature finds their way home
 - Two very different characters become unexpected friends
 - A creature who feels like a burden discovers they are the key
-- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${storySourceBankBlock}${themeBlock}${outlineBlock}
+- An animal faces a fear alone and finds they were never as alone as they thought${bannedCharsBlock}${avoidBlock}${trendsBlock}${weightsBlock}${activeThemesBlock}${competitorBlock}${hookSeedsBlock}${storySourceBankBlock}${themeBlock}${selectedSeedBlock}${outlineBlock}
+
+Extra final-pass rules when a selected seed is provided:
+- Preserve the seed's core event and stakes, do not swap to a different underlying story.
+- Let Beat 5 fully cash out the seed's emotional danger or loneliness.
+- Let Beat 8 echo the seed's most memorable visual hook in a smaller, quieter way.
 
 Before you finalize, self-check every image_prompt:
 - protagonist name appears in every prompt

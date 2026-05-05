@@ -50,3 +50,39 @@
 1. Story reel V2 — Imagen endpoint `v1beta/models/imagen-4.0-generate-001:predict` returns 404; update endpoint/model ID
 2. Animal facts brief — `validateBrief()` throws on Groq malformed output before folder created; needs tolerance or pre-save
 3. 4AM GitHub Actions — `post-content.mjs --scheduled` crashes on empty queue + missing Cloudinary creds; needs graceful fallback
+
+---
+
+### 2026-05-05 | JoyMaze | Story Reel V2 | Story source bank + weekly intelligence seeding + 2-pass generator foundation
+
+**Status:** FOUNDATION COMPLETE, BANK EXPANSION IN PROGRESS
+
+**Completed before this log entry:**
+- Added `config/story-source-bank.json` as a dedicated Story Reel V2 source bank.
+- Extended `scripts/intelligence-refresh.mjs` so weekly intelligence can emit `new_story_source_seeds`.
+- Extended `scripts/apply-intelligence.mjs` so the existing refresh/apply path merges story seeds into the source bank and ages them over time.
+- Upgraded `scripts/generate-story-ideas.mjs` to a 2-pass flow:
+  1. source-bank-aware outline generation
+  2. final story generation from the locked outline spine
+- Persisted source metadata into generated `story.json` via `storySourceBankId` and `storyLane`.
+- Added parse/retry hardening after model output intermittently returned fenced JSON or failed weak image-prompt validation.
+- Real generation through the new bank -> outline -> final-story path succeeded after hardening.
+- Commit pushed: `a866bbd` — `feat: seed story bank from weekly intelligence`
+
+**Durable diagnosis:**
+- Main quality bottleneck is now story depth, not render plumbing.
+- The bank needs stronger high-signal seeds, not just more seeds.
+- Best bank additions should bias toward high-relatability, high-stakes, visually legible animal arcs: rescue, reunion, homecoming, migration, parent-young protection, and loyalty.
+
+**Current next step requested by user:**
+- Update memory and AGENT_LOG first.
+- Then flesh out the story bank by searching for the most relevant / viral / emotionally engaging animal-story patterns first.
+- After bank expansion, tighten the 2-pass step only where the richer bank materially improves selection and copy depth.
+
+**Update after completing that pass:**
+- Bank expanded from 10 -> 20 seeds.
+- Added richer scoring metadata to seeds: `emotionalIntensity`, `relatability`, `virality`.
+- `generate-story-ideas.mjs` now scores against those fields and diversifies the selected candidate set by lane before filling remaining top-scored entries.
+- Final pass now receives the exact selected seed payload from pass 1, so it is less free to drift away from the chosen stakes/event.
+- `intelligence-refresh.mjs` and `apply-intelligence.mjs` were updated so weekly-added seeds can carry the same richer metadata.
+- Live generation validation succeeded after the bank expansion and selected the new swan/cygnet protection lane for the test story.
