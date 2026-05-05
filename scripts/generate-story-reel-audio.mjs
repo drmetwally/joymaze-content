@@ -26,6 +26,7 @@ import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -89,14 +90,13 @@ async function generateKokoroTTS(text, outputPath, speed = 1.0) {
 
 // ── Audio duration via FFmpeg ───────────────────────────────────────────────
 function getAudioDuration(audioPath) {
-  return new Promise((resolve) => {
-    const { exec } = require('child_process');
-    exec(`ffmpeg -i "${audioPath}" -f null - 2>&1`, { timeout: 10000 }, (err, stdout, stderr) => {
-      const output = stdout + stderr;
-      const match = output.match(/Duration:\s*(\d+):(\d+):([\d.]+)/);
-      resolve(match ? +match[1] * 3600 + +match[2] * 60 + parseFloat(match[3]) : null);
-    });
-  });
+  try {
+    const out = execSync(`ffmpeg -i "${audioPath}" -f null - 2>&1`, { timeout: 10000 });
+    const match = out.toString().match(/Duration:\s*(\d+):(\d+):([\d.]+)/);
+    return match ? +match[1] * 3600 + +match[2] * 60 + parseFloat(match[3]) : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 // ── Main ────────────────────────────────────────────────────────────────────
