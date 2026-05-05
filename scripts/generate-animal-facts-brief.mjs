@@ -643,14 +643,20 @@ async function main() {
 
   console.log(`  Calling Groq (${GROQ_MODEL})...`);
   const brief = await callGroq(systemPrompt, userPrompt);
-  validateBrief(brief);
 
+  // Build episodeJson first so we know the folder name regardless of validateBrief outcome
   const episodeJson = buildEpisodeJson(brief, context, artStyle);
   const episodeFolderName = `ep${String(context.nextEpisodeNumber).padStart(2, '0')}-${episodeJson.slug}`;
   const episodeDir = path.join('output', 'longform', 'animal', episodeFolderName).replace(/\\/g, '/');
-  const poolIds = {
-    animal_background_ambient: getLowestUsedPoolEntry(context.sunoPool, 'animal_background_ambient')?.id || null,
-  };
+
+  // validateBrief may throw if Groq returned malformed output -- catch it and report
+  // clearly rather than crashing, so the user can inspect brief.json and retry.
+  let validationError = null;
+  try {
+    validateBrief(brief);
+  } catch (err) {
+    validationError = err;
+  }
 
   console.log('');
   console.log(`  Animal: ${episodeJson.animalName}`);
@@ -660,11 +666,36 @@ async function main() {
   console.log('');
 
   if (!SAVE) {
-    console.log('  Run with --save to create the folder and files.');
+    if (validationError) {
+      console.error(`  \u26a0\ufe0f validateBrief failed: ${validationError.message}`);
+      console.error('  Re-run with --save to write the raw brief for inspection before regenerating.');
+    }
     return;
   }
 
+  // Always create the folder first -- even if validation failed.
+  // This lets the user inspect the raw output and retry without re-running Groq.
   await fs.mkdir(path.join(ANIMAL_LONGFORM_DIR, episodeFolderName), { recursive: true });
+  await fs.writeFile(
+    path.join(ANIMAL_LONGFORM_DIR, episodeFolderName, 'brief-raw.json'),
+    `${JSON.stringify(brief, null, 2)}\n`,
+  );
+
+  if (validationError) {
+    console.error(`  \u26a0\ufe0f validateBrief failed: ${validationError.message}`);
+    console.error(`  Raw brief written to ${episodeDir}/brief-raw.json -- fix the generator and re-run.`);
+    // Write a placeholder episode.json so the folder is complete
+    await fs.writeFile(
+      path.join(ANIMAL_LONGFORM_DIR, episodeFolderName, 'episode.json'),
+      `${JSON.stringify({ error: validationError.message, animalName: episodeJson.animalName }, null, 2)}\n`,
+    );
+    process.exit(1);
+  }
+
+  const poolIds = {
+    animal_background_ambient: getLowestUsedPoolEntry(context.sunoPool, 'animal_background_ambient')?.id || null,
+  };
+
   await fs.writeFile(
     path.join(ANIMAL_LONGFORM_DIR, episodeFolderName, 'episode.json'),
     `${JSON.stringify(episodeJson, null, 2)}\n`,
@@ -681,6 +712,7 @@ async function main() {
 
   console.log(`  Saved to: ${episodeDir}`);
 }
+
 
 main().catch((err) => {
   console.error('Fatal error:', err.message);
