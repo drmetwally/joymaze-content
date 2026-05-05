@@ -1007,6 +1007,619 @@
       "brand_safe": true,
       "source": "researched_bank",
       "rationale": "Call-and-answer structure is excellent for short-form narration and payoff."
+    },
+    {
+      "id": "story_seed_rescue_beaver_001",
+      "title": "Beaver Kit Finds the Water Again",
+      "animal": "beaver",
+      "sourceType": "true_story_style",
+      "lane": "rescue",
+      "coreEvent": "A young beaver slips onto the wrong side of a fallen branch jam until the family opens a narrow path back to the pond.",
+      "emotionalPattern": "exploring -> trapped -> panic -> family effort -> safe return",
+      "stakes": "If the kit stays stranded too long, dusk comes before it can reach deep water and shelter.",
+      "endingType": "family_channel_rescue",
+      "visualHooks": [
+        "branch-choked stream",
+        "small wet beaver against timber",
+        "opening water lane at dusk"
+      ],
+      "seasonTags": [
+        "autumn",
+        "evening"
+      ],
+      "trendTags": [
+        "Forest/Woodland",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.91,
+      "freshness": 0.9,
+      "confidence": 0.86,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.84,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Physical obstruction plus family teamwork gives this rescue lane clean visual progression."
+    },
+    {
+      "id": "story_seed_rescue_seal_001",
+      "title": "Seal Pup Slips Through the Tide Gap",
+      "animal": "seal",
+      "sourceType": "true_story_style",
+      "lane": "rescue",
+      "coreEvent": "A seal pup is trapped in a fast-emptying tide pool until its mother keeps nudging it toward one narrow channel back to the sea.",
+      "emotionalPattern": "play -> stranded -> rising fear -> repeated nudges -> breakthrough",
+      "stakes": "If the water drops too low, the pup is stuck exposed on the rocks before the next wave returns.",
+      "endingType": "mother_guided_escape",
+      "visualHooks": [
+        "silver pool in dark rocks",
+        "small seal flippers splashing",
+        "single gap to open water"
+      ],
+      "seasonTags": [
+        "summer",
+        "coast"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.91,
+      "confidence": 0.88,
+      "emotionalIntensity": 0.92,
+      "relatability": 0.86,
+      "virality": 0.87,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Strong rescue stakes with a tiny visible exit make it mobile-legible."
+    },
+    {
+      "id": "story_seed_rescue_giraffe_001",
+      "title": "Giraffe Calf Rises From the Mud",
+      "animal": "giraffe",
+      "sourceType": "true_story_style",
+      "lane": "rescue",
+      "coreEvent": "After sliding into riverbank mud, a giraffe calf cannot steady its legs until the herd circles close enough to keep it trying.",
+      "emotionalPattern": "slip -> struggle -> near giving up -> herd support -> standing again",
+      "stakes": "If the calf stays down in the mud, night and cold arrive before the herd can move on.",
+      "endingType": "encouraged_recovery",
+      "visualHooks": [
+        "gold calf in dark mud",
+        "long legs folding",
+        "ring of tall adults at sunset"
+      ],
+      "seasonTags": [
+        "dry season",
+        "sunset"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.9,
+      "freshness": 0.89,
+      "confidence": 0.84,
+      "emotionalIntensity": 0.91,
+      "relatability": 0.82,
+      "virality": 0.85,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Large-scale contrast and repeated effort give this rescue story emotional lift."
+    },
+    {
+      "id": "story_seed_rescue_hummingbird_001",
+      "title": "Hummingbird Finds the Open Pane",
+      "animal": "hummingbird",
+      "sourceType": "true_story_style",
+      "lane": "rescue",
+      "coreEvent": "A hummingbird trapped inside a bright glass room keeps striking the light until another bird's call draws it toward the one open window.",
+      "emotionalPattern": "confusion -> repeated failure -> fading energy -> guiding call -> freedom",
+      "stakes": "If the bird wastes its strength against the glass, it cannot reach the open air in time.",
+      "endingType": "call_guided_escape",
+      "visualHooks": [
+        "tiny bird against huge window light",
+        "blurred wings near glass",
+        "one open pane to the garden"
+      ],
+      "seasonTags": [
+        "spring",
+        "morning"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Animals",
+        "Home"
+      ],
+      "reelSuitability": 0.91,
+      "freshness": 0.92,
+      "confidence": 0.82,
+      "emotionalIntensity": 0.89,
+      "relatability": 0.9,
+      "virality": 0.88,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Very clear visual problem and a tiny fragile protagonist make this easy to feel."
+    },
+    {
+      "id": "story_seed_migration_monarch_001",
+      "title": "Monarch Finds the Warm Current South",
+      "animal": "monarch butterfly",
+      "sourceType": "real_behavior",
+      "lane": "migration",
+      "coreEvent": "A late monarch falls behind the moving cluster after cold rain, then rises again by catching one thin ribbon of warm afternoon air.",
+      "emotionalPattern": "delay -> isolation -> weakness -> lift -> rejoining",
+      "stakes": "If the butterfly cannot regain height before sunset, the migratory stream moves on without it.",
+      "endingType": "thermal_rejoin",
+      "visualHooks": [
+        "orange wings in gray rain",
+        "single butterfly over road",
+        "sunlit current of monarchs"
+      ],
+      "seasonTags": [
+        "autumn",
+        "migration"
+      ],
+      "trendTags": [
+        "Nature",
+        "Butterflies",
+        "Seasonal"
+      ],
+      "reelSuitability": 0.9,
+      "freshness": 0.93,
+      "confidence": 0.86,
+      "emotionalIntensity": 0.88,
+      "relatability": 0.81,
+      "virality": 0.84,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Migration with a tiny hero and one visible turning point is highly reel-friendly."
+    },
+    {
+      "id": "story_seed_migration_salmon_001",
+      "title": "Salmon Leaps the Last White Water",
+      "animal": "salmon",
+      "sourceType": "real_behavior",
+      "lane": "migration",
+      "coreEvent": "A small salmon reaches the final brutal rapid and fails again and again before one perfect leap carries it upstream.",
+      "emotionalPattern": "arrival -> repeated failure -> exhaustion -> final attempt -> breakthrough",
+      "stakes": "If the fish cannot clear the rapid now, the spawning stream remains out of reach.",
+      "endingType": "final_leap_success",
+      "visualHooks": [
+        "silver fish in white spray",
+        "dark rock wall",
+        "single clean leap into sunlight"
+      ],
+      "seasonTags": [
+        "autumn",
+        "river"
+      ],
+      "trendTags": [
+        "Nature",
+        "River Life",
+        "Animals"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.9,
+      "confidence": 0.9,
+      "emotionalIntensity": 0.91,
+      "relatability": 0.78,
+      "virality": 0.85,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Natural repeat-and-breakthrough structure gives strong narrative rhythm."
+    },
+    {
+      "id": "story_seed_migration_crane_001",
+      "title": "Young Crane Holds the Line in Crosswind",
+      "animal": "crane",
+      "sourceType": "real_behavior",
+      "lane": "migration",
+      "coreEvent": "On its first long crossing, a young crane drifts wide in harsh crosswind until it learns how to settle back into the line.",
+      "emotionalPattern": "first journey -> drift -> fear -> adjustment -> belonging in formation",
+      "stakes": "If the crane keeps losing the line, it wastes the strength needed for the crossing.",
+      "endingType": "formation_mastery",
+      "visualHooks": [
+        "V-formation over water",
+        "one bird slipping wide",
+        "sunlit line restored"
+      ],
+      "seasonTags": [
+        "autumn",
+        "migration",
+        "sky"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Nature",
+        "Animals"
+      ],
+      "reelSuitability": 0.89,
+      "freshness": 0.91,
+      "confidence": 0.87,
+      "emotionalIntensity": 0.87,
+      "relatability": 0.8,
+      "virality": 0.83,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Visually clear line-break and line-return make migration readable on mobile."
+    },
+    {
+      "id": "story_seed_migration_whale_001",
+      "title": "Whale Calf Follows the Song Through Fog",
+      "animal": "whale",
+      "sourceType": "true_story_style",
+      "lane": "migration",
+      "coreEvent": "A whale calf loses sight of the pod in thick sea fog and keeps moving only because one low song keeps finding it.",
+      "emotionalPattern": "separation -> fear -> invisible guidance -> trust -> reunion in open water",
+      "stakes": "If the calf turns the wrong way in the fog, the migration route disappears into open distance.",
+      "endingType": "song_guided_reunion",
+      "visualHooks": [
+        "gray sea fog",
+        "small back beside vast water",
+        "dark pod shapes emerging"
+      ],
+      "seasonTags": [
+        "migration",
+        "winter"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.92,
+      "confidence": 0.88,
+      "emotionalIntensity": 0.92,
+      "relatability": 0.84,
+      "virality": 0.87,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Song-led migration has strong audio imagination and emotional pull."
+    },
+    {
+      "id": "story_seed_migration_caribou_001",
+      "title": "Caribou Calf Crosses the Melt River",
+      "animal": "caribou",
+      "sourceType": "real_behavior",
+      "lane": "migration",
+      "coreEvent": "A caribou calf reaches the spring melt river too tired to enter until the herd keeps moving just slowly enough for it to try.",
+      "emotionalPattern": "long journey -> hesitation -> overwhelm -> steady courage -> crossing",
+      "stakes": "If the calf cannot cross with the herd, it is stranded on the wrong bank of the migration route.",
+      "endingType": "migration_crossing_success",
+      "visualHooks": [
+        "wide cold river",
+        "small calf at edge",
+        "antlers and wake lines downstream"
+      ],
+      "seasonTags": [
+        "spring",
+        "migration"
+      ],
+      "trendTags": [
+        "Arctic Animals",
+        "Nature",
+        "Animals"
+      ],
+      "reelSuitability": 0.9,
+      "freshness": 0.9,
+      "confidence": 0.85,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.82,
+      "virality": 0.84,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Migration crossing gives immediate stakes and a strong family-scale frame."
+    },
+    {
+      "id": "story_seed_loyalty_horse_001",
+      "title": "Foal Stays Beside the Old Mare",
+      "animal": "horse",
+      "sourceType": "true_story_style",
+      "lane": "loyalty",
+      "coreEvent": "When the herd moves toward the barn before the storm, one young foal keeps slowing down because the oldest mare behind it cannot keep pace.",
+      "emotionalPattern": "warning -> pull to safety -> choice to stay -> shared struggle -> arrival together",
+      "stakes": "If they do not reach shelter before the rain breaks, both are left exposed in the open field.",
+      "endingType": "stayed_together",
+      "visualHooks": [
+        "dark storm line over pasture",
+        "small foal looking back",
+        "old mare and foal at barn light"
+      ],
+      "seasonTags": [
+        "spring storm",
+        "evening"
+      ],
+      "trendTags": [
+        "Farm Animals",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.91,
+      "freshness": 0.89,
+      "confidence": 0.84,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.89,
+      "virality": 0.85,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Loyalty shown through one repeated choice feels clear and touching."
+    },
+    {
+      "id": "story_seed_loyalty_goose_001",
+      "title": "Goose Refuses to Leave the Shore",
+      "animal": "goose",
+      "sourceType": "true_story_style",
+      "lane": "loyalty",
+      "coreEvent": "As the flock lifts from the lake, one goose stays circling low because its partner is still struggling in reeds near the shore.",
+      "emotionalPattern": "departure -> refusal -> waiting -> effort -> takeoff together",
+      "stakes": "If the pair cannot leave before dark, the cold shoreline becomes dangerous overnight.",
+      "endingType": "paired_departure",
+      "visualHooks": [
+        "flock lifting from water",
+        "single goose circling back",
+        "reed edge takeoff at dusk"
+      ],
+      "seasonTags": [
+        "autumn",
+        "lake"
+      ],
+      "trendTags": [
+        "Birds/Sky",
+        "Nature",
+        "Animals"
+      ],
+      "reelSuitability": 0.9,
+      "freshness": 0.88,
+      "confidence": 0.83,
+      "emotionalIntensity": 0.91,
+      "relatability": 0.87,
+      "virality": 0.84,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "A visible choice not to leave gives loyalty lane a strong hook."
+    },
+    {
+      "id": "story_seed_loyalty_meerkat_001",
+      "title": "Meerkat Waits at the Burrow Mouth",
+      "animal": "meerkat",
+      "sourceType": "true_story_style",
+      "lane": "loyalty",
+      "coreEvent": "One meerkat refuses to disappear underground when its smallest sibling is still racing back across open sand.",
+      "emotionalPattern": "alarm -> everybody runs -> one stays -> tense wait -> last-second return",
+      "stakes": "If the small sibling reaches the burrow too late, it is left exposed in the open.",
+      "endingType": "last_one_home",
+      "visualHooks": [
+        "burrow at golden dusk",
+        "tiny meerkat sprinting",
+        "one upright lookout waiting"
+      ],
+      "seasonTags": [
+        "sunset",
+        "dry season"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.9,
+      "confidence": 0.86,
+      "emotionalIntensity": 0.91,
+      "relatability": 0.85,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "The hold-at-the-door structure is tiny, tense, and highly shareable."
+    },
+    {
+      "id": "story_seed_loyalty_otter_001",
+      "title": "Otter Pup Won't Let Go in the Current",
+      "animal": "sea otter",
+      "sourceType": "true_story_style",
+      "lane": "loyalty",
+      "coreEvent": "A young otter drifts in rough kelp water but keeps one paw locked to its mother's until the swell settles.",
+      "emotionalPattern": "play -> rough water -> fear -> holding on -> calm restored",
+      "stakes": "If the pup lets the current pull it wide, it loses the safety of the kelp raft.",
+      "endingType": "held_on",
+      "visualHooks": [
+        "dark green kelp bed",
+        "tiny paw gripping fur",
+        "swells calming under evening light"
+      ],
+      "seasonTags": [
+        "coast",
+        "evening"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.91,
+      "confidence": 0.88,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.9,
+      "virality": 0.88,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "One tiny gripping detail gives this loyalty story a strong screenshot moment."
+    },
+    {
+      "id": "story_seed_survival_fox_001",
+      "title": "Fox Cub Follows the Shade Line",
+      "animal": "fennec fox",
+      "sourceType": "true_story_style",
+      "lane": "survival",
+      "coreEvent": "A fox cub caught too far from the burrow in rising heat keeps stopping in the wrong places until it learns to move from one patch of shade to the next.",
+      "emotionalPattern": "wandering -> heat danger -> bad choices -> pattern learned -> safe return",
+      "stakes": "If the cub crosses open sand too long at once, the heat drains its strength before it reaches cover.",
+      "endingType": "survival_by_learning",
+      "visualHooks": [
+        "small fox in white heat",
+        "tiny shadows under stones",
+        "burrow entrance in cool dusk"
+      ],
+      "seasonTags": [
+        "summer",
+        "desert"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.9,
+      "freshness": 0.9,
+      "confidence": 0.85,
+      "emotionalIntensity": 0.9,
+      "relatability": 0.81,
+      "virality": 0.84,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Survival through one simple discovered rule works well for kids-story pacing."
+    },
+    {
+      "id": "story_seed_survival_puffin_001",
+      "title": "Puffin Brings the Last Fish Home",
+      "animal": "puffin",
+      "sourceType": "true_story_style",
+      "lane": "survival",
+      "coreEvent": "In rough wind and failing light, a puffin keeps searching until it finally carries one last fish back across the cliff air to the waiting nest.",
+      "emotionalPattern": "need -> repeated search -> worsening conditions -> final find -> return",
+      "stakes": "If the puffin returns empty, the chick waits one more cold night without enough food.",
+      "endingType": "hard_won_return",
+      "visualHooks": [
+        "darkening sea cliff",
+        "small fish gleaming in beak",
+        "nest mouth in rain wind"
+      ],
+      "seasonTags": [
+        "summer",
+        "storm"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Birds/Sky",
+        "Nature"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.89,
+      "confidence": 0.87,
+      "emotionalIntensity": 0.92,
+      "relatability": 0.84,
+      "virality": 0.87,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Clear need, worsening weather, and one final success create strong reel tension."
+    },
+    {
+      "id": "story_seed_survival_frog_001",
+      "title": "Tree Frog Holds Through the Downpour",
+      "animal": "tree frog",
+      "sourceType": "true_story_style",
+      "lane": "survival",
+      "coreEvent": "A tiny tree frog is nearly washed from its leaf by a tropical downpour until it finds the one vein strong enough to hold.",
+      "emotionalPattern": "quiet perch -> sudden storm -> slipping -> tiny adjustment -> survival",
+      "stakes": "If the frog loses its grip, the floodwater below sweeps it out of the safe canopy.",
+      "endingType": "tiny_hold_survival",
+      "visualHooks": [
+        "neon frog on giant leaf",
+        "water hammering green surface",
+        "small toes locked to leaf vein"
+      ],
+      "seasonTags": [
+        "rainy season",
+        "jungle"
+      ],
+      "trendTags": [
+        "Safari and Jungle",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.89,
+      "freshness": 0.92,
+      "confidence": 0.83,
+      "emotionalIntensity": 0.88,
+      "relatability": 0.79,
+      "virality": 0.84,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Macro-scale visuals and one tiny physical solution make this memorable."
+    },
+    {
+      "id": "story_seed_parent_kangaroo_001",
+      "title": "Kangaroo Mother Turns Her Pouch From the Dust",
+      "animal": "kangaroo",
+      "sourceType": "true_story_style",
+      "lane": "parent_bond",
+      "coreEvent": "When desert wind lifts into a dust wall, a kangaroo mother keeps changing her stance so the joey in her pouch can breathe and stay calm.",
+      "emotionalPattern": "warning -> storm rise -> shielding -> endurance -> calm after",
+      "stakes": "If she turns the wrong way too long, the joey takes the full dust and panic of the storm.",
+      "endingType": "shielding_parent",
+      "visualHooks": [
+        "red dust wall",
+        "joey eyes inside pouch",
+        "mother braced against wind"
+      ],
+      "seasonTags": [
+        "summer",
+        "desert"
+      ],
+      "trendTags": [
+        "Animals",
+        "Parenting",
+        "Nature"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.91,
+      "confidence": 0.86,
+      "emotionalIntensity": 0.92,
+      "relatability": 0.92,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "A single protective body action carries the whole emotional meaning."
+    },
+    {
+      "id": "story_seed_parent_polarbear_001",
+      "title": "Polar Bear Cub Crosses the First Crack",
+      "animal": "polar bear",
+      "sourceType": "true_story_style",
+      "lane": "parent_bond",
+      "coreEvent": "A polar bear cub freezes at its first open ice crack until its mother lowers herself into the cold gap to show exactly where to step.",
+      "emotionalPattern": "journey -> fear stop -> patient modeling -> brave copy -> crossing",
+      "stakes": "If the cub cannot cross here, the pair is cut off from the safer sheet ahead.",
+      "endingType": "modeled_courage",
+      "visualHooks": [
+        "white cub at blue ice gap",
+        "mother half in dark water",
+        "small paw over narrow bridge"
+      ],
+      "seasonTags": [
+        "winter",
+        "arctic"
+      ],
+      "trendTags": [
+        "Arctic Animals",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.9,
+      "confidence": 0.85,
+      "emotionalIntensity": 0.93,
+      "relatability": 0.9,
+      "virality": 0.87,
+      "brand_safe": true,
+      "source": "curated_expansion",
+      "rationale": "Parent modeling rather than just rescuing gives this lane a stronger identity."
     }
   ]
 }

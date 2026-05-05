@@ -25,7 +25,7 @@
     "import:raw": "node scripts/import-raw.mjs",
     "generate:prompts": "node scripts/generate-prompts.mjs --save",
     "archive": "node scripts/archive-queue.mjs",
-    "daily": "node scripts/archive-queue.mjs && node scripts/collect-analytics.mjs && node scripts/track-output.mjs && node scripts/collect-trends.mjs --monday-only && node scripts/weekly-scorecard.mjs --monday-only --save && node scripts/intelligence-refresh.mjs --monday-only && node scripts/apply-intelligence.mjs --monday-only && node scripts/intelligence-refresh.mjs --competitor-only --monday-only && node scripts/generate-prompts.mjs --save && node scripts/generate-story-ideas.mjs --save && node scripts/generate-asmr-brief.mjs --save && node scripts/generate-challenge-brief.mjs --save && node scripts/generate-x-posts.mjs",
+    "daily": "node scripts/daily-run.mjs",
     "weekly": "node scripts/collect-trends.mjs && node scripts/intelligence-refresh.mjs && node scripts/apply-intelligence.mjs && node scripts/intelligence-refresh.mjs --competitor-only",
     "generate:story:ideas": "node scripts/generate-story-ideas.mjs",
     "generate:story:idea": "node scripts/generate-story-ideas.mjs --save",

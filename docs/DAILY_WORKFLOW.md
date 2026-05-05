@@ -13,6 +13,8 @@ This is the current real workflow, matching the repo automation.
 npm run daily
 ```
 
+This is now the canonical full daily pipeline. The scheduler calls this same flow on schedule.
+
 This now does all of this automatically:
 - archives yesterday's queue
 - generates today's prompt file
@@ -27,6 +29,12 @@ This now does all of this automatically:
 - runs Monday intelligence refresh steps when applicable
 
 ---
+
+## Scheduler relationship
+
+- `npm run daily` = canonical full generation pipeline
+- `node scripts/daily-scheduler.mjs` = timing wrapper that runs `npm run daily` automatically at the scheduled time
+- goal: manual and scheduled runs use the same underlying daily flow, so they cannot drift
 
 ## What is now automatic vs manual
 
