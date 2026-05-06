@@ -103,6 +103,14 @@
     "ext_rescue_act2": {
       "file": "assets/sfx/external/freesound/rescue/gentle-whoosh-810737.mp3",
       "volume": 0.13
+    },
+    "ext_migration_hook_act1": {
+      "file": "assets/sfx/external/freesound/migration/wind-sky-soft-464108.mp3",
+      "volume": 0.16
+    },
+    "ext_migration_act2": {
+      "file": "assets/sfx/external/freesound/migration/distant-wind-ambience-118118.mp3",
+      "volume": 0.16
     }
   },
   "_note": "Add files to assets/sfx/ subfolders. Render script resolves tags at render time — missing files fall back silently."

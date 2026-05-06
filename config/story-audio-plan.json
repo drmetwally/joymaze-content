@@ -110,9 +110,9 @@
     },
     "migration": {
       "musicPool": "soft_doc",
-      "hookSfxTag": "hook_tension",
-      "act1SfxTag": "middle_motion",
-      "act2SfxTag": "middle_night",
+      "hookSfxTag": "ext_migration_hook_act1",
+      "act1SfxTag": "ext_migration_hook_act1",
+      "act2SfxTag": "ext_migration_act2",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
         "music": [
@@ -121,7 +121,7 @@
         ],
         "sfx": [
           "freesound:wind sky soft",
-          "freesound:distant ambience"
+          "freesound:distant wind ambience"
         ]
       }
     },

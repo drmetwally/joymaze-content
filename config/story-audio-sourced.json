@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-06T20:56:47.783Z",
+  "generatedAt": "2026-05-06T21:03:42.090Z",
   "downloads": [
     {
       "fetchedAt": "2026-05-06T20:40:03.791Z",
@@ -253,6 +253,62 @@
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "relativePath": "assets/sfx/external/freesound/rescue/gentle-whoosh-810737.mp3",
       "tagName": "ext_rescue_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T21:02:58.371Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "migration",
+      "query": "wind sky soft",
+      "id": 464108,
+      "title": "Soaring Clouds",
+      "audioUrl": "https://cdn.freesound.org/previews/464/464108_1755779-lq.mp3",
+      "username": "bruce965",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/migration/wind-sky-soft-464108.mp3",
+      "tagName": "ext_migration_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T21:02:59.225Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "migration",
+      "query": "distant ambience",
+      "id": 389497,
+      "title": "12 farm ambience sound; ducks swimming in a pond; distant; cars passing by; nature.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/389/389497_4223293-lq.mp3",
+      "username": "juanlopz08",
+      "license": "http://creativecommons.org/licenses/by/3.0/",
+      "relativePath": "assets/sfx/external/freesound/migration/distant-ambience-389497.mp3",
+      "tagName": "ext_migration_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T21:03:41.243Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "migration",
+      "query": "wind sky soft",
+      "id": 464108,
+      "title": "Soaring Clouds",
+      "audioUrl": "https://cdn.freesound.org/previews/464/464108_1755779-lq.mp3",
+      "username": "bruce965",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/migration/wind-sky-soft-464108.mp3",
+      "tagName": "ext_migration_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T21:03:42.090Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "migration",
+      "query": "distant wind ambience",
+      "id": 118118,
+      "title": "Spring Evening Ambience -- Crickets, Distant Highway, Leaves Blowing, Slight Wind.WAV",
+      "audioUrl": "https://cdn.freesound.org/previews/118/118118_2123345-lq.mp3",
+      "username": "Ndheger",
+      "license": "http://creativecommons.org/licenses/by/3.0/",
+      "relativePath": "assets/sfx/external/freesound/migration/distant-wind-ambience-118118.mp3",
+      "tagName": "ext_migration_act2"
     }
   ]
 }
