@@ -118,13 +118,30 @@ function extractHeroClause(prompt) {
   return `${match[1]} — ${match[2].trim()}`;
 }
 
+function extractStyleClause(prompt) {
+  const sentences = prompt
+    .split(/\.(?:\s+|$)/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const styleSentence = [...sentences].reverse().find((sentence) => /watercolor|paper grain|brush|gouache|pastel|storybook|illustration|pixar|3d|render|painted|cel[- ]shaded|ink|anime/i.test(sentence));
+  return styleSentence || '';
+}
+
 function buildImagenPrompt(prompt) {
   const adapted = adaptPromptForImagen(prompt);
   const heroClause = extractHeroClause(prompt);
+  const styleClause = extractStyleClause(prompt);
   const heroGuard = heroClause
     ? `Important continuity rule: ${heroClause}. Render this named protagonist only as that exact non-human animal with the described visible body traits. No humans, no dolls, no mammal substitution, no species swap. `
     : 'Important continuity rule: keep the protagonist exactly as described, as a non-human animal only. No humans, dolls, mammal substitution, or species swap. ';
-  return `Children's story illustration. No text, no logos, no watermark. ${heroGuard}The named protagonist must remain the first and dominant subject in frame. ${adapted}`;
+  const anatomyGuard = 'Visible anatomy must read immediately as animal anatomy, not human anatomy: show species-defining features such as beak, feathers, wings, paws, tail, fur, or animal body silhouette. Never render a human-style face, person, child, adult, human portrait, studio headshot, passport-photo framing, glasses, suit, jacket, or human clothing. If the shot is a close-up, it must still read unmistakably as an animal close-up.';
+  const sideCharacterGuard = 'Any companion or secondary character must also be a non-human animal described by the scene. Never introduce a human helper, parent, child, or bystander unless the prompt explicitly asks for one, and these story prompts do not.';
+  const layoutGuard = 'Use one single full-frame illustration only. No split panels, no comic layout, no diptych, no triptych, no collage, no before-and-after layout, and no multiple separate scenes inside one frame.';
+  const styleGuard = styleClause
+    ? `Important style rule: keep the exact same illustration medium and character-design language across every slide. ${styleClause}. Preserve the same brushwork, line weight, palette treatment, and storybook finish. No photorealism, no live-action look, no glossy 3D rendering, no toy-like plastic texture, and no wildlife-photo realism. `
+    : 'Important style rule: keep one consistent 2D children\'s-book illustration style across every slide. Preserve the same brushwork, line weight, palette treatment, and storybook finish. No photorealism, no live-action look, no glossy 3D rendering, and no wildlife-photo realism. ';
+  return `Children's story illustration. No text, no logos, no watermark. ${heroGuard}${anatomyGuard} ${sideCharacterGuard} ${layoutGuard} ${styleGuard}The named protagonist must remain the first and dominant subject in frame. ${adapted}`;
 }
 
 async function generateWithImagen(prompt) {

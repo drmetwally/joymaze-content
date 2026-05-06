@@ -609,11 +609,19 @@ function validateOutline(outline) {
   }
 }
 
+function buildStyleAnchor(style) {
+  const raw = String(style || '').trim();
+  if (!raw) return '';
+  const clause = raw.replace(/\.*\s*$/, '');
+  return `Keep the exact same illustration style across all slides: ${clause}. No photorealism, no glossy 3D, no live-action look.`;
+}
+
 function repairStoryConsistency(story) {
   if (!story || !Array.isArray(story.slides)) return story;
   const character = String(story.character || '').trim();
   const characterName = character.split(/[—,-]/)[0]?.trim();
   if (!character || !characterName) return story;
+  const styleAnchor = buildStyleAnchor(story.style);
 
   story.slides = story.slides.map((slide) => {
     let prompt = String(slide.image_prompt || '').trim();
@@ -628,6 +636,10 @@ function repairStoryConsistency(story) {
       prompt = `${intro}${prompt}`;
     } else if (!earlyName) {
       prompt = `${intro}${prompt}`;
+    }
+
+    if (styleAnchor && !prompt.toLowerCase().includes('keep the exact same illustration style across all slides')) {
+      prompt = `${prompt.replace(/\.*\s*$/, '')}. ${styleAnchor}`;
     }
 
     if (!/Generate at 9:16 portrait ratio \(1080×1920 pixels\)\.?$/i.test(prompt)) {
@@ -657,6 +669,7 @@ function validateGeneratedStory(story) {
       .split(/\s+/)
       .filter((word) => word.length >= 4)
   );
+  const styleAnchor = buildStyleAnchor(story.style);
 
   if (!character || descriptorWords.size < 4) {
     throw new Error('Character description is too weak for image consistency.');
@@ -690,6 +703,9 @@ function validateGeneratedStory(story) {
     const overlap = [...descriptorWords].filter((word) => promptWords.has(word)).length;
     if (overlap < Math.min(3, descriptorWords.size)) {
       throw new Error(`Slide ${index + 1} image_prompt does not repeat enough hero descriptors.`);
+    }
+    if (styleAnchor && !prompt.toLowerCase().includes('keep the exact same illustration style across all slides')) {
+      throw new Error(`Slide ${index + 1} image_prompt is missing the style anchor.`);
     }
   });
 }
