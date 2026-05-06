@@ -232,8 +232,8 @@ Beat 1 is the only chance to stop a scroll. The first sentence must create an un
 
 Each slide's narration is read aloud at TTS speed 0.85. The reel must feel like a real narrated story, not clipped captions.
 
-**TARGET: 18–28 words per slide.**
-**Beat 1 hard cap: 16 words. Beat 8 hard cap: 14 words.**
+**TARGET: 22–36 words per slide.**
+**Beat 1 hard cap: 18 words. Beat 8 hard cap: 16 words.**
 
 Use enough language to create a meaningful narrated beat. Short-form does not mean emotionally empty.
 
@@ -241,10 +241,12 @@ Other rules:
 - 1–2 sentences per slide. Never 3.
 - Beat 1: ONE sentence maximum. Immediate danger, tension, or open loop.
 - Beats 2–6: give enough detail that the viewer feels progression, not summary.
+- Real-story lanes should sound observed and specific, not like a bedtime fable compressed into bullet points.
 - Beat 5: the emotional bottom must breathe. Let the sentence feel heavy, not rushed.
 - Beats 6, 7, and 8 must each do different work. Do not collapse the turn, the payoff, and the afterglow into one rushed resolution.
 - Beat 7: resolution must show change, not just success.
 - Beat 7 must include a concrete reward image or felt release the viewer can emotionally cash out.
+- When the story is based on a real incident or real behavior seed, the narration should feel like a documentary retelling with emotional texture, not an invented fairy-tale summary.
 - Beat 8: ONE sentence only. No CTA. No moral. No "more story" energy. It should feel like the world continues after the reel loops.
 - Beat 8 should let the viewer sit inside the earned ending for one extra breath.
 - No passive voice. Minimal adverbs. No adjective stacking.
@@ -415,13 +417,13 @@ function buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferred
     const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
     return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
   });
-  return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. Do not copy it mechanically; expand it into a stronger original reel story with a real hook/body/resolution.\n${lines.join('\n')}`;
+  return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. If the selected seed is grounded in real behavior or a real incident, preserve the factual sequence and stakes instead of flattening it into a generic fable. Add emotional narration, but do not abandon the seed's real spine.\n${lines.join('\n')}`;
 }
 
 function buildSelectedSeedBlock(storySourceBank, outline = null) {
   const seed = outline?.sourceBankId ? getStorySeedById(storySourceBank, outline.sourceBankId) : null;
   if (!seed) return '';
-  return `\n\nSELECTED STORY SEED — this is the factual/emotional spine chosen in pass 1. Preserve its core event, stakes, and emotional pattern while making the final story feel richer and more cinematic:\n${JSON.stringify(seed, null, 2)}`;
+  return `\n\nSELECTED STORY SEED — this is the factual/emotional spine chosen in pass 1. Preserve its core event, stakes, emotional pattern, and sequence of events. Treat real seeds as documentary-emotional hybrids: stay faithful to what happened, then heighten the feeling, sensory detail, and payoff without turning the story into fiction. If the seed contains no exact date/place/source detail, do not invent fake factual specifics.\n${JSON.stringify(seed, null, 2)}`;
 }
 
 function buildOutlinePrompt(episodeNum, themeSeed, storySourceBank, trends, preferredLane = null) {
@@ -460,6 +462,8 @@ Return ONLY JSON with this exact structure:
 Rules:
 - Pick one source-bank seed if available and make it the spine.
 - Keep the protagonist a non-human animal.
+- If the chosen seed is a real behavior or true-story-style seed, preserve the real event order and true underlying stakes rather than replacing them with a looser invented arc.
+- When real-world context exists in the seed, you may use factual framing in the hook, such as a year, season, place, or witnessed incident detail. Never invent fake dates or fake documentary facts.
 - The beatPlan must escalate cleanly and feel narratable, not like summaries.
 - Beat 5 must hurt. Beat 8 must be screenshot-worthy.
 - No markdown fences. JSON only.`;
@@ -575,7 +579,9 @@ The story must:
 7. Also write a separate hookQuestion for short-form reels. It should be 8-14 words, create a curiosity gap, and be answered only by the final beat.
 8. Also write a separate outroEcho that is only 4-8 words, emotionally resonant, and not a CTA.
 9. Most important: the story must feel narratable. Build a true hook, body escalation, and resolution across the reel-worthy beats — not eight clipped summaries.
-10. Use the intelligence inputs aggressively: strongest hooks, emotional patterning, and top-performing thematic overlaps should shape copy choices, not just theme choice.
+10. When the selected seed is grounded in a real incident or real behavior, tell that story more faithfully instead of summarizing it into a generic moral arc. Preserve the actual chain of pressure, attempt, setback, turn, and payoff.
+11. Use a documentary-emotional narration style for real seeds: precise, observed, and grounded, but still emotionally rich.
+12. Use the intelligence inputs aggressively: strongest hooks, emotional patterning, and top-performing thematic overlaps should shape copy choices, not just theme choice.
 
 Story arcs that travel well for short-form:
 - A small animal solves a big problem through cleverness, not strength
@@ -586,8 +592,11 @@ Story arcs that travel well for short-form:
 
 Extra final-pass rules when a selected seed is provided:
 - Preserve the seed's core event and stakes, do not swap to a different underlying story.
+- Preserve the sequence of what happens, especially for real or real-behavior seeds.
 - Let Beat 5 fully cash out the seed's emotional danger or loneliness.
+- Let Beat 7 visibly reward the viewer with safety, reunion, relief, nourishment, warmth, or return.
 - Let Beat 8 echo the seed's most memorable visual hook in a smaller, quieter way.
+- If authentic factual framing exists, Beat 1 or the hookQuestion may use it to create authority and curiosity, but never fabricate it.
 
 Before you finalize, self-check every image_prompt:
 - protagonist name appears in every prompt
@@ -773,6 +782,7 @@ async function saveStory(story, episodeNum) {
     hookQuestion: story.hookQuestion || story.hook || null,
     outroEcho: story.outroEcho || null,
     storySourceBankId: story.storySourceBankId || story.sourceBankId || null,
+    storySourceType: story.storySourceType || null,
     storyLane: story.storyLane || null,
     reelSlideOrder,
     slides: story.slides.map(s => ({
@@ -927,8 +937,10 @@ async function main() {
 
         validateGeneratedStory(story);
 
+        const selectedSeed = getStorySeedById(storySourceBank, outline.sourceBankId);
         story.episode = episodeNum + i;
         story.storySourceBankId = outline.sourceBankId || null;
+        story.storySourceType = selectedSeed?.sourceType || null;
         story.storyLane = outline.storyLane || null;
         story.storyOutline = outline.beatPlan;
         stories.push(story);

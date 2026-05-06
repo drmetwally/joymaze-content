@@ -4,7 +4,7 @@
     "last_updated": "2026-05-05",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries": 120,
-    "description": "Grounded story seeds for Story Reel V2. Bank prioritizes emotionally legible, visually direct, high-save animal arcs: rescue, reunion, migration, homecoming, loyalty, and parent-young protection. Used as inspiration and scaffolding, not copied verbatim."
+    "description": "Grounded story seeds for Story Reel V2. Bank prioritizes emotionally legible, visually direct, high-save animal arcs: rescue, reunion, migration, homecoming, loyalty, and parent-young protection. For real-behavior and true-story-style seeds, preserve the real spine and event order, then add emotional narration and cinematic detail without fabricating facts."
   },
   "seeds": [
     {

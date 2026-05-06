@@ -251,6 +251,30 @@ function buildDefaultReelSlideOrder(slides = []) {
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 
+function getStoryReelSlideDurationFrames(captionText = '', story = {}) {
+  const fps = 30;
+  const wordCount = String(captionText).split(/\s+/).filter(Boolean).length;
+  const sourceType = String(story.storySourceType || '').toLowerCase();
+  const isRealish = sourceType === 'real_behavior' || sourceType === 'true_story_style';
+  const baseSeconds = isRealish ? 6.2 : 5.5;
+  const secondsPerWord = isRealish ? 0.20 : 0.18;
+  const minFrames = isRealish ? 150 : 138;
+  const maxFrames = isRealish ? 330 : 300;
+  return Math.max(minFrames, Math.min(Math.round((baseSeconds + wordCount * secondsPerWord) * fps), maxFrames));
+}
+
+function getStoryReelHookDurationFrames(hookQuestion = '', story = {}) {
+  const fps = 30;
+  const wordCount = String(hookQuestion).split(/\s+/).filter(Boolean).length;
+  const sourceType = String(story.storySourceType || '').toLowerCase();
+  const isRealish = sourceType === 'real_behavior' || sourceType === 'true_story_style';
+  const baseSeconds = isRealish ? 3.2 : 2.7;
+  const secondsPerWord = isRealish ? 0.16 : 0.13;
+  const minFrames = isRealish ? 102 : 90;
+  const maxFrames = isRealish ? 180 : 150;
+  return Math.max(minFrames, Math.min(Math.round((baseSeconds + wordCount * secondsPerWord) * fps), maxFrames));
+}
+
 async function storyJsonToReelV2Props(story, storyDir) {
   const fps = 30;
   const rawSlides = story.slides ?? [];
@@ -285,8 +309,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
       ? path.relative(ROOT, path.resolve(storyDir, rawImageRef)).replace(/\\/g, '/')
       : '';
     const captionText = slide.narration ?? slide.caption ?? '';
-    const wordCount = captionText.split(/\s+/).filter(Boolean).length;
-    const durationFrames = Math.max(108, Math.min(Math.round((4.4 + wordCount * 0.16) * fps), 210));
+    const durationFrames = getStoryReelSlideDurationFrames(captionText, story);
     const act = slide.act ?? (index < 2 ? 1 : index < selectedSlides.length - 2 ? 2 : 3);
     const { sfxPath, sfxVolume } = await resolveStoryReelSfx(storyLane, act);
     return {
@@ -324,7 +347,6 @@ async function storyJsonToReelV2Props(story, storyDir) {
 
   const flashForwardCaption = flashForwardSlide?.narration ?? flashForwardSlide?.caption ?? '';
   const hookQuestion = story.hookQuestion ?? story.hook ?? flashForwardCaption ?? 'What happens next?';
-  const hookWordCount = hookQuestion.split(/\s+/).filter(Boolean).length;
   const musicPath = await resolveStoryReelMusic(story);
 
   return {
@@ -333,7 +355,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
     hookNarrationPath: story.hookNarrationPath ?? '',
     flashForwardImagePath,
     backgroundMusicPath: musicPath,
-    hookDurationFrames: story.hookDurationFrames ?? Math.max(90, Math.min(Math.round((2.3 + hookWordCount * 0.11) * fps), 126)),
+    hookDurationFrames: story.hookDurationFrames ?? getStoryReelHookDurationFrames(hookQuestion, story),
   };
 }
 
