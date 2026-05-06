@@ -53,7 +53,7 @@
         ],
         "sfx": [
           "freesound:wind gust soft",
-          "freesound:sea ambience"
+          "freesound:ocean waves gentle"
         ]
       }
     },
@@ -76,9 +76,9 @@
     },
     "parent_bond": {
       "musicPool": "warm_return",
-      "hookSfxTag": "hook_observed",
-      "act1SfxTag": "hook_observed",
-      "act2SfxTag": "middle_motion",
+      "hookSfxTag": "ext_parent_bond_hook_act1",
+      "act1SfxTag": "ext_parent_bond_hook_act1",
+      "act2SfxTag": "ext_parent_bond_act2",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
         "music": [

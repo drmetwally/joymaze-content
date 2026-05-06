@@ -77,7 +77,7 @@
       "volume": 0.13
     },
     "ext_survival_act2": {
-      "file": "assets/sfx/external/freesound/survival/sea-ambience-672692.mp3",
+      "file": "assets/sfx/external/freesound/survival/ocean-waves-gentle-852826.mp3",
       "volume": 0.16
     },
     "ext_loyalty_hook_act1": {
@@ -87,6 +87,14 @@
     "ext_loyalty_act2": {
       "file": "assets/sfx/external/freesound/loyalty/grass-rustle-833457.mp3",
       "volume": 0.17
+    },
+    "ext_parent_bond_hook_act1": {
+      "file": "assets/sfx/external/freesound/parent_bond/garden-ambience-348011.mp3",
+      "volume": 0.16
+    },
+    "ext_parent_bond_act2": {
+      "file": "assets/sfx/external/freesound/parent_bond/soft-breeze-844818.mp3",
+      "volume": 0.16
     }
   },
   "_note": "Add files to assets/sfx/ subfolders. Render script resolves tags at render time — missing files fall back silently."

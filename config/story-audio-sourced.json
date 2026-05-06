@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-06T20:49:17.997Z",
+  "generatedAt": "2026-05-06T20:53:29.436Z",
   "downloads": [
     {
       "fetchedAt": "2026-05-06T20:40:03.791Z",
@@ -141,6 +141,62 @@
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "relativePath": "assets/sfx/external/freesound/loyalty/grass-rustle-833457.mp3",
       "tagName": "ext_loyalty_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:53:25.860Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "survival",
+      "query": "wind gust soft",
+      "id": 465691,
+      "title": "dunes some wind NL March 01 190328_1325.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/465/465691_1648170-lq.mp3",
+      "username": "klankbeeld",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/survival/wind-gust-soft-465691.mp3",
+      "tagName": "ext_survival_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:53:26.522Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "survival",
+      "query": "ocean waves gentle",
+      "id": 852826,
+      "title": "Gentle Ocean Waves Loop",
+      "audioUrl": "https://cdn.freesound.org/previews/852/852826_17997500-lq.mp3",
+      "username": "kkenny101",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/survival/ocean-waves-gentle-852826.mp3",
+      "tagName": "ext_survival_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:53:28.676Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "parent_bond",
+      "query": "garden ambience",
+      "id": 348011,
+      "title": "Garden Ambience.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/348/348011_6271616-lq.mp3",
+      "username": "mixxythepixxy",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/parent_bond/garden-ambience-348011.mp3",
+      "tagName": "ext_parent_bond_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:53:29.436Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "parent_bond",
+      "query": "soft breeze",
+      "id": 844818,
+      "title": "Soft breeze at Budaorsi koparok - No2",
+      "audioUrl": "https://cdn.freesound.org/previews/844/844818_15082088-lq.mp3",
+      "username": "rubindaniel",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/parent_bond/soft-breeze-844818.mp3",
+      "tagName": "ext_parent_bond_act2"
     }
   ]
 }
