@@ -282,6 +282,19 @@ function getStoryReelHookDurationFrames(hookQuestion = '', story = {}) {
   return Math.max(minFrames, Math.min(Math.round((baseSeconds + wordCount * secondsPerWord) * fps), maxFrames));
 }
 
+const STORY_REEL_VISUAL_PLAN = {
+  middleRefreshMinFrames: 210,
+  middleRefreshCutFrames: 102,
+  anchorSceneKinds: new Set(['opening', 'climax', 'finish']),
+};
+
+function getStoryReelSceneKind(index, total) {
+  if (index === 0) return 'opening';
+  if (index === total - 2) return 'climax';
+  if (index === total - 1) return 'finish';
+  return 'middle';
+}
+
 async function storyJsonToReelV2Props(story, storyDir) {
   const fps = 30;
   const rawSlides = story.slides ?? [];
@@ -324,20 +337,21 @@ async function storyJsonToReelV2Props(story, storyDir) {
     const durationFrames = getStoryReelSlideDurationFrames(captionText, story);
     const act = slide.act ?? (index < 2 ? 1 : index < selectedSlides.length - 2 ? 2 : 3);
     const { sfxPath, sfxVolume } = await resolveStoryReelSfx(storyLane, act);
-    const isAnchorScene = index === 0 || index >= selectedSlides.length - 2;
+    const sceneKind = getStoryReelSceneKind(index, selectedSlides.length);
     const neighborPool = [index, index + 1, index - 1]
       .filter((candidate) => candidate > 0 && candidate < selectedSlides.length - 2)
       .filter((candidate, candidateIndex, arr) => arr.indexOf(candidate) === candidateIndex)
       .map((candidate) => resolvedImageEntries[candidate]?.imagePath)
       .filter(Boolean);
-    const imageSequence = isAnchorScene || durationFrames < 210
+    const imageSequence = STORY_REEL_VISUAL_PLAN.anchorSceneKinds.has(sceneKind) || durationFrames < STORY_REEL_VISUAL_PLAN.middleRefreshMinFrames
       ? [imagePath].filter(Boolean)
       : neighborPool.length
         ? neighborPool
         : [imagePath].filter(Boolean);
-    const imageSequenceCutFrames = imageSequence.length > 1 ? 102 : 0;
+    const imageSequenceCutFrames = imageSequence.length > 1 ? STORY_REEL_VISUAL_PLAN.middleRefreshCutFrames : 0;
     return {
       sceneIndex: index + 1,
+      sceneKind,
       imageRef: rawImageRef,
       imagePath,
       imageSequence,
@@ -348,7 +362,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
       sfxVolume,
       durationFrames,
       psychologyTrigger: act === 1 ? 'CURIOSITY_GAP' : act === 2 ? 'IDENTITY_MIRROR' : 'COMPLETION_SATISFACTION',
-      isClimaxScene: index === selectedSlides.length - 2,
+      isClimaxScene: sceneKind === 'climax',
     };
   }));
 
