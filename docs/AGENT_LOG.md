@@ -177,3 +177,45 @@ This means current Story Engine work should stay tightly focused on quality vali
 **Commits from this pass:**
 - `52ea525` — `fix: harden story reel style and anti-human guards`
 - `4aef1a9` — `feat: sharpen loyalty lane story generation`
+
+---
+
+### 2026-05-07 | JoyMaze | Story Reel V2 | Final narrow polish pass on homecoming + survival benchmarks
+
+**Status:** POLISH PASS COMPLETE, STOP-LINE HOLD
+
+**Scope kept intentionally narrow:**
+- audited the two latest benchmark renders only
+- patched only the weak ending beats in `homecoming` and `survival`
+- rerendered only those two reels
+- avoided any broader lane expansion or system rewrite
+
+**What changed locally in the reel artifacts:**
+- `ep22-the-last-light-of-home`
+  - tightened ending narration so the landing beat matches the image better
+  - clarified the final rest beat from `Inside...` to `At the window...` after re-audit
+  - regenerated ending art via safe direct Google image fallback after Imagen quota blocked the normal path
+- `ep25-the-last-catch`
+  - rewrote ending narration to bridge exterior return -> burrow payoff more cleanly
+  - regenerated ending art via safe direct Google image fallback after Imagen quota blocked the normal path
+
+**Important execution note:**
+- Standard `scripts/generate-story-reel-images.mjs` hit the known Imagen quota wall again:
+  - `Imagen error 429 ... limit: 70, model: imagen-4.0-generate`
+- To finish the polish pass without reopening infrastructure scope, replacement ending images were generated through the safe direct Google image tool path and converted into the local story folders before render.
+
+**Re-audit result:**
+- `survival` ending now reads cleanly enough to stop, with stronger return-to-burrow continuity and no major remaining fix demanded.
+- `homecoming` improved materially; only a small wording mismatch remained after the first rerender, then was corrected with one final line/audio rerender.
+- Final judgment: this pass did **not** surface a new system defect. Remaining risk stays mostly in image-model variance, not in Story Reel V2 structure.
+
+**Local polish renders produced:**
+- `output/videos/StoryReelV2-homecoming-polish-20260507.mp4`
+- `output/videos/StoryReelV2-homecoming-polish-20260507-thumb.jpg`
+- `output/videos/StoryReelV2-survival-polish-20260507.mp4`
+- `output/videos/StoryReelV2-survival-polish-20260507-thumb.jpg`
+
+**Durable decision after this pass:**
+- `survival` is approved to stop for this benchmark slice.
+- `homecoming` is soft-approved after the final wording cleanup.
+- Stay in render-and-polish mode only; no more lane/infrastructure expansion unless explicitly reopened.
