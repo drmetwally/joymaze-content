@@ -114,10 +114,10 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "starter_bank",
-      "factualContext": null,
-      "location": null,
-      "dateNote": null,
-      "sourceConfidence": 0.72,
+      "factualContext": "Emperor penguin parents keep their egg balanced on their feet through the Antarctic winter.",
+      "location": "Antarctica",
+      "dateNote": "winter breeding season",
+      "sourceConfidence": 0.92,
       "rationale": "Parent-child bond with survival tension."
     },
     {
@@ -224,10 +224,10 @@
       "virality": 0.9,
       "brand_safe": true,
       "source": "starter_bank",
-      "factualContext": null,
-      "location": null,
-      "dateNote": null,
-      "sourceConfidence": 0.76,
+      "factualContext": "Sea turtle hatchlings usually race toward the brightest horizon after hatching at night.",
+      "location": "sandy nesting beaches",
+      "dateNote": "night hatch season",
+      "sourceConfidence": 0.93,
       "rationale": "Classic high-stakes survival lane with immediate visuals."
     },
     {
