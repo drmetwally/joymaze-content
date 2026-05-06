@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-06T20:43:42.609Z",
+  "downloads": [
+    {
+      "fetchedAt": "2026-05-06T20:40:03.791Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "homecoming",
+      "query": "night ambience",
+      "id": 473717,
+      "title": "City Park Ambience At Night 4.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/473/473717_9961300-lq.mp3",
+      "username": "Joao_Janz",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/homecoming/night-ambience-473717.mp3",
+      "tagName": "ext_homecoming_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:40:04.249Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "homecoming",
+      "query": "soft wind",
+      "id": 502883,
+      "title": "Soft Wind",
+      "audioUrl": "https://cdn.freesound.org/previews/502/502883_10851584-lq.mp3",
+      "username": "Animate_42",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/homecoming/soft-wind-502883.mp3",
+      "tagName": "ext_homecoming_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:42:50.203Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "homecoming",
+      "query": "night ambience",
+      "id": 473717,
+      "title": "City Park Ambience At Night 4.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/473/473717_9961300-lq.mp3",
+      "username": "Joao_Janz",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/homecoming/night-ambience-473717.mp3",
+      "tagName": "ext_homecoming_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:42:50.612Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "homecoming",
+      "query": "soft wind",
+      "id": 502883,
+      "title": "Soft Wind",
+      "audioUrl": "https://cdn.freesound.org/previews/502/502883_10851584-lq.mp3",
+      "username": "Animate_42",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/homecoming/soft-wind-502883.mp3",
+      "tagName": "ext_homecoming_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:43:42.229Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "homecoming",
+      "query": "night ambience",
+      "id": 473717,
+      "title": "City Park Ambience At Night 4.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/473/473717_9961300-lq.mp3",
+      "username": "Joao_Janz",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/homecoming/night-ambience-473717.mp3",
+      "tagName": "ext_homecoming_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:43:42.609Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "homecoming",
+      "query": "soft wind",
+      "id": 502883,
+      "title": "Soft Wind",
+      "audioUrl": "https://cdn.freesound.org/previews/502/502883_10851584-lq.mp3",
+      "username": "Animate_42",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/homecoming/soft-wind-502883.mp3",
+      "tagName": "ext_homecoming_act2"
+    }
+  ]
+}

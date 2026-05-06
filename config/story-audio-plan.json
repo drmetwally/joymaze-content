@@ -25,13 +25,19 @@
   "lanePlans": {
     "homecoming": {
       "musicPool": "warm_return",
-      "hookSfxTag": "hook_observed",
-      "act1SfxTag": "middle_motion",
-      "act2SfxTag": "middle_night",
+      "hookSfxTag": "ext_homecoming_hook_act1",
+      "act1SfxTag": "ext_homecoming_hook_act1",
+      "act2SfxTag": "ext_homecoming_act2",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:warm piano", "pixabay:gentle documentary"],
-        "sfx": ["freesound:night ambience", "freesound:soft wind"]
+        "music": [
+          "pixabay:warm piano",
+          "pixabay:gentle documentary"
+        ],
+        "sfx": [
+          "freesound:night ambience",
+          "freesound:soft wind"
+        ]
       }
     },
     "survival": {
@@ -41,8 +47,14 @@
       "act2SfxTag": "middle_motion",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:low tension ambient", "pixabay:documentary suspense soft"],
-        "sfx": ["freesound:wind gust soft", "freesound:sea ambience"]
+        "music": [
+          "pixabay:low tension ambient",
+          "pixabay:documentary suspense soft"
+        ],
+        "sfx": [
+          "freesound:wind gust soft",
+          "freesound:sea ambience"
+        ]
       }
     },
     "loyalty": {
@@ -52,8 +64,14 @@
       "act2SfxTag": "middle_strain",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:emotional strings soft", "pixabay:quiet documentary piano"],
-        "sfx": ["freesound:wind field soft", "freesound:grass rustle"]
+        "music": [
+          "pixabay:emotional strings soft",
+          "pixabay:quiet documentary piano"
+        ],
+        "sfx": [
+          "freesound:wind field soft",
+          "freesound:grass rustle"
+        ]
       }
     },
     "parent_bond": {
@@ -63,8 +81,14 @@
       "act2SfxTag": "middle_motion",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:warm emotional piano", "pixabay:gentle family documentary"],
-        "sfx": ["freesound:garden ambience", "freesound:soft breeze"]
+        "music": [
+          "pixabay:warm emotional piano",
+          "pixabay:gentle family documentary"
+        ],
+        "sfx": [
+          "freesound:garden ambience",
+          "freesound:soft breeze"
+        ]
       }
     },
     "rescue": {
@@ -74,8 +98,14 @@
       "act2SfxTag": "middle_strain",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:hopeful tension", "pixabay:light rescue documentary"],
-        "sfx": ["freesound:motion grass", "freesound:soft impact whoosh"]
+        "music": [
+          "pixabay:hopeful tension",
+          "pixabay:light rescue documentary"
+        ],
+        "sfx": [
+          "freesound:motion grass",
+          "freesound:soft impact whoosh"
+        ]
       }
     },
     "migration": {
@@ -85,8 +115,14 @@
       "act2SfxTag": "middle_night",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:travel documentary ambient", "pixabay:emotional horizon"],
-        "sfx": ["freesound:wind sky soft", "freesound:distant ambience"]
+        "music": [
+          "pixabay:travel documentary ambient",
+          "pixabay:emotional horizon"
+        ],
+        "sfx": [
+          "freesound:wind sky soft",
+          "freesound:distant ambience"
+        ]
       }
     },
     "default": {
@@ -96,8 +132,14 @@
       "act2SfxTag": "middle_motion",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
-        "music": ["pixabay:soft documentary", "pixabay:gentle emotional underscore"],
-        "sfx": ["freesound:soft ambience", "freesound:light breeze"]
+        "music": [
+          "pixabay:soft documentary",
+          "pixabay:gentle emotional underscore"
+        ],
+        "sfx": [
+          "freesound:soft ambience",
+          "freesound:light breeze"
+        ]
       }
     }
   }

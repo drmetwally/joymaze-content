@@ -1,21 +1,77 @@
 {
   "tags": {
-    "garden_ambience":  { "file": "assets/sfx/nature/garden_ambience.mp3",  "volume": 0.22 },
-    "water_pour":       { "file": "assets/sfx/nature/water_pour.mp3",       "volume": 0.32 },
-    "footsteps_grass":  { "file": "assets/sfx/nature/footsteps_grass.mp3",  "volume": 0.28 },
-    "soil_dig":         { "file": "assets/sfx/nature/soil_dig.mp3",         "volume": 0.30 },
-    "evening_ambience": { "file": "assets/sfx/nature/evening_ambience.mp3", "volume": 0.22 },
-    "wind_breeze":      { "file": "assets/sfx/nature/wind_breeze.mp3",      "volume": 0.18 },
-    "leaves_rustle":    { "file": "assets/sfx/nature/leaves_rustle.mp3",    "volume": 0.28 },
-    "gentle_chime":     { "file": "assets/sfx/emotional/gentle_chime.mp3",  "volume": 0.20 },
-    "footsteps_indoor": { "file": "assets/sfx/nature/footsteps_indoor.mp3", "volume": 0.25 },
-    "rain_gentle":      { "file": "assets/sfx/nature/rain_gentle.mp3",      "volume": 0.20 },
-    "crowd_children":   { "file": "assets/sfx/ambient/crowd_children.mp3",  "volume": 0.18 },
-    "book_page_turn":   { "file": "assets/sfx/ambient/book_page_turn.mp3",  "volume": 0.30 },
-    "magic_sparkle":    { "file": "assets/sfx/emotional/magic_sparkle.mp3", "volume": 0.22 },
-    "ocean_waves":      { "file": "assets/sfx/nature/ocean_waves.mp3",      "volume": 0.20 },
-    "fire_crackling":   { "file": "assets/sfx/nature/fire_crackling.mp3",   "volume": 0.20 },
-    "wind_indoor":      { "file": "assets/sfx/nature/wind_indoor.mp3",      "volume": 0.15 }
+    "garden_ambience": {
+      "file": "assets/sfx/nature/garden_ambience.mp3",
+      "volume": 0.22
+    },
+    "water_pour": {
+      "file": "assets/sfx/nature/water_pour.mp3",
+      "volume": 0.32
+    },
+    "footsteps_grass": {
+      "file": "assets/sfx/nature/footsteps_grass.mp3",
+      "volume": 0.28
+    },
+    "soil_dig": {
+      "file": "assets/sfx/nature/soil_dig.mp3",
+      "volume": 0.3
+    },
+    "evening_ambience": {
+      "file": "assets/sfx/nature/evening_ambience.mp3",
+      "volume": 0.22
+    },
+    "wind_breeze": {
+      "file": "assets/sfx/nature/wind_breeze.mp3",
+      "volume": 0.18
+    },
+    "leaves_rustle": {
+      "file": "assets/sfx/nature/leaves_rustle.mp3",
+      "volume": 0.28
+    },
+    "gentle_chime": {
+      "file": "assets/sfx/emotional/gentle_chime.mp3",
+      "volume": 0.2
+    },
+    "footsteps_indoor": {
+      "file": "assets/sfx/nature/footsteps_indoor.mp3",
+      "volume": 0.25
+    },
+    "rain_gentle": {
+      "file": "assets/sfx/nature/rain_gentle.mp3",
+      "volume": 0.2
+    },
+    "crowd_children": {
+      "file": "assets/sfx/ambient/crowd_children.mp3",
+      "volume": 0.18
+    },
+    "book_page_turn": {
+      "file": "assets/sfx/ambient/book_page_turn.mp3",
+      "volume": 0.3
+    },
+    "magic_sparkle": {
+      "file": "assets/sfx/emotional/magic_sparkle.mp3",
+      "volume": 0.22
+    },
+    "ocean_waves": {
+      "file": "assets/sfx/nature/ocean_waves.mp3",
+      "volume": 0.2
+    },
+    "fire_crackling": {
+      "file": "assets/sfx/nature/fire_crackling.mp3",
+      "volume": 0.2
+    },
+    "wind_indoor": {
+      "file": "assets/sfx/nature/wind_indoor.mp3",
+      "volume": 0.15
+    },
+    "ext_homecoming_hook_act1": {
+      "file": "assets/sfx/external/freesound/homecoming/night-ambience-473717.mp3",
+      "volume": 0.16
+    },
+    "ext_homecoming_act2": {
+      "file": "assets/sfx/external/freesound/homecoming/soft-wind-502883.mp3",
+      "volume": 0.16
+    }
   },
   "_note": "Add files to assets/sfx/ subfolders. Render script resolves tags at render time — missing files fall back silently."
 }
