@@ -476,8 +476,12 @@ function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights
     ? `\n\nTheme seed from the user: "${themeSeed}" — build a story around this idea.`
     : '';
 
+  const laneSpecificGuidance = preferredLane === 'loyalty'
+    ? `\n\nLOYALTY LANE SHAPE: make the emotional spine a costly choice to stay. The hero should visibly give something up by remaining, guarding, waiting, returning, or refusing to abandon the vulnerable other. Beat 5 should make leaving feel tempting or necessary. Beat 8 should pay off with quiet earned devotion, not generic recovery.`
+    : '';
+
   const laneBlock = preferredLane
-    ? `\n\nPREFERRED STORY LANE: ${preferredLane}. Prefer seeds and final story beats that clearly fit this lane unless a much stronger fit emerges from the theme seed.`
+    ? `\n\nPREFERRED STORY LANE: ${preferredLane}. Prefer seeds and final story beats that clearly fit this lane unless a much stronger fit emerges from the theme seed.${laneSpecificGuidance}`
     : '';
 
   const storySourceBankBlock = buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferredLane);
