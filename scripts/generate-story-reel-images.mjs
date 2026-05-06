@@ -139,26 +139,39 @@ async function generateWithImagen(prompt) {
     parameters: { sampleCount: 1 },
   };
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  const MAX_ATTEMPTS = 3;
+  let lastError;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      if (attempt > 1) {
+        console.log(`Retry attempt ${attempt}/${MAX_ATTEMPTS} for slide...`);
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-  const raw = await res.text();
-  const data = JSON.parse(raw || '{}');
-  if (data.error) {
-    throw new Error(`Imagen error ${data.error.code}: ${data.error.message}`);
+      const raw = await res.text();
+      const data = JSON.parse(raw || '{}');
+      if (data.error) {
+        throw new Error(`Imagen error ${data.error.code}: ${data.error.message}`);
+      }
+
+      const b64 = data.generatedImages?.[0]?.image?.imageBytes
+        || data.predictions?.[0]?.bytesBase64Encoded
+        || data.images?.[0]?.imageBytes;
+      if (!b64) {
+        throw new Error('Imagen did not return an image');
+      }
+
+      return Buffer.from(b64, 'base64');
+    } catch (err) {
+      lastError = err;
+    }
   }
-
-  const b64 = data.generatedImages?.[0]?.image?.imageBytes
-    || data.predictions?.[0]?.bytesBase64Encoded
-    || data.images?.[0]?.imageBytes;
-  if (!b64) {
-    throw new Error('Imagen did not return an image');
-  }
-
-  return Buffer.from(b64, 'base64');
+  throw lastError;
 }
 
 async function normalizeStoryImage(imageBuffer) {

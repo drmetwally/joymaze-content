@@ -126,7 +126,9 @@ async function main() {
       continue;
     }
 
-    const itemDate = metadata.generatedAt?.slice(0, 10) || 'unknown';
+    const itemDate = metadata.generatedAt?.slice(0, 10)
+      || (typeof metadata.id === 'string' ? (metadata.id.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? null) : null)
+      || '1970-01-01';
 
     // Skip today's items unless --all
     if (!ARCHIVE_ALL && itemDate >= TODAY) {

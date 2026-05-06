@@ -20,6 +20,7 @@ const ROOT = path.resolve(__dirname, '..');
 const NODE = process.execPath;
 
 const args = process.argv.slice(2);
+const DRY_RUN = args.includes('--dry-run');
 const WITH_STORY         = !args.includes('--no-story');
 const WITH_PUZZLE_POSTS  = !args.includes('--no-puzzle-posts');
 const WITH_STORY_REEL    = !args.includes('--no-story-reel');
@@ -93,10 +94,11 @@ async function getLatestStoryFolder() {
 
 async function runScript(scriptName, extraArgs = [], timeoutMs = 120_000) {
   const scriptPath = path.join(ROOT, 'scripts', scriptName);
-  log(`Running: ${scriptName} ${extraArgs.join(' ')}`);
+  const allArgs = [...extraArgs, ...(DRY_RUN ? ['--dry-run'] : [])];
+  log(`Running: ${scriptName} ${allArgs.join(' ')}`);
 
   try {
-    const { stdout, stderr } = await execFileAsync(NODE, [scriptPath, ...extraArgs], {
+    const { stdout, stderr } = await execFileAsync(NODE, [scriptPath, ...allArgs], {
       cwd: ROOT,
       env: { ...process.env },
       timeout: timeoutMs,
@@ -121,7 +123,32 @@ async function appendLog(entry) {
   } catch {}
 }
 
+const LOCK_FILE = path.join(ROOT, 'output', '.daily-lock');
+
 async function main() {
+  if (DRY_RUN) log('[DRY RUN] — child scripts will receive --dry-run flag');
+
+  try {
+    const existing = await fs.readFile(LOCK_FILE, 'utf-8');
+    const pid = Number(existing.trim());
+    let running = false;
+    try { process.kill(pid, 0); running = true; } catch {}
+    if (running) {
+      log(`Daily run already in progress (PID ${pid}), exiting.`);
+      process.exit(0);
+    }
+  } catch {}
+  await fs.mkdir(path.join(ROOT, 'output'), { recursive: true });
+  await fs.writeFile(LOCK_FILE, String(process.pid), 'utf-8');
+
+  try {
+    await runMain();
+  } finally {
+    await fs.unlink(LOCK_FILE).catch(() => {});
+  }
+}
+
+async function runMain() {
   log('=== Daily Morning Job Starting ===');
   await appendLog('Daily job started');
 

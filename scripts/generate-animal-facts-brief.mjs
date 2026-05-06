@@ -641,22 +641,30 @@ async function main() {
     return;
   }
 
-  console.log(`  Calling Groq (${GROQ_MODEL})...`);
-  const brief = await callGroq(systemPrompt, userPrompt);
+  const MAX_BRIEF_ATTEMPTS = 3;
+  let brief;
+  let validationError = null;
+  for (let attempt = 1; attempt <= MAX_BRIEF_ATTEMPTS; attempt++) {
+    if (attempt > 1) console.log(`  Brief retry attempt ${attempt}/${MAX_BRIEF_ATTEMPTS} (validation failed)...`);
+    const attemptUserPrompt = attempt === 1
+      ? userPrompt
+      : `${userPrompt}\n\nIMPORTANT: Every imagePromptHint field must be at least 50 words. Write detailed, specific visual descriptions.`;
+    console.log(`  Calling Groq (${GROQ_MODEL})...`);
+    brief = await callGroq(systemPrompt, attemptUserPrompt);
+    validationError = null;
+    try {
+      validateBrief(brief);
+      break;
+    } catch (err) {
+      validationError = err;
+      console.error(`  Attempt ${attempt}/${MAX_BRIEF_ATTEMPTS} failed validation: ${err.message}`);
+    }
+  }
 
   // Build episodeJson first so we know the folder name regardless of validateBrief outcome
   const episodeJson = buildEpisodeJson(brief, context, artStyle);
   const episodeFolderName = `ep${String(context.nextEpisodeNumber).padStart(2, '0')}-${episodeJson.slug}`;
   const episodeDir = path.join('output', 'longform', 'animal', episodeFolderName).replace(/\\/g, '/');
-
-  // validateBrief may throw if Groq returned malformed output -- catch it and report
-  // clearly rather than crashing, so the user can inspect brief.json and retry.
-  let validationError = null;
-  try {
-    validateBrief(brief);
-  } catch (err) {
-    validationError = err;
-  }
 
   console.log('');
   console.log(`  Animal: ${episodeJson.animalName}`);
