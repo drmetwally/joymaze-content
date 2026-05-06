@@ -85,6 +85,54 @@ const AUDIO_MAP = {
   default:    SOFT_MUSIC,
 };
 
+const STORY_REEL_MUSIC_MAP = {
+  homecoming: ['assets/audio/background.mp3', SOFT_MUSIC],
+  survival: [SOFT_MUSIC, 'assets/audio/background.mp3'],
+  loyalty: ['assets/audio/background.mp3', SOFT_MUSIC],
+  parent_bond: [SOFT_MUSIC, 'assets/audio/background.mp3'],
+  rescue: ['assets/audio/background.mp3', SOFT_MUSIC],
+  migration: [SOFT_MUSIC, 'assets/audio/background.mp3'],
+  default: [SOFT_MUSIC, 'assets/audio/background.mp3'],
+};
+
+const STORY_REEL_SFX_MAP = {
+  homecoming: {
+    act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.12 },
+    act2: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.1 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
+  },
+  survival: {
+    act1: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.1 },
+    act2: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.14 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
+  },
+  loyalty: {
+    act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
+    act2: { path: 'assets/sfx/nature/leaves_rustle.mp3', volume: 0.1 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
+  },
+  parent_bond: {
+    act1: { path: 'assets/sfx/nature/garden_ambience.mp3', volume: 0.1 },
+    act2: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
+  },
+  rescue: {
+    act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
+    act2: { path: 'assets/sfx/nature/footsteps_grass.mp3', volume: 0.08 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
+  },
+  migration: {
+    act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.12 },
+    act2: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.1 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
+  },
+  default: {
+    act1: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.09 },
+    act2: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.09 },
+    act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.15 },
+  },
+};
+
 const CHALLENGE_SFX_MAP = {
   maze: {
     challengeAudioPath: 'assets/audio/masters/maze_music_loop_01.wav',
@@ -119,6 +167,38 @@ async function resolveAudio(type) {
     console.warn(`    [audio] ${rel} not found — skipping music`);
     return '';
   }
+}
+
+async function resolveFirstExistingAudio(candidates = [], label = 'audio') {
+  for (const rel of candidates) {
+    if (!rel) continue;
+    const abs = path.join(ROOT, rel);
+    try {
+      await fs.access(abs);
+      return rel;
+    } catch {
+      // keep trying fallbacks
+    }
+  }
+  if (candidates.length) {
+    console.warn(`    [${label}] none of the candidate files were found: ${candidates.join(', ')}`);
+  }
+  return '';
+}
+
+async function resolveStoryReelMusic(story = {}) {
+  if (story.musicPath !== undefined) return story.musicPath;
+  const lane = String(story.storyLane || 'default');
+  return resolveFirstExistingAudio(STORY_REEL_MUSIC_MAP[lane] ?? STORY_REEL_MUSIC_MAP.default, 'story-music');
+}
+
+async function resolveStoryReelSfx(lane = 'default', act = 1) {
+  const pack = STORY_REEL_SFX_MAP[lane] ?? STORY_REEL_SFX_MAP.default;
+  const key = act <= 1 ? 'act1' : act === 2 ? 'act2' : 'act3';
+  const cue = pack[key] ?? STORY_REEL_SFX_MAP.default[key];
+  if (!cue?.path) return { sfxPath: '', sfxVolume: 0.15 };
+  const resolved = await resolveFirstExistingAudio([cue.path], 'story-sfx');
+  return { sfxPath: resolved, sfxVolume: cue.volume ?? 0.15 };
 }
 
 // ─── Props loaders ────────────────────────────────────────────────────────────
@@ -185,8 +265,21 @@ async function storyJsonToReelV2Props(story, storyDir) {
     ? [...new Set(candidateOrder)].slice(0, 5)
     : buildDefaultReelSlideOrder(rawSlides);
   const selectedSlides = reelSlideOrder.map((n) => rawSlides[n - 1]).filter(Boolean);
+  const storyLane = String(story.storyLane || 'default');
+  const missingNarrationSlides = selectedSlides
+    .map((slide, index) => ({ slide, slideNumber: reelSlideOrder[index] }))
+    .filter(({ slide }) => !(slide?.narrationPath))
+    .map(({ slideNumber }) => slideNumber);
+  const missingHookNarration = Boolean(story.hookQuestion || story.hook) && !story.hookNarrationPath;
+  if (missingHookNarration || missingNarrationSlides.length) {
+    const targetStory = path.basename(storyDir);
+    const parts = [];
+    if (missingHookNarration) parts.push('hook.wav');
+    if (missingNarrationSlides.length) parts.push(`reel slides ${missingNarrationSlides.join(', ')}`);
+    throw new Error(`StoryReelV2 is missing narration audio for ${parts.join(' and ')}. Run: node scripts/generate-story-reel-audio.mjs --story ${targetStory}`);
+  }
 
-  const slides = selectedSlides.map((slide, index) => {
+  const slides = await Promise.all(selectedSlides.map(async (slide, index) => {
     const rawImageRef = slide.imagePath ?? slide.image ?? '';
     const imagePath = rawImageRef
       ? path.relative(ROOT, path.resolve(storyDir, rawImageRef)).replace(/\\/g, '/')
@@ -195,17 +288,20 @@ async function storyJsonToReelV2Props(story, storyDir) {
     const wordCount = captionText.split(/\s+/).filter(Boolean).length;
     const durationFrames = Math.max(108, Math.min(Math.round((4.4 + wordCount * 0.16) * fps), 210));
     const act = slide.act ?? (index < 2 ? 1 : index < selectedSlides.length - 2 ? 2 : 3);
+    const { sfxPath, sfxVolume } = await resolveStoryReelSfx(storyLane, act);
     return {
       sceneIndex: index + 1,
       imageRef: rawImageRef,
       imagePath,
       captionText,
       narrationPath: slide.narrationPath || '',
+      sfxPath,
+      sfxVolume,
       durationFrames,
       psychologyTrigger: act === 1 ? 'CURIOSITY_GAP' : act === 2 ? 'IDENTITY_MIRROR' : 'COMPLETION_SATISFACTION',
       isClimaxScene: index === selectedSlides.length - 2,
     };
-  });
+  }));
 
   const flashForwardSlide = selectedSlides[selectedSlides.length - 1] ?? rawSlides[rawSlides.length - 1] ?? rawSlides[rawSlides.length - 2] ?? rawSlides[0] ?? null;
   const flashForwardRef = flashForwardSlide?.imagePath ?? flashForwardSlide?.image ?? '';
@@ -229,9 +325,7 @@ async function storyJsonToReelV2Props(story, storyDir) {
   const flashForwardCaption = flashForwardSlide?.narration ?? flashForwardSlide?.caption ?? '';
   const hookQuestion = story.hookQuestion ?? story.hook ?? flashForwardCaption ?? 'What happens next?';
   const hookWordCount = hookQuestion.split(/\s+/).filter(Boolean).length;
-  const musicPath = story.musicPath !== undefined
-    ? story.musicPath
-    : await resolveAudio('story');
+  const musicPath = await resolveStoryReelMusic(story);
 
   return {
     slides: slides.map(({ imageRef, ...rest }) => rest),

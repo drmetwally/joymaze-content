@@ -67,6 +67,8 @@ export const StoryReelV2 = ({
             }}
             narrationPath={slide.narrationPath || ''}
             backgroundMusicPath={backgroundMusicPath}
+            sfxPath={slide.sfxPath || ''}
+            sfxVolume={slide.sfxVolume ?? 0.15}
             psychologyTrigger={slide.psychologyTrigger || ''}
             isClimaxScene={Boolean(slide.isClimaxScene)}
           />

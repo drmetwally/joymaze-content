@@ -128,10 +128,19 @@ function extractStyleClause(prompt) {
   return styleSentence || '';
 }
 
+function buildSpeciesGuard(prompt) {
+  const lower = String(prompt || '').toLowerCase();
+  if (/(goose|geese|swan|cygnet|pigeon|puffin|sparrow|owl|bird|wing|beak|feather)/.test(lower)) {
+    return 'Bird-specific guard: every visible main or secondary character must read clearly as a bird with a beak, feathers, wings, and bird body posture. Never stage any figure as a human couple, human parent-child portrait, engagement photo, or fashion portrait.';
+  }
+  return '';
+}
+
 function buildImagenPrompt(prompt) {
   const adapted = adaptPromptForImagen(prompt);
   const heroClause = extractHeroClause(prompt);
   const styleClause = extractStyleClause(prompt);
+  const speciesGuard = buildSpeciesGuard(prompt);
   const heroGuard = heroClause
     ? `Important continuity rule: ${heroClause}. Render this named protagonist only as that exact non-human animal with the described visible body traits. No humans, no dolls, no mammal substitution, no species swap. `
     : 'Important continuity rule: keep the protagonist exactly as described, as a non-human animal only. No humans, dolls, mammal substitution, or species swap. ';
@@ -141,7 +150,7 @@ function buildImagenPrompt(prompt) {
   const styleGuard = styleClause
     ? `Important style rule: keep the exact same illustration medium and character-design language across every slide. ${styleClause}. Preserve the same brushwork, line weight, palette treatment, and storybook finish. No photorealism, no live-action look, no glossy 3D rendering, no toy-like plastic texture, and no wildlife-photo realism. `
     : 'Important style rule: keep one consistent 2D children\'s-book illustration style across every slide. Preserve the same brushwork, line weight, palette treatment, and storybook finish. No photorealism, no live-action look, no glossy 3D rendering, and no wildlife-photo realism. ';
-  return `Children's story illustration. No text, no logos, no watermark. ${heroGuard}${anatomyGuard} ${sideCharacterGuard} ${layoutGuard} ${styleGuard}The named protagonist must remain the first and dominant subject in frame. ${adapted}`;
+  return `Children's story illustration. No text, no logos, no watermark. ${heroGuard}${anatomyGuard} ${sideCharacterGuard} ${speciesGuard} ${layoutGuard} ${styleGuard}The named protagonist must remain the first and dominant subject in frame. ${adapted}`;
 }
 
 async function generateWithImagen(prompt) {

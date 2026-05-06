@@ -242,8 +242,11 @@ Other rules:
 - Beat 1: ONE sentence maximum. Immediate danger, tension, or open loop.
 - Beats 2–6: give enough detail that the viewer feels progression, not summary.
 - Beat 5: the emotional bottom must breathe. Let the sentence feel heavy, not rushed.
+- Beats 6, 7, and 8 must each do different work. Do not collapse the turn, the payoff, and the afterglow into one rushed resolution.
 - Beat 7: resolution must show change, not just success.
+- Beat 7 must include a concrete reward image or felt release the viewer can emotionally cash out.
 - Beat 8: ONE sentence only. No CTA. No moral. No "more story" energy. It should feel like the world continues after the reel loops.
+- Beat 8 should let the viewer sit inside the earned ending for one extra breath.
 - No passive voice. Minimal adverbs. No adjective stacking.
 - NEVER state the moral. The story does the work.
 
@@ -478,7 +481,9 @@ function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights
 
   const laneSpecificGuidance = preferredLane === 'loyalty'
     ? `\n\nLOYALTY LANE SHAPE: make the emotional spine a costly choice to stay. The hero should visibly give something up by remaining, guarding, waiting, returning, or refusing to abandon the vulnerable other. Beat 5 should make leaving feel tempting or necessary. Beat 8 should pay off with quiet earned devotion, not generic recovery.`
-    : '';
+    : preferredLane === 'homecoming'
+      ? `\n\nHOMECOMING LANE SHAPE: make the emotional spine about almost losing the one true signal of home. Beat 2 should define the exact home marker, such as a window light, scent, path, call, or shoreline shape. Beat 4 should blur or bury that signal. Beat 5 should make wrong refuges feel tempting. Beat 7 should deliver unmistakable return, and Beat 8 should rest in a small domestic reward image that feels deeply earned.`
+      : '';
 
   const laneBlock = preferredLane
     ? `\n\nPREFERRED STORY LANE: ${preferredLane}. Prefer seeds and final story beats that clearly fit this lane unless a much stronger fit emerges from the theme seed.${laneSpecificGuidance}`
