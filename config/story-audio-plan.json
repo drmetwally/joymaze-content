@@ -42,9 +42,9 @@
     },
     "survival": {
       "musicPool": "soft_doc",
-      "hookSfxTag": "hook_tension",
-      "act1SfxTag": "middle_night",
-      "act2SfxTag": "middle_motion",
+      "hookSfxTag": "ext_survival_hook_act1",
+      "act1SfxTag": "ext_survival_hook_act1",
+      "act2SfxTag": "ext_survival_act2",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
         "music": [
@@ -59,9 +59,9 @@
     },
     "loyalty": {
       "musicPool": "soft_doc",
-      "hookSfxTag": "hook_tension",
-      "act1SfxTag": "middle_motion",
-      "act2SfxTag": "middle_strain",
+      "hookSfxTag": "ext_loyalty_hook_act1",
+      "act1SfxTag": "ext_loyalty_hook_act1",
+      "act2SfxTag": "ext_loyalty_act2",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
         "music": [

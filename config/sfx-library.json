@@ -71,6 +71,22 @@
     "ext_homecoming_act2": {
       "file": "assets/sfx/external/freesound/homecoming/soft-wind-502883.mp3",
       "volume": 0.16
+    },
+    "ext_survival_hook_act1": {
+      "file": "assets/sfx/external/freesound/survival/wind-gust-soft-465691.mp3",
+      "volume": 0.13
+    },
+    "ext_survival_act2": {
+      "file": "assets/sfx/external/freesound/survival/sea-ambience-672692.mp3",
+      "volume": 0.16
+    },
+    "ext_loyalty_hook_act1": {
+      "file": "assets/sfx/external/freesound/loyalty/wind-field-soft-759778.mp3",
+      "volume": 0.16
+    },
+    "ext_loyalty_act2": {
+      "file": "assets/sfx/external/freesound/loyalty/grass-rustle-833457.mp3",
+      "volume": 0.17
     }
   },
   "_note": "Add files to assets/sfx/ subfolders. Render script resolves tags at render time — missing files fall back silently."

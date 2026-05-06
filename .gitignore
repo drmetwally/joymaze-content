@@ -4,5 +4,6 @@ node_modules
 *.svg
 output/
 .env
+public/assets/sfx/external/
 debug-brace.cjs
 debug-syntax.cjs

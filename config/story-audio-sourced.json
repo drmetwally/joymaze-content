@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-06T20:43:42.609Z",
+  "generatedAt": "2026-05-06T20:49:17.997Z",
   "downloads": [
     {
       "fetchedAt": "2026-05-06T20:40:03.791Z",
@@ -85,6 +85,62 @@
       "license": "http://creativecommons.org/publicdomain/zero/1.0/",
       "relativePath": "assets/sfx/external/freesound/homecoming/soft-wind-502883.mp3",
       "tagName": "ext_homecoming_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:49:14.088Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "survival",
+      "query": "wind gust soft",
+      "id": 465691,
+      "title": "dunes some wind NL March 01 190328_1325.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/465/465691_1648170-lq.mp3",
+      "username": "klankbeeld",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/survival/wind-gust-soft-465691.mp3",
+      "tagName": "ext_survival_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:49:14.935Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "survival",
+      "query": "sea ambience",
+      "id": 672692,
+      "title": "Screeching rusty jetty with harbor ambience.wav",
+      "audioUrl": "https://cdn.freesound.org/previews/672/672692_9551767-lq.mp3",
+      "username": "cher1101",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "relativePath": "assets/sfx/external/freesound/survival/sea-ambience-672692.mp3",
+      "tagName": "ext_survival_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:49:17.577Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "loyalty",
+      "query": "wind field soft",
+      "id": 759778,
+      "title": "village fields 1137 AM 220811_0490",
+      "audioUrl": "https://cdn.freesound.org/previews/759/759778_1648170-lq.mp3",
+      "username": "klankbeeld",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/loyalty/wind-field-soft-759778.mp3",
+      "tagName": "ext_loyalty_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:49:17.996Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "loyalty",
+      "query": "grass rustle",
+      "id": 833457,
+      "title": "Grass and leaves rustling",
+      "audioUrl": "https://cdn.freesound.org/previews/833/833457_16837934-lq.mp3",
+      "username": "darceyprodanovic",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/loyalty/grass-rustle-833457.mp3",
+      "tagName": "ext_loyalty_act2"
     }
   ]
 }
