@@ -367,7 +367,15 @@ function scoreStorySeed(seed, themeSeed, trends, preferredLane = null) {
     + (seed.relatability ?? 0.75) * 1.75
     + (seed.virality ?? 0.72) * 1.75;
 
-  const hay = `${seed.title || ''} ${seed.animal || ''} ${seed.coreEvent || ''} ${(seed.visualHooks || []).join(' ')} ${(seed.trendTags || []).join(' ')} ${(seed.seasonTags || []).join(' ')} ${seed.lane || ''}`.toLowerCase();
+  const sourceType = String(seed.sourceType || '').toLowerCase();
+  const isRealish = sourceType === 'real_behavior' || sourceType === 'true_story_style';
+  const stakesScore = seed.stakes ? 0.8 : 0;
+  const patternScore = seed.emotionalPattern ? 0.6 : 0;
+  const visualsScore = Array.isArray(seed.visualHooks) ? Math.min(seed.visualHooks.length, 3) * 0.2 : 0;
+  score += stakesScore + patternScore + visualsScore;
+  if (isRealish) score += 1.35;
+
+  const hay = `${seed.title || ''} ${seed.animal || ''} ${seed.coreEvent || ''} ${(seed.visualHooks || []).join(' ')} ${(seed.trendTags || []).join(' ')} ${(seed.seasonTags || []).join(' ')} ${seed.lane || ''} ${seed.sourceType || ''}`.toLowerCase();
   if (preferredLane && seed.lane === preferredLane) {
     score += 3.5;
   }
@@ -415,7 +423,7 @@ function buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferred
   if (!selected.length) return '';
   const lines = selected.map((seed) => {
     const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
-    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
+    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | sourceType: ${seed.sourceType || 'unknown'} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
   });
   return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. If the selected seed is grounded in real behavior or a real incident, preserve the factual sequence and stakes instead of flattening it into a generic fable. Add emotional narration, but do not abandon the seed's real spine.\n${lines.join('\n')}`;
 }
@@ -463,6 +471,8 @@ Return ONLY JSON with this exact structure:
 Rules:
 - Pick one source-bank seed if available and make it the spine.
 - Keep the protagonist a non-human animal.
+- Prefer the seed with the strongest tellable incident, not the most generic theme match.
+- Stronger seeds have clear stakes, a visible chain of events, and at least one screenshot-worthy visual hook.
 - If the chosen seed is a real behavior or true-story-style seed, preserve the real event order and true underlying stakes rather than replacing them with a looser invented arc.
 - When real-world context exists in the seed, you may use factual framing in the hook, such as a year, season, place, or witnessed incident detail. Never invent fake dates or fake documentary facts.
 - factualContext must be null unless that framing is authentically supported by the selected seed or trusted context.
