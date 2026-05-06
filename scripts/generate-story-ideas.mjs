@@ -443,6 +443,7 @@ Return ONLY JSON with this exact structure:
   "title": "specific evocative title",
   "theme": "one sentence emotional promise",
   "hookQuestion": "8-14 words",
+  "factualContext": "real date/place/season/source framing if authentic, else null",
   "outroEcho": "4-8 words",
   "style": "one visual style line",
   "character": "full reusable protagonist description",
@@ -464,7 +465,9 @@ Rules:
 - Keep the protagonist a non-human animal.
 - If the chosen seed is a real behavior or true-story-style seed, preserve the real event order and true underlying stakes rather than replacing them with a looser invented arc.
 - When real-world context exists in the seed, you may use factual framing in the hook, such as a year, season, place, or witnessed incident detail. Never invent fake dates or fake documentary facts.
+- factualContext must be null unless that framing is authentically supported by the selected seed or trusted context.
 - The beatPlan must escalate cleanly and feel narratable, not like summaries.
+- Beat 1 should work as a documentary-style opening line when real framing exists: factual anchor first, emotional tension immediately after.
 - Beat 5 must hurt. Beat 8 must be screenshot-worthy.
 - No markdown fences. JSON only.`;
 }
@@ -577,11 +580,13 @@ The story must:
 5. Beat 8 narration: ONE sentence. The share trigger. Must land without context. Write this last.
 6. End with a payoff that makes parents want to screenshot and share the final slide
 7. Also write a separate hookQuestion for short-form reels. It should be 8-14 words, create a curiosity gap, and be answered only by the final beat.
-8. Also write a separate outroEcho that is only 4-8 words, emotionally resonant, and not a CTA.
-9. Most important: the story must feel narratable. Build a true hook, body escalation, and resolution across the reel-worthy beats — not eight clipped summaries.
-10. When the selected seed is grounded in a real incident or real behavior, tell that story more faithfully instead of summarizing it into a generic moral arc. Preserve the actual chain of pressure, attempt, setback, turn, and payoff.
-11. Use a documentary-emotional narration style for real seeds: precise, observed, and grounded, but still emotionally rich.
-12. Use the intelligence inputs aggressively: strongest hooks, emotional patterning, and top-performing thematic overlaps should shape copy choices, not just theme choice.
+8. Also output factualContext: a short factual framing line only when it is authentic to the selected seed, otherwise null.
+9. Also write a separate outroEcho that is only 4-8 words, emotionally resonant, and not a CTA.
+10. Most important: the story must feel narratable. Build a true hook, body escalation, and resolution across the reel-worthy beats — not eight clipped summaries.
+11. When the selected seed is grounded in a real incident or real behavior, tell that story more faithfully instead of summarizing it into a generic moral arc. Preserve the actual chain of pressure, attempt, setback, turn, and payoff.
+12. Use a documentary-emotional narration style for real seeds: precise, observed, and grounded, but still emotionally rich.
+13. If factualContext exists, Beat 1 should feel like a documentary opening, not a fairy-tale opening.
+14. Use the intelligence inputs aggressively: strongest hooks, emotional patterning, and top-performing thematic overlaps should shape copy choices, not just theme choice.
 
 Story arcs that travel well for short-form:
 - A small animal solves a big problem through cleverness, not strength
@@ -593,10 +598,11 @@ Story arcs that travel well for short-form:
 Extra final-pass rules when a selected seed is provided:
 - Preserve the seed's core event and stakes, do not swap to a different underlying story.
 - Preserve the sequence of what happens, especially for real or real-behavior seeds.
+- Let Beat 1 open with either factual authority or immediate jeopardy, then a clear open loop.
 - Let Beat 5 fully cash out the seed's emotional danger or loneliness.
 - Let Beat 7 visibly reward the viewer with safety, reunion, relief, nourishment, warmth, or return.
 - Let Beat 8 echo the seed's most memorable visual hook in a smaller, quieter way.
-- If authentic factual framing exists, Beat 1 or the hookQuestion may use it to create authority and curiosity, but never fabricate it.
+- If authentic factual framing exists, factualContext and Beat 1 may use it to create authority and curiosity, but never fabricate it.
 
 Before you finalize, self-check every image_prompt:
 - protagonist name appears in every prompt
@@ -780,6 +786,7 @@ async function saveStory(story, episodeNum) {
     theme: story.theme,
     hook: story.hook || null,         // Legacy intro hook
     hookQuestion: story.hookQuestion || story.hook || null,
+    factualContext: story.factualContext || null,
     outroEcho: story.outroEcho || null,
     storySourceBankId: story.storySourceBankId || story.sourceBankId || null,
     storySourceType: story.storySourceType || null,

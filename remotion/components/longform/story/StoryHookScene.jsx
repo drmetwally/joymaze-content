@@ -21,7 +21,10 @@ const resolveAssetSrc = (src) => {
 
 export const StoryHookScene = ({
   hookQuestion = '',
+  factualContext = '',
   hookNarrationPath = '',
+  hookSfxPath = '',
+  hookSfxVolume = 0.08,
   jinglePath = '',
   backgroundMusicPath = '',
   flashForwardSrc = '',
@@ -56,6 +59,7 @@ export const StoryHookScene = ({
   return (
     <AbsoluteFill style={{ background: 'linear-gradient(180deg, #103a61 0%, #081421 100%)' }}>
       {jinglePath ? <Audio src={resolveAssetSrc(jinglePath)} volume={0.85} /> : null}
+      {hookSfxPath ? <Audio src={resolveAssetSrc(hookSfxPath)} volume={hookSfxVolume} /> : null}
       {hookNarrationPath ? <Audio src={resolveAssetSrc(hookNarrationPath)} volume={1} /> : null}
 
       {/* Flash forward: full-screen, full duration, Ken Burns */}
@@ -95,26 +99,61 @@ export const StoryHookScene = ({
         {visibleWords.length > 0 ? (
           <div
             style={{
-              backgroundColor: PILL_BG,
-              borderRadius: PILL_RX,
-              padding: '28px 40px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 18,
+              alignItems: 'center',
               maxWidth: '90%',
-              boxShadow: '0 18px 40px rgba(0,0,0,0.28)',
             }}
           >
-            <p
+            {factualContext ? (
+              <div
+                style={{
+                  backgroundColor: 'rgba(15,10,6,0.78)',
+                  borderRadius: 999,
+                  padding: '10px 22px',
+                  boxShadow: '0 10px 24px rgba(0,0,0,0.18)',
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    color: '#fff5d6',
+                    fontFamily: FONT_FAMILY,
+                    fontSize: 24,
+                    fontWeight: 700,
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                    letterSpacing: 0.4,
+                  }}
+                >
+                  {factualContext}
+                </p>
+              </div>
+            ) : null}
+            <div
               style={{
-                margin: 0,
-                color: PILL_TEXT,
-                fontFamily: FONT_FAMILY,
-                fontSize: 52,
-                fontWeight: 800,
-                textAlign: 'center',
-                lineHeight: 1.25,
+                backgroundColor: PILL_BG,
+                borderRadius: PILL_RX,
+                padding: '28px 40px',
+                maxWidth: '100%',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.28)',
               }}
             >
-              {visibleWords.join(' ')}
-            </p>
+              <p
+                style={{
+                  margin: 0,
+                  color: PILL_TEXT,
+                  fontFamily: FONT_FAMILY,
+                  fontSize: 52,
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  lineHeight: 1.25,
+                }}
+              >
+                {visibleWords.join(' ')}
+              </p>
+            </div>
           </div>
         ) : null}
       </AbsoluteFill>

@@ -97,36 +97,43 @@ const STORY_REEL_MUSIC_MAP = {
 
 const STORY_REEL_SFX_MAP = {
   homecoming: {
+    hook: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.08 },
     act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.12 },
     act2: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.1 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
   },
   survival: {
+    hook: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
     act1: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.1 },
     act2: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.14 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
   },
   loyalty: {
+    hook: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.08 },
     act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
     act2: { path: 'assets/sfx/nature/leaves_rustle.mp3', volume: 0.1 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
   },
   parent_bond: {
+    hook: { path: 'assets/sfx/nature/garden_ambience.mp3', volume: 0.08 },
     act1: { path: 'assets/sfx/nature/garden_ambience.mp3', volume: 0.1 },
     act2: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
   },
   rescue: {
+    hook: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.09 },
     act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
     act2: { path: 'assets/sfx/nature/footsteps_grass.mp3', volume: 0.08 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
   },
   migration: {
+    hook: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.1 },
     act1: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.12 },
     act2: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.1 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.16 },
   },
   default: {
+    hook: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.07 },
     act1: { path: 'assets/sfx/nature/evening_ambience.mp3', volume: 0.09 },
     act2: { path: 'assets/sfx/nature/wind_breeze.mp3', volume: 0.09 },
     act3: { path: 'assets/sfx/emotional/gentle_chime.mp3', volume: 0.15 },
@@ -192,9 +199,9 @@ async function resolveStoryReelMusic(story = {}) {
   return resolveFirstExistingAudio(STORY_REEL_MUSIC_MAP[lane] ?? STORY_REEL_MUSIC_MAP.default, 'story-music');
 }
 
-async function resolveStoryReelSfx(lane = 'default', act = 1) {
+async function resolveStoryReelSfx(lane = 'default', act = 1, cueType = 'scene') {
   const pack = STORY_REEL_SFX_MAP[lane] ?? STORY_REEL_SFX_MAP.default;
-  const key = act <= 1 ? 'act1' : act === 2 ? 'act2' : 'act3';
+  const key = cueType === 'hook' ? 'hook' : act <= 1 ? 'act1' : act === 2 ? 'act2' : 'act3';
   const cue = pack[key] ?? STORY_REEL_SFX_MAP.default[key];
   if (!cue?.path) return { sfxPath: '', sfxVolume: 0.15 };
   const resolved = await resolveFirstExistingAudio([cue.path], 'story-sfx');
@@ -367,11 +374,15 @@ async function storyJsonToReelV2Props(story, storyDir) {
   const flashForwardCaption = flashForwardSlide?.narration ?? flashForwardSlide?.caption ?? '';
   const hookQuestion = story.hookQuestion ?? story.hook ?? flashForwardCaption ?? 'What happens next?';
   const musicPath = await resolveStoryReelMusic(story);
+  const { sfxPath: hookSfxPath, sfxVolume: hookSfxVolume } = await resolveStoryReelSfx(storyLane, 1, 'hook');
 
   return {
     slides: slides.map(({ imageRef, ...rest }) => rest),
     hookQuestion,
+    factualContext: story.factualContext ?? '',
     hookNarrationPath: story.hookNarrationPath ?? '',
+    hookSfxPath,
+    hookSfxVolume,
     flashForwardImagePath,
     backgroundMusicPath: musicPath,
     hookDurationFrames: story.hookDurationFrames ?? getStoryReelHookDurationFrames(hookQuestion, story),

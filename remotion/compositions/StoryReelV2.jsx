@@ -5,7 +5,10 @@ import { StoryActScene } from '../components/longform/story/StoryActScene.jsx';
 export const storyReelV2Schema = {
   slides: [],
   hookQuestion: '',
+  factualContext: '',
   hookNarrationPath: '',
+  hookSfxPath: '',
+  hookSfxVolume: 0.08,
   flashForwardImagePath: '',
   backgroundMusicPath: '',
   hookDurationFrames: 150,
@@ -20,7 +23,10 @@ const resolveAssetSrc = (src) => {
 export const StoryReelV2 = ({
   slides = [],
   hookQuestion = '',
+  factualContext = '',
   hookNarrationPath = '',
+  hookSfxPath = '',
+  hookSfxVolume = 0.08,
   flashForwardImagePath = '',
   backgroundMusicPath = '',
   hookDurationFrames = 150,
@@ -47,7 +53,10 @@ export const StoryReelV2 = ({
       <Sequence from={0} durationInFrames={hookDurationFrames}>
         <StoryHookScene
           hookQuestion={hookQuestion}
+          factualContext={factualContext}
           hookNarrationPath={hookNarrationPath}
+          hookSfxPath={hookSfxPath}
+          hookSfxVolume={hookSfxVolume}
           backgroundMusicPath={backgroundMusicPath}
           flashForwardSrc={flashForwardImagePath}
         />
