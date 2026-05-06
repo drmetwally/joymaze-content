@@ -93,9 +93,9 @@
     },
     "rescue": {
       "musicPool": "soft_doc",
-      "hookSfxTag": "hook_tension",
-      "act1SfxTag": "middle_motion",
-      "act2SfxTag": "middle_strain",
+      "hookSfxTag": "ext_rescue_hook_act1",
+      "act1SfxTag": "ext_rescue_hook_act1",
+      "act2SfxTag": "ext_rescue_act2",
       "act3SfxTag": "payoff_release",
       "externalTargets": {
         "music": [
@@ -104,7 +104,7 @@
         ],
         "sfx": [
           "freesound:motion grass",
-          "freesound:soft impact whoosh"
+          "freesound:gentle whoosh"
         ]
       }
     },

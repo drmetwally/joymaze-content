@@ -95,6 +95,14 @@
     "ext_parent_bond_act2": {
       "file": "assets/sfx/external/freesound/parent_bond/soft-breeze-844818.mp3",
       "volume": 0.16
+    },
+    "ext_rescue_hook_act1": {
+      "file": "assets/sfx/external/freesound/rescue/motion-grass-848143.mp3",
+      "volume": 0.17
+    },
+    "ext_rescue_act2": {
+      "file": "assets/sfx/external/freesound/rescue/gentle-whoosh-810737.mp3",
+      "volume": 0.13
     }
   },
   "_note": "Add files to assets/sfx/ subfolders. Render script resolves tags at render time — missing files fall back silently."

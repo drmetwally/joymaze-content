@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-06T20:53:29.436Z",
+  "generatedAt": "2026-05-06T20:56:47.783Z",
   "downloads": [
     {
       "fetchedAt": "2026-05-06T20:40:03.791Z",
@@ -197,6 +197,62 @@
       "license": "http://creativecommons.org/publicdomain/zero/1.0/",
       "relativePath": "assets/sfx/external/freesound/parent_bond/soft-breeze-844818.mp3",
       "tagName": "ext_parent_bond_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:56:13.594Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "rescue",
+      "query": "motion grass",
+      "id": 848143,
+      "title": "spring breezy sand-dunes heathland Loonse en Drunense Duinen 1157 am 250520_1107",
+      "audioUrl": "https://cdn.freesound.org/previews/848/848143_1648170-lq.mp3",
+      "username": "klankbeeld",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/rescue/motion-grass-848143.mp3",
+      "tagName": "ext_rescue_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:56:14.019Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "rescue",
+      "query": "soft impact whoosh",
+      "id": 785338,
+      "title": "Impact Piano Logo",
+      "audioUrl": "https://cdn.freesound.org/previews/785/785338_14640845-lq.mp3",
+      "username": "LiteSaturation",
+      "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "relativePath": "assets/sfx/external/freesound/rescue/soft-impact-whoosh-785338.mp3",
+      "tagName": "ext_rescue_act2"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:56:47.395Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "rescue",
+      "query": "motion grass",
+      "id": 848143,
+      "title": "spring breezy sand-dunes heathland Loonse en Drunense Duinen 1157 am 250520_1107",
+      "audioUrl": "https://cdn.freesound.org/previews/848/848143_1648170-lq.mp3",
+      "username": "klankbeeld",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/rescue/motion-grass-848143.mp3",
+      "tagName": "ext_rescue_hook_act1"
+    },
+    {
+      "fetchedAt": "2026-05-06T20:56:47.783Z",
+      "provider": "freesound",
+      "kind": "sfx",
+      "lane": "rescue",
+      "query": "gentle whoosh",
+      "id": 810737,
+      "title": "Long, airy whoosh",
+      "audioUrl": "https://cdn.freesound.org/previews/810/810737_17437502-lq.mp3",
+      "username": "mokasza",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "relativePath": "assets/sfx/external/freesound/rescue/gentle-whoosh-810737.mp3",
+      "tagName": "ext_rescue_act2"
     }
   ]
 }
