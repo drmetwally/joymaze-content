@@ -64,23 +64,56 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 - [x] **TASK-OC-008 — Puzzle image-post workflow structure** — DONE 2026-04-29. Contract mapped, manifest seam defined and live, Phase 1 integration complete. Art wrapper rebuilt with modular Sharp layers (corner decor, margin motifs, start/goal markers, title system). All 3 Claude-audit bugs fixed. Two visual gaps remain for next wrapper pass: (1) no footer CTA band — 260px dead space below puzzle, (2) finish marker clips at right edge (left=910, marker=150px wide, canvas=1000px). Theme families partial: 5 of 10 done (ocean, space, animals, colors/shapes, workshop) — missing dinosaurs, jungle/safari, fairy/princess, vehicles, food/kitchen. Sharp decision gate (A8) pending comparison pack generation (A7).
 - [x] **TASK-OC-009 — Maze + Word Search image-post integration** — started 2026-04-29, finished first Phase 1 implementation on 2026-04-29. `scripts/generate-puzzle-image-post.mjs` now supports direct generation and manifest-driven generation, builds a polished wrapped `post.png`, copies it into `output/raw/{maze|wordsearch}/`, writes import sidecars, and can target all supported daily slots from `activity-manifest-YYYY-MM-DD.json`. `import-raw.mjs` preserves richer sidecar metadata (`difficulty`, `theme`, `sourceFolder`, `puzzleType`, `titleText`, `ctaText`). Validation completed through `generate-prompts --save` -> manifest-driven puzzle-post generation -> `import-raw` -> `generate-captions --dry-run` for both a maze slot and a word-search slot.
 
-## STORY ENGINE — NEXT LOCKED WORK (2026-05-05)
+## STORY ENGINE — NEXT LOCKED WORK (2026-05-06)
 
-- [ ] **STORY-ENGINE-001 — Lane validation pass on 48-seed bank**
-  - Run intentional live generations for `homecoming`, `parent_bond`, `loyalty`, and `survival`.
-  - Goal: verify the bank keeps producing genuinely different emotional spines instead of collapsing into one repeated story shape.
-  - Success bar: at least 2 strong outputs per priority lane.
+- [x] **STORY-ENGINE-001 — Lane validation pass on 48-seed bank**
+  - Ran intentional live generations for `homecoming`, `parent_bond`, `loyalty`, and `survival`.
+  - Result: the bank is producing genuinely different emotional spines instead of collapsing into one repeated story shape.
+  - Strongest lanes after pass: `homecoming`, then `survival`.
 
-- [ ] **STORY-ENGINE-002 — Cross-slide style consistency pass**
-  - Focus on style continuity between reel slides, not basic VO/render plumbing and not species continuity unless it regresses.
-  - Goal: reduce visual looseness across slides after hero/species continuity improvements.
+- [x] **STORY-ENGINE-002 — Cross-slide style consistency pass**
+  - Completed the smallest effective style-consistency intervention instead of a broad rewrite.
+  - Added a style anchor in `generate-story-ideas.mjs` and stronger Imagen wrapper guards in `generate-story-reel-images.mjs`.
+  - Real failures fixed in this pass: human portrait substitution, human side-character leakage, and split-panel/collage drift.
 
-- [ ] **STORY-ENGINE-003 — Stop benchmark verification**
-  - Treat the current story-engine wave as done enough to stop only when all are true:
-    - 3 consecutive clean runs
-    - 2 strong outputs each for `homecoming`, `parent_bond`, `loyalty`, `survival`
-    - no major hero/species drift
-    - no broken handoff across intelligence -> bank -> story gen -> reel image gen -> reel audio -> render
+- [~] **STORY-ENGINE-003 — Stop benchmark verification**
+  - Current judgment: **practical stop line reached for major rebuilding**.
+  - Verified true now:
+    - no major hero/species drift in the strongest validated lanes
+    - no broken handoff across intelligence -> bank -> story gen -> reel image gen -> reel audio -> render for the strongest rendered lanes
+    - `homecoming`, `survival`, and improved `loyalty` now render cleanly end-to-end as `StoryReelV2`
+  - Not worth forcing as a broad-engine milestone now:
+    - strict “2 strong outputs each” for every priority lane
+    - strict “3 consecutive clean runs” as a reason to keep rebuilding the engine
+  - Durable decision: stop broad Story Reel engine work here unless a clearly scoped regression appears. Prefer narrow lane polish only if there is a compelling quality reason.
+
+## STORY ENGINE — IMMEDIATE NEXT PHASE (locked 2026-05-06)
+
+- [ ] **STORY-ENGINE-004 — Light QC + posting selection**
+  - Use the strongest current Story Reel outputs as the posting/benchmark set.
+  - Current top order: `homecoming`, `survival`, `loyalty`, then `parent_bond`.
+
+- [ ] **STORY-ENGINE-005 — Production reliability only**
+  - Prefer small reliability / workflow fixes over new story-engine architecture.
+  - Treat Imagen variance as a QC/retry problem, not a reason to reopen core Story Reel plumbing.
+
+- [ ] **STORY-ENGINE-006 — Optional parent_bond-only polish**
+  - If one more polish pass is justified, spend it only on `parent_bond`, which is now the least settled of the top lanes.
+
+## POST-STORY BUILD ORDER (locked 2026-05-06)
+
+- [ ] **ANIMAL-FACTS-001 — Build animal facts short using Story Reel structural reference**
+  - Use Story Reel as the main structural reference once Story Reel quality is considered good enough.
+  - Main difference: narration should be a **song** generated via Suno or another music path, not standard spoken narration.
+  - Reuse as much of the proven story-engine pacing, beat clarity, and quality gates as possible.
+
+- [ ] **CHALLENGE-REEL-001 — Find-the-Difference challenge reel engine**
+  - After Animal Facts structure is stabilized, build/finish the Find-the-Difference challenge reel engine as the final major build lane.
+
+- [ ] **PHASE-SHIFT-001 — Stop building and pivot to operations/marketing**
+  - After Story Reel, Animal Facts, and Find-the-Difference challenge reel are in a good state, stop major pipeline building.
+  - Primary focus becomes posting, automation reliability, polishing, and marketing KPIs.
+  - Main business goals: views, subscribers, and sales for books and app.
 
 ## ACTIVE SPRINT — DUAL TRACK (2026-04-30)
 

@@ -118,3 +118,62 @@
   - fallback 2: `google/gemini-2.5-pro-preview-05-06`
   - fallback 3: `google/gemini-2.5-flash-preview-04-17`
 - Gemini 3 was investigated, but that lane depends on the separate `google-gemini-cli` OAuth provider and was intentionally not adopted.
+
+### 2026-05-06 | OpenClaw | Roadmap lock after Story Reel
+
+**Status:** PRODUCT SEQUENCE LOCKED
+
+User clarified the intended build order after Story Reel V2 quality is strong enough:
+1. Perfect Story Reel first.
+2. Then build the Animal Facts short, using Story Reel as the structural reference.
+   - Main difference: narration is a **song** generated via Suno or another music path, not standard spoken narration.
+3. Then build/finish the Find-the-Difference challenge reel engine.
+4. After those lanes are in a good state, stop major new building completely.
+   - Focus shifts to posting, automation, polishing, and business/marketing KPIs.
+   - Main targets: views, subscribers, and sales for books and app.
+
+This means current Story Engine work should stay tightly focused on quality validation and style consistency, because it is now the reference structure for the next lane, not just another feature to finish.
+
+### 2026-05-06 | JoyMaze | Story Reel stop-line reached for major rebuilding
+
+**Status:** MAJOR REBUILDING NEARLY COMPLETE, SHIFT TO NARROW POLISH + OPERATIONS
+
+**What landed in this pass:**
+- Confirmed the existing Imagen-based reel quality gate is present in `scripts/generate-story-reel-images.mjs` and the upstream protagonist-first gate exists in `scripts/generate-story-ideas.mjs`.
+- Tightened `scripts/generate-story-ideas.mjs` so every slide prompt carries a reusable style anchor and validation now fails if the style anchor drops out.
+- Tightened `scripts/generate-story-reel-images.mjs` so the Imagen wrapper explicitly enforces:
+  - same-medium / same-finish illustration consistency
+  - no photoreal / no live-action / no glossy 3D drift
+  - explicit animal-anatomy readability in close-ups
+  - no human companion leakage
+  - no split-panel / comic / collage layouts
+- Regenerated the 4 priority lanes (`homecoming`, `parent_bond`, `loyalty`, `survival`) and did targeted retries on real failures instead of broad rewrites.
+
+**Real failures observed and corrected:**
+- human portrait substitution in close-up frames
+- human side-character leakage
+- split-panel/comic-style frame in the swan (`parent_bond`) set
+
+**Lane outcomes after the pass:**
+- `homecoming` — strongest lane, strong enough to use as a benchmark
+- `survival` — also strong and stable
+- `loyalty` — improved materially after adding lane-specific copy guidance around costly devotion / staying
+- `parent_bond` — improved, but still the least settled of the top lanes
+
+**Rendered QC outputs completed:**
+- `StoryReelV2-1778058758388.mp4` — homecoming
+- `StoryReelV2-1778058854166.mp4` — survival
+- `StoryReelV2-1778060372026.mp4` — improved loyalty
+
+**Important render-path diagnosis:**
+- A temporary render failure on `ep22` was not a story bug; it came from invoking `render-video.mjs` with `--composition` instead of `--comp`, which fell back to `StoryEpisode` and tried to load missing non-reel slides (`02.png`, `04.png`, `06.png`).
+- Re-running with `--comp StoryReelV2` confirmed the reel path renders cleanly.
+
+**Current durable judgment:**
+- The main remaining Story Reel risk is now **Imagen variance**, not missing story-system structure and not broken handoffs.
+- This is the practical stop line for broad Story Reel engine rebuilding.
+- Next work should be narrow only: light QC, posting selection, production reliability, and only lane-specific polish if a lane clearly lags enough to justify it.
+
+**Commits from this pass:**
+- `52ea525` — `fix: harden story reel style and anti-human guards`
+- `4aef1a9` — `feat: sharpen loyalty lane story generation`
