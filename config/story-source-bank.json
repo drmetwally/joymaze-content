@@ -40,6 +40,10 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "starter_bank",
+      "factualContext": null,
+      "location": null,
+      "dateNote": null,
+      "sourceConfidence": 0.7,
       "rationale": "Natural homecoming arc with built-in stakes and visual clarity."
     },
     {
@@ -74,6 +78,10 @@
       "virality": 0.89,
       "brand_safe": true,
       "source": "starter_bank",
+      "factualContext": null,
+      "location": null,
+      "dateNote": null,
+      "sourceConfidence": 0.7,
       "rationale": "Large emotional contrast and clear rescue visuals."
     },
     {
@@ -106,6 +114,10 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "starter_bank",
+      "factualContext": null,
+      "location": null,
+      "dateNote": null,
+      "sourceConfidence": 0.72,
       "rationale": "Parent-child bond with survival tension."
     },
     {
@@ -138,6 +150,10 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "starter_bank",
+      "factualContext": null,
+      "location": null,
+      "dateNote": null,
+      "sourceConfidence": 0.68,
       "rationale": "Elegant rescue lane with strong sound/motion imagery."
     },
     {
@@ -171,6 +187,10 @@
       "virality": 0.91,
       "brand_safe": true,
       "source": "starter_bank",
+      "factualContext": null,
+      "location": null,
+      "dateNote": null,
+      "sourceConfidence": 0.74,
       "rationale": "Parent rescue and home shift, very relatable for viewers."
     },
     {
@@ -204,6 +224,10 @@
       "virality": 0.9,
       "brand_safe": true,
       "source": "starter_bank",
+      "factualContext": null,
+      "location": null,
+      "dateNote": null,
+      "sourceConfidence": 0.76,
       "rationale": "Classic high-stakes survival lane with immediate visuals."
     },
     {

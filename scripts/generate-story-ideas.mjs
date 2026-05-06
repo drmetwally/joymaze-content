@@ -427,7 +427,7 @@ function buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferred
   if (!selected.length) return '';
   const lines = selected.map((seed) => {
     const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
-    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | sourceType: ${seed.sourceType || 'unknown'} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
+    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | sourceType: ${seed.sourceType || 'unknown'} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${seed.factualContext ? ` | factual: ${seed.factualContext}` : ''}${seed.location ? ` | location: ${seed.location}` : ''}${seed.dateNote ? ` | date: ${seed.dateNote}` : ''}${typeof seed.sourceConfidence === 'number' ? ` | sourceConfidence: ${seed.sourceConfidence}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
   });
   return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. If the selected seed is grounded in real behavior or a real incident, preserve the factual sequence and stakes instead of flattening it into a generic fable. Add emotional narration, but do not abandon the seed's real spine.\n${lines.join('\n')}`;
 }
@@ -804,6 +804,9 @@ async function saveStory(story, episodeNum) {
     hook: story.hook || null,         // Legacy intro hook
     hookQuestion: story.hookQuestion || story.hook || null,
     factualContext: story.factualContext || null,
+    location: story.location || null,
+    dateNote: story.dateNote || null,
+    sourceConfidence: story.sourceConfidence ?? null,
     outroEcho: story.outroEcho || null,
     storySourceBankId: story.storySourceBankId || story.sourceBankId || null,
     storySourceType: story.storySourceType || null,
@@ -969,7 +972,10 @@ async function main() {
         story.storySourceType = storySourceType;
         story.storyLane = outline.storyLane || null;
         story.storyOutline = outline.beatPlan;
-        story.factualContext = isRealish ? (story.factualContext || null) : null;
+        story.factualContext = isRealish ? (story.factualContext || selectedSeed?.factualContext || null) : null;
+        story.location = isRealish ? (story.location || selectedSeed?.location || null) : null;
+        story.dateNote = isRealish ? (story.dateNote || selectedSeed?.dateNote || null) : null;
+        story.sourceConfidence = isRealish ? (story.sourceConfidence ?? selectedSeed?.sourceConfidence ?? null) : null;
         stories.push(story);
       } catch (err) {
         lastError = err.message;
