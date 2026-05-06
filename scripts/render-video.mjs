@@ -303,19 +303,38 @@ async function storyJsonToReelV2Props(story, storyDir) {
     throw new Error(`StoryReelV2 is missing narration audio for ${parts.join(' and ')}. Run: node scripts/generate-story-reel-audio.mjs --story ${targetStory}`);
   }
 
-  const slides = await Promise.all(selectedSlides.map(async (slide, index) => {
+  const resolvedImageEntries = selectedSlides.map((slide) => {
     const rawImageRef = slide.imagePath ?? slide.image ?? '';
     const imagePath = rawImageRef
       ? path.relative(ROOT, path.resolve(storyDir, rawImageRef)).replace(/\\/g, '/')
       : '';
+    return { rawImageRef, imagePath };
+  });
+
+  const slides = await Promise.all(selectedSlides.map(async (slide, index) => {
+    const { rawImageRef, imagePath } = resolvedImageEntries[index];
     const captionText = slide.narration ?? slide.caption ?? '';
     const durationFrames = getStoryReelSlideDurationFrames(captionText, story);
     const act = slide.act ?? (index < 2 ? 1 : index < selectedSlides.length - 2 ? 2 : 3);
     const { sfxPath, sfxVolume } = await resolveStoryReelSfx(storyLane, act);
+    const isAnchorScene = index === 0 || index >= selectedSlides.length - 2;
+    const neighborPool = [index, index + 1, index - 1]
+      .filter((candidate) => candidate > 0 && candidate < selectedSlides.length - 2)
+      .filter((candidate, candidateIndex, arr) => arr.indexOf(candidate) === candidateIndex)
+      .map((candidate) => resolvedImageEntries[candidate]?.imagePath)
+      .filter(Boolean);
+    const imageSequence = isAnchorScene || durationFrames < 210
+      ? [imagePath].filter(Boolean)
+      : neighborPool.length
+        ? neighborPool
+        : [imagePath].filter(Boolean);
+    const imageSequenceCutFrames = imageSequence.length > 1 ? 102 : 0;
     return {
       sceneIndex: index + 1,
       imageRef: rawImageRef,
       imagePath,
+      imageSequence,
+      imageSequenceCutFrames,
       captionText,
       narrationPath: slide.narrationPath || '',
       sfxPath,

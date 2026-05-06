@@ -88,7 +88,27 @@ export const StoryActScene = ({
   const isHorizontal = width > height;
 
   const clipSrc = resolveAssetSrc(scene.animatedClip || '');
-  const imageSrc = resolveAssetSrc(scene.imagePath || '');
+  const imageSequence = Array.isArray(scene.imageSequence) && scene.imageSequence.length
+    ? scene.imageSequence.map((src) => resolveAssetSrc(src)).filter(Boolean)
+    : [resolveAssetSrc(scene.imagePath || '')].filter(Boolean);
+  const imageSrc = imageSequence[0] || '';
+  const imageSequenceCutFrames = Number(scene.imageSequenceCutFrames) > 0 ? Number(scene.imageSequenceCutFrames) : 0;
+  const imageSequenceEnabled = imageSequence.length > 1 && imageSequenceCutFrames >= 60;
+  const sequenceIndex = imageSequenceEnabled
+    ? Math.min(imageSequence.length - 1, Math.floor(frame / imageSequenceCutFrames))
+    : 0;
+  const currentImageSrc = imageSequence[sequenceIndex] || imageSrc;
+  const nextImageSrc = imageSequenceEnabled && sequenceIndex < imageSequence.length - 1
+    ? imageSequence[sequenceIndex + 1]
+    : '';
+  const localFrameInSegment = imageSequenceEnabled ? frame % imageSequenceCutFrames : 0;
+  const segmentTransitionStart = Math.max(0, imageSequenceCutFrames - 12);
+  const nextImageOpacity = nextImageSrc
+    ? interpolate(localFrameInSegment, [segmentTransitionStart, imageSequenceCutFrames], [0, 1], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+      })
+    : 0;
 
   // Ken Burns over FULL scene duration — no cycling, one continuous motion per scene
   const kbIndex = Math.max(0, ((scene.sceneIndex ?? 1) - 1) % KB_MOVES.length);
@@ -123,7 +143,10 @@ export const StoryActScene = ({
                 transformOrigin: 'center center',
               }}
             >
-              <Img src={imageSrc} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Img src={currentImageSrc} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {nextImageSrc ? (
+                <Img src={nextImageSrc} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: nextImageOpacity, position: 'absolute', inset: 0 }} />
+              ) : null}
             </AbsoluteFill>
           ) : null}
 
@@ -137,13 +160,26 @@ export const StoryActScene = ({
             }}
           >
             <Img
-              src={imageSrc}
+              src={currentImageSrc}
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: isHorizontal ? 'contain' : 'cover',
               }}
             />
+            {nextImageSrc ? (
+              <Img
+                src={nextImageSrc}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: isHorizontal ? 'contain' : 'cover',
+                  opacity: nextImageOpacity,
+                  position: 'absolute',
+                  inset: 0,
+                }}
+              />
+            ) : null}
           </AbsoluteFill>
         </>
       ) : (

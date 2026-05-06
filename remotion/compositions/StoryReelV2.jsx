@@ -63,6 +63,8 @@ export const StoryReelV2 = ({
             scene={{
               sceneIndex: slide.sceneIndex ?? index + 1,
               imagePath: slide.imagePath,
+              imageSequence: slide.imageSequence || [slide.imagePath],
+              imageSequenceCutFrames: slide.imageSequenceCutFrames || 0,
               narration: slide.captionText,
             }}
             narrationPath={slide.narrationPath || ''}
