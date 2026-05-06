@@ -945,11 +945,14 @@ async function main() {
         validateGeneratedStory(story);
 
         const selectedSeed = getStorySeedById(storySourceBank, outline.sourceBankId);
+        const storySourceType = selectedSeed?.sourceType || null;
+        const isRealish = storySourceType === 'real_behavior' || storySourceType === 'true_story_style';
         story.episode = episodeNum + i;
         story.storySourceBankId = outline.sourceBankId || null;
-        story.storySourceType = selectedSeed?.sourceType || null;
+        story.storySourceType = storySourceType;
         story.storyLane = outline.storyLane || null;
         story.storyOutline = outline.beatPlan;
+        story.factualContext = isRealish ? (story.factualContext || null) : null;
         stories.push(story);
       } catch (err) {
         lastError = err.message;
