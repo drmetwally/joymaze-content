@@ -240,9 +240,13 @@ Use enough language to create a meaningful narrated beat. Short-form does not me
 Other rules:
 - 1–2 sentences per slide. Never 3.
 - Beat 1: ONE sentence maximum. Immediate danger, tension, or open loop.
+- Beat 2 must state the cost of failure in a way a parent instantly feels.
+- Beat 3 must show a real attempt in motion, not just intention.
+- Beat 4 must complicate the attempt, not merely repeat the problem in different words.
 - Beats 2–6: give enough detail that the viewer feels progression, not summary.
 - Real-story lanes should sound observed and specific, not like a bedtime fable compressed into bullet points.
 - Beat 5: the emotional bottom must breathe. Let the sentence feel heavy, not rushed.
+- Beat 6 must feel like a true turn, a discovery, remembered cue, help, or last risky try, not instant magic.
 - Beats 6, 7, and 8 must each do different work. Do not collapse the turn, the payoff, and the afterglow into one rushed resolution.
 - Beat 7: resolution must show change, not just success.
 - Beat 7 must include a concrete reward image or felt release the viewer can emotionally cash out.
@@ -609,7 +613,10 @@ Extra final-pass rules when a selected seed is provided:
 - Preserve the seed's core event and stakes, do not swap to a different underlying story.
 - Preserve the sequence of what happens, especially for real or real-behavior seeds.
 - Let Beat 1 open with either factual authority or immediate jeopardy, then a clear open loop.
+- Let Beat 3 show the first decisive action.
+- Let Beat 4 introduce the harder complication.
 - Let Beat 5 fully cash out the seed's emotional danger or loneliness.
+- Let Beat 6 earn the turn through memory, instinct, help, persistence, or one last attempt.
 - Let Beat 7 visibly reward the viewer with safety, reunion, relief, nourishment, warmth, or return.
 - Let Beat 8 echo the seed's most memorable visual hook in a smaller, quieter way.
 - If authentic factual framing exists, factualContext and Beat 1 may use it to create authority and curiosity, but never fabricate it.
