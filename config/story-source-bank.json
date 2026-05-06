@@ -1644,6 +1644,235 @@
       "brand_safe": true,
       "source": "curated_expansion",
       "rationale": "Parent modeling rather than just rescuing gives this lane a stronger identity."
+    },
+    {
+      "id": "story_seed_homecoming_salmon_002",
+      "title": "Salmon Finds the Birth River by Scent",
+      "animal": "salmon",
+      "sourceType": "real_behavior",
+      "lane": "homecoming",
+      "coreEvent": "After miles of gray water and wrong currents, one salmon keeps turning until the one familiar river scent finally finds its way through the rain.",
+      "emotionalPattern": "distance -> wrong turns -> fading strength -> scent recognition -> homewater return",
+      "stakes": "If the salmon misses the natal river now, the last push home is spent on the wrong current.",
+      "endingType": "scent_guided_return",
+      "visualHooks": [
+        "silver body in dark current",
+        "river mouth in rain",
+        "one turn into calmer homewater"
+      ],
+      "seasonTags": [
+        "autumn",
+        "river",
+        "migration"
+      ],
+      "trendTags": [
+        "Nature",
+        "River Life",
+        "Animals"
+      ],
+      "reelSuitability": 0.94,
+      "freshness": 0.93,
+      "confidence": 0.93,
+      "emotionalIntensity": 0.92,
+      "relatability": 0.79,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "real_seed_expansion",
+      "factualContext": "Salmon are known to use their sense of smell to locate the river systems where they hatched.",
+      "location": "cold river mouths and spawning streams",
+      "dateNote": "autumn run season",
+      "sourceConfidence": 0.94,
+      "rationale": "A real homecoming incident with a concrete invisible cue, scent, that turns into a clean emotional reveal."
+    },
+    {
+      "id": "story_seed_parent_orca_001",
+      "title": "Orca Mother Keeps the Calf Breathing",
+      "animal": "orca",
+      "sourceType": "real_behavior",
+      "lane": "parent_bond",
+      "coreEvent": "In rough water, an orca mother keeps nudging her exhausted calf back to the surface until the calf finally catches the rhythm of breathing on its own.",
+      "emotionalPattern": "strain -> surfacing effort -> near failure -> repeated lift -> steadier breathing",
+      "stakes": "If the calf misses too many clean breaths in the chop, panic and exhaustion take over.",
+      "endingType": "protective_lift",
+      "visualHooks": [
+        "black fin cutting gray water",
+        "small calf tilted toward air",
+        "mother's head rising beneath the calf"
+      ],
+      "seasonTags": [
+        "open ocean",
+        "storm light"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Animals",
+        "Family"
+      ],
+      "reelSuitability": 0.95,
+      "freshness": 0.92,
+      "confidence": 0.9,
+      "emotionalIntensity": 0.95,
+      "relatability": 0.9,
+      "virality": 0.9,
+      "brand_safe": true,
+      "source": "real_seed_expansion",
+      "factualContext": "Orca calves need frequent surfacing, and mothers are often observed supporting them closely in their earliest days.",
+      "location": "cold coastal waters",
+      "dateNote": null,
+      "sourceConfidence": 0.9,
+      "rationale": "Immediate physical stakes, one repeated protective action, and a very readable documentary-emotional spine."
+    },
+    {
+      "id": "story_seed_loyalty_wolf_002",
+      "title": "Wolf Stays With the Limping Yearling",
+      "animal": "wolf",
+      "sourceType": "true_story_style",
+      "lane": "loyalty",
+      "coreEvent": "As the pack pushes through deep snow at dusk, one older wolf keeps dropping back because the youngest yearling cannot carry its bad leg fast enough.",
+      "emotionalPattern": "movement -> weakness exposed -> choice to stay -> shared endurance -> pack regained",
+      "stakes": "If the older wolf leaves, the yearling loses both pace and protection before the dark closes in.",
+      "endingType": "stayed_with_the_slowest",
+      "visualHooks": [
+        "two wolves in blue snow",
+        "one set of tracks dragging",
+        "pack shapes waiting ahead"
+      ],
+      "seasonTags": [
+        "winter",
+        "dusk"
+      ],
+      "trendTags": [
+        "Forest/Woodland",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.93,
+      "freshness": 0.91,
+      "confidence": 0.87,
+      "emotionalIntensity": 0.93,
+      "relatability": 0.88,
+      "virality": 0.87,
+      "brand_safe": true,
+      "source": "real_seed_expansion",
+      "factualContext": null,
+      "location": "snow forest",
+      "dateNote": null,
+      "sourceConfidence": 0.82,
+      "rationale": "This gives loyalty a costly stay-behind choice without drifting into humanized romance or vague waiting."
+    },
+    {
+      "id": "story_seed_survival_muskox_001",
+      "title": "Musk Ox Calf Steps Inside the Circle",
+      "animal": "musk ox",
+      "sourceType": "real_behavior",
+      "lane": "survival",
+      "coreEvent": "When the wind shifts and danger nears across the tundra, a musk ox calf has to make the longest few steps of its life to reach the center of the adults' circle.",
+      "emotionalPattern": "exposure -> threat sensed -> desperate movement -> protective wall closes -> survival calm",
+      "stakes": "If the calf hesitates in the open, it stays outside the only shelter strong enough to hold the line.",
+      "endingType": "defensive_circle_safety",
+      "visualHooks": [
+        "dark horned ring in snow",
+        "small calf in open white space",
+        "wind combing shaggy coats"
+      ],
+      "seasonTags": [
+        "winter",
+        "arctic"
+      ],
+      "trendTags": [
+        "Arctic Animals",
+        "Nature",
+        "Animals"
+      ],
+      "reelSuitability": 0.94,
+      "freshness": 0.93,
+      "confidence": 0.91,
+      "emotionalIntensity": 0.94,
+      "relatability": 0.84,
+      "virality": 0.86,
+      "brand_safe": true,
+      "source": "real_seed_expansion",
+      "factualContext": "Musk oxen are known to form defensive circles with calves protected toward the center.",
+      "location": "Arctic tundra",
+      "dateNote": "winter",
+      "sourceConfidence": 0.93,
+      "rationale": "A real behavior with one iconic shape, a circle, and a tiny center-run that makes the stakes instantly visual."
+    },
+    {
+      "id": "story_seed_parent_crocodile_001",
+      "title": "Crocodile Mother Carries the Last Hatchling",
+      "animal": "crocodile",
+      "sourceType": "real_behavior",
+      "lane": "parent_bond",
+      "coreEvent": "After the nest breaks open, a crocodile mother keeps returning to the sand because one last hatchling is still crying from below.",
+      "emotionalPattern": "hatching -> gathering -> one left behind -> careful return -> mouth-carried safety",
+      "stakes": "If the last hatchling stays buried too long, heat and open ground become danger before water is reached.",
+      "endingType": "careful_carry",
+      "visualHooks": [
+        "cracked sand nest",
+        "tiny hatchling beside huge jaws",
+        "small striped body carried over dark water"
+      ],
+      "seasonTags": [
+        "riverbank",
+        "summer"
+      ],
+      "trendTags": [
+        "Animals",
+        "Nature",
+        "Parenting"
+      ],
+      "reelSuitability": 0.95,
+      "freshness": 0.94,
+      "confidence": 0.92,
+      "emotionalIntensity": 0.93,
+      "relatability": 0.87,
+      "virality": 0.9,
+      "brand_safe": true,
+      "source": "real_seed_expansion",
+      "factualContext": "Crocodile mothers are known to dig open nests and carry hatchlings carefully in their mouths to the water.",
+      "location": "warm riverbanks and marsh edges",
+      "dateNote": "hatching season",
+      "sourceConfidence": 0.94,
+      "rationale": "It has factual surprise, strong contrast, and a last-one-left-behind micro-incident that tells cleanly."
+    },
+    {
+      "id": "story_seed_homecoming_manatee_001",
+      "title": "Manatee Calf Finds the Scarred Shadow Again",
+      "animal": "manatee",
+      "sourceType": "true_story_style",
+      "lane": "homecoming",
+      "coreEvent": "After boat noise splits the water and the calf turns the wrong way, a young manatee keeps following false shapes until one broad scarred shadow glides back through the green water.",
+      "emotionalPattern": "startle -> separation -> false hope -> true recognition -> calm rejoin",
+      "stakes": "If the calf follows the wrong body into darker channels, the safe route back to its mother disappears.",
+      "endingType": "shadow_reunion",
+      "visualHooks": [
+        "green river haze",
+        "small calf turning toward shapes",
+        "scarred mother shadow returning"
+      ],
+      "seasonTags": [
+        "river",
+        "warm season"
+      ],
+      "trendTags": [
+        "Ocean/Underwater",
+        "Animals",
+        "Nature"
+      ],
+      "reelSuitability": 0.92,
+      "freshness": 0.92,
+      "confidence": 0.85,
+      "emotionalIntensity": 0.91,
+      "relatability": 0.88,
+      "virality": 0.85,
+      "brand_safe": true,
+      "source": "real_seed_expansion",
+      "factualContext": null,
+      "location": "slow green river channels",
+      "dateNote": null,
+      "sourceConfidence": 0.8,
+      "rationale": "Recognition-through-water silhouette gives homecoming a fresh visual lane without losing emotional clarity."
     }
   ]
 }
