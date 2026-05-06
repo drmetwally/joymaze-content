@@ -147,7 +147,11 @@ async function main() {
   const introDur = await getAudioDuration(introPath);
   console.log(`done (${introDur ? introDur.toFixed(2) + 's' : '?'})`);
 
-  const hookText = story.hookQuestion ?? story.hook ?? '';
+  const factualContext = String(story.factualContext || '').trim();
+  const hookQuestion = String(story.hookQuestion ?? story.hook ?? '').trim();
+  const hookText = factualContext && hookQuestion
+    ? `${factualContext}. ${hookQuestion}`
+    : hookQuestion || factualContext;
   const hookPath = path.join(ttsDir, 'hook.wav');
   if (hookText) {
     process.stdout.write(`  [Hook]: "${hookText}"... `);
