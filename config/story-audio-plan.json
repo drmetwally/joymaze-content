@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "notes": {
+    "purpose": "Story Reel V2 audio planning layer. Local curated assets stay first choice. External sources like Pixabay music or Freesound/SFX can backfill these slots later without changing reel logic.",
+    "policy": "Prefer local approved assets first. Only use external replacements after review/QC and save them into assets/audio or assets/sfx."
+  },
+  "musicPools": {
+    "soft_doc": [
+      "assets/audio/Twinkle - The Grey Room _ Density & Time.mp3",
+      "assets/audio/background.mp3"
+    ],
+    "warm_return": [
+      "assets/audio/background.mp3",
+      "assets/audio/Twinkle - The Grey Room _ Density & Time.mp3"
+    ]
+  },
+  "sfxTags": {
+    "hook_observed": "evening_ambience",
+    "hook_tension": "wind_breeze",
+    "middle_motion": "wind_breeze",
+    "middle_strain": "leaves_rustle",
+    "middle_night": "evening_ambience",
+    "payoff_release": "gentle_chime"
+  },
+  "lanePlans": {
+    "homecoming": {
+      "musicPool": "warm_return",
+      "hookSfxTag": "hook_observed",
+      "act1SfxTag": "middle_motion",
+      "act2SfxTag": "middle_night",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:warm piano", "pixabay:gentle documentary"],
+        "sfx": ["freesound:night ambience", "freesound:soft wind"]
+      }
+    },
+    "survival": {
+      "musicPool": "soft_doc",
+      "hookSfxTag": "hook_tension",
+      "act1SfxTag": "middle_night",
+      "act2SfxTag": "middle_motion",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:low tension ambient", "pixabay:documentary suspense soft"],
+        "sfx": ["freesound:wind gust soft", "freesound:sea ambience"]
+      }
+    },
+    "loyalty": {
+      "musicPool": "soft_doc",
+      "hookSfxTag": "hook_tension",
+      "act1SfxTag": "middle_motion",
+      "act2SfxTag": "middle_strain",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:emotional strings soft", "pixabay:quiet documentary piano"],
+        "sfx": ["freesound:wind field soft", "freesound:grass rustle"]
+      }
+    },
+    "parent_bond": {
+      "musicPool": "warm_return",
+      "hookSfxTag": "hook_observed",
+      "act1SfxTag": "hook_observed",
+      "act2SfxTag": "middle_motion",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:warm emotional piano", "pixabay:gentle family documentary"],
+        "sfx": ["freesound:garden ambience", "freesound:soft breeze"]
+      }
+    },
+    "rescue": {
+      "musicPool": "soft_doc",
+      "hookSfxTag": "hook_tension",
+      "act1SfxTag": "middle_motion",
+      "act2SfxTag": "middle_strain",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:hopeful tension", "pixabay:light rescue documentary"],
+        "sfx": ["freesound:motion grass", "freesound:soft impact whoosh"]
+      }
+    },
+    "migration": {
+      "musicPool": "soft_doc",
+      "hookSfxTag": "hook_tension",
+      "act1SfxTag": "middle_motion",
+      "act2SfxTag": "middle_night",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:travel documentary ambient", "pixabay:emotional horizon"],
+        "sfx": ["freesound:wind sky soft", "freesound:distant ambience"]
+      }
+    },
+    "default": {
+      "musicPool": "soft_doc",
+      "hookSfxTag": "hook_observed",
+      "act1SfxTag": "middle_night",
+      "act2SfxTag": "middle_motion",
+      "act3SfxTag": "payoff_release",
+      "externalTargets": {
+        "music": ["pixabay:soft documentary", "pixabay:gentle emotional underscore"],
+        "sfx": ["freesound:soft ambience", "freesound:light breeze"]
+      }
+    }
+  }
+}

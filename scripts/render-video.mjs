@@ -74,6 +74,8 @@ const PREVIEW_SCALE  = 0.5; // half resolution → 540×960
 // Falls back gracefully if the file doesn't exist (logs a warning, uses '').
 
 const SOFT_MUSIC = 'assets/audio/Twinkle - The Grey Room _ Density & Time.mp3';
+const STORY_AUDIO_PLAN_FILE = path.join(ROOT, 'config', 'story-audio-plan.json');
+const SFX_LIBRARY_FILE = path.join(ROOT, 'config', 'sfx-library.json');
 
 const AUDIO_MAP = {
   coloring:   'assets/audio/crayon.mp3',  // crayon scratch ASMR — no background music
@@ -176,6 +178,29 @@ async function resolveAudio(type) {
   }
 }
 
+let storyAudioPlanCache = null;
+let sfxLibraryCache = null;
+
+async function loadStoryAudioPlan() {
+  if (storyAudioPlanCache !== null) return storyAudioPlanCache;
+  try {
+    storyAudioPlanCache = JSON.parse(await fs.readFile(STORY_AUDIO_PLAN_FILE, 'utf-8'));
+  } catch {
+    storyAudioPlanCache = null;
+  }
+  return storyAudioPlanCache;
+}
+
+async function loadSfxLibrary() {
+  if (sfxLibraryCache !== null) return sfxLibraryCache;
+  try {
+    sfxLibraryCache = JSON.parse(await fs.readFile(SFX_LIBRARY_FILE, 'utf-8'));
+  } catch {
+    sfxLibraryCache = null;
+  }
+  return sfxLibraryCache;
+}
+
 async function resolveFirstExistingAudio(candidates = [], label = 'audio') {
   for (const rel of candidates) {
     if (!rel) continue;
@@ -196,16 +221,32 @@ async function resolveFirstExistingAudio(candidates = [], label = 'audio') {
 async function resolveStoryReelMusic(story = {}) {
   if (story.musicPath !== undefined) return story.musicPath;
   const lane = String(story.storyLane || 'default');
+  const audioPlan = await loadStoryAudioPlan();
+  const poolName = audioPlan?.lanePlans?.[lane]?.musicPool || audioPlan?.lanePlans?.default?.musicPool || null;
+  const plannedCandidates = poolName ? (audioPlan?.musicPools?.[poolName] || []) : [];
+  if (plannedCandidates.length) {
+    const resolvedPlanned = await resolveFirstExistingAudio(plannedCandidates, 'story-music');
+    if (resolvedPlanned) return resolvedPlanned;
+  }
   return resolveFirstExistingAudio(STORY_REEL_MUSIC_MAP[lane] ?? STORY_REEL_MUSIC_MAP.default, 'story-music');
+}
+
+async function resolveSfxFromTag(tag, fallbackCue = null) {
+  const sfxLibrary = await loadSfxLibrary();
+  const entry = tag ? sfxLibrary?.tags?.[tag] : null;
+  const candidates = [entry?.file, fallbackCue?.path].filter(Boolean);
+  const resolved = await resolveFirstExistingAudio(candidates, 'story-sfx');
+  return { sfxPath: resolved, sfxVolume: entry?.volume ?? fallbackCue?.volume ?? 0.15 };
 }
 
 async function resolveStoryReelSfx(lane = 'default', act = 1, cueType = 'scene') {
   const pack = STORY_REEL_SFX_MAP[lane] ?? STORY_REEL_SFX_MAP.default;
+  const audioPlan = await loadStoryAudioPlan();
+  const lanePlan = audioPlan?.lanePlans?.[lane] || audioPlan?.lanePlans?.default || null;
   const key = cueType === 'hook' ? 'hook' : act <= 1 ? 'act1' : act === 2 ? 'act2' : 'act3';
+  const tagKey = cueType === 'hook' ? 'hookSfxTag' : act <= 1 ? 'act1SfxTag' : act === 2 ? 'act2SfxTag' : 'act3SfxTag';
   const cue = pack[key] ?? STORY_REEL_SFX_MAP.default[key];
-  if (!cue?.path) return { sfxPath: '', sfxVolume: 0.15 };
-  const resolved = await resolveFirstExistingAudio([cue.path], 'story-sfx');
-  return { sfxPath: resolved, sfxVolume: cue.volume ?? 0.15 };
+  return resolveSfxFromTag(lanePlan?.[tagKey] || null, cue);
 }
 
 // ─── Props loaders ────────────────────────────────────────────────────────────
