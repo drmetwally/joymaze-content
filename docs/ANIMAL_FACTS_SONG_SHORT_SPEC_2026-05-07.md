@@ -117,6 +117,8 @@ If not, the beat is too abstract, too dense, or poorly chosen.
 - image prompts should be written for immediate legibility, not just beauty
 - maintain one consistent illustration medium and character design across the whole reel
 - avoid collage, split-panel, or cluttered educational infographic energy
+- for longer songs, increase the number of creatives, not just the hold time on the same 5 images
+- recommended production model: keep 4-5 lyrical beats, but expand to 8-10 visual moments when the selected song runs longer and the material supports it
 
 ## Song-writing rules
 
@@ -221,6 +223,7 @@ New timing rule:
 - the composition follows the selected song duration, not a fixed reel duration target
 - scene count may exceed beat count when a strong song needs more visual moments
 - each beat can expand into multiple scene slices with different framing or camera motion while keeping the same lyric line active
+- the generator should explicitly plan these extra creatives as a wide visual expansion layer, not leave them implicit in render-time duplication
 
 ### Phase 5 — benchmark set
 Create 2-4 benchmark animals and iterate narrowly.

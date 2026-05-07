@@ -123,6 +123,7 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
   - Build a lightweight **animal-song topic bank** (curated hook/fact/visual/songability source layer), not a Story-Reel-style narrative seed bank.
   - Durable visual rule (2026-05-07): generate Animal Facts beat images as **vertical portrait by default**, with safe breathing room for reel framing, to avoid heavy crop loss from horizontal generations.
   - Durable timing rule (2026-05-07): Animal Facts short reels should follow the **selected song duration and scene energy**, not compress strong material into a fixed 24-27s template. Puzzle reels stay duration-disciplined; story/fact reels can run longer when the song and copy justify it.
+  - Durable expansion rule (2026-05-07): longer / stronger Animal Facts songs should expand into a wider creative plan (typically 8-10 `visualExpansionMoments`), not just stretch 5 beat images longer.
 
 - [ ] **CHALLENGE-REEL-001 — Find-the-Difference challenge reel engine**
   - After Animal Facts structure is stabilized, build/finish the Find-the-Difference challenge reel engine as the final major build lane.

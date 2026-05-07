@@ -46,6 +46,13 @@ const positiveSec = (value, fallbackSec) => {
 };
 
 const getBeatImagePaths = (episodeFolder, episode) => {
+  const expandedMoments = Array.isArray(episode.visualExpansionMoments) ? episode.visualExpansionMoments : [];
+  if (expandedMoments.length > 0) {
+    return expandedMoments.map((moment, index) =>
+      resolveEpisodeAsset(episodeFolder, moment.imageAsset || `moment${index + 1}.png`)
+    );
+  }
+
   const beatCount = Array.isArray(episode.songBeats) ? episode.songBeats.length : 0;
   if (beatCount > 0) {
     return Array.from({ length: beatCount }, (_, index) =>

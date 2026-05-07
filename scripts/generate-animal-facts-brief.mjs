@@ -386,6 +386,19 @@ Return one JSON object with EXACTLY this shape (no extra fields, no missing fiel
       "imagePromptHint": "string — 50-70 words full Gemini prompt"
     }
   ],
+  "visualExpansionMoments": [
+    {
+      "key": "moment1",
+      "beatKey": "beat1",
+      "title": "string — short creative label",
+      "lyricFocus": "string — the exact lyric chunk or phrase this creative supports",
+      "factFocus": "string — factual idea shown in this creative",
+      "shotType": "ESTABLISHING or MEDIUM or ACTION or CLOSE-UP",
+      "compositionNote": "string — 1 sentence",
+      "psychologyBeat": "string — 3-6 words",
+      "imagePromptHint": "string — 50-70 words full Gemini prompt"
+    }
+  ],
   "loopBackIdea": "string — 1 sentence on how the ending loops back into the opening line",
   "fullSongLyrics": "string — full short song, multi-line, includes the opening line and all beat ideas",
   "songSunoPrompt": "string — upbeat children's animal fact song, earworm cadence, loop-friendly, rich enough to support a longer fact reel when the song quality is strong",
@@ -401,6 +414,9 @@ Hard rules:
 - Each lyric line must be short, sticky, child-friendly, and visually legible.
 - Richer copy is allowed when it stays musical, clear, and replayable. Do not flatten strong material just to force a short runtime.
 - The final reel should follow the selected song, not force the song to fit a fixed short duration.
+- Keep \`songBeats\` as the lyrical spine, but make \`visualExpansionMoments\` the wider creative plan for production.
+- For stronger / longer songs, \`visualExpansionMoments\` should usually expand to 8-10 creatives, even if \`songBeats\` stays at 4-5 beats.
+- Every visualExpansionMoment must feel visually distinct from the others. No duplicate holds disguised as separate ideas.
 - Choose 5 song beats only if the animal supports 5 truly strong beats. Avoid filler energy.
 - Every beat must be understandable in 2-3 seconds visually.
 - factFocus should stay factual and clear. Do not fabricate facts.
@@ -432,21 +448,62 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
   return normalized;
 }
 
+function synthesizeVisualExpansionMomentsFromBeats(songBeats = []) {
+  return songBeats.flatMap((beat, index) => {
+    const beatKey = beat?.key || `beat${index + 1}`;
+    const shotType = String(beat?.shotType || '').toUpperCase();
+    const dynamic = /ACTION|ESTABLISHING/.test(shotType);
+    return [
+      {
+        key: `${beatKey}-main`,
+        beatKey,
+        title: beat?.title || `Moment ${index + 1}`,
+        lyricFocus: beat?.lyric || '',
+        factFocus: beat?.factFocus || '',
+        shotType: beat?.shotType || 'MEDIUM',
+        compositionNote: beat?.compositionNote || '',
+        psychologyBeat: beat?.psychologyBeat || '',
+        imagePromptHint: beat?.imagePromptHint || '',
+        imageAsset: `moment${index * 2 + 1}.png`,
+      },
+      {
+        key: `${beatKey}-accent`,
+        beatKey,
+        title: `${beat?.title || `Moment ${index + 1}`} accent`,
+        lyricFocus: beat?.lyric || '',
+        factFocus: beat?.factFocus || '',
+        shotType: dynamic ? 'ACTION' : 'MEDIUM',
+        compositionNote: beat?.compositionNote || '',
+        psychologyBeat: beat?.psychologyBeat || '',
+        imagePromptHint: beat?.imagePromptHint || '',
+        imageAsset: `moment${index * 2 + 2}.png`,
+      },
+    ];
+  });
+}
+
+function normalizeCreativeMoments(moments, { animalName, artStyle, fallbackEnvironment }) {
+  if (!Array.isArray(moments)) return [];
+  return moments.map((moment) => {
+    const wordCount = String(moment?.imagePromptHint || '').split(/\s+/).filter(Boolean).length;
+    if (wordCount >= 40) return moment;
+    return {
+      ...moment,
+      imagePromptHint: expandImagePromptHint({ animalName, artStyle, beat: moment, fallbackEnvironment }),
+    };
+  });
+}
+
 function normalizeBrief(brief, context, artStyle) {
   if (!brief || typeof brief !== 'object') return brief;
   const topic = getCandidateAnimalTopics(context).find((item) => item.animalName === brief.animalName || item.slug === brief.slug);
   const fallbackEnvironment = topic?.habitat || 'natural habitat';
 
-  if (Array.isArray(brief.songBeats)) {
-    brief.songBeats = brief.songBeats.map((beat) => {
-      const wordCount = String(beat?.imagePromptHint || '').split(/\s+/).filter(Boolean).length;
-      if (wordCount >= 40) return beat;
-      return {
-        ...beat,
-        imagePromptHint: expandImagePromptHint({ animalName: brief.animalName, artStyle, beat, fallbackEnvironment }),
-      };
-    });
-  }
+  brief.songBeats = normalizeCreativeMoments(brief.songBeats, { animalName: brief.animalName, artStyle, fallbackEnvironment });
+  const suppliedMoments = Array.isArray(brief.visualExpansionMoments) && brief.visualExpansionMoments.length >= 6
+    ? brief.visualExpansionMoments
+    : synthesizeVisualExpansionMomentsFromBeats(brief.songBeats);
+  brief.visualExpansionMoments = normalizeCreativeMoments(suppliedMoments, { animalName: brief.animalName, artStyle, fallbackEnvironment });
 
   return brief;
 }
@@ -497,6 +554,26 @@ function validateBrief(brief) {
     }
   }
 
+  if (!Array.isArray(brief.visualExpansionMoments) || brief.visualExpansionMoments.length < 6) {
+    throw new Error('Brief field missing or too short: visualExpansionMoments (minimum 6 creatives required).');
+  }
+
+  for (let i = 0; i < brief.visualExpansionMoments.length; i++) {
+    const moment = brief.visualExpansionMoments[i];
+    if (!moment || typeof moment !== 'object') {
+      throw new Error(`visualExpansionMoments[${i}] is missing or invalid.`);
+    }
+    for (const key of ['key', 'beatKey', 'title', 'lyricFocus', 'factFocus', 'shotType', 'compositionNote', 'psychologyBeat', 'imagePromptHint']) {
+      if (typeof moment[key] !== 'string' || moment[key].trim().length === 0) {
+        throw new Error(`visualExpansionMoments[${i}].${key} is missing.`);
+      }
+    }
+    const wordCount = moment.imagePromptHint.split(/\s+/).filter(Boolean).length;
+    if (wordCount < 40) {
+      throw new Error(`visualExpansionMoments[${i}].imagePromptHint too short (${wordCount} words — minimum 40, target 50-70).`);
+    }
+  }
+
   if (!/\b${''}/.source) {
     // no-op placeholder to avoid accidental template interpolation confusion in exact replacement block
   }
@@ -510,42 +587,44 @@ function validateBrief(brief) {
   }
 }
 
-function buildSongScenePlan(songBeats = []) {
-  return songBeats.flatMap((beat, index) => {
-    const key = beat.key || `beat${index + 1}`;
-    const wordCount = String(beat?.lyric || '').split(/\s+/).filter(Boolean).length;
-    const mainWeight = Math.max(1, Math.min(2.4, wordCount / 6) + (index === 0 ? 0.25 : 0) + (index === songBeats.length - 1 ? 0.35 : 0));
-    const accentWeight = Math.max(0.55, Math.min(1.6, wordCount / 10) + (index === songBeats.length - 1 ? 0.2 : 0));
-    const shotType = String(beat?.shotType || '').toUpperCase();
-    const mainCamera = /ACTION|ESTABLISHING/.test(shotType) ? 'wide-sweep' : (index === songBeats.length - 1 ? 'loop-settle' : 'push-in');
-    const accentCamera = /ACTION|ESTABLISHING/.test(shotType) ? 'lift-up' : (index === songBeats.length - 1 ? 'loop-return' : 'drift-right');
+function buildWideExpansionMoments(songBeats = [], suppliedMoments = []) {
+  if (Array.isArray(suppliedMoments) && suppliedMoments.length > 0) {
+    return suppliedMoments.map((moment, index) => ({
+      ...moment,
+      imageAsset: moment.imageAsset || `moment${index + 1}.png`,
+    }));
+  }
 
-    return [
-      {
-        key: `${key}-main`,
-        beatKey: key,
-        lyric: beat.lyric,
-        imageIndex: index,
-        durationWeight: Number(mainWeight.toFixed(2)),
-        cameraPreset: mainCamera,
-        captionLabel: beat.title || '',
-      },
-      {
-        key: `${key}-accent`,
-        beatKey: key,
-        lyric: beat.lyric,
-        imageIndex: index,
-        durationWeight: Number(accentWeight.toFixed(2)),
-        cameraPreset: accentCamera,
-        captionLabel: beat.factFocus || '',
-      },
-    ];
+  return synthesizeVisualExpansionMomentsFromBeats(songBeats);
+}
+
+function buildSongScenePlan(songBeats = [], visualExpansionMoments = []) {
+  const moments = buildWideExpansionMoments(songBeats, visualExpansionMoments);
+  return moments.map((moment, index) => {
+    const shotType = String(moment?.shotType || '').toUpperCase();
+    const dynamic = /ACTION|ESTABLISHING/.test(shotType);
+    const isFirst = index === 0;
+    const isLast = index === moments.length - 1;
+    const wordCount = String(moment?.lyricFocus || '').split(/\s+/).filter(Boolean).length;
+    const durationWeight = Math.max(0.6, Math.min(1.8, wordCount / 7) + (isFirst ? 0.15 : 0) + (isLast ? 0.2 : 0));
+
+    return {
+      key: moment.key || `scene-${index + 1}`,
+      beatKey: moment.beatKey || songBeats[Math.min(index, Math.max(songBeats.length - 1, 0))]?.key || `beat${index + 1}`,
+      lyric: moment.lyricFocus || songBeats.find((beat) => beat.key === moment.beatKey)?.lyric || '',
+      imageIndex: index,
+      durationWeight: Number(durationWeight.toFixed(2)),
+      cameraPreset: dynamic ? (isFirst ? 'wide-sweep' : 'lift-up') : (isLast ? 'loop-return' : index % 2 === 0 ? 'push-in' : 'drift-right'),
+      captionLabel: moment.factFocus || moment.title || '',
+      imageAsset: moment.imageAsset || `moment${index + 1}.png`,
+    };
   });
 }
 
 function buildEpisodeJson(brief, context, artStyle) {
   const selectedBackground = getLowestUsedPoolEntry(context.sunoPool, 'animal_background_ambient');
   const songBeats = Array.isArray(brief.songBeats) ? brief.songBeats : [];
+  const visualExpansionMoments = buildWideExpansionMoments(songBeats, brief.visualExpansionMoments);
 
   return {
     format: 'animal-facts-song-short',
@@ -567,10 +646,11 @@ function buildEpisodeJson(brief, context, artStyle) {
     openingHookLine: brief.openingHookLine,
     loopBackIdea: brief.loopBackIdea,
     songBeats,
+    visualExpansionMoments,
     fullSongLyrics: brief.fullSongLyrics,
     songDurationTargetSec: 32,
     selectedSongDurationSec: null,
-    songScenePlan: buildSongScenePlan(songBeats),
+    songScenePlan: buildSongScenePlan(songBeats, visualExpansionMoments),
     sunoPrompts: {
       fullSong: brief.songSunoPrompt,
       background: selectedBackground?.prompt || brief.backgroundSunoPrompt,
@@ -590,7 +670,7 @@ function buildBriefMd(episode, episodeDir) {
 
   const beatImageSections = (episode.songBeats || [])
     .map((beat, index) => `
-## ${beat.title || `Beat ${index + 1}`} → save as \`beat${index + 1}.png\`
+## ${beat.title || `Beat ${index + 1}`} → core beat anchor, save as \`beat${index + 1}.png\`
 **Shot type:** ${beat.shotType || 'MEDIUM'} · **Psychology beat:** _${beat.psychologyBeat || ''}_
 **Fact focus:** ${beat.factFocus || ''}
 **Composition:** ${beat.compositionNote || ''}
@@ -600,6 +680,21 @@ function buildBriefMd(episode, episodeDir) {
 Image prompt (paste into Gemini):
 \`\`\`
 ${beat.imagePromptHint}
+\`\`\`
+`).join('');
+
+  const wideExpansionSections = (episode.visualExpansionMoments || [])
+    .map((moment, index) => `
+## ${moment.title || `Creative ${index + 1}`} → expanded creative, save as \`${moment.imageAsset || `moment${index + 1}.png`}\`
+**Linked beat:** ${moment.beatKey || ''} · **Shot type:** ${moment.shotType || 'MEDIUM'} · **Psychology beat:** _${moment.psychologyBeat || ''}_
+**Fact focus:** ${moment.factFocus || ''}
+**Composition:** ${moment.compositionNote || ''}
+
+**Lyric focus:** ${moment.lyricFocus || ''}
+
+Image prompt (paste into Gemini):
+\`\`\`
+${moment.imagePromptHint}
 \`\`\`
 `).join('');
 
@@ -626,7 +721,11 @@ ${episode.loopBackIdea}
 
 ---
 ## IMAGES — Generate in Gemini, drop into episode folder with exact filenames below
+### Core beat anchors
 ${beatImageSections}
+
+### Wide expansion creatives
+${wideExpansionSections}
 ---
 
 ## Beat Lyrics (reference)
@@ -647,7 +746,9 @@ ${episode.fullSongLyrics}
 - Loop ending required
 - Selected song becomes the duration source of truth for final render timing
 - Stronger songs may justify a longer fact reel with richer copy and more visual moments
-- Required beat images: ${(episode.songBeats || []).map((_, index) => `\`beat${index + 1}.png\``).join(', ')}
+- Longer songs should usually trigger more creatives, not longer holds on the same 5 images
+- Required core beat images: ${(episode.songBeats || []).map((_, index) => `\`beat${index + 1}.png\``).join(', ')}
+- Preferred expanded creative images: ${(episode.visualExpansionMoments || []).map((moment, index) => `\`${moment.imageAsset || `moment${index + 1}.png`}\``).join(', ')}
 
 ## Suno Drop Instructions
 Drop these MP3 files into the episode folder with exact filenames:
