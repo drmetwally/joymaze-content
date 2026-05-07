@@ -11,8 +11,8 @@ const ROOT = path.resolve(__dirname, '..');
 const STORIES_DIR = path.join(ROOT, 'output', 'stories');
 const MODEL = 'imagen-4.0-generate-001';
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
-const WIDTH = 1080;
-const HEIGHT = 1920;
+const WIDTH = 1024;
+const HEIGHT = 1536;
 
 const args = process.argv.slice(2);
 const getArg = (flag) => {
@@ -109,8 +109,8 @@ async function loadPromptMaps(storyDir) {
 
 function adaptPromptForImagen(prompt) {
   return prompt
-    .replace(/Generate at 9:16 portrait ratio \(1080[×x]1920 pixels\)\./gi, 'Portrait composition, vertical framing.')
-    .replace(/Generate at 9:16 portrait ratio\./gi, 'Portrait composition, vertical framing.')
+    .replace(/Generate at 9:16 portrait ratio \(1080[×x]1920 pixels\)\./gi, 'Vertical portrait composition, safe reel framing, extra breathing room above and below the main subject.')
+    .replace(/Generate at 9:16 portrait ratio\./gi, 'Vertical portrait composition, safe reel framing, extra breathing room above and below the main subject.')
     .trim();
 }
 
@@ -265,7 +265,7 @@ async function main() {
   console.log(`Mode     : ${ALL_SLIDES ? 'all slides' : explicitSlides.length ? 'custom slide list' : 'reel-first'}`);
   console.log(`Slides   : ${targetSlides.join(', ')}`);
   console.log(`Prompt   : ${reelMap.size > 0 && !ALL_SLIDES && !explicitSlides.length ? path.relative(ROOT, reelPath) : path.relative(ROOT, fullPath)}`);
-  console.log(`Output   : ${WIDTH}x${HEIGHT} PNG`);
+  console.log(`Output   : ${WIDTH}x${HEIGHT} PNG (vertical default)`);
   console.log(`Fallback : ${FALLBACK_MODE}`);
   if (CONTINUE_ON_ERROR) console.log('On error : continue and log fallback-needed slides');
   if (DRY_RUN) console.log('Mode     : DRY RUN');

@@ -301,8 +301,9 @@ Write the song beats so they activate these feelings:
 
   const visualStyleBlock = `
 ## VISUAL STYLE (apply to every imagePromptHint)
-- Image format: horizontal landscape, 1920×1080 px — every imagePromptHint MUST end with "horizontal landscape format, 1920×1080 px"
+- Image format: vertical portrait, 1024×1536 px — every imagePromptHint MUST end with "vertical portrait format, 1024×1536 px"
 - Bottom 15% of every image must be clear (no animals, no objects) — text overlay zone
+- Compose with safe breathing room above and below the main subject so vertical reel framing does not crop away the core action.
 - BOTTOM FADE (mandatory every scene): ground or environment at the lower edge must dissolve softly into light cream or pale white — like paint fading into paper. Include "ground fades softly to pale cream at lower edge" in every imagePromptHint.
 - Art style for this episode (use EXACTLY this style across ALL images — never deviate): ${artStyle}
 - No text, logos, watermarks, or human characters in any image.
@@ -401,7 +402,7 @@ Hard rules:
 - Choose 5 song beats only if the animal supports 5 truly strong beats. Avoid filler energy.
 - Every beat must be understandable in 2-3 seconds visually.
 - factFocus should stay factual and clear. Do not fabricate facts.
-- Every imagePromptHint: 50-70 words, complete Gemini generation prompt. MUST include: animal species, shotType framing, environment, lighting mood, "ground fades softly to pale cream at lower edge", "horizontal landscape format, 1920×1080 px". Do NOT include text or logos.
+- Every imagePromptHint: 50-70 words, complete Gemini generation prompt. MUST include: animal species, shotType framing, environment, lighting mood, "ground fades softly to pale cream at lower edge", "vertical portrait format, 1024×1536 px". Do NOT include text or logos.
 - compositionNote: 1 sentence. What is in foreground, background, lighting direction, animal posture or expression.
 - psychologyBeat: 3-6 words. The emotional beat this image serves.
 - fullSongLyrics should feel musical and replayable, not like stitched prose facts.
@@ -420,7 +421,7 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
     `Show the factual idea clearly: ${factFocus}.`,
     `Mood should feel like ${psychologyBeat}, with child-friendly readability and strong visual clarity in 2-3 seconds.`,
     `Use ${artStyle}.`,
-    `Keep the scene in ${fallbackEnvironment}, no text or logos, ground fades softly to pale cream at lower edge, horizontal landscape format, 1920×1080 px.`,
+    `Keep the scene in ${fallbackEnvironment}, no text or logos, ground fades softly to pale cream at lower edge, vertical portrait format, 1024×1536 px, with safe breathing room above and below the subject for reel framing.`,
   ].join(' ');
 
   const existing = String(beat?.imagePromptHint || '').trim();

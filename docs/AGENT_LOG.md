@@ -285,3 +285,5 @@ This means current Story Engine work should stay tightly focused on quality vali
 **Important scope note:**
 - The validation placeholders were only for render-path proof, not creative approval.
 - Remaining work after this checkpoint is real benchmark asset generation, song generation, pacing polish, and narrow quality iteration.
+- Durable image-generation correction from the first real Puffin benchmark: Animal Facts beat images should be generated as **vertical portrait by default**, not horizontal landscape, because horizontal generations crop too aggressively inside the reel. The brief generator contract was updated accordingly so future image batches default to vertical framing with extra breathing room.
+- Matching correction applied to Story Reel V2 image generation on 2026-05-07: `generate-story-reel-images.mjs` now defaults to vertical output sizing and stronger portrait-framing language so future story reel image patches are vertical by default too.

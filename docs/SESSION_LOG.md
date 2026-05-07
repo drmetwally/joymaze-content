@@ -2720,3 +2720,8 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - real song generation
 - composition/pacing polish
 - benchmark QC and narrow iteration
+
+**Durable correction discovered during first real benchmark image generation:**
+- Horizontal image generation is a bad default for the new Animal Facts song-short lane because the vertical reel crop trims too aggressively.
+- The generator contract was updated so Animal Facts beat images now default to vertical portrait framing with extra breathing room around the subject.
+- The same directional fix was then applied to Story Reel V2 image generation: `generate-story-reel-images.mjs` now normalizes to vertical default output and stronger portrait-safe prompt language for future story reel image patch batches.
