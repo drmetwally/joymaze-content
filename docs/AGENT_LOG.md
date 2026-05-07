@@ -1,5 +1,74 @@
 ---
 
+### 2026-05-08 | OpenClaw | HANDOFF-PLAN | Tomorrow-start plan after Claude audit + Sea Otter validation
+
+**Status:** READY FOR NEXT SESSION
+
+**Agreed durable judgment:**
+- `StoryReelV2` and `AnimalFactsSongShort` are ship-ready at the **engine** level for the current slice.
+- Tomorrow should **not** start with broad renderer/composition rebuilding.
+- Claude's main diagnosis stands: the highest-ROI next work is upstream generation quality, plus one narrow reliability guardrail so bad inputs do not masquerade as engine defects.
+
+**Tomorrow-first priority order:**
+1. **Animal brief quality pass**
+   - Tighten `generate-animal-facts-brief` so opener and payoff do not routinely repeat the same core fact.
+   - Preserve immediate animal naming in the opening lyric.
+   - Keep final moments biased toward a concrete emotional/factual payoff, not a generic scenic return.
+2. **Story Reel quality pass**
+   - Improve source-bank / slide quality and image-prompt richness rather than changing reel architecture.
+   - Use the renderer as validator, not the main invention surface.
+3. **Reliability hardening**
+   - Add a fail-loud or at least explicit warning path when Animal Facts has a partial `moment*.png` set and would silently fall back to `beat*.png` or legacy images.
+   - Goal: avoid future false engine diagnoses like the `namereveal` confusion.
+4. **Later format improvement, not morning task #1**
+   - Standalone Animal Facts likely still wants a stronger hook/cold-open strategy, but only after the brief-quality and reliability passes above.
+
+**Specific agreement with Claude's fixes:**
+- Keep the StoryReelV2 hard-cut `imageSequence` change.
+- Keep the Animal Facts `--episode` alias fix and current song-driven timing path.
+- Do not spend the next pass activating inert psychology pulses or building broader animation complexity unless a concrete QC failure demands it.
+
+**Stop-line for next session:**
+- Preferred order is **brief quality -> reliability guardrail -> benchmark/QC**.
+- Reopen engine architecture only if a new real render exposes a concrete defect.
+
+---
+
+### 2026-05-08 | Claude | AUDIT-001 | StoryReelV2 + AnimalFactsSongShort engine audit + fixes
+
+**Status:** COMPLETE
+
+**Audit findings:**
+
+**AnimalFactsSongShort (score: 9/10 post-fixes)**
+- Architecture: single-sequence wrapper, audio-driven timing via `music-metadata`, image fallback cascade (visualExpansionMoments → beat*.png → legacy namereveal+facts)
+- `--episode` alias bug fixed in commit `8655c17` (by OpenClaw) — correctly guards alias to AnimalFactsSongShort comp only
+- Badge alpha corrected: `rgba(255,210,0,0.9)` → `rgba(255,210,0,0.93)` — `AnimalSungRecap.jsx:166` — commit `4042f3e`
+- Song recap display compliant: no karaoke sync, shows animal name + "♪ Fun Facts Song ♪" + 2 floating note particles
+- `durationSec` rule not applicable here — engine uses actual audio file duration, no narration scenes
+- **Known gaps:** no hook scene (cold start), `scenePlan` fallback gives equal weight to all scenes regardless of emotional value, partial `moment*.png` set falls back silently to beat/legacy images
+
+**StoryReelV2 (score: 9/10 post-fixes)**
+- Architecture: hook (`StoryHookScene`) + N act slides (`StoryActScene`), hard cuts throughout, background music loop at composition level
+- All 6 SFX lanes present: homecoming, survival, loyalty, parent_bond, rescue, migration
+- Yellow pill exact match: `rgba(255,210,0,0.93)`, `rx=22`, dark text — compliant
+- No outro, no CTA, no fade — loop-clean hard cut on last frame — compliant
+- `psychologyTrigger` was hardcoded by act number, ignoring `slide.psychologyTrigger` from story JSON — fixed: `render-video.mjs:458` — commit `4042f3e`
+- Dead `backgroundMusicPath` prop removed from `StoryHookScene.jsx` — commit `4042f3e`
+- **Grey area resolved:** `imageSequence` within-scene 12-frame crossfade removed — now hard cut — commit `1aa403f`. Note: Ken Burns resets at `sequenceIndex` switch; `imageSequence` is now functionally a hard-cut image swap mid-scene. Recommend removing `imageSequence` from story generator or wiring KB per segment.
+- **Known gap:** `brightnessPulse` and `climaxPulse` both hardcoded to `1` in `StoryActScene.jsx` — psychology trigger color overlays are wired but visually inert (no-op)
+- **Known gap:** No analytics hookback — arc selection is blind until Phase 2 story performance weights loop is built
+
+**Content production verdict:**
+- Both engines are ship-ready. The bottleneck is upstream content quality (brief quality, image prompt richness, story arc selection), not engine capability.
+- StoryReelV2: SFX lane system is a genuine differentiator vs competitor reels. Engine amplifies story data quality.
+- AnimalFactsSongShort: Works as companion to full episode; weaker as standalone post. Hook scene would dramatically improve retention.
+- Highest-ROI next investment: tighten generation scripts (story JSON + animal brief), not more engine work.
+
+**Commits this session:** `4042f3e` (4 fixes), `1aa403f` (imageSequence hard-cut)
+
+---
+
 ### 2026-05-04 | OpenClaw | OC-030 | MatchingReveal fixes — timing, layering, ocean background
 
 **Status:** LARGELY COMPLETE — minor timing edge cases remain (see below)
