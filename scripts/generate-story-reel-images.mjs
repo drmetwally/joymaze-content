@@ -26,6 +26,8 @@ const DRY_RUN = hasFlag('--dry-run');
 const FORCE = hasFlag('--force');
 const ALL_SLIDES = hasFlag('--all');
 const SLIDES_ARG = getArg('--slides');
+const FALLBACK_MODE = getArg('--fallback') || 'none';
+const CONTINUE_ON_ERROR = hasFlag('--continue-on-error') || FALLBACK_MODE !== 'none';
 
 function buildDefaultReelSlideOrder(slides = []) {
   const count = Array.isArray(slides) ? slides.length : 0;
@@ -153,6 +155,34 @@ function buildImagenPrompt(prompt) {
   return `Children's story illustration. No text, no logos, no watermark. ${heroGuard}${anatomyGuard} ${sideCharacterGuard} ${speciesGuard} ${layoutGuard} ${styleGuard}The named protagonist must remain the first and dominant subject in frame. ${adapted}`;
 }
 
+function classifyGenerationError(err) {
+  const message = String(err?.message || err || 'Unknown error');
+  if (/429|quota|rate limit|resource exhausted/i.test(message)) {
+    return { type: 'quota', retryable: true, message };
+  }
+  if (/403|permission|unauthorized|api key/i.test(message)) {
+    return { type: 'auth', retryable: false, message };
+  }
+  if (/404|not found|predict/i.test(message)) {
+    return { type: 'endpoint', retryable: false, message };
+  }
+  if (/timed out|timeout|fetch failed|network|econnreset|socket/i.test(message)) {
+    return { type: 'network', retryable: true, message };
+  }
+  return { type: 'unknown', retryable: false, message };
+}
+
+function buildFallbackNotice({ slideNumber, fileName, classification }) {
+  return {
+    slide: slideNumber,
+    file: fileName,
+    status: 'failed-needs-fallback',
+    failureType: classification.type,
+    error: classification.message,
+    fallback: FALLBACK_MODE,
+  };
+}
+
 async function generateWithImagen(prompt) {
   const apiKey = process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY;
   if (!apiKey) {
@@ -195,6 +225,8 @@ async function generateWithImagen(prompt) {
       return Buffer.from(b64, 'base64');
     } catch (err) {
       lastError = err;
+      const classification = classifyGenerationError(err);
+      if (!classification.retryable) break;
     }
   }
   throw lastError;
@@ -234,6 +266,8 @@ async function main() {
   console.log(`Slides   : ${targetSlides.join(', ')}`);
   console.log(`Prompt   : ${reelMap.size > 0 && !ALL_SLIDES && !explicitSlides.length ? path.relative(ROOT, reelPath) : path.relative(ROOT, fullPath)}`);
   console.log(`Output   : ${WIDTH}x${HEIGHT} PNG`);
+  console.log(`Fallback : ${FALLBACK_MODE}`);
+  if (CONTINUE_ON_ERROR) console.log('On error : continue and log fallback-needed slides');
   if (DRY_RUN) console.log('Mode     : DRY RUN');
   console.log('');
 
@@ -269,11 +303,24 @@ async function main() {
       continue;
     }
 
-    const rawImage = await generateWithImagen(prompt);
-    const normalized = await normalizeStoryImage(rawImage);
-    await fs.writeFile(outPath, normalized);
-    console.log(`  Saved ${fileName} (${Math.round(normalized.length / 1024)} KB)`);
-    generationLog.push({ slide: slideNumber, file: fileName, status: 'generated', bytes: normalized.length });
+    try {
+      const rawImage = await generateWithImagen(prompt);
+      const normalized = await normalizeStoryImage(rawImage);
+      await fs.writeFile(outPath, normalized);
+      console.log(`  Saved ${fileName} (${Math.round(normalized.length / 1024)} KB)`);
+      generationLog.push({ slide: slideNumber, file: fileName, status: 'generated', bytes: normalized.length });
+    } catch (err) {
+      const classification = classifyGenerationError(err);
+      console.warn(`  Generation failed [${classification.type}]: ${classification.message}`);
+      if (!CONTINUE_ON_ERROR) {
+        throw err;
+      }
+      if (classification.type === 'quota' && FALLBACK_MODE !== 'none') {
+        console.warn(`  Marking slide for fallback workflow (${FALLBACK_MODE}).`);
+      }
+      generationLog.push(buildFallbackNotice({ slideNumber, fileName, classification }));
+      continue;
+    }
   }
 
   const logPath = path.join(storyDir, '_reel-image-generation.json');
@@ -284,11 +331,25 @@ async function main() {
       mode: ALL_SLIDES ? 'all' : explicitSlides.length ? 'custom' : 'reel-first',
       targetSlides,
       files: generationLog,
+      fallbackMode: FALLBACK_MODE,
+      continueOnError: CONTINUE_ON_ERROR,
     }, null, 2)}\n`);
   }
 
+  const generatedCount = generationLog.filter((entry) => entry.status === 'generated').length;
+  const failedCount = generationLog.filter((entry) => entry.status === 'failed-needs-fallback').length;
+  const skippedCount = generationLog.filter((entry) => String(entry.status).startsWith('skipped')).length;
+
   console.log('');
-  console.log(DRY_RUN ? 'Dry run complete.' : `Done. Log -> ${path.relative(ROOT, logPath)}`);
+  if (DRY_RUN) {
+    console.log('Dry run complete.');
+  } else {
+    console.log(`Done. Log -> ${path.relative(ROOT, logPath)}`);
+    console.log(`Summary  : generated=${generatedCount}, skipped=${skippedCount}, fallback-needed=${failedCount}`);
+    if (failedCount > 0) {
+      console.log('Next     : complete fallback generation for the marked slides, then rerun with --force for any final replacements if needed.');
+    }
+  }
 }
 
 main().catch((err) => {

@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
+
+**Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`
+
+**What was refreshed:**
+- Confirmed `AGENT_LOG.md` already contained the latest 2026-05-07 Story Reel benchmark polish entry for `homecoming` + `survival`, so no backlog gap remained there.
+- Confirmed the current durable roadmap is still: light QC + posting selection -> Animal Facts (song-led) -> Find-the-Difference -> operations/growth.
+- Refreshed `SESSION_LOG.md` and `CHAT_LOG.md` so both now reflect the latest narrow-polish/stop-line state instead of trailing the prior sprint logs.
+
+**Current working state:**
+- Story Reel V2 remains in narrow render-and-polish mode only.
+- `survival` is approved to stop for the current benchmark slice.
+- `homecoming` is soft-approved after the final wording cleanup.
+- No new infrastructure/build expansion is justified unless explicitly reopened.
+
+---
+
 ## 2026-04-30 — [Agent: Claude] — OC-011 audit closed + dual-track roadmap locked
 
 **OC-011 audit outcome:**
@@ -2617,3 +2634,23 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 **Daily pipeline ran.**
 
 **Next:** QC renders for maze v3 + word-search v3 (priority 2).
+
+---
+
+## 2026-05-07 — [Agent: OpenClaw] — Story Reel posting set locked + first reliability hardening
+
+**Files changed:** `docs/TASKS.md`, `docs/AGENT_LOG.md`, `scripts/render-video.mjs`
+
+**What was decided:**
+- `STORY-ENGINE-004` is now closed for the current slice.
+- Posting/benchmark set is locked to the polished `homecoming` and `survival` Story Reel outputs.
+- `loyalty` is retained only as a fallback candidate.
+- `parent_bond` is intentionally held out of the primary posting set unless a narrow lane-specific polish is explicitly chosen later.
+
+**Reliability hardening shipped immediately:**
+- `render-video.mjs` now fails fast if an operator uses `--composition` instead of `--comp`.
+- `render-video.mjs` now warns when a reel-style `story.json` appears to be routed through `StoryEpisode` instead of `StoryReelV2`.
+
+**Current next step:**
+- Stay inside `STORY-ENGINE-005` production reliability only.
+- Do not reopen broad Story Reel engine work from the selection task.

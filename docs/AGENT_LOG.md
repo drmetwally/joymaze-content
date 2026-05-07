@@ -219,3 +219,9 @@ This means current Story Engine work should stay tightly focused on quality vali
 - `survival` is approved to stop for this benchmark slice.
 - `homecoming` is soft-approved after the final wording cleanup.
 - Stay in render-and-polish mode only; no more lane/infrastructure expansion unless explicitly reopened.
+
+**Follow-up logging state (2026-05-07 morning):**
+- `docs/TASKS.md` was refreshed so the Story Reel immediate-next-phase tasks now match the real current state.
+- `STORY-ENGINE-004` is now considered closed for the current slice: posting/benchmark selection locked to the polished `homecoming` and `survival` renders, with `loyalty` retained only as a fallback candidate and `parent_bond` held out unless a narrow lane-specific polish is explicitly chosen later.
+- Active next task is `STORY-ENGINE-005` production reliability only.
+- First reliability hardening landed immediately after that handoff: `scripts/render-video.mjs` now fails fast if an operator uses `--composition` instead of `--comp`, and it warns when a reel-style `story.json` appears to be routed through `StoryEpisode` rather than `StoryReelV2`.

@@ -4,6 +4,17 @@
 
 ---
 
+### 2026-05-07 — Story Reel benchmark polish state + logging refresh
+
+- **Log audit:** Checked `AGENT_LOG.md`, `SESSION_LOG.md`, and `CHAT_LOG.md` for staleness after the latest Story Reel work.
+- **AGENT_LOG state:** Already current. It already captured the 2026-05-07 narrow polish pass on the `homecoming` and `survival` benchmark reels, including the Imagen quota workaround and the local polish render outputs.
+- **Session/docs refresh:** `SESSION_LOG.md` and `CHAT_LOG.md` were behind that latest state, so they were refreshed to match the current stop-line judgment.
+- **Current durable Story Reel judgment:** stay in narrow render-and-polish mode only; no lane expansion or infrastructure expansion unless explicitly reopened.
+- **Benchmark status:** `survival` is approved to stop for this slice. `homecoming` is soft-approved after the final wording cleanup.
+- **Roadmap remains locked:** first light QC + posting selection, then Animal Facts (song-led), then Find-the-Difference, then shift hard toward operations/growth.
+
+---
+
 ### 2026-04-18 — Session close: memory audit + longform E2E testing plan
 
 - **Intelligence pools audit:** Prior session recommendation falsely stated pools "never ran live, still empty." Confirmed all 5 dynamic pools are fully populated (last updated 2026-04-16). Memory was already accurate — the error was only in the recommendation text.

@@ -34,6 +34,11 @@ const args    = process.argv.slice(2);
 const getArg  = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] ?? null : null; };
 const hasFlag = (f) => args.includes(f);
 
+if (hasFlag('--composition')) {
+  console.error('Error: use --comp, not --composition. Example: --comp StoryReelV2');
+  process.exit(1);
+}
+
 // Auto-select composition from context flags if --comp not given explicitly
 const _compArg = getArg('--comp');
 const compositionId = _compArg
@@ -64,6 +69,17 @@ const outArg        = getArg('--out');
 const dryRun        = hasFlag('--dry-run');
 const verbose       = hasFlag('--verbose');
 const previewMode   = hasFlag('--preview');  // render first 3s at half resolution
+
+if (_compArg === 'StoryEpisode' && storyFile) {
+  try {
+    const storyPreview = JSON.parse(await fs.readFile(path.resolve(ROOT, storyFile), 'utf8'));
+    if (Array.isArray(storyPreview.reelSlideOrder) && storyPreview.reelSlideOrder.length) {
+      console.warn('[warn] story.json contains reelSlideOrder but --comp StoryEpisode was requested. If you meant the short reel, use: --comp StoryReelV2');
+    }
+  } catch {
+    // ignore preview-read issues here, normal file loading later will handle real errors
+  }
+}
 
 const PREVIEW_FRAMES = 90;  // 3s @ 30fps
 const PREVIEW_SCALE  = 0.5; // half resolution → 540×960

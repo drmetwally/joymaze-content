@@ -89,16 +89,26 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
 ## STORY ENGINE — IMMEDIATE NEXT PHASE (locked 2026-05-06)
 
-- [ ] **STORY-ENGINE-004 — Light QC + posting selection**
+- [x] **STORY-ENGINE-004 — Light QC + posting selection**
   - Use the strongest current Story Reel outputs as the posting/benchmark set.
   - Current top order: `homecoming`, `survival`, `loyalty`, then `parent_bond`.
+  - 2026-05-07 state: narrow benchmark polish already completed on `homecoming` + `survival`; `survival` is approved to stop for this slice, `homecoming` is soft-approved after the final wording cleanup.
+  - Posting/benchmark selection now locked for the current slice:
+    1. `homecoming` -> `output/videos/StoryReelV2-homecoming-polish-20260507.mp4`
+    2. `survival` -> `output/videos/StoryReelV2-survival-polish-20260507.mp4`
+    3. `loyalty` fallback candidate -> prefer the stronger rendered loyalty benchmark over reopening another lane pass
+    4. `parent_bond` held out of the primary posting set unless a narrow lane-specific polish is explicitly chosen later
+  - Durable rule: selection is complete; do not reopen broad Story Reel engine work from this task.
 
-- [ ] **STORY-ENGINE-005 — Production reliability only**
+- [~] **STORY-ENGINE-005 — Production reliability only**
   - Prefer small reliability / workflow fixes over new story-engine architecture.
   - Treat Imagen variance as a QC/retry problem, not a reason to reopen core Story Reel plumbing.
+  - Includes practical operator hardening around quota-hit fallback paths, rerender reliability, and any small workflow seams surfaced during posting selection.
+  - 2026-05-07 progress: hardened `render-video.mjs` against the known operator footgun by failing fast on `--composition` and warning when a reel-style `story.json` is rendered through `StoryEpisode` instead of `StoryReelV2`.
 
 - [ ] **STORY-ENGINE-006 — Optional parent_bond-only polish**
   - If one more polish pass is justified, spend it only on `parent_bond`, which is now the least settled of the top lanes.
+  - Do not broaden this into another multi-lane story-engine pass.
 
 ## POST-STORY BUILD ORDER (locked 2026-05-06)
 
@@ -106,6 +116,7 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
   - Use Story Reel as the main structural reference once Story Reel quality is considered good enough.
   - Main difference: narration should be a **song** generated via Suno or another music path, not standard spoken narration.
   - Reuse as much of the proven story-engine pacing, beat clarity, and quality gates as possible.
+  - Start only after STORY-ENGINE-004 finishes the benchmark/posting selection decision.
 
 - [ ] **CHALLENGE-REEL-001 — Find-the-Difference challenge reel engine**
   - After Animal Facts structure is stabilized, build/finish the Find-the-Difference challenge reel engine as the final major build lane.
