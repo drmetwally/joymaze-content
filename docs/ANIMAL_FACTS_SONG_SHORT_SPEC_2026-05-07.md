@@ -56,6 +56,8 @@ This is now the default target structure for Animal Facts short-form.
 - Ending should flow naturally back toward the opening line, image, or rhythm.
 - Final beat should feel rewatchable, not conclusive.
 - Ideal end state: viewer can loop back to the first frame/song phrase with no emotional drop.
+- The final visual moment should usually be an explicit payoff image, not just a generic return flight or pretty environment hold.
+- Prefer a concrete emotional/factual resolve such as home, burrow, chick, family, food delivery, cuddle, sleep, or another unmistakable “why this matters” image.
 
 ## Intended feel
 
@@ -119,6 +121,7 @@ If not, the beat is too abstract, too dense, or poorly chosen.
 - avoid collage, split-panel, or cluttered educational infographic energy
 - for longer songs, increase the number of creatives, not just the hold time on the same 5 images
 - recommended production model: keep 4-5 lyrical beats, but expand to 8-10 visual moments when the selected song runs longer and the material supports it
+- the last expanded creative should usually cash out the whole song with a clear payoff image, not merely repeat the same traveling or posing energy
 
 ## Song-writing rules
 
@@ -224,6 +227,7 @@ New timing rule:
 - scene count may exceed beat count when a strong song needs more visual moments
 - each beat can expand into multiple scene slices with different framing or camera motion while keeping the same lyric line active
 - the generator should explicitly plan these extra creatives as a wide visual expansion layer, not leave them implicit in render-time duplication
+- the final expanded scene should usually be reserved for an explicit emotional/factual resolve, so the loop ending lands as a payoff before it feeds back into the opener
 
 ### Phase 5 — benchmark set
 Create 2-4 benchmark animals and iterate narrowly.

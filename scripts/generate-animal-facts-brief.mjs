@@ -417,6 +417,8 @@ Hard rules:
 - Keep \`songBeats\` as the lyrical spine, but make \`visualExpansionMoments\` the wider creative plan for production.
 - For stronger / longer songs, \`visualExpansionMoments\` should usually expand to 8-10 creatives, even if \`songBeats\` stays at 4-5 beats.
 - Every visualExpansionMoment must feel visually distinct from the others. No duplicate holds disguised as separate ideas.
+- The final visualExpansionMoment should usually be an explicit emotional/factual payoff, not just another pretty return or travel shot.
+- Prefer a concrete end resolve such as home, burrow, chick, family, food delivery, cuddle, sleep, or another unmistakable “why this matters” image when the material supports it.
 - Choose 5 song beats only if the animal supports 5 truly strong beats. Avoid filler energy.
 - Every beat must be understandable in 2-3 seconds visually.
 - factFocus should stay factual and clear. Do not fabricate facts.
@@ -453,6 +455,7 @@ function synthesizeVisualExpansionMomentsFromBeats(songBeats = []) {
     const beatKey = beat?.key || `beat${index + 1}`;
     const shotType = String(beat?.shotType || '').toUpperCase();
     const dynamic = /ACTION|ESTABLISHING/.test(shotType);
+    const isLastBeat = index === songBeats.length - 1;
     return [
       {
         key: `${beatKey}-main`,
@@ -467,14 +470,16 @@ function synthesizeVisualExpansionMomentsFromBeats(songBeats = []) {
         imageAsset: `moment${index * 2 + 1}.png`,
       },
       {
-        key: `${beatKey}-accent`,
+        key: isLastBeat ? `${beatKey}-resolve` : `${beatKey}-accent`,
         beatKey,
-        title: `${beat?.title || `Moment ${index + 1}`} accent`,
+        title: isLastBeat ? `${beat?.title || `Moment ${index + 1}`} payoff resolve` : `${beat?.title || `Moment ${index + 1}`} accent`,
         lyricFocus: beat?.lyric || '',
-        factFocus: beat?.factFocus || '',
-        shotType: dynamic ? 'ACTION' : 'MEDIUM',
-        compositionNote: beat?.compositionNote || '',
-        psychologyBeat: beat?.psychologyBeat || '',
+        factFocus: isLastBeat ? `${beat?.factFocus || ''} final payoff at home or family context`.trim() : (beat?.factFocus || ''),
+        shotType: isLastBeat ? 'MEDIUM' : (dynamic ? 'ACTION' : 'MEDIUM'),
+        compositionNote: isLastBeat
+          ? `Explicit end payoff moment: ${beat?.compositionNote || ''} Show why the return or final beat matters in a concrete home, family, burrow, nest, cuddle, or feeding context.`.trim()
+          : (beat?.compositionNote || ''),
+        psychologyBeat: isLastBeat ? 'earned payoff resolve' : (beat?.psychologyBeat || ''),
         imagePromptHint: beat?.imagePromptHint || '',
         imageAsset: `moment${index * 2 + 2}.png`,
       },
@@ -747,6 +752,7 @@ ${episode.fullSongLyrics}
 - Selected song becomes the duration source of truth for final render timing
 - Stronger songs may justify a longer fact reel with richer copy and more visual moments
 - Longer songs should usually trigger more creatives, not longer holds on the same 5 images
+- The final expanded creative should usually be the clearest home/family/payoff image in the reel
 - Required core beat images: ${(episode.songBeats || []).map((_, index) => `\`beat${index + 1}.png\``).join(', ')}
 - Preferred expanded creative images: ${(episode.visualExpansionMoments || []).map((moment, index) => `\`${moment.imageAsset || `moment${index + 1}.png`}\``).join(', ')}
 
