@@ -760,6 +760,37 @@ function buildDefaultReelSlideOrder(slides = []) {
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 
+function getNarrationWordCount(slide) {
+  return String(slide?.narration ?? slide?.caption ?? '').split(/\s+/).filter(Boolean).length;
+}
+
+function getAdaptiveReelTargetCount(slides = [], story = {}) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= 5) return count;
+  const totalWords = slides.reduce((sum, slide) => sum + getNarrationWordCount(slide), 0);
+  const sourceType = String(story.storySourceType || '').toLowerCase();
+  const isRealish = sourceType === 'real_behavior' || sourceType === 'true_story_style';
+  let target = 5;
+  if (totalWords >= 56) target += 1;
+  if (totalWords >= 76) target += 1;
+  if ((isRealish && totalWords >= 90) || totalWords >= 102) target += 1;
+  return Math.max(5, Math.min(target, Math.min(count, 8)));
+}
+
+function buildDistributedSlideOrder(slides = [], targetCount = 5) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= targetCount) return Array.from({ length: count }, (_, i) => i + 1);
+  const picks = [];
+  for (let i = 0; i < targetCount; i++) {
+    picks.push(1 + Math.round((i * (count - 1)) / Math.max(targetCount - 1, 1)));
+  }
+  return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
+}
+
+function buildAdaptiveReelSlideOrder(slides = [], story = {}) {
+  return buildDistributedSlideOrder(slides, getAdaptiveReelTargetCount(slides, story));
+}
+
 function buildPromptMarkdown(story, reelSlideOrder, slides, title) {
   const lines = [
     `# ${title} — ${story.title}`,
@@ -796,7 +827,7 @@ async function saveStory(story, episodeNum) {
   await fs.mkdir(storyDir, { recursive: true });
 
   // Write story.json (same format generate-story-video.mjs expects)
-  const reelSlideOrder = buildDefaultReelSlideOrder(story.slides);
+  const reelSlideOrder = buildAdaptiveReelSlideOrder(story.slides, story);
   const storyJson = {
     title: story.title,
     episode: story.episode,
@@ -811,6 +842,7 @@ async function saveStory(story, episodeNum) {
     storySourceBankId: story.storySourceBankId || story.sourceBankId || null,
     storySourceType: story.storySourceType || null,
     storyLane: story.storyLane || null,
+    reelSelectionMode: 'copy-driven-adaptive',
     reelSlideOrder,
     slides: story.slides.map(s => ({
       image: s.image,
@@ -852,7 +884,7 @@ function printStory(story) {
   console.log(`Theme: ${story.theme}`);
   console.log(`Hook: ${story.hookQuestion || story.hook || '(none)'}`);
   console.log(`Outro echo: ${story.outroEcho || '(none)'}`);
-  console.log(`Reel cut: ${buildDefaultReelSlideOrder(story.slides).join(', ')}`);
+  console.log(`Reel cut: ${buildAdaptiveReelSlideOrder(story.slides, story).join(', ')}`);
   console.log(`Style: ${story.style}`);
   console.log('');
 

@@ -38,6 +38,44 @@ function buildDefaultReelSlideOrder(slides = []) {
   return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
 }
 
+function getNarrationWordCount(slide) {
+  return String(slide?.narration ?? slide?.caption ?? '').split(/\s+/).filter(Boolean).length;
+}
+
+function getAdaptiveReelTargetCount(slides = [], story = {}) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= 5) return count;
+  const totalWords = slides.reduce((sum, slide) => sum + getNarrationWordCount(slide), 0);
+  const sourceType = String(story.storySourceType || '').toLowerCase();
+  const isRealish = sourceType === 'real_behavior' || sourceType === 'true_story_style';
+  let target = 5;
+  if (totalWords >= 56) target += 1;
+  if (totalWords >= 76) target += 1;
+  if ((isRealish && totalWords >= 90) || totalWords >= 102) target += 1;
+  return Math.max(5, Math.min(target, Math.min(count, 8)));
+}
+
+function buildDistributedSlideOrder(slides = [], targetCount = 5) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= targetCount) return Array.from({ length: count }, (_, i) => i + 1);
+  const picks = [];
+  for (let i = 0; i < targetCount; i++) {
+    picks.push(1 + Math.round((i * (count - 1)) / Math.max(targetCount - 1, 1)));
+  }
+  return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
+}
+
+function resolveAdaptiveReelSlideOrder(slides = [], story = {}) {
+  const mode = String(story.reelSelectionMode || (Array.isArray(story.reelSlideOrder) && story.reelSlideOrder.length ? 'manual-lock' : 'copy-driven-adaptive')).toLowerCase();
+  if (mode === 'manual-lock') {
+    const candidateOrder = Array.isArray(story.reelSlideOrder)
+      ? story.reelSlideOrder.map((n) => Number(n)).filter((n) => Number.isInteger(n) && n >= 1 && n <= slides.length)
+      : [];
+    return candidateOrder.length >= 5 ? [...new Set(candidateOrder)] : buildDefaultReelSlideOrder(slides);
+  }
+  return buildDistributedSlideOrder(slides, getAdaptiveReelTargetCount(slides, story));
+}
+
 function parseSlideList(value) {
   if (!value) return [];
   return [...new Set(value.split(',').map((part) => Number(part.trim())).filter((n) => Number.isInteger(n) && n > 0))].sort((a, b) => a - b);
@@ -247,9 +285,7 @@ async function main() {
   }
 
   const story = JSON.parse(await fs.readFile(storyPath, 'utf8'));
-  const reelOrder = Array.isArray(story.reelSlideOrder) && story.reelSlideOrder.length
-    ? story.reelSlideOrder
-    : buildDefaultReelSlideOrder(story.slides || []);
+  const reelOrder = resolveAdaptiveReelSlideOrder(story.slides || [], story);
   const explicitSlides = parseSlideList(SLIDES_ARG);
   const targetSlides = explicitSlides.length
     ? explicitSlides

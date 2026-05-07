@@ -65,6 +65,44 @@ function buildDefaultReelSlideOrder(slides = []) {
   return [1, 2, Math.round(slides.length / 2), slides.length - 1, slides.length];
 }
 
+function getNarrationWordCount(slide) {
+  return String(slide?.narration ?? slide?.caption ?? '').split(/\s+/).filter(Boolean).length;
+}
+
+function getAdaptiveReelTargetCount(slides = [], story = {}) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= 5) return count;
+  const totalWords = slides.reduce((sum, slide) => sum + getNarrationWordCount(slide), 0);
+  const sourceType = String(story.storySourceType || '').toLowerCase();
+  const isRealish = sourceType === 'real_behavior' || sourceType === 'true_story_style';
+  let target = 5;
+  if (totalWords >= 56) target += 1;
+  if (totalWords >= 76) target += 1;
+  if ((isRealish && totalWords >= 90) || totalWords >= 102) target += 1;
+  return Math.max(5, Math.min(target, Math.min(count, 8)));
+}
+
+function buildDistributedSlideOrder(slides = [], targetCount = 5) {
+  const count = Array.isArray(slides) ? slides.length : 0;
+  if (count <= targetCount) return Array.from({ length: count }, (_, i) => i + 1);
+  const picks = [];
+  for (let i = 0; i < targetCount; i++) {
+    picks.push(1 + Math.round((i * (count - 1)) / Math.max(targetCount - 1, 1)));
+  }
+  return [...new Set(picks)].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
+}
+
+function resolveAdaptiveReelSlideOrder(slides = [], story = {}) {
+  const mode = String(story.reelSelectionMode || (Array.isArray(story.reelSlideOrder) && story.reelSlideOrder.length ? 'manual-lock' : 'copy-driven-adaptive')).toLowerCase();
+  if (mode === 'manual-lock') {
+    const candidateOrder = Array.isArray(story.reelSlideOrder)
+      ? story.reelSlideOrder.map(n => Number(n)).filter(n => Number.isInteger(n) && n >= 1 && n <= slides.length)
+      : [];
+    return candidateOrder.length >= 5 ? [...new Set(candidateOrder)] : buildDefaultReelSlideOrder(slides);
+  }
+  return buildDistributedSlideOrder(slides, getAdaptiveReelTargetCount(slides, story));
+}
+
 // ── TTS providers ──────────────────────────────────────────────────────────
 async function generateOpenAITTS(text, outputPath, speed = 0.75, voice = 'shimmer') {
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -108,9 +146,7 @@ async function main() {
   const story = JSON.parse(await fs.readFile(storyPath, 'utf-8'));
 
   const rawSlides = story.slides ?? [];
-  const reelOrder = Array.isArray(story.reelSlideOrder) && story.reelSlideOrder.length >= 5
-    ? [...new Set(story.reelSlideOrder.map(n => Number(n)).filter(n => Number.isInteger(n) && n >= 1 && n <= rawSlides.length))].slice(0, 5)
-    : buildDefaultReelSlideOrder(rawSlides);
+  const reelOrder = resolveAdaptiveReelSlideOrder(rawSlides, story);
   const reelSlides = reelOrder.map(n => rawSlides[n - 1]).filter(Boolean);
 
   const ttsDir = path.join(storyDir, 'tts');
