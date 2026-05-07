@@ -49,6 +49,7 @@ async function runDailyCommand() {
       cwd: ROOT,
       env: { ...process.env },
       timeout: 0,
+      shell: true,  // required on Windows — npm.cmd is a batch file, execFile can't spawn it without shell
     });
     if (stdout.trim()) stdout.trim().split('\n').forEach((line) => log(`  ${line}`));
     if (stderr.trim()) stderr.trim().split('\n').forEach((line) => log(`  [stderr] ${line}`));
