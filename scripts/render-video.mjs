@@ -5,6 +5,7 @@
  *   node scripts/render-video.mjs --comp StoryEpisode --story output/stories/my-story/story.json
  *   node scripts/render-video.mjs --comp StoryReelV2 --story output/stories/my-story/story.json
  *   node scripts/render-video.mjs --comp AnimalFactsSongShort --animal-episode output/longform/animal/ep03-hedgehog
+ *   node scripts/render-video.mjs --comp AnimalFactsSongShort --episode output/longform/animal/ep03-hedgehog
  *   node scripts/render-video.mjs --comp AsmrReveal   --asmr  output/asmr/maze-slug/activity.json
  *   node scripts/render-video.mjs --comp AsmrReveal   --challenge output/challenge/generated-activity/maze-slug
  *   node scripts/render-video.mjs --comp HookIntro    --props '{"headline":"Can your kid solve this?","subline":"Screen-free fun for ages 4-8"}'
@@ -44,13 +45,14 @@ if (hasFlag('--composition')) {
 const _compArg = getArg('--comp');
 const compositionId = _compArg
   ?? (args.includes('--challenge') ? 'ActivityChallenge'
-    : args.includes('--animal-episode') ? 'AnimalFactsSongShort'
+    : (args.includes('--animal-episode') || args.includes('--episode')) ? 'AnimalFactsSongShort'
     : args.includes('--asmr')      ? 'AsmrReveal'
     : args.includes('--story')     ? 'StoryEpisode'
     : 'StoryEpisode');
 const storyFile     = getArg('--story');
 const challengeFile = getArg('--challenge');
-const animalEpisodeArg = getArg('--animal-episode');
+const animalEpisodeArg = getArg('--animal-episode')
+  ?? ((_compArg === 'AnimalFactsSongShort' || compositionId === 'AnimalFactsSongShort') ? getArg('--episode') : null);
 
 // --asmr can be used as a flag (value comes from positional slug) or as a key-value pair.
 // Positional slug: first non-flag arg that isn't already consumed as a --comp value.
