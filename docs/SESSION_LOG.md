@@ -2654,3 +2654,10 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 **Current next step:**
 - Stay inside `STORY-ENGINE-005` production reliability only.
 - Do not reopen broad Story Reel engine work from the selection task.
+
+**Follow-up validation completed:**
+- Ran live forced single-slide validations of `generate-story-reel-images.mjs` with `--fallback manual --continue-on-error` against:
+  - `output/stories/ep22-the-last-light-of-home`
+  - `output/stories/ep25-the-last-catch`
+- Both succeeded cleanly and wrote the richer `_reel-image-generation.json` logs with fallback metadata fields present.
+- `docs/DAILY_CHEATSHEET.md` and `docs/DAILY_WORKFLOW.md` were updated with a short Story Reel image fallback runbook so future operators can recover quota-hit slides without rediscovering the process.

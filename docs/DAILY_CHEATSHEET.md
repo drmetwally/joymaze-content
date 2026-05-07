@@ -62,6 +62,26 @@ Automatically:
 
 **Check:** Open `output/prompts/prompts-YYYY-MM-DD.md` · Check `output/videos/` for new Story Reel V2 · Check `output/longform/animal/` for new animal brief
 
+**Story Reel image fallback runbook (when Imagen quota/rate-limit hits):**
+```bash
+node scripts/generate-story-reel-images.mjs --story output/stories/<folder> --fallback manual --continue-on-error
+```
+What this does:
+- keeps generating any slides that still succeed
+- does **not** hard-stop the whole run on quota-hit slides
+- writes `output/stories/<folder>/_reel-image-generation.json`
+
+If a slide fails, the log file will mark it as:
+- `status: "failed-needs-fallback"`
+- `failureType: "quota"` (or auth/endpoint/network/unknown)
+
+Then:
+1. generate the missing slide image through the safe manual/direct image path
+2. save it into the same story folder with the expected filename (`01.png`, `03.png`, etc.)
+3. rerun with `--force` only if you want to replace an already-written slide
+
+**Render safety note:** always use `--comp StoryReelV2` for reel renders. `render-video.mjs` now fails fast on `--composition` and warns if a reel-style `story.json` is accidentally routed through `StoryEpisode`.
+
 **Series days:** Mon = Maze Monday · Wed = Puzzle Power Wednesday · Fri = Fine Motor Friday (auto-injected into prompts)
 
 ---

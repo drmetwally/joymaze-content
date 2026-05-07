@@ -28,6 +28,28 @@ This now does all of this automatically:
 - generates X text posts
 - runs Monday intelligence refresh steps when applicable
 
+### Story Reel image fallback workflow
+
+If Story Reel image generation hits Imagen quota/rate-limit issues, use:
+```bash
+node scripts/generate-story-reel-images.mjs --story output/stories/<folder> --fallback manual --continue-on-error
+```
+
+Behavior:
+- successful slides still save normally
+- failed slides are logged into `output/stories/<folder>/_reel-image-generation.json`
+- quota/auth/endpoint/network/unknown failure types are classified explicitly
+- a fallback-needed slide is recorded as `status: "failed-needs-fallback"`
+
+Manual recovery path:
+1. generate the missing slide image through the safe manual/direct image path
+2. save it into the same story folder using the expected filename
+3. rerun with `--force` only when you intentionally want to replace an existing PNG
+
+Render guardrail:
+- always render reels with `node scripts/render-video.mjs --comp StoryReelV2 --story <story.json>`
+- `--composition` is now rejected explicitly to prevent silent fallback to `StoryEpisode`
+
 ---
 
 ## Scheduler relationship
