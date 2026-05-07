@@ -132,7 +132,7 @@ const Root = () => (
       height={1080}
       defaultProps={animalFactsEpisodeSchema}
     />
-    {/* ── Animal song short: mystery hook + reveal + sung recap ────── */}
+    {/* ── Animal song short: song-led fact reel, duration follows selected song ────── */}
     <Composition
       id="AnimalFactsSongShort"
       component={AnimalFactsSongShort}

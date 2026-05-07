@@ -388,7 +388,7 @@ Return one JSON object with EXACTLY this shape (no extra fields, no missing fiel
   ],
   "loopBackIdea": "string — 1 sentence on how the ending loops back into the opening line",
   "fullSongLyrics": "string — full short song, multi-line, includes the opening line and all beat ideas",
-  "songSunoPrompt": "string — upbeat children's animal fact song, earworm cadence, loop-friendly, ~20-35 seconds",
+  "songSunoPrompt": "string — upbeat children's animal fact song, earworm cadence, loop-friendly, rich enough to support a longer fact reel when the song quality is strong",
   "backgroundSunoPrompt": "string"
 }
 
@@ -399,6 +399,8 @@ Hard rules:
 - No numbered fact-classroom tone.
 - The whole format is a song, not a prose explainer plus a song ending.
 - Each lyric line must be short, sticky, child-friendly, and visually legible.
+- Richer copy is allowed when it stays musical, clear, and replayable. Do not flatten strong material just to force a short runtime.
+- The final reel should follow the selected song, not force the song to fit a fixed short duration.
 - Choose 5 song beats only if the animal supports 5 truly strong beats. Avoid filler energy.
 - Every beat must be understandable in 2-3 seconds visually.
 - factFocus should stay factual and clear. Do not fabricate facts.
@@ -508,6 +510,39 @@ function validateBrief(brief) {
   }
 }
 
+function buildSongScenePlan(songBeats = []) {
+  return songBeats.flatMap((beat, index) => {
+    const key = beat.key || `beat${index + 1}`;
+    const wordCount = String(beat?.lyric || '').split(/\s+/).filter(Boolean).length;
+    const mainWeight = Math.max(1, Math.min(2.4, wordCount / 6) + (index === 0 ? 0.25 : 0) + (index === songBeats.length - 1 ? 0.35 : 0));
+    const accentWeight = Math.max(0.55, Math.min(1.6, wordCount / 10) + (index === songBeats.length - 1 ? 0.2 : 0));
+    const shotType = String(beat?.shotType || '').toUpperCase();
+    const mainCamera = /ACTION|ESTABLISHING/.test(shotType) ? 'wide-sweep' : (index === songBeats.length - 1 ? 'loop-settle' : 'push-in');
+    const accentCamera = /ACTION|ESTABLISHING/.test(shotType) ? 'lift-up' : (index === songBeats.length - 1 ? 'loop-return' : 'drift-right');
+
+    return [
+      {
+        key: `${key}-main`,
+        beatKey: key,
+        lyric: beat.lyric,
+        imageIndex: index,
+        durationWeight: Number(mainWeight.toFixed(2)),
+        cameraPreset: mainCamera,
+        captionLabel: beat.title || '',
+      },
+      {
+        key: `${key}-accent`,
+        beatKey: key,
+        lyric: beat.lyric,
+        imageIndex: index,
+        durationWeight: Number(accentWeight.toFixed(2)),
+        cameraPreset: accentCamera,
+        captionLabel: beat.factFocus || '',
+      },
+    ];
+  });
+}
+
 function buildEpisodeJson(brief, context, artStyle) {
   const selectedBackground = getLowestUsedPoolEntry(context.sunoPool, 'animal_background_ambient');
   const songBeats = Array.isArray(brief.songBeats) ? brief.songBeats : [];
@@ -520,6 +555,7 @@ function buildEpisodeJson(brief, context, artStyle) {
     date: TODAY,
     artStyle,
     structure: 'named-immediately-all-song-loop',
+    timingRule: 'follow-selected-song',
     psychologyMap: {
       openingLyric: 'CURIOSITY_GAP',
       beat1: 'COMPLETION_SATISFACTION',
@@ -532,7 +568,9 @@ function buildEpisodeJson(brief, context, artStyle) {
     loopBackIdea: brief.loopBackIdea,
     songBeats,
     fullSongLyrics: brief.fullSongLyrics,
-    songDurationTargetSec: 24,
+    songDurationTargetSec: 32,
+    selectedSongDurationSec: null,
+    songScenePlan: buildSongScenePlan(songBeats),
     sunoPrompts: {
       fullSong: brief.songSunoPrompt,
       background: selectedBackground?.prompt || brief.backgroundSunoPrompt,
@@ -607,6 +645,8 @@ ${episode.fullSongLyrics}
 - Entire reel is song-driven from start to finish
 - No CTA
 - Loop ending required
+- Selected song becomes the duration source of truth for final render timing
+- Stronger songs may justify a longer fact reel with richer copy and more visual moments
 - Required beat images: ${(episode.songBeats || []).map((_, index) => `\`beat${index + 1}.png\``).join(', ')}
 
 ## Suno Drop Instructions

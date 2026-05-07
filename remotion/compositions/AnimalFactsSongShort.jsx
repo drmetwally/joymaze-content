@@ -7,7 +7,7 @@ export const animalFactsSongShortSchema = {
 };
 
 const FPS = 30;
-const DEFAULT_SONG_FRAMES = 720;
+const DEFAULT_SONG_FRAMES = 1080;
 
 const normalizeSlashes = (value) => String(value || '').replace(/\\/g, '/');
 const isAbsolutePath = (value) => {
@@ -77,7 +77,13 @@ export const AnimalFactsSongShort = ({
   episodeFolder = '',
   episode = {},
 }) => {
-  const songFrames = secToFrames(positiveSec(episode.songDurationTargetSec || episode.sungRecapShortDurationSec, 24), 24);
+  const songFrames = secToFrames(
+    positiveSec(
+      episode.selectedSongDurationSec || episode.songDurationTargetSec || episode.sungRecapShortDurationSec,
+      24,
+    ),
+    24,
+  );
   const imagePaths = getBeatImagePaths(episodeFolder, episode);
   const songAudioPath = getSongAudioPath(episodeFolder, episode);
   const lyrics = getSongLyrics(episode);
@@ -89,6 +95,7 @@ export const AnimalFactsSongShort = ({
           imagePaths={imagePaths}
           sungAudioPath={songAudioPath}
           lyrics={lyrics}
+          scenePlan={Array.isArray(episode.songScenePlan) ? episode.songScenePlan : []}
         />
       </Sequence>
     </AbsoluteFill>

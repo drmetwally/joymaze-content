@@ -24,6 +24,7 @@ import { renderMedia, selectComposition, renderStill } from '@remotion/renderer'
 import path   from 'path';
 import fs     from 'fs/promises';
 import os     from 'os';
+import { parseFile as parseAudioFile } from 'music-metadata';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -489,10 +490,89 @@ async function animalEpisodeToSongShortProps(episode, episodeDir) {
     throw new Error(`AnimalFactsSongShort missing required image assets: ${lastMissingImages.join(', ')}`);
   }
 
+  const songAudioFile = episode?.jingleDropPaths?.fullSong || episode?.jingleDropPaths?.sungRecap || 'song.mp3';
+  const songAudioPath = path.resolve(episodeDir, songAudioFile);
+  const selectedSongDurationSec = await parseAudioFile(songAudioPath)
+    .then((meta) => meta?.format?.duration || null)
+    .catch(() => null);
+
+  const normalizedEpisode = {
+    ...episode,
+    timingRule: episode?.timingRule || 'follow-selected-song',
+    selectedSongDurationSec: selectedSongDurationSec || episode?.selectedSongDurationSec || episode?.songDurationTargetSec || 24,
+    songTimingSource: selectedSongDurationSec ? 'selected-song-audio' : (episode?.selectedSongDurationSec ? 'episode-selected-duration' : 'fallback-target-duration'),
+    songScenePlan: normalizeAnimalSongScenePlan(episode),
+  };
+
   return {
     episodeFolder: path.relative(ROOT, episodeDir).replace(/\\/g, '/'),
-    episode,
+    episode: normalizedEpisode,
   };
+}
+
+function normalizeAnimalSongScenePlan(episode) {
+  const beats = Array.isArray(episode?.songBeats) ? episode.songBeats : [];
+  const existingPlan = Array.isArray(episode?.songScenePlan) ? episode.songScenePlan : [];
+
+  if (existingPlan.length > 0) {
+    return existingPlan.map((scene, index) => ({
+      key: scene.key || `scene-${index + 1}`,
+      beatKey: scene.beatKey || beats[Math.min(index, Math.max(beats.length - 1, 0))]?.key || `beat${index + 1}`,
+      lyric: scene.lyric || beats.find((beat) => beat.key === scene.beatKey)?.lyric || beats[Math.min(index, Math.max(beats.length - 1, 0))]?.lyric || '',
+      imageIndex: Number.isFinite(scene.imageIndex) ? scene.imageIndex : Math.min(index, Math.max(beats.length - 1, 0)),
+      durationWeight: Number(scene.durationWeight) > 0 ? Number(scene.durationWeight) : 1,
+      cameraPreset: scene.cameraPreset || 'push-in',
+      captionLabel: scene.captionLabel || '',
+    }));
+  }
+
+  if (beats.length === 0) {
+    const lyricLines = String(episode?.fullSongLyrics || '').split('\n').map((line) => line.trim()).filter(Boolean);
+    return lyricLines.map((lyric, index) => ({
+      key: `line-${index + 1}`,
+      beatKey: `line-${index + 1}`,
+      lyric,
+      imageIndex: index,
+      durationWeight: 1,
+      cameraPreset: index % 2 === 0 ? 'push-in' : 'drift-right',
+      captionLabel: '',
+    }));
+  }
+
+  const scenes = [];
+  beats.forEach((beat, index) => {
+    const wordCount = String(beat?.lyric || '').split(/\s+/).filter(Boolean).length;
+    const baseWeight = Math.max(1, Math.min(2.4, wordCount / 6));
+    const isFirst = index === 0;
+    const isLast = index === beats.length - 1;
+    const shotType = String(beat?.shotType || '').toUpperCase();
+    const dynamic = /ACTION|ESTABLISHING/.test(shotType);
+    const payoff = isLast || /REPLAY|COMPLETION/i.test(String(beat?.psychologyBeat || ''));
+
+    scenes.push({
+      key: `${beat.key || `beat${index + 1}`}-main`,
+      beatKey: beat.key || `beat${index + 1}`,
+      lyric: beat.lyric || '',
+      imageIndex: index,
+      durationWeight: Number((baseWeight + (isFirst ? 0.25 : 0) + (isLast ? 0.35 : 0)).toFixed(2)),
+      cameraPreset: dynamic ? 'wide-sweep' : isLast ? 'loop-settle' : 'push-in',
+      captionLabel: beat.title || '',
+    });
+
+    if (dynamic || payoff || wordCount >= 9 || beats.length <= 5) {
+      scenes.push({
+        key: `${beat.key || `beat${index + 1}`}-accent`,
+        beatKey: beat.key || `beat${index + 1}`,
+        lyric: beat.lyric || '',
+        imageIndex: index,
+        durationWeight: Number((Math.max(0.5, baseWeight * (payoff ? 0.85 : 0.65))).toFixed(2)),
+        cameraPreset: dynamic ? 'lift-up' : payoff ? 'loop-return' : 'drift-right',
+        captionLabel: beat.factFocus || '',
+      });
+    }
+  });
+
+  return scenes;
 }
 
 // activity.json → AsmrReveal props
@@ -877,12 +957,13 @@ function computeDuration(inputProps, compId) {
     return hookFrames + slideFrames;
   }
   if (compId === 'AnimalFactsSongShort') {
-    const hookFrames = Math.round(Math.min(Math.max(inputProps.episode?.hookNarrationDurationSec || 4, 3), 5) * fps);
-    const revealFrames = Math.round(2.5 * fps);
-    const sungRecapSec = Number(inputProps.episode?.sungRecapShortDurationSec);
-    const songFrames = Math.round((Number.isFinite(sungRecapSec) && sungRecapSec > 0 ? sungRecapSec : 17) * fps);
-    const outroFrames = Math.round(Math.min(Math.max(inputProps.episode?.outroCtaShortDurationSec || 4, 3), 4) * fps);
-    return hookFrames + revealFrames + songFrames + outroFrames;
+    const selectedSongSec = Number(
+      inputProps.episode?.selectedSongDurationSec
+      || inputProps.episode?.songDurationTargetSec
+      || inputProps.episode?.sungRecapShortDurationSec
+    );
+    const safeSongSec = Number.isFinite(selectedSongSec) && selectedSongSec > 0 ? selectedSongSec : 24;
+    return Math.max(Math.round(safeSongSec * fps), fps * 12);
   }
   if (compId === 'AsmrReveal') {
     const totalSec = inputProps._totalSec

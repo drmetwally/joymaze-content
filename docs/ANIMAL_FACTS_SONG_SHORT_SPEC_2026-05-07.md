@@ -34,6 +34,7 @@ This is now the default target structure for Animal Facts short-form.
 - No dead intro.
 - No spoken setup before the song.
 - No separate sung-summary segment at the end because the whole format is now the sung segment.
+- The selected song becomes the timing source of truth for the final reel. Do not force a strong song back into a fixed short runtime.
 
 ### 2. Animal named immediately
 - The animal should usually be named in the first line or first beat.
@@ -99,6 +100,7 @@ Recommended baseline:
 Notes:
 - 4-beat and 6-beat variants are allowed if they preserve the same shape
 - do not force five beats if the animal only supports four truly strong songable ideas
+- stronger songs may justify longer reels with richer copy, as long as the structure stays musical, visual, and replayable
 
 ## Image design rules
 
@@ -214,6 +216,11 @@ not:
 - reveal scene
 - sung recap scene
 - outro CTA scene
+
+New timing rule:
+- the composition follows the selected song duration, not a fixed reel duration target
+- scene count may exceed beat count when a strong song needs more visual moments
+- each beat can expand into multiple scene slices with different framing or camera motion while keeping the same lyric line active
 
 ### Phase 5 — benchmark set
 Create 2-4 benchmark animals and iterate narrowly.
