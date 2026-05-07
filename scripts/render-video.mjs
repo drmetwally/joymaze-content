@@ -461,15 +461,32 @@ async function storyJsonToReelV2Props(story, storyDir) {
 }
 
 async function animalEpisodeToSongShortProps(episode, episodeDir) {
-  const requiredImages = ['namereveal.png', 'fact1.png', 'fact2.png', 'fact3.png', 'fact4.png', 'fact5.png'];
-  const missingImages = [];
-  for (const filename of requiredImages) {
-    const abs = path.join(episodeDir, filename);
-    const exists = await fs.access(abs).then(() => true).catch(() => false);
-    if (!exists) missingImages.push(filename);
+  const legacyImages = ['namereveal.png', 'fact1.png', 'fact2.png', 'fact3.png', 'fact4.png', 'fact5.png'];
+  const beatCount = Array.isArray(episode?.songBeats) ? episode.songBeats.length : 0;
+  const beatImages = beatCount > 0
+    ? Array.from({ length: beatCount }, (_, index) => `beat${index + 1}.png`)
+    : [];
+
+  const candidateSets = [beatImages, legacyImages].filter((set) => set.length > 0);
+  let matchedSet = null;
+  let lastMissingImages = [];
+
+  for (const requiredImages of candidateSets) {
+    const missingImages = [];
+    for (const filename of requiredImages) {
+      const abs = path.join(episodeDir, filename);
+      const exists = await fs.access(abs).then(() => true).catch(() => false);
+      if (!exists) missingImages.push(filename);
+    }
+    if (missingImages.length === 0) {
+      matchedSet = requiredImages;
+      break;
+    }
+    lastMissingImages = missingImages;
   }
-  if (missingImages.length) {
-    throw new Error(`AnimalFactsSongShort missing required image assets: ${missingImages.join(', ')}`);
+
+  if (!matchedSet) {
+    throw new Error(`AnimalFactsSongShort missing required image assets: ${lastMissingImages.join(', ')}`);
   }
 
   return {

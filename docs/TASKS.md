@@ -112,11 +112,15 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
 
 ## POST-STORY BUILD ORDER (locked 2026-05-06)
 
-- [ ] **ANIMAL-FACTS-001 — Build animal facts short using Story Reel structural reference**
+- [~] **ANIMAL-FACTS-001 — Build animal facts short using Story Reel structural reference**
   - Use Story Reel as the main structural reference once Story Reel quality is considered good enough.
   - Main difference: narration should be a **song** generated via Suno or another music path, not standard spoken narration.
   - Reuse as much of the proven story-engine pacing, beat clarity, and quality gates as possible.
   - Start only after STORY-ENGINE-004 finishes the benchmark/posting selection decision.
+  - 2026-05-07 direction lock: discard the inherited longform short structure (`hook -> reveal -> fact blocks -> sung summary -> CTA`) for the new short lane.
+  - New canonical format: **animal named immediately -> all-song from first line -> escalating fact wonder -> loop ending**.
+  - No full CTA. No formal reveal segment. Keep any question-hook payoff tiny and embedded inside the first lyric beat, not as a separate scene.
+  - Build a lightweight **animal-song topic bank** (curated hook/fact/visual/songability source layer), not a Story-Reel-style narrative seed bank.
 
 - [ ] **CHALLENGE-REEL-001 — Find-the-Difference challenge reel engine**
   - After Animal Facts structure is stabilized, build/finish the Find-the-Difference challenge reel engine as the final major build lane.

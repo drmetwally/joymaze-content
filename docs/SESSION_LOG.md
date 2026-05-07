@@ -2661,3 +2661,62 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
   - `output/stories/ep25-the-last-catch`
 - Both succeeded cleanly and wrote the richer `_reel-image-generation.json` logs with fallback metadata fields present.
 - `docs/DAILY_CHEATSHEET.md` and `docs/DAILY_WORKFLOW.md` were updated with a short Story Reel image fallback runbook so future operators can recover quota-hit slides without rediscovering the process.
+
+---
+
+## 2026-05-07 — [Agent: OpenClaw] — Animal Facts short format reset and sung-first spec lock
+
+**Files changed:** `docs/TASKS.md`, `docs/ANIMAL_FACTS_SONG_SHORT_SPEC_2026-05-07.md`, `docs/AGENT_LOG.md`
+
+**What was decided:**
+- The old inherited short structure from longform animal facts is no longer the canonical path.
+- The sung section is now treated as the core product, not the closing segment.
+- New canonical format locked with the user:
+  - animal named immediately
+  - all-song from first line
+  - escalating fact wonder
+  - loop ending
+- No full CTA, no formal reveal segment.
+
+**Source-layer decision:**
+- Do not build a Story-Reel-style narrative seed bank.
+- Build a lightweight animal-song topic bank instead.
+
+**Spec written:**
+- `docs/ANIMAL_FACTS_SONG_SHORT_SPEC_2026-05-07.md`
+
+**Next implementation order:**
+1. topic bank design
+2. brief generator refactor
+3. short composition refactor
+4. benchmark episodes
+
+**Immediate follow-through completed:**
+- Created `config/animal-song-topic-bank.json` as the first real source bank for the new lane.
+- Created `docs/ANIMAL_SONG_TOPIC_BANK_NOTES_2026-05-07.md` to explain how that bank should be used.
+- Seeded first champion animals for benchmark work: Fennec Fox, Okapi, Puffin, Sea Otter.
+- Seeded supporting animals: Armadillo, Hedgehog.
+- The next logical step is now the brief-generator refactor, not more source-system discussion.
+
+---
+
+## 2026-05-07 — [Agent: OpenClaw] — Animal Facts short end-to-end structure validated
+
+**Files changed:** `scripts/generate-animal-facts-brief.mjs`, `config/video-virality-rules.json`, `remotion/compositions/AnimalFactsSongShort.jsx`, `scripts/render-video.mjs`, `docs/AGENT_LOG.md`
+
+**What was validated:**
+- The brief generator now emits the new sung-first contract (`openingHookLine`, `songBeats`, `loopBackIdea`, `fullSongLyrics`, `song.mp3` expectation).
+- Shared `animal_song_short` virality rules were aligned to the new format so they no longer fight the generator.
+- The short composition was simplified into a continuous song-driven beat-image reel with no reveal scene and no CTA outro.
+- The render bridge now supports the new beat-image asset naming (`beat1.png ... beatN.png`) while remaining backward compatible with the legacy image set.
+
+**Proof checkpoint:**
+- Saved a real new-format episode folder: `output/longform/animal/ep07-puffin`
+- Added temporary placeholder beat images/audio only to validate the render path.
+- Dry render succeeded for `AnimalFactsSongShort` at 825 frames / 27.5 seconds.
+
+**What remains after this checkpoint:**
+- real beat-image generation
+- real song generation
+- composition/pacing polish
+- benchmark QC and narrow iteration

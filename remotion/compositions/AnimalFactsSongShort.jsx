@@ -1,8 +1,5 @@
 import { AbsoluteFill, Sequence } from 'remotion';
-import { AnimalHookScene } from '../components/longform/animal/AnimalHookScene.jsx';
-import { AnimalNameReveal } from '../components/longform/animal/AnimalNameReveal.jsx';
 import { AnimalSungRecap } from '../components/longform/animal/AnimalSungRecap.jsx';
-import { AnimalOutroScene } from '../components/longform/animal/AnimalOutroScene.jsx';
 
 export const animalFactsSongShortSchema = {
   episodeFolder: '',
@@ -10,9 +7,7 @@ export const animalFactsSongShortSchema = {
 };
 
 const FPS = 30;
-const NAME_REVEAL_FRAMES = 75;
-const DEFAULT_SUNG_RECAP_FRAMES = 510;
-const DEFAULT_OUTRO_FRAMES = 120;
+const DEFAULT_SONG_FRAMES = 720;
 
 const normalizeSlashes = (value) => String(value || '').replace(/\\/g, '/');
 const isAbsolutePath = (value) => {
@@ -50,54 +45,50 @@ const positiveSec = (value, fallbackSec) => {
   return Number.isFinite(sec) && sec > 0 ? sec : fallbackSec;
 };
 
+const getBeatImagePaths = (episodeFolder, episode) => {
+  const beatCount = Array.isArray(episode.songBeats) ? episode.songBeats.length : 0;
+  if (beatCount > 0) {
+    return Array.from({ length: beatCount }, (_, index) =>
+      resolveEpisodeAsset(episodeFolder, `beat${index + 1}.png`)
+    );
+  }
+
+  return [
+    resolveEpisodeAsset(episodeFolder, 'namereveal.png'),
+    ...['fact1', 'fact2', 'fact3', 'fact4', 'fact5'].map((key) =>
+      resolveEpisodeAsset(episodeFolder, `${key}.png`)
+    ),
+  ];
+};
+
+const getSongAudioPath = (episodeFolder, episode) => {
+  if (episode?.jingleDropPaths?.fullSong) {
+    return resolveEpisodeAsset(episodeFolder, episode.jingleDropPaths.fullSong);
+  }
+  if (episode?.jingleDropPaths?.sungRecap) {
+    return resolveEpisodeAsset(episodeFolder, episode.jingleDropPaths.sungRecap);
+  }
+  return resolveEpisodeAsset(episodeFolder, 'song.mp3');
+};
+
+const getSongLyrics = (episode) => episode.fullSongLyrics || episode.sungRecapLyrics || '';
+
 export const AnimalFactsSongShort = ({
   episodeFolder = '',
   episode = {},
 }) => {
-  const hookFrames = secToFrames(Math.min(Math.max(episode.hookNarrationDurationSec || 4, 3), 5), 4);
-  const sungRecapFrames = secToFrames(positiveSec(episode.sungRecapShortDurationSec, 17), 17);
-  const outroFrames = secToFrames(Math.min(Math.max(episode.outroCtaShortDurationSec || 4, 3), 4), 4);
+  const songFrames = secToFrames(positiveSec(episode.songDurationTargetSec || episode.sungRecapShortDurationSec, 24), 24);
+  const imagePaths = getBeatImagePaths(episodeFolder, episode);
+  const songAudioPath = getSongAudioPath(episodeFolder, episode);
+  const lyrics = getSongLyrics(episode);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000' }}>
-      <Sequence from={0} durationInFrames={hookFrames}>
-        <AnimalHookScene
-          hookText={episode.hookNarration || episode.hookFact || ''}
-          namerevealPath={resolveEpisodeAsset(episodeFolder, 'namereveal.png')}
-          hookNarrationPath={resolveEpisodeAsset(episodeFolder, 'narration-hook.mp3')}
-        />
-      </Sequence>
-
-      <Sequence from={hookFrames} durationInFrames={NAME_REVEAL_FRAMES}>
-        <AnimalNameReveal
-          animalName={episode.animalName || ''}
-          imagePath={resolveEpisodeAsset(episodeFolder, 'namereveal.png')}
-          hookJinglePath={resolveEpisodeAsset(episodeFolder, 'hook-jingle.mp3')}
-          narrationPath={resolveEpisodeAsset(episodeFolder, 'narration-namereveal.mp3')}
-        />
-      </Sequence>
-
-      <Sequence from={hookFrames + NAME_REVEAL_FRAMES} durationInFrames={sungRecapFrames}>
+      <Sequence from={0} durationInFrames={songFrames || DEFAULT_SONG_FRAMES}>
         <AnimalSungRecap
-          imagePaths={[
-            resolveEpisodeAsset(episodeFolder, 'namereveal.png'),
-            ...['fact1', 'fact2', 'fact3', 'fact4', 'fact5'].map((key) =>
-              resolveEpisodeAsset(episodeFolder, `${key}.png`)
-            ),
-          ]}
-          sungAudioPath={resolveEpisodeAsset(episodeFolder, 'sung-recap.mp3')}
-          lyrics={episode.sungRecapLyrics || ''}
-        />
-      </Sequence>
-
-      <Sequence from={hookFrames + NAME_REVEAL_FRAMES + sungRecapFrames} durationInFrames={outroFrames || DEFAULT_OUTRO_FRAMES}>
-        <AnimalOutroScene
-          imagePath={resolveEpisodeAsset(episodeFolder, 'namereveal.png')}
-          outroCta={episode.outroCtaShort || episode.outroCta || `What was your favorite ${episode.animalName || 'animal'} fact?`}
-          outroCtaNarrationPath={episode.outroCtaShortFile
-            ? resolveEpisodeAsset(episodeFolder, episode.outroCtaShortFile)
-            : resolveEpisodeAsset(episodeFolder, 'narration-outro-cta.mp3')}
-          outroJinglePath={resolveEpisodeAsset(episodeFolder, 'outro-jingle.mp3')}
+          imagePaths={imagePaths}
+          sungAudioPath={songAudioPath}
+          lyrics={lyrics}
         />
       </Sequence>
     </AbsoluteFill>

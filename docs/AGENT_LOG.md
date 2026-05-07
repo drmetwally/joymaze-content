@@ -226,3 +226,62 @@ This means current Story Engine work should stay tightly focused on quality vali
 - Active next task is `STORY-ENGINE-005` production reliability only.
 - First reliability hardening landed immediately after that handoff: `scripts/render-video.mjs` now fails fast if an operator uses `--composition` instead of `--comp`, and it warns when a reel-style `story.json` appears to be routed through `StoryEpisode` rather than `StoryReelV2`.
 - Live validation of the new Story Reel image fallback path also passed on 2026-05-07 using real forced single-slide runs on `ep22-the-last-light-of-home` and `ep25-the-last-catch` with `--fallback manual --continue-on-error`. Both completed cleanly and wrote the new richer `_reel-image-generation.json` logs. Daily operator docs were updated with the fallback runbook.
+
+### 2026-05-07 | JoyMaze | Animal Facts short | Format reset and new canonical direction locked
+
+**Status:** SPEC LOCKED, IMPLEMENTATION NEXT
+
+**Durable product decision:**
+- Reject the inherited longform-derived short structure (`hook -> reveal -> fact blocks -> sung summary -> CTA`) as the canonical future Animal Facts short lane.
+- The strongest user-validated part of the prior experiments was the sung portion itself, so the new lane should make song the whole structure, not the ending gimmick.
+
+**New canonical format locked with user:**
+- **animal named immediately -> all-song from first line -> escalating fact wonder -> loop ending**
+- No full CTA
+- No formal reveal segment
+- If a mystery-question opening is ever used, the name payoff must happen almost immediately inside the first lyric beat rather than as a standalone reveal scene
+
+**Source-system decision:**
+- Do **not** build a Story-Reel-style narrative seed bank for this lane.
+- Build a lightweight **animal-song topic bank** instead, optimized for hook trait, singable fact beats, visual set pieces, loop ending ideas, and overall songability/replay value.
+
+**Spec written:**
+- `docs/ANIMAL_FACTS_SONG_SHORT_SPEC_2026-05-07.md`
+
+**Implementation order now implied by the spec:**
+1. topic bank design
+2. brief generator refactor
+3. short composition refactor
+4. 2-4 benchmark episodes, then narrow polish
+
+**Topic bank foundation completed immediately after spec lock:**
+- Added `config/animal-song-topic-bank.json` as the first dedicated source layer for the new sung-first Animal Facts short lane.
+- Added `docs/ANIMAL_SONG_TOPIC_BANK_NOTES_2026-05-07.md` to explain intent, scoring, and first-use guidance.
+- This bank is explicitly not a story bank; it is a songability-first source bank keyed around hook trait, singable fact beats, visual set pieces, and loop ending ideas.
+- Initial champion-tier animals seeded for first benchmarks:
+  - Fennec Fox
+  - Okapi
+  - Puffin
+  - Sea Otter
+- Non-champion but useful supporting entries also seeded: Armadillo, Hedgehog.
+
+### 2026-05-07 | JoyMaze | Animal Facts short | Brief generator + composition + render bridge validated
+
+**Status:** END-TO-END STRUCTURE VALIDATED
+
+**What was validated:**
+- `scripts/generate-animal-facts-brief.mjs` now successfully emits the new sung-first contract using the animal-song topic bank.
+- Shared virality rules for `animal_song_short` were rewritten to match the new format instead of the old mystery/reveal/CTA logic.
+- `remotion/compositions/AnimalFactsSongShort.jsx` was refactored away from hook/reveal/outro sequencing and now plays as one continuous song-driven beat-image reel.
+- `scripts/render-video.mjs` was updated so `AnimalFactsSongShort` accepts the new `beat1.png ... beatN.png` asset contract while still tolerating the legacy image set when present.
+- A real saved episode folder (`output/longform/animal/ep07-puffin`) was used to validate the new path.
+
+**Render proof:**
+- After adding placeholder beat images and placeholder audio only for path validation, dry render completed successfully for:
+  - `AnimalFactsSongShort`
+  - duration: 825 frames / 27.5s
+- This confirms the new lane is structurally wired end-to-end.
+
+**Important scope note:**
+- The validation placeholders were only for render-path proof, not creative approval.
+- Remaining work after this checkpoint is real benchmark asset generation, song generation, pacing polish, and narrow quality iteration.

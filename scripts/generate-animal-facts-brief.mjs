@@ -11,6 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const ANIMAL_LONGFORM_DIR = path.join(ROOT, 'output', 'longform', 'animal');
 const SUNO_POOL_PATH = path.join(ROOT, 'config', 'suno-prompt-pool.json');
+const ANIMAL_SONG_TOPIC_BANK_PATH = path.join(ROOT, 'config', 'animal-song-topic-bank.json');
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GROQ_MAX_TOKENS = 4000;
 
@@ -51,6 +52,7 @@ async function loadContext() {
   let sunoPool = null;
   let contentIntelligence = null;
   let patternInterrupts = null;
+  let animalSongTopicBank = null;
   let recentEpisodes = [];
   let nextEpisodeNumber = 1;
 
@@ -97,6 +99,10 @@ async function loadContext() {
   } catch {}
 
   try {
+    animalSongTopicBank = JSON.parse(await fs.readFile(ANIMAL_SONG_TOPIC_BANK_PATH, 'utf-8'));
+  } catch {}
+
+  try {
     const entries = await fs.readdir(ANIMAL_LONGFORM_DIR, { withFileTypes: true });
     const episodes = entries
       .filter((entry) => entry.isDirectory())
@@ -128,9 +134,30 @@ async function loadContext() {
     sunoPool,
     contentIntelligence,
     patternInterrupts,
+    animalSongTopicBank,
     recentEpisodes,
     nextEpisodeNumber,
   };
+}
+
+function getCandidateAnimalTopics(context) {
+  const topics = context.animalSongTopicBank?.topics;
+  if (!Array.isArray(topics)) return [];
+  const recentSlugs = new Set(
+    (context.recentEpisodes || [])
+      .map((name) => String(name).match(/^ep\d+-(.+)$/i)?.[1] || '')
+      .filter(Boolean)
+  );
+
+  return topics
+    .filter((topic) => !recentSlugs.has(topic.slug))
+    .sort((a, b) => {
+      const championDiff = Number(Boolean(b.championTier)) - Number(Boolean(a.championTier));
+      if (championDiff !== 0) return championDiff;
+      const scoreA = (a.songabilityScore || 0) + (a.visualDistinctivenessScore || 0) + (a.surpriseScore || 0) + (a.sceneVarietyScore || 0);
+      const scoreB = (b.songabilityScore || 0) + (b.visualDistinctivenessScore || 0) + (b.surpriseScore || 0) + (b.sceneVarietyScore || 0);
+      return scoreB - scoreA;
+    });
 }
 
 async function callGroq(systemPrompt, userPrompt) {
@@ -182,6 +209,8 @@ function buildPrompt(context, artStyle) {
     recentEpisodes,
     nextEpisodeNumber,
   } = context;
+
+  const candidateTopics = getCandidateAnimalTopics(context).slice(0, 6);
 
   const viralityBlock = buildVideoViralityBlock(videoViralityRules, 'animal_song_short');
 
@@ -240,11 +269,15 @@ function buildPrompt(context, artStyle) {
     : '';
 
   const patternInterruptBlock = patternInterrupts?.interrupts
-    ? `\nHook pattern references (use for hookFact style — surprising, direct, curiosity-gap):\n${patternInterrupts.interrupts
+    ? `\nHook pattern references (use for opening lyric energy — surprising, direct, curiosity-gap, replayable):\n${patternInterrupts.interrupts
         .filter((i) => i.brand_safe !== false && i.subtype !== 'edutainment')
         .slice(0, 3)
         .map((i) => `- [${i.subtype}] ${i.topic}`)
         .join('\n')}`
+    : '';
+
+  const candidateTopicsBlock = candidateTopics.length
+    ? `\nPreferred animal-song source topics (choose one and preserve its best hook/fact logic):\n${candidateTopics.map((topic) => `- ${topic.animalName} | hook trait: ${topic.signatureHookTrait} | fact beats: ${topic.factBeats.slice(0, 4).join(' / ')} | loop idea: ${topic.loopEndingIdea}`).join('\n')}`
     : '';
 
   const selectedBackground = getLowestUsedPoolEntry(sunoPool, 'animal_background_ambient');
@@ -256,14 +289,13 @@ function buildPrompt(context, artStyle) {
   const psychBlock = psychTriggers
     ? `
 ## PSYCHOLOGY TRIGGER INJECTION
-Write each section so it activates the assigned trigger:
-- nameReveal → COMPLETION_SATISFACTION: burst of recognition and warmth. Animal name revealed with energy. Feels like a reward for watching.
-- fact1 → CURIOSITY_GAP: state the most remarkable fact directly — then open "but why?" or "how is that possible?" Compels the viewer forward.
-- fact2 → NOSTALGIA: grounding and familiar. Connect to something from the child's everyday world. "Just like when you..." quality.
-- fact3 → CURIOSITY_GAP: surprising behavior or adaptation that contradicts expectations. Lead with the surprise, then explain.
-- fact4 → COMPLETION_SATISFACTION: the "aha" connection — two facts from earlier link together. Something from fact1 or fact2 pays off here.
-- fact5 → NOSTALGIA: warm, endearing, lovable. The trait that makes you want this animal as a friend.
-- sungRecap → NOSTALGIA: warm, earworm cadence. The lyric should feel familiar on second listen. Repetition is a feature.
+Write the song beats so they activate these feelings:
+- openingLyric → CURIOSITY_GAP: immediate wonder from the first sung line, no slow setup
+- beat1 → COMPLETION_SATISFACTION: instant delight from naming the animal and landing its strongest visible trait
+- beat2 → CURIOSITY_GAP: a surprising adaptation or behavior that makes the viewer lean in
+- beat3 → NOSTALGIA or PLAY: rhythmic, lovable, relatable, or funny motion/behavior
+- beat4 → COMPLETION_SATISFACTION: strongest payoff beat, often the cutest or most impressive visual idea
+- loopEnding → NOSTALGIA + REPLAY: should feel natural, circular, and satisfying enough to restart
 `
     : '';
 
@@ -272,116 +304,148 @@ Write each section so it activates the assigned trigger:
 - Image format: horizontal landscape, 1920×1080 px — every imagePromptHint MUST end with "horizontal landscape format, 1920×1080 px"
 - Bottom 15% of every image must be clear (no animals, no objects) — text overlay zone
 - BOTTOM FADE (mandatory every scene): ground or environment at the lower edge must dissolve softly into light cream or pale white — like paint fading into paper. Include "ground fades softly to pale cream at lower edge" in every imagePromptHint.
-- Art style for this episode (use EXACTLY this style across ALL 6 images — never deviate): ${artStyle}
+- Art style for this episode (use EXACTLY this style across ALL images — never deviate): ${artStyle}
 - No text, logos, watermarks, or human characters in any image.
-- PSYCHOLOGY COLOR CUES (weave into every imagePromptHint):
-  * CURIOSITY_GAP (nameReveal, fact1, fact3): dramatic contrast lighting, deep rich shadows, single warm spotlight on animal
-  * NOSTALGIA (fact2, fact5): warm amber-golden haze, late-afternoon glow, soft earthy muted tones
-  * COMPLETION_SATISFACTION (fact4): vibrant saturated colors, bright warm sunlight, joyful open palette
-- 3-SECOND VISUAL RULE: each image must communicate the fact visually in 3 seconds without audio. If the image prompt doesn't make this possible, rewrite it.
+- 3-SECOND VISUAL RULE: each image must communicate the beat visually in 3 seconds without audio. If the image prompt doesn't make this possible, rewrite it.
 
 ## SHOT TYPE RULES
-Each image section has a shotType. Use it to set camera distance and framing:
+Use these framing types across beats:
 - ESTABLISHING: wide shot — animal small in frame, full environment visible
 - MEDIUM: mid-body shot — animal fills roughly half the frame, some environment visible
 - CLOSE-UP: face or key feature fills most of the frame, background softly blurred
 - ACTION: animal in motion — blur, dynamic pose, energy implied
-- POV: viewer's eye-level looking directly at the animal or from animal's perspective
 
-shotType assignments (use these exactly):
-- nameReveal: ESTABLISHING
-- fact1: ESTABLISHING (introduce the animal in its world)
-- fact2: MEDIUM (mid-body, environment context, warm and relatable)
-- fact3: ACTION (animal performing the notable behavior — dynamic, energetic)
-- fact4: CLOSE-UP (key feature or detail that completes the "aha" connection)
-- fact5: MEDIUM (warm, endearing portrait — the trait that makes you love this animal)
+Recommended beat spread:
+- beat1: ESTABLISHING or MEDIUM
+- beat2: ACTION or MEDIUM
+- beat3: ACTION or CLOSE-UP
+- beat4: CLOSE-UP or MEDIUM
+- loopEnding: MEDIUM or ESTABLISHING with strong restart energy
 `;
 
-  return `You are planning a JoyMaze animal facts long-form video episode for kids ages 4-8 and their parents.
+  return `You are planning a JoyMaze Animal Facts Song Short for kids ages 4-8 and their parents.
 Episode number: ${nextEpisodeNumber}
-Format: hook (mystery question — NO animal name) → name reveal (payoff) → FACT 1 → FACT 2 → FACT 3 → FACT 4 → FACT 5 → sung recap.
-${viralityBlock ? `\n## SHARED VIRAL VIDEO STRUCTURE CONTRACT\n${viralityBlock}\n` : ''}${recentEpisodesBlock}${trendsBlock}${dynamicThemesBlock}${competitorBlock}${hooksBlock}${perfWeightsBlock}${contentIntelBlock}${patternInterruptBlock}${backgroundRule}
+Format: **animal named immediately -> all-song from first line -> escalating fact wonder -> loop ending**.
+${viralityBlock ? `\n## SHARED VIRAL VIDEO STRUCTURE CONTRACT\n${viralityBlock}\n` : ''}${recentEpisodesBlock}${trendsBlock}${dynamicThemesBlock}${competitorBlock}${hooksBlock}${perfWeightsBlock}${contentIntelBlock}${patternInterruptBlock}${candidateTopicsBlock}${backgroundRule}
 ${psychBlock}${visualStyleBlock}
 Return one JSON object with EXACTLY this shape (no extra fields, no missing fields):
 {
-  "animalName": "Sea Otter",
-  "slug": "sea-otter",
-  "hookFact": "What ocean animal holds hands while sleeping so they don't drift apart?",
-  "nameReveal": {
-    "shotType": "ESTABLISHING",
-    "compositionNote": "string — 1 sentence: foreground, background, lighting, animal posture",
-    "psychologyBeat": "string — 3-6 words, e.g. 'burst of joyful recognition'",
-    "imagePromptHint": "string — 50-70 words full Gemini prompt"
-  },
-  "fact1": {
-    "numberLabel": "FACT 1",
-    "description": "string — EXACTLY 4 sentences: (1) fact statement 12-15 words, (2) detailed explanation 14-18 words, (3) specific detail or stat 10-13 words, (4) comparison to child's world 10-13 words",
-    "comparisonAnchor": "string — standalone version of sentence 3. Always starts with 'That's like...' or 'Just like...'",
-    "shotType": "ESTABLISHING",
-    "compositionNote": "string — 1 sentence",
-    "psychologyBeat": "string — 3-6 words",
-    "imagePromptHint": "string — 50-70 words full Gemini prompt"
-  },
-  "fact2": {
-    "numberLabel": "FACT 2",
-    "description": "string — EXACTLY 4 sentences: (1) fact statement 12-15 words, (2) detailed explanation 14-18 words, (3) specific detail or stat 10-13 words, (4) comparison to child's world 10-13 words. MINIMUM 48 words total.",
-    "comparisonAnchor": "string",
-    "shotType": "MEDIUM",
-    "compositionNote": "string — 1 sentence",
-    "psychologyBeat": "string — 3-6 words",
-    "imagePromptHint": "string — 50-70 words full Gemini prompt"
-  },
-  "fact3": {
-    "numberLabel": "FACT 3",
-    "description": "string — EXACTLY 4 sentences: (1) fact statement 12-15 words, (2) detailed explanation 14-18 words, (3) specific detail or stat 10-13 words, (4) comparison to child's world 10-13 words. MINIMUM 48 words total.",
-    "comparisonAnchor": "string",
-    "shotType": "ACTION",
-    "compositionNote": "string — 1 sentence",
-    "psychologyBeat": "string — 3-6 words",
-    "imagePromptHint": "string — 50-70 words full Gemini prompt"
-  },
-  "fact4": {
-    "numberLabel": "FACT 4",
-    "description": "string — EXACTLY 4 sentences: (1) fact statement 12-15 words, (2) detailed explanation 14-18 words, (3) specific detail or stat 10-13 words, (4) comparison to child's world 10-13 words. MINIMUM 48 words total.",
-    "comparisonAnchor": "string",
-    "shotType": "CLOSE-UP",
-    "compositionNote": "string — 1 sentence",
-    "psychologyBeat": "string — 3-6 words",
-    "imagePromptHint": "string — 50-70 words full Gemini prompt"
-  },
-  "fact5": {
-    "numberLabel": "FACT 5",
-    "description": "string — EXACTLY 4 sentences: (1) fact statement 12-15 words, (2) detailed explanation 14-18 words, (3) specific detail or stat 10-13 words, (4) comparison to child's world 10-13 words. MINIMUM 48 words total.",
-    "comparisonAnchor": "string",
-    "shotType": "MEDIUM",
-    "compositionNote": "string — 1 sentence",
-    "psychologyBeat": "string — 3-6 words",
-    "imagePromptHint": "string — 50-70 words full Gemini prompt"
-  },
-  "sungRecapLyrics": "string — short, catchy, repeatable, child-friendly, multi-line",
-  "sungRecapSunoPrompt": "string — upbeat children's educational song, earworm cadence, ~30 seconds",
-  "backgroundSunoPrompt": "string",
-  "activityFolder": ""
+  "animalName": "Fennec Fox",
+  "slug": "fennec-fox",
+  "openingHookLine": "Fennec fox, tiny body, giant ears in the desert sun!",
+  "songBeats": [
+    {
+      "key": "beat1",
+      "title": "Immediate animal + strongest trait",
+      "lyric": "string — short, catchy, factually clear lyric line",
+      "factFocus": "string — the factual idea this beat is built on",
+      "shotType": "ESTABLISHING or MEDIUM",
+      "compositionNote": "string — 1 sentence",
+      "psychologyBeat": "string — 3-6 words",
+      "imagePromptHint": "string — 50-70 words full Gemini prompt"
+    },
+    {
+      "key": "beat2",
+      "title": "Escalating wonder beat",
+      "lyric": "string",
+      "factFocus": "string",
+      "shotType": "MEDIUM or ACTION",
+      "compositionNote": "string — 1 sentence",
+      "psychologyBeat": "string — 3-6 words",
+      "imagePromptHint": "string — 50-70 words full Gemini prompt"
+    },
+    {
+      "key": "beat3",
+      "title": "Most dynamic or surprising fact beat",
+      "lyric": "string",
+      "factFocus": "string",
+      "shotType": "ACTION or CLOSE-UP",
+      "compositionNote": "string — 1 sentence",
+      "psychologyBeat": "string — 3-6 words",
+      "imagePromptHint": "string — 50-70 words full Gemini prompt"
+    },
+    {
+      "key": "beat4",
+      "title": "Payoff beat",
+      "lyric": "string",
+      "factFocus": "string",
+      "shotType": "CLOSE-UP or MEDIUM",
+      "compositionNote": "string — 1 sentence",
+      "psychologyBeat": "string — 3-6 words",
+      "imagePromptHint": "string — 50-70 words full Gemini prompt"
+    },
+    {
+      "key": "loopEnding",
+      "title": "Loop ending beat",
+      "lyric": "string — should reconnect naturally to the opening energy",
+      "factFocus": "string",
+      "shotType": "MEDIUM or ESTABLISHING",
+      "compositionNote": "string — 1 sentence",
+      "psychologyBeat": "string — 3-6 words",
+      "imagePromptHint": "string — 50-70 words full Gemini prompt"
+    }
+  ],
+  "loopBackIdea": "string — 1 sentence on how the ending loops back into the opening line",
+  "fullSongLyrics": "string — full short song, multi-line, includes the opening line and all beat ideas",
+  "songSunoPrompt": "string — upbeat children's animal fact song, earworm cadence, loop-friendly, ~20-35 seconds",
+  "backgroundSunoPrompt": "string"
 }
 
 Hard rules:
 - Animal must be educationally rich for ages 4-8 and NOT in the recentEpisodes list.
-- hookFact: MYSTERY QUESTION — NEVER include the animal name. The hook must make the viewer wonder "what animal is that?" before the name reveal pays it off. Format: curiosity question about the animal's most remarkable trait. Max 15 words. Example: "What ocean animal holds hands while sleeping so they don't drift apart?"
-- description (each fact): EXACTLY 4 sentences. Target 38-56 words total. These are factual source sentences for later narration, so they must be clear, specific, and easy to rewrite into energetic spoken VO.
-  Sentence roles:
-  1. The surprising fact, stated clearly and directly.
-  2. Why or how it works in simple, concrete language.
-  3. One vivid real detail or verified statistic.
-  4. A child-world comparison or relatable payoff.
-  Keep the writing clean and factual, but avoid stiff textbook wording.
-- comparisonAnchor: standalone version of sentence 3. Always starts with "That's like..." or "Just like..."
-- Numbers/stats in description: use plain, clear phrasing. Never fabricate statistics. Only include numbers that are verified facts for this animal.
-- 5 facts must together give a complete, surprising picture of the animal. No fact should be predictable. fact5 must be endearing.
-- Every imagePromptHint: 50-70 words, complete Gemini generation prompt. MUST include: animal species, shotType framing, environment, lighting mood, psychology color cue, "ground fades softly to pale cream at lower edge", "horizontal landscape format, 1920×1080 px". Do NOT include text or logos.
+- Name the animal immediately in the opening line. Do not build a standalone reveal scene.
+- No CTA language at all.
+- No numbered fact-classroom tone.
+- The whole format is a song, not a prose explainer plus a song ending.
+- Each lyric line must be short, sticky, child-friendly, and visually legible.
+- Choose 5 song beats only if the animal supports 5 truly strong beats. Avoid filler energy.
+- Every beat must be understandable in 2-3 seconds visually.
+- factFocus should stay factual and clear. Do not fabricate facts.
+- Every imagePromptHint: 50-70 words, complete Gemini generation prompt. MUST include: animal species, shotType framing, environment, lighting mood, "ground fades softly to pale cream at lower edge", "horizontal landscape format, 1920×1080 px". Do NOT include text or logos.
 - compositionNote: 1 sentence. What is in foreground, background, lighting direction, animal posture or expression.
 - psychologyBeat: 3-6 words. The emotional beat this image serves.
-- If a background pool prompt was provided above, copy it verbatim into "backgroundSunoPrompt".
-- activityFolder may be empty string.`;
+- fullSongLyrics should feel musical and replayable, not like stitched prose facts.
+- loopBackIdea must explicitly describe why the last line can feed back into the first line.
+- If a background pool prompt was provided above, copy it verbatim into "backgroundSunoPrompt".`;
+}
+
+function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment = 'natural habitat' }) {
+  const shotType = beat?.shotType || 'MEDIUM';
+  const composition = beat?.compositionNote || `${animalName} shown clearly in its environment`;
+  const factFocus = beat?.factFocus || '';
+  const psychologyBeat = beat?.psychologyBeat || 'playful wonder';
+  const lyric = beat?.lyric || '';
+  const base = [
+    `${animalName}, ${shotType} framing, ${composition}.`,
+    `Show the factual idea clearly: ${factFocus}.`,
+    `Mood should feel like ${psychologyBeat}, with child-friendly readability and strong visual clarity in 2-3 seconds.`,
+    `Use ${artStyle}.`,
+    `Keep the scene in ${fallbackEnvironment}, no text or logos, ground fades softly to pale cream at lower edge, horizontal landscape format, 1920×1080 px.`,
+  ].join(' ');
+
+  const existing = String(beat?.imagePromptHint || '').trim();
+  if (!existing) return base;
+  const normalized = `${existing.replace(/\s+/g, ' ').trim()} ${base}`.replace(/\s+/g, ' ').trim();
+  return normalized;
+}
+
+function normalizeBrief(brief, context, artStyle) {
+  if (!brief || typeof brief !== 'object') return brief;
+  const topic = getCandidateAnimalTopics(context).find((item) => item.animalName === brief.animalName || item.slug === brief.slug);
+  const fallbackEnvironment = topic?.habitat || 'natural habitat';
+
+  if (Array.isArray(brief.songBeats)) {
+    brief.songBeats = brief.songBeats.map((beat) => {
+      const wordCount = String(beat?.imagePromptHint || '').split(/\s+/).filter(Boolean).length;
+      if (wordCount >= 40) return beat;
+      return {
+        ...beat,
+        imagePromptHint: expandImagePromptHint({ animalName: brief.animalName, artStyle, beat, fallbackEnvironment }),
+      };
+    });
+  }
+
+  return brief;
 }
 
 function validateBrief(brief) {
@@ -389,23 +453,13 @@ function validateBrief(brief) {
     throw new Error('Groq response was not a JSON object.');
   }
 
-  const factKeys = ['fact1', 'fact2', 'fact3', 'fact4', 'fact5'];
   const requiredPaths = [
     ['animalName'],
     ['slug'],
-    ['hookFact'],
-    ['nameReveal', 'imagePromptHint'],
-    ['nameReveal', 'compositionNote'],
-    ['nameReveal', 'psychologyBeat'],
-    ...factKeys.flatMap((f) => [
-      [f, 'description'],
-      [f, 'comparisonAnchor'],
-      [f, 'imagePromptHint'],
-      [f, 'compositionNote'],
-      [f, 'psychologyBeat'],
-    ]),
-    ['sungRecapLyrics'],
-    ['sungRecapSunoPrompt'],
+    ['openingHookLine'],
+    ['loopBackIdea'],
+    ['fullSongLyrics'],
+    ['songSunoPrompt'],
     ['backgroundSunoPrompt'],
   ];
 
@@ -420,80 +474,72 @@ function validateBrief(brief) {
     }
   }
 
-  // imagePromptHint word count — must be 40+ words (spec: 50-70); short prompts produce identical-looking images
-  const imageHintSections = [
-    ['nameReveal', 'imagePromptHint'],
-    ...factKeys.map((f) => [f, 'imagePromptHint']),
-  ];
-  for (const [section, field] of imageHintSections) {
-    const hint = brief[section]?.[field] || '';
-    const wordCount = hint.split(/\s+/).filter(Boolean).length;
+  if (!Array.isArray(brief.songBeats) || brief.songBeats.length < 4) {
+    throw new Error('Brief field missing or too short: songBeats (minimum 4 beats required).');
+  }
+
+  for (let i = 0; i < brief.songBeats.length; i++) {
+    const beat = brief.songBeats[i];
+    if (!beat || typeof beat !== 'object') {
+      throw new Error(`songBeats[${i}] is missing or invalid.`);
+    }
+    for (const key of ['key', 'title', 'lyric', 'factFocus', 'shotType', 'compositionNote', 'psychologyBeat', 'imagePromptHint']) {
+      if (typeof beat[key] !== 'string' || beat[key].trim().length === 0) {
+        throw new Error(`songBeats[${i}].${key} is missing.`);
+      }
+    }
+    const wordCount = beat.imagePromptHint.split(/\s+/).filter(Boolean).length;
     if (wordCount < 40) {
-      throw new Error(
-        `${section}.imagePromptHint too short (${wordCount} words — minimum 40, target 50-70). Groq generated a lazy prompt. Re-run or use --force to regenerate.`,
-      );
+      throw new Error(`songBeats[${i}].imagePromptHint too short (${wordCount} words — minimum 40, target 50-70).`);
     }
   }
 
-  // Runtime projection — rough planning estimate only.
-  // Narration engine now targets punchier spoken copy around ~1.05 speed.
-  const perFactSec = factKeys.reduce((sum, key) => {
-    const wc = brief[key]?.description?.split(/\s+/).filter(Boolean).length || 0;
-    return sum + Math.max((wc / 2.8) + 4, wc / 1.8);
-  }, 0);
-  const projectedSec = perFactSec + 13 + (5 * 1.5) + 30 + 8; // +hook+nameReveal+titleCards+sungRecap+outro
-  if (projectedSec < 170) {
-    console.warn(`  Warning: projected runtime ~${Math.round(projectedSec)}s — may feel short for the current longform target.`);
+  if (!/\b${''}/.source) {
+    // no-op placeholder to avoid accidental template interpolation confusion in exact replacement block
+  }
+
+  if (!new RegExp(`\\b${String(brief.animalName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(brief.openingHookLine)) {
+    throw new Error('openingHookLine must name the animal immediately.');
+  }
+
+  if (/follow|subscribe|favorite fact|what did you learn|comment below|tell us/i.test(`${brief.fullSongLyrics} ${brief.loopBackIdea}`)) {
+    throw new Error('CTA-style language detected in the sung-first brief.');
   }
 }
 
 function buildEpisodeJson(brief, context, artStyle) {
   const selectedBackground = getLowestUsedPoolEntry(context.sunoPool, 'animal_background_ambient');
+  const songBeats = Array.isArray(brief.songBeats) ? brief.songBeats : [];
 
   return {
-    format: 'animal-facts',
+    format: 'animal-facts-song-short',
     episodeNumber: context.nextEpisodeNumber,
     animalName: brief.animalName,
     slug: brief.slug,
     date: TODAY,
     artStyle,
+    structure: 'named-immediately-all-song-loop',
     psychologyMap: {
-      hook: 'CURIOSITY_GAP',
-      nameReveal: 'COMPLETION_SATISFACTION',
-      fact1: 'CURIOSITY_GAP',
-      fact2: 'NOSTALGIA',
-      fact3: 'CURIOSITY_GAP',
-      fact4: 'COMPLETION_SATISFACTION',
-      fact5: 'NOSTALGIA',
-      sungRecap: 'NOSTALGIA',
-      activity: 'CHALLENGE',
-      outro: 'SCREEN_RELIEF',
+      openingLyric: 'CURIOSITY_GAP',
+      beat1: 'COMPLETION_SATISFACTION',
+      beat2: 'CURIOSITY_GAP',
+      beat3: 'PLAY',
+      beat4: 'COMPLETION_SATISFACTION',
+      loopEnding: 'REPLAY',
     },
-    hookFact: brief.hookFact,
-    nameReveal: brief.nameReveal,
-    fact1: brief.fact1,
-    fact2: brief.fact2,
-    fact3: brief.fact3,
-    fact4: brief.fact4,
-    fact5: brief.fact5,
-    sungRecapLyrics: brief.sungRecapLyrics,
-    sungRecapShortDurationSec: 17,
-    outroCtaShort: '',
-    outroCtaShortFile: '',
-    outroCtaShortDurationSec: 3.5,
-    hookNarrationShortTargetSec: 4,
-    nameRevealShortTargetSec: 2.5,
+    openingHookLine: brief.openingHookLine,
+    loopBackIdea: brief.loopBackIdea,
+    songBeats,
+    fullSongLyrics: brief.fullSongLyrics,
+    songDurationTargetSec: 24,
     sunoPrompts: {
-      sungRecap: brief.sungRecapSunoPrompt,
+      fullSong: brief.songSunoPrompt,
       background: selectedBackground?.prompt || brief.backgroundSunoPrompt,
     },
     jingleDropPaths: {
       background: 'background.mp3',
-      sungRecap: 'sung-recap.mp3',
-      hookJingle: 'hook-jingle.mp3',
-      outroJingle: 'outro-jingle.mp3',
+      fullSong: 'song.mp3',
     },
-    activityFolder: brief.activityFolder || '',
     rendered: false,
   };
 }
@@ -503,90 +549,78 @@ function buildBriefMd(episode, episodeDir) {
     .map(([segment, trigger]) => `| ${segment} | ${trigger} |`)
     .join('\n');
 
-  const imageSection = (label, filename, section) => {
-    if (!section) return '';
-    return `
-## ${label} → save as \`${filename}\`
-**Shot type:** ${section.shotType || 'MEDIUM'} · **Psychology beat:** _${section.psychologyBeat || ''}_
-**Composition:** ${section.compositionNote || ''}
+  const beatImageSections = (episode.songBeats || [])
+    .map((beat, index) => `
+## ${beat.title || `Beat ${index + 1}`} → save as \`beat${index + 1}.png\`
+**Shot type:** ${beat.shotType || 'MEDIUM'} · **Psychology beat:** _${beat.psychologyBeat || ''}_
+**Fact focus:** ${beat.factFocus || ''}
+**Composition:** ${beat.compositionNote || ''}
+
+**Lyric:** ${beat.lyric || ''}
 
 Image prompt (paste into Gemini):
 \`\`\`
-${section.imagePromptHint}
+${beat.imagePromptHint}
 \`\`\`
-`;
-  };
+`).join('');
 
-  const FACT_KEYS = ['fact1', 'fact2', 'fact3', 'fact4', 'fact5'];
-
-  const factImageSections = FACT_KEYS
-    .map((key) => {
-      const fact = episode[key];
-      if (!fact) return '';
-      return imageSection(`${fact.numberLabel || key.toUpperCase()} Image`, `${key}.png`, fact);
-    })
-    .join('');
-
-  const factDescriptions = FACT_KEYS
-    .map((key) => {
-      const fact = episode[key];
-      if (!fact) return '';
-      return `**${fact.numberLabel || key.toUpperCase()}:** ${fact.description}\n\n_Comparison anchor:_ "${fact.comparisonAnchor || ''}"`;
-    })
+  const beatLyricReference = (episode.songBeats || [])
+    .map((beat, index) => `**Beat ${index + 1} — ${beat.title || beat.key}:** ${beat.lyric}\n\n_Fact focus:_ ${beat.factFocus || ''}`)
     .join('\n\n');
 
-  return `# Animal Facts Brief: ${episode.animalName}
+  return `# Animal Facts Song Short Brief: ${episode.animalName}
 
 - Episode number: ${episode.episodeNumber}
 - Date: ${episode.date}
 - Folder: ${episodeDir}
+- Structure: ${episode.structure}
 
 ## Episode Visual Style — set this in Gemini BEFORE generating any image
 - **Art style:** ${episode.artStyle}
-- **Apply to ALL 6 images** — open one Gemini session, paste the style first, then generate each image in sequence
+- **Apply to ALL beat images in one Gemini session** for consistency
 
-## Hook Fact
-${episode.hookFact}
+## Opening Hook Line
+${episode.openingHookLine}
+
+## Loop Back Idea
+${episode.loopBackIdea}
 
 ---
 ## IMAGES — Generate in Gemini, drop into episode folder with exact filenames below
-${imageSection('Name Reveal', 'namereveal.png', episode.nameReveal)}${factImageSections}
+${beatImageSections}
 ---
 
-## Fact Descriptions (narration reference)
+## Beat Lyrics (reference)
 
-${factDescriptions}
+${beatLyricReference}
 
 ---
 
-## Sung Recap Lyrics
+## Full Song Lyrics
 \`\`\`
-${episode.sungRecapLyrics}
+${episode.fullSongLyrics}
 \`\`\`
 
-## Short-Form Reel Contract
-- Hook target: ~${episode.hookNarrationShortTargetSec}s
-- Name reveal target: ~${episode.nameRevealShortTargetSec}s
-- Sung recap target: ~${episode.sungRecapShortDurationSec}s
-- Outro CTA target: ~${episode.outroCtaShortDurationSec}s
-- Required reel images: \`namereveal.png\`, \`fact1.png\`, \`fact2.png\`, \`fact3.png\`, \`fact4.png\`, \`fact5.png\`
-- B-roll: optional later, not required for v1 reel
+## Short-Form Song Contract
+- Animal named immediately in first sung line
+- Entire reel is song-driven from start to finish
+- No CTA
+- Loop ending required
+- Required beat images: ${(episode.songBeats || []).map((_, index) => `\`beat${index + 1}.png\``).join(', ')}
 
 ## Suno Drop Instructions
 Drop these MP3 files into the episode folder with exact filenames:
-- \`background.mp3\` — Suno prompt below
-- \`sung-recap.mp3\` — Suno prompt below
-- \`hook-jingle.mp3\` — reuse from \`assets/audio/hook-jingle.mp3\`
-- \`outro-jingle.mp3\` — reuse from \`assets/audio/outro-jingle.mp3\`
+- \`background.mp3\` — background Suno prompt below
+- \`song.mp3\` — full song Suno prompt below
 
 **Background Suno prompt:**
 \`\`\`
 ${episode.sunoPrompts.background}
 \`\`\`
 
-**Sung recap Suno prompt:**
+**Full song Suno prompt:**
 \`\`\`
-${episode.sunoPrompts.sungRecap}
+${episode.sunoPrompts.fullSong}
 \`\`\`
 
 ---
@@ -651,6 +685,7 @@ async function main() {
       : `${userPrompt}\n\nIMPORTANT: Every imagePromptHint field must be at least 50 words. Write detailed, specific visual descriptions.`;
     console.log(`  Calling Groq (${GROQ_MODEL})...`);
     brief = await callGroq(systemPrompt, attemptUserPrompt);
+    brief = normalizeBrief(brief, context, artStyle);
     validationError = null;
     try {
       validateBrief(brief);
@@ -668,9 +703,9 @@ async function main() {
 
   console.log('');
   console.log(`  Animal: ${episodeJson.animalName}`);
-  console.log(`  Hook:   "${episodeJson.hookFact}"`);
-  console.log(`  Fact 1: ${episodeJson.fact1?.description?.substring(0, 80)}...`);
-  console.log(`  Fact 5: ${episodeJson.fact5?.description?.substring(0, 80)}...`);
+  console.log(`  Open:   "${episodeJson.openingHookLine}"`);
+  console.log(`  Beat 1: ${episodeJson.songBeats?.[0]?.lyric?.substring(0, 80) || ''}`);
+  console.log(`  Loop:   ${episodeJson.songBeats?.[episodeJson.songBeats.length - 1]?.lyric?.substring(0, 80) || ''}`);
   console.log('');
 
   if (!SAVE) {

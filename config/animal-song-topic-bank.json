@@ -1,0 +1,223 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "last_updated": "2026-05-07",
+    "managed_by": "manual_curated_v1",
+    "description": "Curated source bank for Animal Facts Song Short. This is not a narrative story bank. It is a songability-first topic bank optimized for immediate animal naming, strong hook traits, escalating fact wonder, fast visual readability, and loop ending potential.",
+    "selection_rule": "Prefer animals with strong immediate naming value, high visual distinctiveness, 3-5 singable fact beats, and a natural loop-back ending idea.",
+    "scoring_notes": {
+      "kidFamiliarityScore": "0-1, how likely a child/parent pair already recognizes or quickly accepts the animal",
+      "visualDistinctivenessScore": "0-1, how visually memorable the silhouette/features are in under 3 seconds",
+      "surpriseScore": "0-1, how naturally surprising the animal's best facts are",
+      "cutenessScore": "0-1, cuteness/endearment value for replay and saves",
+      "songabilityScore": "0-1, how easily the animal/facts convert into catchy lyric beats",
+      "sceneVarietyScore": "0-1, how many visually different beat scenes the animal can support"
+    }
+  },
+  "topics": [
+    {
+      "id": "animal_song_fennec_fox_001",
+      "animalName": "Fennec Fox",
+      "slug": "fennec-fox",
+      "category": "mammal",
+      "habitat": "desert",
+      "kidFamiliarityScore": 0.74,
+      "visualDistinctivenessScore": 0.97,
+      "surpriseScore": 0.86,
+      "cutenessScore": 0.96,
+      "songabilityScore": 0.94,
+      "sceneVarietyScore": 0.83,
+      "signatureHookTrait": "tiny fox with giant ears that help it survive desert heat",
+      "factBeats": [
+        "Its ears are huge compared with its tiny body.",
+        "Those giant ears help release body heat in the hot desert.",
+        "It can hear prey moving under the sand.",
+        "Its furry feet help protect it from burning ground.",
+        "It pops, listens, and pounces in quick playful motions."
+      ],
+      "visualSetPieces": [
+        "tiny fox with oversized ears under a glowing desert sky",
+        "close shot of translucent ears catching warm light",
+        "fox listening with head tilted over rippled sand",
+        "springy pounce into sand",
+        "small paw prints and fluffy feet on sunlit dunes"
+      ],
+      "loopEndingIdea": "end on the fox listening with giant ears again so the first hook line can restart naturally",
+      "avoidNotes": [
+        "do not let the visuals drift into generic red-fox forest imagery",
+        "avoid crowded desert scenes that hide the ear silhouette"
+      ],
+      "championTier": true
+    },
+    {
+      "id": "animal_song_okapi_001",
+      "animalName": "Okapi",
+      "slug": "okapi",
+      "category": "mammal",
+      "habitat": "rainforest",
+      "kidFamiliarityScore": 0.42,
+      "visualDistinctivenessScore": 0.95,
+      "surpriseScore": 0.91,
+      "cutenessScore": 0.72,
+      "songabilityScore": 0.84,
+      "sceneVarietyScore": 0.78,
+      "signatureHookTrait": "a rainforest animal that looks part zebra, part deer, but is its own thing",
+      "factBeats": [
+        "It looks striped like a zebra but is closer to a giraffe.",
+        "Its long dark tongue can grab leaves and clean its own eyes and ears.",
+        "Its striped legs help it vanish into broken forest light.",
+        "It walks quietly through dense rainforest shadows.",
+        "Its look is so unusual that every beat can reveal a new surprise."
+      ],
+      "visualSetPieces": [
+        "full-body okapi reveal in dappled jungle light",
+        "close-up of striped legs in layered foliage shadows",
+        "tongue stretching toward leaves",
+        "quiet walking pose through narrow jungle path",
+        "half-hidden silhouette blending with shafts of light"
+      ],
+      "loopEndingIdea": "end on the strange stripes and ask visually what kind of animal it even is, so the opening naming line feels replayable",
+      "avoidNotes": [
+        "do not make it read as a zebra in a jungle",
+        "keep giraffe-family anatomy accurate in the face and body"
+      ],
+      "championTier": true
+    },
+    {
+      "id": "animal_song_puffin_001",
+      "animalName": "Puffin",
+      "slug": "puffin",
+      "category": "bird",
+      "habitat": "coastal cliffs",
+      "kidFamiliarityScore": 0.68,
+      "visualDistinctivenessScore": 0.93,
+      "surpriseScore": 0.82,
+      "cutenessScore": 0.9,
+      "songabilityScore": 0.9,
+      "sceneVarietyScore": 0.84,
+      "signatureHookTrait": "a funny seabird with a bright beak that can carry several fish at once",
+      "factBeats": [
+        "Its beak glows with bright colors in breeding season.",
+        "It can hold multiple fish crosswise at the same time.",
+        "It flies fast but looks adorably frantic in the air.",
+        "It nests in burrows on steep grassy cliffs.",
+        "It dives underwater to chase fish with its wings."
+      ],
+      "visualSetPieces": [
+        "bright-beaked puffin perched on a cliff edge",
+        "beak full of fish in side profile",
+        "puffin flapping low over waves",
+        "burrow opening in grassy cliff wall",
+        "underwater-style dive motion beat"
+      ],
+      "loopEndingIdea": "end on the fish-filled beak so the opener about the funny bright-beaked bird can restart cleanly",
+      "avoidNotes": [
+        "do not let it drift into penguin-like body staging",
+        "keep the beak shape oversized and iconic"
+      ],
+      "championTier": true
+    },
+    {
+      "id": "animal_song_armadillo_001",
+      "animalName": "Armadillo",
+      "slug": "armadillo",
+      "category": "mammal",
+      "habitat": "grassland and scrub",
+      "kidFamiliarityScore": 0.63,
+      "visualDistinctivenessScore": 0.9,
+      "surpriseScore": 0.8,
+      "cutenessScore": 0.69,
+      "songabilityScore": 0.81,
+      "sceneVarietyScore": 0.76,
+      "signatureHookTrait": "a little armored mammal with a shell-like body and digging claws",
+      "factBeats": [
+        "Its body is covered in armor-like plates.",
+        "It digs quickly with strong curved claws.",
+        "Some armadillos can curl tighter when frightened.",
+        "It sniffs along the ground for insects.",
+        "Its funny shuffle and armor shape make it instantly memorable."
+      ],
+      "visualSetPieces": [
+        "armadillo profile showing plate bands",
+        "digging action with dirt flying",
+        "nose-down insect search pose",
+        "curled protective posture",
+        "little armored shuffle at golden hour"
+      ],
+      "loopEndingIdea": "end on the rolling/armor idea so the first naming line about the armored animal can replay naturally",
+      "avoidNotes": [
+        "avoid making the shell look like turtle anatomy",
+        "do not overcrowd scenes with too much vegetation"
+      ],
+      "championTier": false
+    },
+    {
+      "id": "animal_song_hedgehog_001",
+      "animalName": "Hedgehog",
+      "slug": "hedgehog",
+      "category": "mammal",
+      "habitat": "gardens and woodland edges",
+      "kidFamiliarityScore": 0.86,
+      "visualDistinctivenessScore": 0.85,
+      "surpriseScore": 0.7,
+      "cutenessScore": 0.95,
+      "songabilityScore": 0.82,
+      "sceneVarietyScore": 0.67,
+      "signatureHookTrait": "a tiny spiky nighttime explorer with a surprisingly busy nose",
+      "factBeats": [
+        "Its back is covered with sharp protective spines.",
+        "It sniffs and rustles around mostly at night.",
+        "It can curl into a ball when danger comes close.",
+        "It hunts little bugs with patient searching.",
+        "Its tiny feet and nose make every movement feel cute and rhythmic."
+      ],
+      "visualSetPieces": [
+        "small hedgehog under moonlit garden glow",
+        "close-up of spines catching light",
+        "curled defensive ball pose",
+        "nose-down insect search in leaves",
+        "tiny walking silhouette through grass"
+      ],
+      "loopEndingIdea": "end with the hedgehog rustling into the night so the opening line can start again like a bedtime loop",
+      "avoidNotes": [
+        "avoid flat static pet-portrait energy",
+        "keep the night scenes readable, not muddy"
+      ],
+      "championTier": false
+    },
+    {
+      "id": "animal_song_sea_otter_001",
+      "animalName": "Sea Otter",
+      "slug": "sea-otter",
+      "category": "mammal",
+      "habitat": "ocean kelp forests",
+      "kidFamiliarityScore": 0.84,
+      "visualDistinctivenessScore": 0.88,
+      "surpriseScore": 0.87,
+      "cutenessScore": 0.98,
+      "songabilityScore": 0.92,
+      "sceneVarietyScore": 0.85,
+      "signatureHookTrait": "a fluffy ocean animal that floats, cracks shells, and wraps in kelp",
+      "factBeats": [
+        "It floats on its back like a tiny drifting raft.",
+        "It uses rocks as tools to crack open shellfish.",
+        "It wraps itself in kelp so it does not drift away.",
+        "Its fur is extremely dense and helps keep it warm.",
+        "Its paws, whiskers, and floating pose are instantly lovable on screen."
+      ],
+      "visualSetPieces": [
+        "otter floating on back in blue-green water",
+        "shell cracking with rock on chest",
+        "kelp wrapping scene with playful motion",
+        "close-up whiskers and paws",
+        "gentle wave bobbing for loop ending"
+      ],
+      "loopEndingIdea": "end with the otter bobbing on its back so the opening line can loop like a floating lullaby",
+      "avoidNotes": [
+        "avoid generic river-otter shoreline scenes",
+        "keep kelp and shell-tool behavior present in the visual language"
+      ],
+      "championTier": true
+    }
+  ]
+}

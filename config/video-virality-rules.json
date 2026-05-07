@@ -61,19 +61,22 @@
       ]
     },
     "animal_song_short": {
-      "goal": "Create a high-retention mystery-to-reveal kids short where the song carries the memory loop and the reveal feels rewarding.",
-      "dominantTrigger": "CURIOSITY_GAP leading into NOSTALGIA or COMPLETION_SATISFACTION",
+      "goal": "Create a replayable sung-first animal short where the animal is named immediately, fact wonder escalates through catchy visual song beats, and the ending loops naturally back to the opening.",
+      "dominantTrigger": "CURIOSITY_GAP leading into REPLAY and COMPLETION_SATISFACTION",
       "requiredStructure": [
-        "Hook: mystery trait question with the animal name withheld",
-        "Reveal: fast payoff naming the animal cleanly",
-        "Recap spine: strongest facts compressed into musical repetition",
-        "Ending: short challenge/question that feels playful, not instructional"
+        "Beat 1: name the animal immediately in the first sung line and land its strongest visible trait",
+        "Beat 2: escalate with a surprising or delightful fact beat that is easy to visualize fast",
+        "Beat 3: deepen wonder with the most dynamic, strange, cute, or behavior-rich beat",
+        "Beat 4: deliver the strongest payoff beat, often the cutest or most impressive image-friendly fact",
+        "Beat 5: loop ending that reconnects naturally to the opening line, image, or rhythm"
       ],
       "rules": [
-        "Do not leak the animal name before the reveal payoff.",
-        "Pick facts that are surprising, visual, and easy to sing or repeat.",
-        "Song cadence matters more than fact quantity.",
-        "Short CTA should feel like a curiosity game, not a classroom prompt."
+        "Do not withhold the animal name for a reveal scene.",
+        "The entire reel should feel song-driven from start to finish, not like prose facts plus a sung recap.",
+        "Pick facts that are surprising, visual, easy to sing, and understandable in 2-3 seconds per beat.",
+        "No CTA, no classroom question ending, and no bolted-on engagement ask.",
+        "Song cadence, replay value, and loop quality matter more than fact quantity.",
+        "Every beat should feel like a distinct visual moment, not a repeated static portrait."
       ]
     },
     "challenge_reel": {
