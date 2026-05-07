@@ -11,21 +11,19 @@ import {
 const FONT_FAMILY = 'Nunito, Fredoka One, sans-serif';
 
 const CAMERA_PRESETS = {
-  'push-in':    { scaleFrom: 1.00, scaleTo: 1.08, xFrom: 0, yFrom: 0, xTo: 0, yTo: -10 },
+  'push-in': { scaleFrom: 1.0, scaleTo: 1.08, xFrom: 0, yFrom: 0, xTo: 0, yTo: -10 },
   'drift-right': { scaleFrom: 1.03, scaleTo: 1.09, xFrom: -20, yFrom: 0, xTo: 12, yTo: -6 },
   'wide-sweep': { scaleFrom: 0.98, scaleTo: 1.08, xFrom: 18, yFrom: 6, xTo: -18, yTo: -10 },
-  'lift-up':    { scaleFrom: 1.01, scaleTo: 1.1, xFrom: 0, yFrom: 16, xTo: 0, yTo: -18 },
+  'lift-up': { scaleFrom: 1.01, scaleTo: 1.1, xFrom: 0, yFrom: 16, xTo: 0, yTo: -18 },
   'loop-settle': { scaleFrom: 1.05, scaleTo: 1.0, xFrom: 10, yFrom: -8, xTo: -4, yTo: 0 },
   'loop-return': { scaleFrom: 1.08, scaleTo: 1.02, xFrom: -10, yFrom: -6, xTo: 0, yTo: 4 },
 };
 
 const NOTE_PARTICLES = [
-  { symbol: '♪', left: '7%',  startY: 76 },
-  { symbol: '♫', left: '21%', startY: 63 },
-  { symbol: '♪', left: '76%', startY: 78 },
-  { symbol: '♫', left: '90%', startY: 61 },
+  { symbol: '♪', left: '12%', startY: 74 },
+  { symbol: '♫', left: '84%', startY: 66 },
 ];
-const SONG_BADGES = ['SING ALONG', 'LA-LA-LA', 'FUN FACTS SONG'];
+const SONG_BADGE = 'FUN FACTS SONG';
 
 const resolveAssetSrc = (src) => {
   if (!src) return '';
@@ -91,7 +89,6 @@ export const AnimalSungRecap = ({
   const currentLyric = currentScene.lyric || lyricLines[0] || '';
   const lyricPulse = 1 + (0.02 * Math.sin(sceneFrame * 0.18));
   const lyricBeat = Math.max(0, 1 - Math.abs((sceneFrame / Math.max(8, currentScene.durationInFrames * 0.18)) - 1));
-  const songBadge = SONG_BADGES[(scenes.indexOf(currentScene)) % SONG_BADGES.length];
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000', overflow: 'hidden' }}>
@@ -107,11 +104,11 @@ export const AnimalSungRecap = ({
         </AbsoluteFill>
       ) : null}
 
-      <AbsoluteFill style={{ backgroundColor: 'rgba(0,0,0,0.28)' }} />
+      <AbsoluteFill style={{ backgroundColor: 'rgba(0,0,0,0.20)' }} />
 
       <AbsoluteFill
         style={{
-          background: `radial-gradient(circle at 50% 42%, rgba(255,240,181,${0.06 + (lyricBeat * 0.08)}) 0%, transparent 46%)`,
+          background: `radial-gradient(circle at 50% 42%, rgba(255,240,181,${0.05 + (lyricBeat * 0.06)}) 0%, transparent 46%)`,
         }}
       />
 
@@ -120,7 +117,7 @@ export const AnimalSungRecap = ({
       {NOTE_PARTICLES.map((note, index) => {
         const speed = 82 + index * 13;
         const offsetY = (frame * (1 + index * 0.14)) % speed;
-        const opacity = interpolate(offsetY, [0, speed * 0.1, speed * 0.75, speed], [0, 0.55, 0.55, 0], {
+        const opacity = interpolate(offsetY, [0, speed * 0.1, speed * 0.75, speed], [0, 0.28, 0.28, 0], {
           extrapolateLeft: 'clamp',
           extrapolateRight: 'clamp',
         });
@@ -135,7 +132,7 @@ export const AnimalSungRecap = ({
               opacity,
               color: '#fff0b5',
               fontFamily: FONT_FAMILY,
-              fontSize: 50 + (index % 2) * 10,
+              fontSize: 42 + (index % 2) * 6,
               fontWeight: 800,
             }}
           >
@@ -176,7 +173,7 @@ export const AnimalSungRecap = ({
           boxShadow: '0 8px 22px rgba(0,0,0,0.22)',
         }}
       >
-        {songBadge}
+        {SONG_BADGE}
       </div>
 
       {currentLyric ? (
@@ -192,10 +189,10 @@ export const AnimalSungRecap = ({
           {currentScene.captionLabel ? (
             <div
               style={{
-                marginBottom: 14,
-                padding: '8px 16px',
+                marginBottom: 12,
+                padding: '8px 14px',
                 borderRadius: 999,
-                backgroundColor: 'rgba(255,255,255,0.18)',
+                backgroundColor: 'rgba(255,255,255,0.14)',
                 color: '#fff7d8',
                 fontFamily: FONT_FAMILY,
                 fontSize: 20,
@@ -209,7 +206,7 @@ export const AnimalSungRecap = ({
           <div
             style={{
               transform: `scale(${lyricPulse})`,
-              backgroundColor: 'rgba(0,0,0,0.76)',
+              backgroundColor: 'rgba(0,0,0,0.64)',
               borderRadius: 18,
               padding: '16px 32px',
               maxWidth: '80%',
