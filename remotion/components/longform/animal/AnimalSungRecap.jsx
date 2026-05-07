@@ -163,7 +163,7 @@ export const AnimalSungRecap = ({
           right: 30,
           padding: '8px 16px',
           borderRadius: 999,
-          backgroundColor: 'rgba(255,210,0,0.9)',
+          backgroundColor: 'rgba(255,210,0,0.93)',
           color: '#1a1a1a',
           fontFamily: FONT_FAMILY,
           fontSize: 20,

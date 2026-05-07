@@ -26,7 +26,6 @@ export const StoryHookScene = ({
   hookSfxPath = '',
   hookSfxVolume = 0.08,
   jinglePath = '',
-  backgroundMusicPath = '',
   flashForwardSrc = '',
 }) => {
   const frame = useCurrentFrame();
