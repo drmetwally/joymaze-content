@@ -427,9 +427,9 @@ function buildStorySourceBankBlock(storySourceBank, themeSeed, trends, preferred
   if (!selected.length) return '';
   const lines = selected.map((seed) => {
     const hooks = Array.isArray(seed.visualHooks) ? seed.visualHooks.join(', ') : '';
-    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | sourceType: ${seed.sourceType || 'unknown'} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${seed.factualContext ? ` | factual: ${seed.factualContext}` : ''}${seed.location ? ` | location: ${seed.location}` : ''}${seed.dateNote ? ` | date: ${seed.dateNote}` : ''}${typeof seed.sourceConfidence === 'number' ? ` | sourceConfidence: ${seed.sourceConfidence}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
+    return `- [${seed.id}] ${seed.title} | animal: ${seed.animal} | lane: ${seed.lane} | sourceType: ${seed.sourceType || 'unknown'} | core: ${seed.coreEvent}${seed.stakes ? ` | stakes: ${seed.stakes}` : ''}${seed.emotionalPattern ? ` | pattern: ${seed.emotionalPattern}` : ''}${seed.endingType ? ` | ending: ${seed.endingType}` : ''}${seed.rationale ? ` | why-it-works: ${seed.rationale}` : ''}${seed.factualContext ? ` | factual: ${seed.factualContext}` : ''}${seed.location ? ` | location: ${seed.location}` : ''}${seed.dateNote ? ` | date: ${seed.dateNote}` : ''}${typeof seed.sourceConfidence === 'number' ? ` | sourceConfidence: ${seed.sourceConfidence}` : ''}${hooks ? ` | visuals: ${hooks}` : ''}${typeof seed._score === 'number' ? ` | score: ${seed._score.toFixed(2)}` : ''}`;
   });
-  return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. If the selected seed is grounded in real behavior or a real incident, preserve the factual sequence and stakes instead of flattening it into a generic fable. Add emotional narration, but do not abandon the seed's real spine.\n${lines.join('\n')}`;
+  return `\n\nSTORY SOURCE BANK — choose one of these as the structural seed and build from it. Prefer the seed with the clearest pressure ladder, strongest visual hooks, and most cash-out-worthy ending image, not the most generic emotional label. If the selected seed is grounded in real behavior or a real incident, preserve the factual sequence and stakes instead of flattening it into a generic fable. Add emotional narration, but do not abandon the seed's real spine.\n${lines.join('\n')}`;
 }
 
 function buildSelectedSeedBlock(storySourceBank, outline = null) {
@@ -504,7 +504,13 @@ function buildUserPrompt(episodeNum, existingStories, themeSeed, trends, weights
     ? `\n\nLOYALTY LANE SHAPE: make the emotional spine a costly choice to stay. The hero should visibly give something up by remaining, guarding, waiting, returning, or refusing to abandon the vulnerable other. Beat 5 should make leaving feel tempting or necessary. Beat 8 should pay off with quiet earned devotion, not generic recovery.`
     : preferredLane === 'homecoming'
       ? `\n\nHOMECOMING LANE SHAPE: make the emotional spine about almost losing the one true signal of home. Beat 2 should define the exact home marker, such as a window light, scent, path, call, or shoreline shape. Beat 4 should blur or bury that signal. Beat 5 should make wrong refuges feel tempting. Beat 7 should deliver unmistakable return, and Beat 8 should rest in a small domestic reward image that feels deeply earned.`
-      : '';
+      : preferredLane === 'survival'
+        ? `\n\nSURVIVAL LANE SHAPE: keep the pressure physical and specific. Beat 2 must define the real danger window. Beat 3 should show the first decisive survival move. Beat 4 should make the environment harder, not just sadder. Beat 5 should feel like failure is seconds away. Beat 7 must cash out in visible safety, shelter, warmth, food, breath, or reunion.`
+        : preferredLane === 'rescue'
+          ? `\n\nRESCUE LANE SHAPE: clarify exactly who is in danger and what the rescue attempt costs. Beat 3 should show a concrete failed or partial attempt. Beat 4 should tighten urgency. Beat 6 should earn the rescue turn through teamwork, instinct, memory, or one brave choice, not magic.`
+          : preferredLane === 'parent_bond'
+            ? `\n\nPARENT_BOND LANE SHAPE: center protective tenderness under real pressure. Beat 2 should define what the young one cannot yet do alone. Beat 5 should hurt because the caregiver cannot instantly fix it. Beat 7 should reward with contact, warmth, feeding, shelter, or unmistakable safety.`
+            : '';
 
   const laneBlock = preferredLane
     ? `\n\nPREFERRED STORY LANE: ${preferredLane}. Prefer seeds and final story beats that clearly fit this lane unless a much stronger fit emerges from the theme seed.${laneSpecificGuidance}`
@@ -613,6 +619,7 @@ Extra final-pass rules when a selected seed is provided:
 - Preserve the seed's core event and stakes, do not swap to a different underlying story.
 - Preserve the sequence of what happens, especially for real or real-behavior seeds.
 - Let Beat 1 open with either factual authority or immediate jeopardy, then a clear open loop.
+- Let Beat 2 define the exact cost of failure in a way a parent instantly feels.
 - Let Beat 3 show the first decisive action.
 - Let Beat 4 introduce the harder complication.
 - Let Beat 5 fully cash out the seed's emotional danger or loneliness.
@@ -621,10 +628,23 @@ Extra final-pass rules when a selected seed is provided:
 - Let Beat 8 echo the seed's most memorable visual hook in a smaller, quieter way.
 - If authentic factual framing exists, factualContext and Beat 1 may use it to create authority and curiosity, but never fabricate it.
 
+NARRATION QUALITY BAR:
+- Avoid generic emotional summary like "she kept going," "his heart pounded," "everything changed," or "she never gave up" unless the surrounding line contains a concrete physical image.
+- Beats 3 through 7 must each contain a visible action, pressure change, or sensory cue, not just mood language.
+- Beat 5 should feel heaviest, Beat 6 should feel like a real turn, and Beat 7 should visually cash out what the viewer waited for.
+- Beat 8 should be screenshot-worthy because of specificity, not because it sounds like a moral.
+
+IMAGE PROMPT RICHNESS BAR:
+- Every prompt must specify camera framing, angle, exact foreground detail, exact background depth cue, time of day, named light source, and a single dominant focal action.
+- Prompts should feel like distinct storyboard frames, not eight versions of the same portrait.
+- If a beat is about motion or danger, the prompt must show that motion or danger visually, not only mention it in narration.
+- Favor richer environmental specificity over vague beauty words.
+
 Before you finalize, self-check every image_prompt:
 - protagonist name appears in every prompt
 - protagonist name appears within the first 14 words
 - at least 3 character descriptor words are repeated from the character field
+- prompt includes a camera/framing cue and a time-of-day or lighting cue
 - prompt ends with 9:16 portrait ratio instruction
 
 Return ONLY the JSON. No explanation. No markdown fences.`;
@@ -711,18 +731,39 @@ function validateGeneratedStory(story) {
       .filter((word) => word.length >= 4)
   );
   const styleAnchor = buildStyleAnchor(story.style);
+  const framingCueRegex = /\b(wide shot|wide establishing shot|establishing shot|mid-shot|mid shot|close-up|close up|extreme close-up|extreme close up|eye-level|eye level|low angle|slightly overhead|bird's eye|birds eye)\b/i;
+  const lightingCueRegex = /\b(dawn|sunrise|morning|golden hour|afternoon|dusk|twilight|night|moonlight|sunlight|backlight|rim light|firelight|window light|storm light|overcast)\b/i;
+  const genericNarrationRegex = /\b(once upon a time|from that day on|she learned that|he learned that|they learned that|everything changed|never gave up|deep in the forest|in a magical forest|more than ever)\b/i;
 
   if (!character || descriptorWords.size < 4) {
     throw new Error('Character description is too weak for image consistency.');
   }
 
   story.slides.forEach((slide, index) => {
+    const narration = String(slide.narration || '').trim();
+    if (!narration) {
+      throw new Error(`Slide ${index + 1} is missing narration.`);
+    }
+    const narrationWordCount = narration.split(/\s+/).filter(Boolean).length;
+    if (index === 0 && narrationWordCount > 18) {
+      throw new Error('Slide 1 narration is too long for a clean hook.');
+    }
+    if (index === story.slides.length - 1 && narrationWordCount > 16) {
+      throw new Error('Final slide narration is too long for a clean echo.');
+    }
+    if (index > 0 && index < story.slides.length - 1 && narrationWordCount < 10) {
+      throw new Error(`Slide ${index + 1} narration is too thin to carry a real story beat.`);
+    }
+    if (genericNarrationRegex.test(narration)) {
+      throw new Error(`Slide ${index + 1} narration is too generic. Use a more specific image or action.`);
+    }
+
     const prompt = String(slide.image_prompt || '').trim();
     if (!prompt) {
       throw new Error(`Slide ${index + 1} is missing image_prompt.`);
     }
     const wordCount = prompt.split(/\s+/).filter(Boolean).length;
-    if (wordCount < 24) {
+    if (wordCount < 34) {
       throw new Error(`Slide ${index + 1} image_prompt too short (${wordCount} words).`);
     }
     if (characterName && !prompt.toLowerCase().includes(characterName.toLowerCase())) {
@@ -747,6 +788,12 @@ function validateGeneratedStory(story) {
     }
     if (styleAnchor && !prompt.toLowerCase().includes('keep the exact same illustration style across all slides')) {
       throw new Error(`Slide ${index + 1} image_prompt is missing the style anchor.`);
+    }
+    if (!framingCueRegex.test(prompt)) {
+      throw new Error(`Slide ${index + 1} image_prompt is missing a clear framing or camera cue.`);
+    }
+    if (!lightingCueRegex.test(prompt)) {
+      throw new Error(`Slide ${index + 1} image_prompt is missing a clear lighting or time-of-day cue.`);
     }
   });
 }

@@ -4,6 +4,31 @@
 
 ---
 
+## 2026-05-08 — [Agent: OpenClaw] — Upstream generator quality pass for Animal Facts + StoryReelV2
+
+**Files changed:** `scripts/generate-animal-facts-brief.mjs`, `scripts/generate-story-ideas.mjs`, `docs/SESSION_LOG.md`
+
+**What changed:**
+- Tightened `generate-animal-facts-brief.mjs` prompt rules so Animal Facts briefs now explicitly push for stronger escalation, less opener/payoff fact repetition, richer `imagePromptHint` detail, and more concrete final payoff moments.
+- Added fail-loud validation in Animal Facts brief generation for repeated adjacent fact beats, opener/payoff semantic overlap, and generic scenic final moments.
+- Tightened `generate-story-ideas.mjs` upstream guidance around seed choice, lane-specific pressure ladders, narration specificity, and storyboard-grade image prompt richness.
+- Expanded StoryReelV2 validation so slides now fail when narration is too generic/thin, prompts are too short, or prompts omit clear framing and lighting/time-of-day cues.
+
+**Validation completed:**
+- `node --check scripts/generate-animal-facts-brief.mjs`
+- `node --check scripts/generate-story-ideas.mjs`
+- `node scripts/generate-animal-facts-brief.mjs --dry-run`
+- `node scripts/generate-story-ideas.mjs --dry-run --lane homecoming`
+
+**Why this pass happened:**
+- Follows Claude audit + project memory direction: improve upstream copy/narration/prompt quality first, instead of reopening reel/renderer architecture.
+- Keeps current StoryReelV2 hard-cut structure and current Animal Facts opening-name rule intact.
+
+**Next recommended step:**
+- Add the narrow Animal Facts reliability guardrail for partial `moment*.png` image sets failing silently, then run a fresh Sea Otter or equivalent benchmark/QC pass against the tightened generators.
+
+---
+
 ## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
 
 **Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`
@@ -205,6 +230,28 @@
 - ep02 art style: "NatGeo Kids editorial illustration, clean linework, vibrant natural palette, flat digital painterly"
 
 **Next:** Generate 4 images in Gemini for ep02 (open brief.md, set art style first) → drop audio → `npm run longform:animal:narrate` → `npm run longform:animal:render`
+
+---
+
+## 2026-05-08 — [Agent: Claude] — Engine audit: StoryReelV2 + AnimalFactsSongShort + fixes
+
+**Files changed:** `scripts/render-video.mjs`, `remotion/components/longform/animal/AnimalSungRecap.jsx`, `remotion/components/longform/story/StoryHookScene.jsx`, `remotion/components/longform/story/StoryActScene.jsx`, `docs/AGENT_LOG.md`
+
+**What was done:**
+- Full code audit of both engines via subagent (42 tool calls, frame QC via thumbnail read)
+- StoryReelV2 scored 9/10, AnimalFactsSongShort scored 9/10 after fixes
+- Fixed: psychologyTrigger reads `slide.psychologyTrigger` from story JSON (was hardcoded by act number) — `render-video.mjs:458`
+- Fixed: badge alpha corrected `0.9` → `0.93` — `AnimalSungRecap.jsx:166`
+- Fixed: dead `backgroundMusicPath` prop removed from `StoryHookScene.jsx`
+- Fixed: `imageSequence` within-scene 12-frame crossfade replaced with hard cut — `StoryActScene.jsx`
+- Commits: `4042f3e` (4 fixes), `1aa403f` (imageSequence hard-cut)
+
+**Known gaps documented (not fixed — content-side or Phase 2):**
+- AnimalFactsSongShort: no hook scene, equal scene weights in fallback plan, silent partial-set fallback
+- StoryReelV2: `brightnessPulse`/`climaxPulse` hardcoded to 1 (psychology overlays visually inert), no analytics hookback yet
+- `imageSequence` KB reset on index switch — recommend removing from story generator or wiring KB per segment
+
+**Next:** X warmup ended 2026-05-07 — remove `if:false` from `x-posts.yml` + update GitHub Secrets for @playjoymaze keys. Manual image gen still needed for today's prompts.
 
 ---
 

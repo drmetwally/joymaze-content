@@ -416,16 +416,19 @@ Hard rules:
 - The final reel should follow the selected song, not force the song to fit a fixed short duration.
 - Keep \`songBeats\` as the lyrical spine, but make \`visualExpansionMoments\` the wider creative plan for production.
 - For stronger / longer songs, \`visualExpansionMoments\` should usually expand to 8-10 creatives, even if \`songBeats\` stays at 4-5 beats.
+- Beat 1 and the payoff beat must not cash out the same core fact. The opener should land the instantly graspable visible trait, while the payoff should reveal why that trait matters, what the animal does with it, or what emotional/factual resolve it earns.
+- Every beat must contribute a different kind of wonder: visible trait, action, weird ability, care behavior, survival trick, tool use, home/family payoff, or another clearly distinct angle. Do not restate the same fact with different wording.
 - Every visualExpansionMoment must feel visually distinct from the others. No duplicate holds disguised as separate ideas.
 - The final visualExpansionMoment should usually be an explicit emotional/factual payoff, not just another pretty return or travel shot.
-- Prefer a concrete end resolve such as home, burrow, chick, family, food delivery, cuddle, sleep, or another unmistakable “why this matters” image when the material supports it.
+- Prefer a concrete end resolve such as home, burrow, chick, family, food delivery, cuddle, sleep, shell crack success, safe floating, or another unmistakable “why this matters” image when the material supports it.
 - Choose 5 song beats only if the animal supports 5 truly strong beats. Avoid filler energy.
 - Every beat must be understandable in 2-3 seconds visually.
 - factFocus should stay factual and clear. Do not fabricate facts.
-- Every imagePromptHint: 50-70 words, complete Gemini generation prompt. MUST include: animal species, shotType framing, environment, lighting mood, "ground fades softly to pale cream at lower edge", "vertical portrait format, 1024×1536 px". Do NOT include text or logos.
+- Every imagePromptHint: 50-70 words, complete Gemini generation prompt. MUST include: animal species, shotType framing, environment, lighting mood, foreground detail, background depth, one focal action, "ground fades softly to pale cream at lower edge", "vertical portrait format, 1024×1536 px". Do NOT include text or logos.
 - compositionNote: 1 sentence. What is in foreground, background, lighting direction, animal posture or expression.
 - psychologyBeat: 3-6 words. The emotional beat this image serves.
 - fullSongLyrics should feel musical and replayable, not like stitched prose facts.
+- Avoid generic filler rhymes or scenery-only lines. Every sung line should either name a trait, show behavior, deepen wonder, or cash out the payoff.
 - loopBackIdea must explicitly describe why the last line can feed back into the first line.
 - If a background pool prompt was provided above, copy it verbatim into "backgroundSunoPrompt".`;
 }
@@ -513,6 +516,31 @@ function normalizeBrief(brief, context, artStyle) {
   return brief;
 }
 
+function normalizeSemanticWords(text, animalName = '') {
+  const animalWords = String(animalName || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+  const stop = new Set([
+    'with', 'from', 'that', 'this', 'into', 'over', 'under', 'their', 'there', 'where', 'while', 'about', 'little', 'tiny', 'giant', 'animal', 'animals', 'song', 'beat', 'loop', 'back', 'again', 'really', 'very', 'just', 'like', 'they', 'them', 'then', 'than', 'your', 'into', 'onto', 'across', ...animalWords,
+  ]);
+
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((word) => word.length >= 4 && !stop.has(word));
+}
+
+function hasExcessiveSemanticOverlap(a, b, animalName = '') {
+  const aWords = new Set(normalizeSemanticWords(a, animalName));
+  const bWords = new Set(normalizeSemanticWords(b, animalName));
+  if (!aWords.size || !bWords.size) return false;
+  const overlap = [...aWords].filter((word) => bWords.has(word));
+  return overlap.length >= 2;
+}
+
 function validateBrief(brief) {
   if (!brief || typeof brief !== 'object') {
     throw new Error('Groq response was not a JSON object.');
@@ -585,6 +613,26 @@ function validateBrief(brief) {
 
   if (!new RegExp(`\\b${String(brief.animalName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(brief.openingHookLine)) {
     throw new Error('openingHookLine must name the animal immediately.');
+  }
+
+  const songBeats = brief.songBeats || [];
+  for (let i = 1; i < songBeats.length; i++) {
+    const prev = songBeats[i - 1];
+    const current = songBeats[i];
+    if (hasExcessiveSemanticOverlap(prev.factFocus, current.factFocus, brief.animalName)) {
+      throw new Error(`songBeats[${i - 1}] and songBeats[${i}] repeat the same core fact instead of escalating.`);
+    }
+  }
+
+  const openingFact = `${brief.openingHookLine} ${songBeats[0]?.factFocus || ''} ${songBeats[0]?.lyric || ''}`;
+  const payoffBeat = songBeats.find((beat) => /payoff/i.test(String(beat?.title || ''))) || songBeats[Math.max(songBeats.length - 2, 0)];
+  if (payoffBeat && hasExcessiveSemanticOverlap(openingFact, `${payoffBeat.factFocus} ${payoffBeat.lyric}`, brief.animalName)) {
+    throw new Error('The opener and payoff are repeating the same core fact. Give the payoff a different factual or emotional cash-out.');
+  }
+
+  const finalMoment = brief.visualExpansionMoments[brief.visualExpansionMoments.length - 1];
+  if (finalMoment && /scenic|pretty|beautiful view|nice view/i.test(`${finalMoment.factFocus} ${finalMoment.compositionNote}`)) {
+    throw new Error('Final visualExpansionMoment is reading like generic scenery instead of a concrete payoff image.');
   }
 
   if (/follow|subscribe|favorite fact|what did you learn|comment below|tell us/i.test(`${brief.fullSongLyrics} ${brief.loopBackIdea}`)) {
