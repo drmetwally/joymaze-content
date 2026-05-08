@@ -385,6 +385,7 @@ function buildMetadata({ seed, title, theme, shape, difficulty, rows, cols, cell
     showJoyo: true,
     showBrandWatermark: false,
     sourceFolder: folderRel,
+    generatedAt: new Date().toISOString(),
   };
 
   return { mazeJson, pathJson, activityJson };

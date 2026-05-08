@@ -3,6 +3,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
+import 'dotenv/config';
 import { fileURLToPath } from 'url';
 import { buildChallengeHook } from './lib/challenge-hooks.mjs';
 import { pickAsset } from './lib/asset-library.mjs';
@@ -37,6 +38,7 @@ const getArg = (f, def = null) => {
 };
 
 const DRY_RUN   = hasFlag('--dry-run');
+const IMAGEN_MODE = hasFlag('--imagen');
 const TITLE     = getArg('--title', 'Color the Scene');
 const THEME     = getArg('--theme', TITLE);
 const DIFFICULTY = (getArg('--difficulty', 'medium') || 'medium').toLowerCase();
@@ -381,6 +383,37 @@ async function writeSvgPng(svg, outSvgPath, outPngPath) {
   await fs.writeFile(outPngPath, pngBuffer);
 }
 
+// ── Imagen helpers ──────────────────────────────────────────────────────────
+
+function buildColoringPagePrompt(theme) {
+  // Purely visual/painterly language — no instructional or spec-like clauses.
+  // "No X" phrases cause Imagen to render text fields. Describe only what IS visible.
+  return `Cute cartoon ${theme} drawn with thick bold black ink lines on solid white paper. ` +
+    `Single large character centered in frame, friendly expression, simple rounded shapes. ` +
+    `Classic children's coloring book illustration. Black outlines only, white fill everywhere, ` +
+    `completely uncolored line art. Clean crisp strokes, no gray, no shading, no color.`;
+}
+
+async function callImagen(prompt, aspectRatio = '3:4') {
+  const API_KEY = process.env.VERTEX_API_KEY;
+  const IMAGEN_URL = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=' + API_KEY;
+
+  const body = {
+    instances:  [{ prompt }],
+    parameters: { sampleCount: 1, aspectRatio },
+  };
+  const res  = await fetch(IMAGEN_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(`Imagen error ${data.error.code}: ${data.error.message}`);
+  const b64 = data.predictions?.[0]?.bytesBase64Encoded;
+  if (!b64)   throw new Error('Empty Imagen response (safety filter or unsupported content)');
+  return Buffer.from(b64, 'base64');
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -390,7 +423,70 @@ async function main() {
   const outDir = OUT_DIR_ARG ? path.resolve(ROOT, OUT_DIR_ARG) : path.join(OUTPUT_ROOT, slug);
   const folderRel = path.relative(ROOT, outDir).replace(/\\/g, '/');
 
+  // Idempotency: skip if output already exists unless --force
+  if (!hasFlag('--force')) {
+    try {
+      await fs.access(path.join(outDir, 'puzzle.png'));
+      console.log(`[coloring-factory] skip — output already exists: ${outDir}`);
+      console.log('[coloring-factory] use --force to regenerate');
+      return;
+    } catch { /* folder doesn't exist — proceed */ }
+  }
+
   const family = resolveThemeFamily(THEME);
+
+  // ── Imagen mode ─────────────────────────────────────────────────────────────
+  if (IMAGEN_MODE) {
+    const API_KEY = process.env.VERTEX_API_KEY;
+    if (!API_KEY) { console.error('[coloring-factory] ERROR: VERTEX_API_KEY not set'); process.exit(1); }
+
+    if (DRY_RUN) {
+      console.log('[coloring-factory] dry-run — skipping Imagen 4.0 API call');
+      return;
+    }
+
+    console.log('[coloring-factory] imagen mode — calling Imagen 4.0');
+
+    const prompt = buildColoringPagePrompt(THEME);
+    const imgBuf = await callImagen(prompt, '3:4');
+
+    // Resize to 1080×1500, white letterbox if needed
+    const finalBuf = await sharp(imgBuf)
+      .resize(1080, 1500, { fit: 'contain', background: '#FFFFFF' })
+      .png()
+      .toBuffer();
+
+    await fs.mkdir(outDir, { recursive: true });
+
+    const hookTitle = await buildChallengeHook({
+      theme: THEME, puzzleType: PUZZLE_TYPE, difficulty: DIFFICULTY,
+      seedHint: `${TITLE}|${THEME}|${DIFFICULTY}`,
+    });
+
+    const activityJson = {
+      type: 'challenge', puzzleType: PUZZLE_TYPE, difficulty: DIFFICULTY, theme: THEME,
+      titleText: hookTitle, hookText: `Color the ${THEME}!`,
+      ctaText: 'Show us your coloring in the comments!',
+      activityLabel: 'COLORING PAGE', countdownSec: COUNTDOWN_SEC, hookDurationSec: 2.5,
+      holdAfterSec: SOLVE_DURATION_SEC, blankImage: 'blank.png', solvedImage: 'colored.png',
+      imagePath: 'puzzle.png', challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME,
+      tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME, transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME,
+      solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME, showJoyo: true, showBrandWatermark: false,
+      sourceFolder: folderRel, generatedBy: 'imagen',
+    };
+
+    await Promise.all([
+      fs.writeFile(path.join(outDir, 'blank.png'), finalBuf),
+      fs.writeFile(path.join(outDir, 'colored.png'), finalBuf),  // same image — child provides color
+      fs.writeFile(path.join(outDir, 'puzzle.png'), finalBuf),
+      fs.writeFile(path.join(outDir, 'activity.json'), JSON.stringify(activityJson, null, 2)),
+    ]);
+
+    console.log('[coloring-factory] wrote files (imagen mode):');
+    for (const f of ['activity.json', 'blank.png', 'colored.png', 'puzzle.png'])
+      console.log(`  - ${path.join(outDir, f)}`);
+    return;
+  }
 
   let factories, palette;
   if (family === 'ocean') { factories = OCEAN_FACTORIES; palette = OCEAN_PALETTE; }

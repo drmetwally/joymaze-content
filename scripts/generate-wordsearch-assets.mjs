@@ -322,6 +322,7 @@ async function main() {
     imagePath: 'puzzle.png', blankImage: 'blank.png', solvedImage: 'solved.png', highlightColor: HIGHLIGHT_COLOR,
     challengeAudioVolume: DEFAULT_CHALLENGE_AUDIO_VOLUME, tickAudioVolume: DEFAULT_TICK_AUDIO_VOLUME, transitionCueVolume: DEFAULT_TRANSITION_CUE_VOLUME, solveAudioVolume: DEFAULT_SOLVE_AUDIO_VOLUME,
     showJoyo: true, showBrandWatermark: false, sourceFolder: folderRel,
+    generatedAt: new Date().toISOString(),
   };
 
   const layoutMeta = { offsetX: layout.gridX, offsetY: layout.gridY, mazeW: layout.gridSizePx, mazeH: layout.gridSizePx, canvasW: CANVAS_W, canvasH: CANVAS_H, wordsTop: layout.wordsTop, wordCols: layout.wordCols };

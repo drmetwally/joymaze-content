@@ -3028,3 +3028,23 @@ ode --check clean. Ran --save --lane homecoming twice � ep29 and ep30 both gener
 - Run vision-capable model (or use human QC) to audit ep28 slides 1, 4, 8 for: (1) pigeon recognizability with black neck stripes on slide 1, (2) threat concreteness vs generic rooftop atmosphere on slide 4, (3) concrete landing action vs portrait-with-glow on slide 8
 - If vision is available: audit ep29/ep30 image prompts for same Beat 4/7/8 quality
 - Consider adding a vision-capable model to the image tool fallback chain in gateway config
+
+---
+## Session 2026-05-09 — Dottodot pipeline fix + puzzle batch generation
+
+**Files changed:**
+- scripts/generate-dottodot-from-image.mjs (morphological closing algorithm + archive fix)
+- scripts/generate-maze-assets.mjs (generatedAt added to activity.json)
+- scripts/generate-wordsearch-assets.mjs (generatedAt added to activity.json)
+- scripts/batch-generate-puzzles.mjs (NEW — batch 15 wordsearch + 15 maze → puzzle-collection/)
+- package.json (batch:puzzles + batch:puzzles:dry scripts added)
+
+**What was done:**
+
+1. **Dottodot contour extraction overhaul** — previous algorithm (BFS flood fill) leaked through cat whisker channels; replaced with morphological closing (dilate r=20 → erode r=20 via fast prefix-sum separable erosion). Result: 18 dots evenly around full cat shape including head/ears (scored 9/10). Moore tracer early-termination bug (visited set) also fixed; closure guard raised to length>200.
+
+2. **Archive wiring for new engines** — maze, wordsearch, and dottodot activity.json files now include `generatedAt: new Date().toISOString()`. Archive script's `getFolderDate()` reads this field; previously fell back to mtime which was unreliable on Windows (file copies reset mtime to today).
+
+3. **Monster truck puzzle batch (30 puzzles)** — batch-generate-puzzles.mjs generates 15 wordsearch (5 unique words each, 60 unique words total across groups) + 15 hard mazes. Output: output/puzzle-collection/monster-truck/ → ws-01..ws-15.png + maze-01..maze-15.png only.
+
+**Next steps:** Visual QC on ep28 story slides (slides 1/4/8 need vision-capable model audit).
