@@ -439,9 +439,34 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
   const factFocus = beat?.factFocus || '';
   const psychologyBeat = beat?.psychologyBeat || 'playful wonder';
   const lyric = beat?.lyric || '';
+  const lightingMood = /night|moon|sleep/i.test(`${composition} ${factFocus} ${lyric}`)
+    ? 'soft moonlit blue darkness with a gentle rim light on the animal'
+    : /sunny|warm|desert|golden/i.test(`${composition} ${factFocus} ${lyric}`)
+      ? 'warm late-afternoon sunlight with long readable shadows'
+      : /danger|fright|defen/i.test(`${composition} ${factFocus} ${lyric}`)
+        ? 'tense directional light with stronger contrast on the face and body'
+        : 'soft natural daylight with clear directional light on the subject';
+  const focalAction = /dig/i.test(`${composition} ${factFocus} ${lyric}`)
+    ? 'one clawed digging action frozen mid-scrape with dirt visibly moving'
+    : /curl|ball/i.test(`${composition} ${factFocus} ${lyric}`)
+      ? 'the body curling inward so the defense behavior reads instantly'
+      : /sniff|insect|eat|food/i.test(`${composition} ${factFocus} ${lyric}`)
+        ? 'nose low to the ground as the animal tracks food with intent'
+        : /burrow|home|return/i.test(`${composition} ${factFocus} ${lyric}`)
+          ? 'the animal entering or reaching home in a way that clearly pays off the journey'
+          : 'one instantly readable signature action that makes the fact obvious';
+  const foregroundDetail = /close/i.test(String(shotType))
+    ? 'sharp whiskers, claws, eyes, and shell texture in the foreground'
+    : 'the animal large in frame with one crisp foreground detail like claws, shell plates, or sand texture';
+  const backgroundDepth = `layered ${fallbackEnvironment} depth behind the subject with a simple horizon or habitat cue, kept soft enough that the animal reads first`;
   const base = [
     `${animalName}, ${shotType} framing, ${composition}.`,
+    `Foreground detail: ${foregroundDetail}.`,
+    `Background depth: ${backgroundDepth}.`,
+    `Lighting mood: ${lightingMood}.`,
+    `Focal action: ${focalAction}.`,
     `Show the factual idea clearly: ${factFocus}.`,
+    `Lyric support: ${lyric || 'make the sung line feel obvious in one glance'}.`,
     `Mood should feel like ${psychologyBeat}, with child-friendly readability and strong visual clarity in 2-3 seconds.`,
     `Use ${artStyle}.`,
     `Keep the scene in ${fallbackEnvironment}, no text or logos, ground fades softly to pale cream at lower edge, vertical portrait format, 1024×1536 px, with safe breathing room above and below the subject for reel framing.`,
@@ -494,7 +519,7 @@ function normalizeCreativeMoments(moments, { animalName, artStyle, fallbackEnvir
   if (!Array.isArray(moments)) return [];
   return moments.map((moment) => {
     const wordCount = String(moment?.imagePromptHint || '').split(/\s+/).filter(Boolean).length;
-    if (wordCount >= 40) return moment;
+    if (wordCount >= 70) return moment;
     return {
       ...moment,
       imagePromptHint: expandImagePromptHint({ animalName, artStyle, beat: moment, fallbackEnvironment }),

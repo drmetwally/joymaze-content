@@ -93,6 +93,32 @@
 
 ---
 
+## 2026-05-08 — [Agent: OpenClaw] — Animal prompt enrichment threshold raised after qualitative audit
+
+**Files changed:** `scripts/generate-animal-facts-brief.mjs`, `output/longform/animal/ep10-okapi/*`, `output/longform/animal/ep11-fennec-fox/*`, `docs/SESSION_LOG.md`
+
+**Why this follow-up happened:**
+- Qualitative audit of fresh `ep09-armadillo` showed the anti-repetition pass was helping, but many early image prompts were still too generic visually.
+- Root cause: the prompt enrichment threshold was low enough that mid-quality model prompts could skip the richer expansion path.
+
+**Fix applied:**
+- Strengthened `expandImagePromptHint()` so the deterministic expansion now injects explicit foreground detail, background depth, lighting mood, focal action, and lyric-support language.
+- Raised `normalizeCreativeMoments()` enrichment threshold from `40` words to `70` words so more weak-but-not-empty prompts get expanded instead of passing through mostly raw.
+
+**Fresh validation after fix:**
+- Generated `ep10-okapi` and then `ep11-fennec-fox`.
+- `ep10-okapi` still showed one mid-tier beat prompt slipping through at only ~42 words, confirming the threshold bug before the final threshold raise.
+- `ep11-fennec-fox` after the threshold raise produced fully expanded prompt blocks across all visual moments, roughly ~195-222 words each, which is materially richer than the earlier Armadillo/Okapi weak cases.
+
+**Current judgment:**
+- Animal prompt richness is now meaningfully stronger in fresh saves.
+- Remaining issue is not missing detail anymore, but taste calibration of the heuristic inserts, for example a few lighting/action defaults can be semantically imperfect even while the prompts are much richer.
+
+**Next recommended step:**
+- Stop changing contracts for the moment and do one practical image-generation/QC slice on a fresh strong episode to judge whether the richer prompts improve actual Gemini outputs enough to justify further taste cleanup.
+
+---
+
 ## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
 
 **Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`
