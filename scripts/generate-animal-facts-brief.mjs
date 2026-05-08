@@ -439,32 +439,53 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
   const factFocus = beat?.factFocus || '';
   const psychologyBeat = beat?.psychologyBeat || 'playful wonder';
   const lyric = beat?.lyric || '';
-  const lightingMood = /night|moon|sleep/i.test(`${composition} ${factFocus} ${lyric}`)
-    ? 'soft moonlit blue darkness with a gentle rim light on the animal'
-    : /sunny|warm|desert|golden/i.test(`${composition} ${factFocus} ${lyric}`)
-      ? 'warm late-afternoon sunlight with long readable shadows'
-      : /danger|fright|defen/i.test(`${composition} ${factFocus} ${lyric}`)
-        ? 'tense directional light with stronger contrast on the face and body'
-        : 'soft natural daylight with clear directional light on the subject';
-  const focalAction = /dig/i.test(`${composition} ${factFocus} ${lyric}`)
-    ? 'one clawed digging action frozen mid-scrape with dirt visibly moving'
-    : /curl|ball/i.test(`${composition} ${factFocus} ${lyric}`)
-      ? 'the body curling inward so the defense behavior reads instantly'
-      : /sniff|insect|eat|food/i.test(`${composition} ${factFocus} ${lyric}`)
-        ? 'nose low to the ground as the animal tracks food with intent'
-        : /burrow|home|return/i.test(`${composition} ${factFocus} ${lyric}`)
-          ? 'the animal entering or reaching home in a way that clearly pays off the journey'
-          : 'one instantly readable signature action that makes the fact obvious';
+  const signal = `${composition} ${factFocus} ${lyric}`.toLowerCase();
+
+  const lightingMood = /sunset|golden hour|late-afternoon|sunny|desert sun|warm desert/i.test(signal)
+    ? 'warm late-afternoon sunlight with long readable shadows and a clean glow on the subject'
+    : /night|moon|moonlit|sleep|dark|star/i.test(signal)
+      ? 'soft moonlit night with a gentle rim light that keeps the animal silhouette easy to read'
+      : /burrow|den|family|cozy|home/i.test(signal)
+        ? 'soft warm den light focused on faces and body contact, with darker edges kept simple'
+        : /danger|fright|defen|hide/i.test(signal)
+          ? 'tense directional light with stronger contrast on the face and body'
+          : 'soft natural daylight with clear directional light on the subject';
+
+  const focalAction = /hear|listen|ear|underground|prey moving/i.test(signal)
+    ? 'ears tilted and body held still in a listening pose, with one subtle ground cue that suggests movement below the sand'
+    : /heat|cool|survive the desert heat|giant ears/i.test(signal)
+      ? 'ears spread wide and held clearly in frame so their size and cooling function read instantly'
+      : /dig|burrow.*dig|claw/i.test(signal)
+        ? 'one clawed digging action frozen mid-scrape with dirt visibly moving'
+        : /curl|ball|defen/i.test(signal)
+          ? 'the body curling inward so the defense behavior reads instantly'
+          : /sniff|insect|eat|food|hunt|track/i.test(signal)
+            ? 'nose low and attention fixed on one food trail so the search behavior reads at a glance'
+            : /family|den|burrow|cozy|snuggle/i.test(signal)
+              ? 'close body contact or shared resting posture that makes the home-and-family payoff unmistakable'
+              : /return|home/i.test(signal)
+                ? 'the animal reaching or entering home in a way that clearly pays off the journey'
+                : /jump|run|speed|acrobat/i.test(signal)
+                  ? 'one mid-motion leap or sprint pose that makes the agility obvious in a single glance'
+                  : 'one instantly readable signature action that makes the fact obvious';
+
   const foregroundDetail = /close/i.test(String(shotType))
-    ? 'sharp whiskers, claws, eyes, and shell texture in the foreground'
-    : 'the animal large in frame with one crisp foreground detail like claws, shell plates, or sand texture';
-  const backgroundDepth = `layered ${fallbackEnvironment} depth behind the subject with a simple horizon or habitat cue, kept soft enough that the animal reads first`;
+    ? 'sharp eyes, whiskers, fur texture, and one key feature tied to the fact in the foreground'
+    : /action/i.test(String(shotType).toLowerCase())
+      ? 'one crisp contact detail like paws kicking sand, claws striking dirt, or a body edge cutting through motion'
+      : 'the animal large in frame with one clean foreground detail like paw prints, fur texture, leaf edge, or sand grain pattern';
+
+  const backgroundDepth = /burrow|den|family|cozy/i.test(signal)
+    ? `simple layered ${fallbackEnvironment} depth that keeps the den interior readable first, with background shapes softened behind the family group`
+    : `layered ${fallbackEnvironment} depth behind the subject with one simple habitat cue, kept soft enough that the animal reads first`;
+
   const base = [
     `${animalName}, ${shotType} framing, ${composition}.`,
     `Foreground detail: ${foregroundDetail}.`,
     `Background depth: ${backgroundDepth}.`,
     `Lighting mood: ${lightingMood}.`,
     `Focal action: ${focalAction}.`,
+    `Keep one dominant fact and one dominant behavior in the frame. Avoid decorative patterning that competes with the subject.`,
     `Show the factual idea clearly: ${factFocus}.`,
     `Lyric support: ${lyric || 'make the sung line feel obvious in one glance'}.`,
     `Mood should feel like ${psychologyBeat}, with child-friendly readability and strong visual clarity in 2-3 seconds.`,

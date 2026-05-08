@@ -119,6 +119,41 @@
 
 ---
 
+## 2026-05-08 — [Agent: OpenClaw] — Animal heuristic taste cleanup validated with second image QC slice
+
+**Files changed:** `scripts/generate-animal-facts-brief.mjs`, `output/longform/animal/ep12-hedgehog/*`, `docs/SESSION_LOG.md`
+
+**Why this pass happened:**
+- The first practical image QC on fresh Fennec Fox prompts showed the richer prompt layer was helping, but some heuristic inserts were still too blunt, especially around night-vs-sunset lighting, listening behavior, and payoff semantics.
+
+**Fix applied:**
+- Tightened `expandImagePromptHint()` to be more beat-specific for:
+  - listening / hearing-underground scenes
+  - heat / giant-ear scenes
+  - family / den / home scenes
+  - jump / run agility scenes
+  - night vs sunset lighting conflicts
+- Added stronger anti-decoration guidance: one dominant fact, one dominant behavior, less ornamental competition.
+- Improved foreground/background/detail defaults so they map better to close-up vs action vs habitat shots.
+
+**Fresh validation after fix:**
+- Generated a fresh Hedgehog episode at `output/longform/animal/ep12-hedgehog`.
+- Ran a second three-image QC slice (opening, smell/foraging, payoff).
+- Result vs the earlier Fennec slice:
+  - opening defensive-ball image: clearly stronger, instant behavior read
+  - payoff shelter/nest image: strong and immediately legible
+  - mid smell/foraging image: still the weakest, but failure mode shifted from ornamental drift to action-specificity drift
+
+**Current judgment:**
+- The cleanup worked.
+- The system is now in a healthier state: subject clarity and fact alignment improved meaningfully, and the remaining weakness is narrower, mostly subtle action specificity rather than broad stylistic drift.
+- This is a good stop-line for prompt-contract work until more real image-generation evidence suggests another tweak.
+
+**Next recommended step:**
+- Move from prompt-contract tuning to practical image-generation/QC on a chosen fresh episode, then decide whether to keep Hedgehog/Fennec/Fennec payoff-style lessons as durable heuristics or tune per animal family later.
+
+---
+
 ## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
 
 **Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`
