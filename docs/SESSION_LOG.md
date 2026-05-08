@@ -3002,3 +3002,29 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 ode --check clean. Ran --save --lane homecoming twice — ep29 and ep30 both generated and saved without validator failures. ep30 shows the new Beat 4 validator triggered retry correctly on the homecoming pigeon story.
 
 **Next:** Real story image QC on ep28 (first post-repair homecoming story). Generate slides 1, 4, 8 images and audit for threat concreteness and payoff echo quality.
+
+---
+
+## 2026-05-08 evening — [Agent: OpenClaw] — Story Beat 4/7/8 image prompt QC; imagen generation + vision limitation notes
+
+**Files changed:** scripts/generate-story-ideas.mjs, output/stories/ep28-the-last-light-of-day/_reel-image-generation.json
+
+**What was done:**
+
+1. **Story image prompt quality pass (Beat 4 threat staging + payoff concreteness)**
+   - Committed earlier as 20314cf — sharp Beat 4 threat staging and payoff concreteness rules with validator checks
+   - ep29 and ep30 both generated cleanly with new validators active
+
+2. **Practical Story image QC on ep28** — generated slides 1, 4, 8 with generate-story-reel-images.mjs --story ep28-the-last-light-of-day --slides 1,4,8 --force
+   - All 3 slides generated successfully via Imagen 4.0
+   - Files: output/stories/ep28-the-last-light-of-day/01.png (3.3MB),  4.png (2.9MB),  8.png (2.7MB) — all valid 1024×1536 PNGs
+   - Generation log: _reel-image-generation.json
+
+3. **Vision limitation discovered** — current model (minimax/MiniMax-M2.7) doesn't support image input. Image tool fallbacks: openai-codex/gpt-5.4 (rate limited), google/gemini-2.5-pro-preview-05-06 (404 not found). Cannot self-audit generated images without a vision-capable model or clearing the ChatGPT rate limit.
+
+**QC verdict pending** — all 3 images are valid but visual audit needs human eyes or a vision-capable model. Slides 1/4/8 are in C:\Users\BESOO\.openclaw\canvas\ for convenience.
+
+**Next steps when session resumes:**
+- Run vision-capable model (or use human QC) to audit ep28 slides 1, 4, 8 for: (1) pigeon recognizability with black neck stripes on slide 1, (2) threat concreteness vs generic rooftop atmosphere on slide 4, (3) concrete landing action vs portrait-with-glow on slide 8
+- If vision is available: audit ep29/ep30 image prompts for same Beat 4/7/8 quality
+- Consider adding a vision-capable model to the image tool fallback chain in gateway config
