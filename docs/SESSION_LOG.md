@@ -25,7 +25,7 @@
 - Keeps current StoryReelV2 hard-cut structure and current Animal Facts opening-name rule intact.
 
 **Next recommended step:**
-- Add the narrow Animal Facts reliability guardrail for partial `moment*.png` image sets failing silently, then run a fresh Sea Otter or equivalent benchmark/QC pass against the tightened generators.
+- Run a fresh Sea Otter or equivalent benchmark/QC pass against the tightened generators and the new partial-asset guardrail.
 
 ---
 

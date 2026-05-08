@@ -1,6 +1,19 @@
 import { AbsoluteFill, Sequence } from 'remotion';
 import { AnimalSungRecap } from '../components/longform/animal/AnimalSungRecap.jsx';
 
+const loadNodeHelpers = () => {
+  if (typeof window !== 'undefined') return null;
+  try {
+    const requireFn = eval('require');
+    return {
+      fs: requireFn('fs'),
+      path: requireFn('path'),
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const animalFactsSongShortSchema = {
   episodeFolder: '',
   episode: {},
@@ -45,9 +58,47 @@ const positiveSec = (value, fallbackSec) => {
   return Number.isFinite(sec) && sec > 0 ? sec : fallbackSec;
 };
 
+const assertNoPartialMomentImageSet = (episodeFolder, expandedMoments) => {
+  const node = loadNodeHelpers();
+  if (!node || !Array.isArray(expandedMoments) || !expandedMoments.length) {
+    return;
+  }
+
+  const resolved = expandedMoments.map((moment, index) => ({
+    expected: moment.imageAsset || `moment${index + 1}.png`,
+    resolved: resolveEpisodeAsset(episodeFolder, moment.imageAsset || `moment${index + 1}.png`),
+  }));
+
+  const localFiles = resolved.filter(({ resolved: assetPath }) => !/^https?:\/\//i.test(assetPath) && !/^data:/i.test(assetPath));
+  if (!localFiles.length) {
+    return;
+  }
+
+  const present = [];
+  const missing = [];
+  for (const file of localFiles) {
+    const normalizedPath = file.resolved.replace(/\//g, node.path.sep);
+    if (node.fs.existsSync(normalizedPath)) {
+      present.push(file.expected);
+    } else {
+      missing.push(file.expected);
+    }
+  }
+
+  if (present.length > 0 && missing.length > 0) {
+    throw new Error(
+      `AnimalFactsSongShort: partial visualExpansionMoments image set detected for ${episodeFolder || 'episode'}.
+Present: ${present.join(', ')}
+Missing: ${missing.join(', ')}
+Generate the full moment*.png set or remove visualExpansionMoments before rendering, so the engine does not silently mix asset strategies.`
+    );
+  }
+};
+
 const getBeatImagePaths = (episodeFolder, episode) => {
   const expandedMoments = Array.isArray(episode.visualExpansionMoments) ? episode.visualExpansionMoments : [];
   if (expandedMoments.length > 0) {
+    assertNoPartialMomentImageSet(episodeFolder, expandedMoments);
     return expandedMoments.map((moment, index) =>
       resolveEpisodeAsset(episodeFolder, moment.imageAsset || `moment${index + 1}.png`)
     );
