@@ -433,20 +433,37 @@ Hard rules:
 - If a background pool prompt was provided above, copy it verbatim into "backgroundSunoPrompt".`;
 }
 
+function sanitizeAnimalPromptField(value = '', animalName = '') {
+  return String(value || '')
+    .replace(/Explicit end payoff moment:\s*/gi, '')
+    .replace(/Show why[^.]*\.?/gi, '')
+    .replace(/ground fades softly to pale cream at lower edge/gi, '')
+    .replace(/vertical portrait format,?\s*1024[×x]1536\s*px/gi, '')
+    .replace(/no text(?:,? no letters)? or logos/gi, '')
+    .replace(/safe breathing room above and below the subject for reel framing/gi, '')
+    .replace(/\b(ACTION|MEDIUM|ESTABLISHING|CLOSE-UP) framing,?\s*/gi, '')
+    .replace(animalName ? new RegExp(`\\b${String(animalName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*,?\\s*`, 'gi') : /$^/, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+,/g, ',')
+    .replace(/\.{2,}/g, '.')
+    .trim()
+    .replace(/[,.\s]+$/, '');
+}
+
 function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment = 'natural habitat' }) {
   const shotType = beat?.shotType || 'MEDIUM';
-  const composition = beat?.compositionNote || `${animalName} shown clearly in its environment`;
-  const factFocus = beat?.factFocus || '';
-  const psychologyBeat = beat?.psychologyBeat || 'playful wonder';
-  const lyric = beat?.lyric || '';
+  const composition = sanitizeAnimalPromptField(beat?.compositionNote || `${animalName} shown clearly in its environment`, animalName) || `${animalName} shown clearly in its environment`;
+  const factFocus = sanitizeAnimalPromptField(beat?.factFocus || '');
+  const psychologyBeat = sanitizeAnimalPromptField(beat?.psychologyBeat || 'playful wonder') || 'playful wonder';
+  const lyric = sanitizeAnimalPromptField(beat?.lyric || beat?.lyricFocus || '');
   const signal = `${composition} ${factFocus} ${lyric}`.toLowerCase();
 
   const lightingMood = /sunset|golden hour|late-afternoon|sunny|desert sun|warm desert/i.test(signal)
     ? 'warm late-afternoon sunlight with long readable shadows and a clean glow on the subject'
-    : /night|moon|moonlit|sleep|dark|star/i.test(signal)
-      ? 'soft moonlit night with a gentle rim light that keeps the animal silhouette easy to read'
-      : /burrow|den|family|cozy|home/i.test(signal)
-        ? 'soft warm den light focused on faces and body contact, with darker edges kept simple'
+    : /burrow|den|family|cozy|home/i.test(signal)
+      ? 'soft warm den light focused on faces and body contact, with darker edges kept simple'
+      : /night|moon|moonlit|sleep|dark|star/i.test(signal)
+        ? 'soft moonlit night with a gentle rim light that keeps the animal silhouette easy to read'
         : /danger|fright|defen|hide/i.test(signal)
           ? 'tense directional light with stronger contrast on the face and body'
           : 'soft natural daylight with clear directional light on the subject';
@@ -459,15 +476,13 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
         ? 'one clawed digging action frozen mid-scrape with dirt visibly moving'
         : /curl|ball|defen/i.test(signal)
           ? 'the body curling inward so the defense behavior reads instantly'
-          : /sniff|insect|eat|food|hunt|track/i.test(signal)
+          : /sniff|insect|hunt|track|forag/i.test(signal)
             ? 'nose low and attention fixed on one food trail so the search behavior reads at a glance'
-            : /family|den|burrow|cozy|snuggle/i.test(signal)
-              ? 'close body contact or shared resting posture that makes the home-and-family payoff unmistakable'
-              : /return|home/i.test(signal)
-                ? 'the animal reaching or entering home in a way that clearly pays off the journey'
-                : /jump|run|speed|acrobat/i.test(signal)
-                  ? 'one mid-motion leap or sprint pose that makes the agility obvious in a single glance'
-                  : 'one instantly readable signature action that makes the fact obvious';
+            : /family|den|burrow|cozy|snuggle|pup|home/i.test(signal)
+              ? 'close body contact or a return-to-burrow pose that makes the home-and-family payoff unmistakable'
+              : /jump|run|speed|acrobat/i.test(signal)
+                ? 'one mid-motion leap or sprint pose that makes the agility obvious in a single glance'
+                : 'one instantly readable signature action that makes the fact obvious';
 
   const foregroundDetail = /close/i.test(String(shotType))
     ? 'sharp eyes, whiskers, fur texture, and one key feature tied to the fact in the foreground'
@@ -475,28 +490,23 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
       ? 'one crisp contact detail like paws kicking sand, claws striking dirt, or a body edge cutting through motion'
       : 'the animal large in frame with one clean foreground detail like paw prints, fur texture, leaf edge, or sand grain pattern';
 
-  const backgroundDepth = /burrow|den|family|cozy/i.test(signal)
-    ? `simple layered ${fallbackEnvironment} depth that keeps the den interior readable first, with background shapes softened behind the family group`
+  const backgroundDepth = /burrow|den|family|cozy|home/i.test(signal)
+    ? `simple layered ${fallbackEnvironment} depth that keeps the den or burrow readable first, with background shapes softened behind the family group`
     : `layered ${fallbackEnvironment} depth behind the subject with one simple habitat cue, kept soft enough that the animal reads first`;
 
-  const base = [
+  return [
     `${animalName}, ${shotType} framing, ${composition}.`,
     `Foreground detail: ${foregroundDetail}.`,
     `Background depth: ${backgroundDepth}.`,
     `Lighting mood: ${lightingMood}.`,
     `Focal action: ${focalAction}.`,
-    `Keep one dominant fact and one dominant behavior in the frame. Avoid decorative patterning that competes with the subject.`,
+    'Keep one dominant fact and one dominant behavior in the frame. Avoid decorative patterning or literal written words in the artwork.',
     `Show the factual idea clearly: ${factFocus}.`,
     `Lyric support: ${lyric || 'make the sung line feel obvious in one glance'}.`,
     `Mood should feel like ${psychologyBeat}, with child-friendly readability and strong visual clarity in 2-3 seconds.`,
     `Use ${artStyle}.`,
-    `Keep the scene in ${fallbackEnvironment}, no text or logos, ground fades softly to pale cream at lower edge, vertical portrait format, 1024×1536 px, with safe breathing room above and below the subject for reel framing.`,
+    `Keep the scene in ${fallbackEnvironment}, no text, no letters, no logos, ground fades softly to pale cream at lower edge, vertical portrait format, 1024×1536 px, with safe breathing room above and below the subject for reel framing.`,
   ].join(' ');
-
-  const existing = String(beat?.imagePromptHint || '').trim();
-  if (!existing) return base;
-  const normalized = `${existing.replace(/\s+/g, ' ').trim()} ${base}`.replace(/\s+/g, ' ').trim();
-  return normalized;
 }
 
 function synthesizeVisualExpansionMomentsFromBeats(songBeats = []) {

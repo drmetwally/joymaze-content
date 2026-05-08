@@ -154,6 +154,46 @@
 
 ---
 
+## 2026-05-08 — [Agent: OpenClaw] — Practical Animal Imagen QC slice proved the next bottleneck is heuristic specificity
+
+**Files changed:** `scripts/generate-animal-facts-brief.mjs`, `scripts/qc-animal-imagen-slice.mjs`, `output/longform/animal/ep13-puffin/*`, `output/longform/animal/ep14-sea-otter/*`, `docs/SESSION_LOG.md`
+
+**What was run:**
+- Generated a practical three-image Imagen QC slice on the earlier enriched `ep11-fennec-fox` candidate.
+- Added a small reusable helper `scripts/qc-animal-imagen-slice.mjs` so Animal episode images can be sampled directly from `episode.json` prompts instead of doing purely manual copy-paste QC.
+- After the Fennec slice exposed prompt-stitching problems, tightened `expandImagePromptHint()` and regenerated fresh episodes.
+- Generated a fresh Puffin episode (`ep13-puffin`) and ran another three-image Imagen QC slice.
+- Ran one more fresh save to verify the prompt-shape fix against a new episode (`ep14-sea-otter`).
+
+**What the first real QC slice revealed:**
+- `ep11-fennec-fox` opening image proved the richer prompts were materially stronger than the earlier generic outputs, but the prompt had contradictory stacked instructions and Imagen literally rendered garbage text at the top of frame.
+- `ep11-fennec-fox` payoff image was usable, but the final resolve image catastrophically drifted into an unrelated food-bowl scene.
+- Root cause: the enrichment layer was concatenating raw model prompt text plus deterministic heuristics, so Imagen inherited duplicated species labels, framing metadata, conflicting lighting cues, and other literalized prompt junk.
+
+**Fix applied:**
+- `expandImagePromptHint()` now emits one cleaner synthesized prompt instead of appending heuristic text onto the weak raw prompt block.
+- Added prompt-field sanitizing so meta phrases like explicit payoff instructions, repeated framing labels, and formatting boilerplate stop leaking straight into image-generation text.
+- Added `scripts/qc-animal-imagen-slice.mjs` as a reusable narrow QC tool for future episode sampling.
+
+**What the second QC slice showed:**
+- `ep13-puffin` images were clearly healthier than the first Fennec pass.
+  - Opening beak-with-fish image: strong, immediate, distinct, no literal text artifact.
+  - Burrow/cliff image: readable and on-theme, though still not perfectly action-specific.
+  - Final image: coherent, scene-related, and no longer catastrophic drift.
+- This is a real improvement. The system is past the "generic thin prompts" problem.
+
+**Remaining issue after the fix:**
+- The weak spot is now narrower and more specific: heuristic mapping still overfits some mammal/desert logic onto other animal families.
+- Fresh `ep14-sea-otter` prompts show that aquatic or tool-use beats can still inherit the wrong focal action or home/den language, even after the prompt-shape cleanup.
+- So the next tuning, if any, should be small and taxonomy/behavior specific, not another broad contract rewrite.
+
+**Current judgment:**
+- Practical image QC validated that the upstream prompt-enrichment work was worth it.
+- The next bottleneck is heuristic specificity by animal/behavior family, not overall prompt richness.
+- This is a good stop-line for today unless we want one more very narrow species-family cleanup pass.
+
+---
+
 ## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
 
 **Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`
