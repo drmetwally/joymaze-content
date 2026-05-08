@@ -2986,12 +2986,12 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 
 ---
 
-## 2026-05-08 evening — [Agent: OpenClaw] — Story image prompt quality pass: sharpen Beat 4 threat staging and payoff concreteness
+## 2026-05-08 evening ï¿½ [Agent: OpenClaw] ï¿½ Story image prompt quality pass: sharpen Beat 4 threat staging and payoff concreteness
 
 **Files changed:** scripts/generate-story-ideas.mjs
 
 **What changed:**
-- Added explicit Beat 4 threat-staging guidance in the system-prompt image prompt rules block: generic \"identical rooftops\" or \"blurring\" atmosphere is now flagged. Prompts must show the story's specific complication visually — what exactly is failing or blocking the character.
+- Added explicit Beat 4 threat-staging guidance in the system-prompt image prompt rules block: generic \"identical rooftops\" or \"blurring\" atmosphere is now flagged. Prompts must show the story's specific complication visually ï¿½ what exactly is failing or blocking the character.
 - Added Beat 7 + Beat 8 payoff concreteness rules: Beat 7 must show the concrete winning action (talons touching down, wings folding, posture shift), not just a relieved face. Beat 8 must be a small earned visual echo with concrete environmental grounding, not a generic portrait.
 - Added Beat 4 / Beat 7 / Beat 8 validator checks in alidateGeneratedStory(story):
   - Slide 4: fails if it detects generic threat language without story-specific blocking language
@@ -2999,30 +2999,30 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
   - Slide 8: fails if it detects a generic portrait without talons/feet/wings folded/windowsill/landing/posture concrete cue
 
 **Validation:** 
-ode --check clean. Ran --save --lane homecoming twice — ep29 and ep30 both generated and saved without validator failures. ep30 shows the new Beat 4 validator triggered retry correctly on the homecoming pigeon story.
+ode --check clean. Ran --save --lane homecoming twice ï¿½ ep29 and ep30 both generated and saved without validator failures. ep30 shows the new Beat 4 validator triggered retry correctly on the homecoming pigeon story.
 
 **Next:** Real story image QC on ep28 (first post-repair homecoming story). Generate slides 1, 4, 8 images and audit for threat concreteness and payoff echo quality.
 
 ---
 
-## 2026-05-08 evening — [Agent: OpenClaw] — Story Beat 4/7/8 image prompt QC; imagen generation + vision limitation notes
+## 2026-05-08 evening ï¿½ [Agent: OpenClaw] ï¿½ Story Beat 4/7/8 image prompt QC; imagen generation + vision limitation notes
 
 **Files changed:** scripts/generate-story-ideas.mjs, output/stories/ep28-the-last-light-of-day/_reel-image-generation.json
 
 **What was done:**
 
 1. **Story image prompt quality pass (Beat 4 threat staging + payoff concreteness)**
-   - Committed earlier as 20314cf — sharp Beat 4 threat staging and payoff concreteness rules with validator checks
+   - Committed earlier as 20314cf ï¿½ sharp Beat 4 threat staging and payoff concreteness rules with validator checks
    - ep29 and ep30 both generated cleanly with new validators active
 
-2. **Practical Story image QC on ep28** — generated slides 1, 4, 8 with generate-story-reel-images.mjs --story ep28-the-last-light-of-day --slides 1,4,8 --force
+2. **Practical Story image QC on ep28** ï¿½ generated slides 1, 4, 8 with generate-story-reel-images.mjs --story ep28-the-last-light-of-day --slides 1,4,8 --force
    - All 3 slides generated successfully via Imagen 4.0
-   - Files: output/stories/ep28-the-last-light-of-day/01.png (3.3MB),  4.png (2.9MB),  8.png (2.7MB) — all valid 1024×1536 PNGs
+   - Files: output/stories/ep28-the-last-light-of-day/01.png (3.3MB),  4.png (2.9MB),  8.png (2.7MB) ï¿½ all valid 1024ï¿½1536 PNGs
    - Generation log: _reel-image-generation.json
 
-3. **Vision limitation discovered** — current model (minimax/MiniMax-M2.7) doesn't support image input. Image tool fallbacks: openai-codex/gpt-5.4 (rate limited), google/gemini-2.5-pro-preview-05-06 (404 not found). Cannot self-audit generated images without a vision-capable model or clearing the ChatGPT rate limit.
+3. **Vision limitation discovered** ï¿½ current model (minimax/MiniMax-M2.7) doesn't support image input. Image tool fallbacks: openai-codex/gpt-5.4 (rate limited), google/gemini-2.5-pro-preview-05-06 (404 not found). Cannot self-audit generated images without a vision-capable model or clearing the ChatGPT rate limit.
 
-**QC verdict pending** — all 3 images are valid but visual audit needs human eyes or a vision-capable model. Slides 1/4/8 are in C:\Users\BESOO\.openclaw\canvas\ for convenience.
+**QC verdict pending** ï¿½ all 3 images are valid but visual audit needs human eyes or a vision-capable model. Slides 1/4/8 are in C:\Users\BESOO\.openclaw\canvas\ for convenience.
 
 **Next steps when session resumes:**
 - Run vision-capable model (or use human QC) to audit ep28 slides 1, 4, 8 for: (1) pigeon recognizability with black neck stripes on slide 1, (2) threat concreteness vs generic rooftop atmosphere on slide 4, (3) concrete landing action vs portrait-with-glow on slide 8
@@ -3046,5 +3046,23 @@ ode --check clean. Ran --save --lane homecoming twice — ep29 and ep30 both gener
 2. **Archive wiring for new engines** â€” maze, wordsearch, and dottodot activity.json files now include `generatedAt: new Date().toISOString()`. Archive script's `getFolderDate()` reads this field; previously fell back to mtime which was unreliable on Windows (file copies reset mtime to today).
 
 3. **Monster truck puzzle batch (30 puzzles)** â€” batch-generate-puzzles.mjs generates 15 wordsearch (5 unique words each, 60 unique words total across groups) + 15 hard mazes. Output: output/puzzle-collection/monster-truck/ â†’ ws-01..ws-15.png + maze-01..maze-15.png only.
+
+---
+## Session 2026-05-09 (cont.) â€” Cheatsheet audit + daily automation planning
+
+**Files changed:**
+- docs/DAILY_CHEATSHEET.md (Step 2B updated, batch puzzles addendum added)
+- docs/AGENT_LOG.md (Task A + Task B specs written for Gemini)
+- memory/project_build_sprint.md (updated sprint state)
+
+**What was done:**
+
+1. **Cheatsheet audit** â€” confirmed puzzle difficulty criteria (3 levels across maze/wordsearch/dottodot), confirmed beautifying pipeline (theme-matched gradients, corner emoji decors, START/FINISH stickers, difficulty dots, card borders). Updated DAILY_CHEATSHEET.md: coloring + dottodot now show Imagen engine commands, find-diff marked WIP, batch puzzles added as KDP addendum.
+
+2. **Daily automation planning** â€” discussed + specced two tasks for Gemini:
+   - **Task A:** Wire all 5 puzzle types (maze, ws, coloring, dottodot, matching) into `npm run daily` via activity manifest. Removes 4 of 5 manual puzzle image steps.
+   - **Task B:** Auto-generate 5 inspiration images via Imagen in `daily-run.mjs` using `generate-images-vertex.mjs --inspiration-only`. Full daily run becomes zero manual image work.
+
+**Next:** Run Gemini on Task A + Task B from docs/AGENT_LOG.md tomorrow.
 
 **Next steps:** Visual QC on ep28 story slides (slides 1/4/8 need vision-capable model audit).

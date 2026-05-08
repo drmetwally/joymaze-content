@@ -884,3 +884,12 @@ Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizonta
 - Dry-run proof showed each generator now prints ## SHARED VIRAL VIDEO STRUCTURE CONTRACT with the correct lane block before its local instructions.
 - Temporary patch helper files used during the repair were deleted before session wrap.
 - Next restart point: Claude audit the virality-pass commit, then decide whether more generators should consume the shared contract or whether the current four-lane scope is enough for now.
+
+---
+### 2026-05-09 — Cheatsheet audit + daily automation planning
+
+- Audited puzzle difficulty criteria across all 3 types (maze: grid size, wordsearch: grid+word count, dottodot: dot count).
+- Audited puzzle-post-renderer.mjs beautifying pipeline: confirmed theme-matched gradients, corner emoji decors, START/FINISH stickers, difficulty dots, card borders — all present.
+- Updated DAILY_CHEATSHEET.md: coloring + dottodot Imagen engine commands added to Step 2B, find-diff marked WIP, batch puzzles KDP addendum added, date updated.
+- Specced Task A (wire 5 puzzle types into daily manifest) + Task B (auto-generate 5 inspiration images via Imagen) in docs/AGENT_LOG.md for Gemini to implement tomorrow.
+- If both tasks land: daily manual image work drops to zero — full 10-post day runs automatically.

@@ -358,4 +358,126 @@ This means current Story Engine work should stay tightly focused on quality vali
 - Matching correction applied to Story Reel V2 image generation on 2026-05-07: `generate-story-reel-images.mjs` now defaults to vertical output sizing and stronger portrait-framing language so future story reel image patches are vertical by default too.
 - Animal Facts timing rule changed on 2026-05-07 after auditing the first real Puffin benchmark: the selected song is now the timing source of truth for short-form animal reels. The render path no longer uses the stale hook/reveal/outro duration formula for this composition, and the short now expands into a song-led scene plan instead of evenly splitting a fixed short runtime across beat images.
 - Animal Facts generator contract widened on 2026-05-07: the planner now distinguishes between `songBeats` (lyrical spine) and `visualExpansionMoments` (wider creative/image plan). This locks in the rule that longer songs should earn more creatives, not just longer holds on the same five images.
+
+---
+
+## TOMORROW'S TASKS — 2026-05-10
+
+> These two tasks are for Gemini (or any capable coding assistant). Read each spec fully before touching any file. Both tasks are independent — they can be done in either order.
+
+---
+
+### TASK A — Wire all 5 puzzle types into the daily manifest so `npm run daily` auto-generates 5 puzzle posts
+
+**Status:** READY TO IMPLEMENT
+
+**Goal:** `npm run daily` should auto-generate a branded puzzle image post for all 5 ready puzzle types (maze, wordsearch, coloring, dottodot, matching), so the only manual image work each day is the 5 inspiration slots (Fact Card, Challenge, Quiet Moment, Printable Tease, Identity).
+
+**Current state (before this task):**
+- `npm run daily` calls `generate-challenge-brief.mjs` → writes `output/prompts/activity-manifest-YYYY-MM-DD.json`
+- That manifest drives `generate-puzzle-image-post.mjs` for maze + wordsearch only (those two are wired into `daily-run.mjs`)
+- Coloring, dottodot, matching are NOT called from `daily-run.mjs` — they have engines but are not wired in
+
+**Key files to read first:**
+- `scripts/daily-run.mjs` — the daily orchestrator; find where maze/wordsearch puzzle posts are called
+- `scripts/generate-challenge-brief.mjs` — reads what puzzle types go into the manifest; check if it already plans all 5 types or only 2
+- `scripts/generate-coloring-assets.mjs` — supports `--imagen` flag for Imagen-based generation
+- `scripts/generate-imagen-dottodot-assets.mjs` — Imagen-based dottodot generator
+- `scripts/generate-matching-assets.mjs` — matching generator
+- `scripts/generate-puzzle-image-post.mjs` — the branded post wrapper; check it supports coloring, dottodot, matching types
+
+**What to change:**
+
+1. **`scripts/generate-challenge-brief.mjs`** — if the manifest only plans maze + wordsearch slots, extend it to plan 5 slots: maze, wordsearch, coloring, dottodot, matching. Each slot needs: `type`, `theme`, `difficulty`, `slug`. Themes should be drawn from `config/theme-pool-dynamic.json` (same source as existing slots). One slot per type per day.
+
+2. **`scripts/daily-run.mjs`** — after the existing maze/wordsearch puzzle post generation block, add calls for coloring, dottodot, and matching:
+   - Coloring: call `generate-coloring-assets.mjs --imagen --theme <theme> --difficulty <difficulty> --slug <slug> --force` → then call `generate-puzzle-image-post.mjs --type coloring --slug <slug>`
+   - Dottodot: call `generate-imagen-dottodot-assets.mjs --theme <theme> --difficulty <difficulty> --slug <slug> --force` → then call `generate-puzzle-image-post.mjs --type dot-to-dot --slug <slug>`
+   - Matching: call `generate-matching-assets.mjs --theme <theme> --difficulty <difficulty> --slug <slug> --force` → then call `generate-puzzle-image-post.mjs --type matching --slug <slug>`
+   - Each call should be wrapped with the same try/catch + `--no-X` skip flag pattern already used for story-reel and animal-brief in `daily-run.mjs`
+
+3. **Idempotency:** Each generator already checks if `puzzle.png` exists and skips unless `--force`. The daily runner should pass `--force` only if a `--force-puzzles` flag is given to `daily-run.mjs`. Default behavior: skip if already generated today.
+
+4. **`--dry-run` support:** All three new calls must respect the existing `DRY_RUN` flag in `daily-run.mjs` — print the command but don't execute.
+
+**Output locations (do not change these):**
+- Coloring: `output/challenge/generated-activity/{slug}/` → branded post at `output/raw/coloring/{slug}-post.png` (or wherever puzzlepost writes its output — check the existing maze output path and mirror it)
+- Dottodot: same pattern
+- Matching: same pattern
+
+**Validation (how to know it worked):**
+```bash
+node scripts/daily-run.mjs --dry-run
+# Should print 5 puzzle generation commands (maze, ws, coloring, dottodot, matching) — not just 2
+```
+
+**Do NOT change:**
+- The coloring/dottodot/matching generator scripts themselves (logic is correct)
+- The puzzle post renderer
+- Any existing maze/wordsearch wiring
+- `generate-prompts.mjs` (inspiration image prompts stay as-is for now)
+
+---
+
+### TASK B — Auto-generate the 5 inspiration images via Imagen on `npm run daily`
+
+**Status:** READY TO IMPLEMENT
+
+**Goal:** `npm run daily` should call `generate-images-vertex.mjs` (Imagen) to generate the 5 inspiration image slots automatically, so the day starts with all 10 posts already generated — zero manual Gemini work for images.
+
+**Current state (before this task):**
+- `generate-prompts.mjs` already writes rich, intelligence-driven image prompts for all 10 slots to `output/prompts/prompts-YYYY-MM-DD.md`
+- `generate-images-vertex.mjs` already exists and generates images via Imagen using prompts
+- But `daily-run.mjs` does NOT call `generate-images-vertex.mjs` — inspiration images are generated manually in Gemini
+- The 5 inspiration slots are: Fact Card, Challenge, Quiet Moment, Printable Tease, Identity
+
+**Key files to read first:**
+- `scripts/generate-images-vertex.mjs` — understand its input format: does it read from `prompts-YYYY-MM-DD.md` directly, or does it take `--prompt` flags? What flags does it support? What does it output and where?
+- `scripts/generate-prompts.mjs` — confirm the prompts file format (especially the 5 inspiration slot prompts) so you know what `generate-images-vertex.mjs` needs to consume
+- `scripts/daily-run.mjs` — find where to insert the new call (after prompts are generated, before the rest)
+
+**What to change:**
+
+1. **`scripts/generate-images-vertex.mjs`** — if it does not already support reading from `output/prompts/prompts-YYYY-MM-DD.md` and filtering by slot type (inspiration only, skipping puzzle slots), add that mode:
+   - New flag: `--inspiration-only` — reads today's prompts file, extracts only the 5 inspiration slot prompts, generates one image per slot
+   - Output: `output/raw/{slot-type}/{date}-{slug}.png` — same folder structure that `import:raw` already expects
+   - If a slot's output file already exists: skip (idempotency)
+   - If the prompts file doesn't exist yet: exit cleanly with a warning (daily-run.mjs calls prompts first, so this shouldn't happen)
+   - Respect a `--dry-run` flag: print what would be generated, exit without API calls
+
+2. **`scripts/daily-run.mjs`** — add a call to `generate-images-vertex.mjs --inspiration-only` immediately after `generate-prompts.mjs` completes:
+   - Wrap with try/catch — if Imagen quota is hit or API fails, log a warning and continue (do not abort the whole daily run)
+   - Add a `--no-inspiration-images` skip flag (same pattern as `--no-story-reel`, `--no-animal-brief`)
+   - Respect `DRY_RUN` — print the command but don't execute
+
+**Imagen prompt quality rules (critical — do not skip):**
+- Each prompt sent to Imagen must be the full prompt text from `prompts-YYYY-MM-DD.md` for that slot — do NOT truncate or summarize
+- Prompts already include vertical format language (1080×1500 or portrait framing) — preserve this
+- Model to use: Imagen 4.0 (`imagen-4.0-generate-001`) — same as used for Story Reel V2 images. Check `generate-story-reel-images.mjs` for the exact API call pattern and mirror it
+- Aspect ratio: `9:16` or `2:3` portrait — check what Story Reel V2 uses and use the same
+
+**Output contract:**
+```
+output/raw/fact-card/fact-card-YYYY-MM-DD.png
+output/raw/challenge/challenge-YYYY-MM-DD.png
+output/raw/quiet/quiet-YYYY-MM-DD.png
+output/raw/printable/printable-YYYY-MM-DD.png
+output/raw/identity/identity-YYYY-MM-DD.png
+```
+These must land in the correct `output/raw/{slot}/` subfolder so `npm run import:raw` picks them up automatically on Step 5.
+
+**Validation (how to know it worked):**
+```bash
+node scripts/daily-run.mjs --dry-run
+# Should print the generate-images-vertex call with --inspiration-only
+
+node scripts/generate-images-vertex.mjs --inspiration-only --dry-run
+# Should print 5 slot names + prompt previews without making any API calls
+```
+
+**Do NOT change:**
+- `generate-prompts.mjs` prompt logic
+- `import:raw` — it already handles these folders
+- Story Reel V2 image generation path
+- Any existing Imagen usage in other scripts
 - Puffin benchmark polish added a second durable rule on 2026-05-07: the final expanded Animal Facts moment should usually be a clear emotional/factual payoff image, not merely a generic return-flight or scenic hold. Future episodes should end on home/family/food-delivery resolve when the material supports it.
