@@ -322,6 +322,27 @@ Plan the full visual arc before writing prompts:
 - ACT 2: Varies with story events — use location changes to signal scene shifts
 - ACT 3: Echo ACT 1's composition but show what has changed (full circle)
 
+### BEAT 4 — THREAT STAGING (specific, not vague)
+Beat 4 image prompts must show the complication visually, not just describe it in narration.
+- Do NOT default to: "city rooftops, long shadows, dark windows" (generic atmosphere, no story-specific threat)
+- DO show: a concrete environmental failure or obstruction that directly matches the story's particular danger
+- The pigeon story example shows "every window look like a dark mouth" — the image must make rooftops feel maze-like and alienating, not just shadowy
+- Ask: "what exactly is the character fighting in this beat?" and show that thing, specifically, in the frame.
+- Avoid: lighting-only threat. Combine framing + environment + light to make the danger feel spatially real.
+
+### BEAT 7 + BEAT 8 — PAYOFF CONCRETENESS (critical fix)
+Beat 7 and Beat 8 must NOT end on a portrait-like image. A close-up face with warm glow is a generic resolution — it doesn't earn the story's arc.
+
+Specific rules:
+- Beat 7 must show the concrete winning action in the frame — not just the character at rest with a relieved expression
+  - GOOD: pigeon talons touching down on weathered stone windowsill, city visible below, wings still half-spread from the landing
+  - BAD: "pigeon face looking relieved, warm glow surrounding her"
+- Beat 8 must echo the theme visually, not just restate it
+  - The echo image must contain the story's emotional resolution as a specific visible action or small observed detail — a tiny repeated act, a sensory anchor, or a reversal visual
+  - GOOD: pigeon silhouette against a small amber window, city dark behind her, wings folded, already home
+  - BAD: pigeon on windowsill looking happy with warm glow
+- Both Beat 7 and Beat 8 must include a concrete environmental detail that grounds the reward in the story's specific world
+
 ## OUTPUT FORMAT
 
 Return a single JSON object with this exact structure — no extra text:
@@ -647,6 +668,11 @@ Before you finalize, self-check every image_prompt:
 - prompt includes a camera/framing cue and a time-of-day or lighting cue
 - prompt ends with 9:16 portrait ratio instruction
 
+Extra final-pass checks for Beat 4, Beat 7, and Beat 8:
+- Beat 4: the prompt must show the story's specific complication visually — not generic shadowy rooftops. Ask: what exactly is failing or obstructing the character in this beat? Show that in the frame. The background/environment must carry narrative weight, not just atmosphere.
+- Beat 7: the prompt must show the concrete winning action, not a character face at rest with a warm glow. Talons touching down, wings folding, body posture changing — a physical state shift, not just an expression change.
+- Beat 8: the prompt must be visually distinct from Beat 7 and must echo the story's theme as a small observed action or sensory detail, not a portrait with a caption.
+
 Return ONLY the JSON. No explanation. No markdown fences.`;
 }
 
@@ -823,6 +849,27 @@ function validateGeneratedStory(story) {
     }
     if (!lightingCueRegex.test(prompt)) {
       throw new Error(`Slide ${index + 1} image_prompt is missing a clear lighting or time-of-day cue.`);
+    }
+
+    // Beat-specific concrete checks
+    if (index === 3) {
+      const promptLower = prompt.toLowerCase();
+      const genericThreat = /\b(blurring together|identical rooftops|rows of windows|dark windows|cityscape|stretching out)\b/i.test(prompt) && !/\b(failing|obstructing|swallowing|maze|labyrinth|closing in|hemming in|closing|walls|funnel|squeezing)\b/i.test(promptLower);
+      if (genericThreat) {
+        throw new Error(`Slide 4 image_prompt must show the story's specific complication visually — not generic "identical rooftops" or "blurring" atmosphere. What exactly is failing or blocking the character? Show that in the frame.`);
+      }
+    }
+    if (index === 6) {
+      const noConcreteWin = /close-up[^.]{0,50}(looking relieved|looking happy|looking content|expression of relief|happy glow|warm glow around her|surrounded by warmth)/i.test(prompt);
+      if (noConcreteWin) {
+        throw new Error(`Slide 7 image_prompt must show the concrete winning action — talons touching down, wings folding, posture shift — not just a relieved face with warm glow.`);
+      }
+    }
+    if (index === story.slides.length - 1) {
+      const isGenericPortrait = /^[^,.]{0,30}close-up[^.]{0,60}(looking|silhouette|warm glow|surrounded|peaceful)/i.test(prompt) && !/(talons|feet|wings folded|windowsill texture|perched on the|landing on|settling|body posture)/i.test(prompt);
+      if (isGenericPortrait) {
+        throw new Error(`Slide 8 image_prompt must show a small earned visual echo — a tiny observed action or sensory detail — not a generic portrait. Include a concrete environmental grounding.`);
+      }
     }
   });
 }

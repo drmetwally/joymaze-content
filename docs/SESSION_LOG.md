@@ -2983,3 +2983,22 @@ All 6 imagePromptHints rewritten manually (50-70 words, fully differentiated):
 - The generator contract was updated so Animal Facts beat images now default to vertical portrait framing with extra breathing room around the subject.
 - The same directional fix was then applied to Story Reel V2 image generation: `generate-story-reel-images.mjs` now normalizes to vertical default output and stronger portrait-safe prompt language for future story reel image patch batches.
 - After QC on the first real Puffin benchmark, the Animal Facts short lane adopted a new rule: for story/fact reels, the selected song can drive duration and scene timing when the material is strong. The composition/render path was refactored so `AnimalFactsSongShort` now follows selected-song duration and uses a scene-plan expansion model instead of the old fixed short timing assumption.
+
+---
+
+## 2026-05-08 evening — [Agent: OpenClaw] — Story image prompt quality pass: sharpen Beat 4 threat staging and payoff concreteness
+
+**Files changed:** scripts/generate-story-ideas.mjs
+
+**What changed:**
+- Added explicit Beat 4 threat-staging guidance in the system-prompt image prompt rules block: generic \"identical rooftops\" or \"blurring\" atmosphere is now flagged. Prompts must show the story's specific complication visually — what exactly is failing or blocking the character.
+- Added Beat 7 + Beat 8 payoff concreteness rules: Beat 7 must show the concrete winning action (talons touching down, wings folding, posture shift), not just a relieved face. Beat 8 must be a small earned visual echo with concrete environmental grounding, not a generic portrait.
+- Added Beat 4 / Beat 7 / Beat 8 validator checks in alidateGeneratedStory(story):
+  - Slide 4: fails if it detects generic threat language without story-specific blocking language
+  - Slide 7: fails if it detects a portrait-like \"looking relieved\" close-up without concrete winning action
+  - Slide 8: fails if it detects a generic portrait without talons/feet/wings folded/windowsill/landing/posture concrete cue
+
+**Validation:** 
+ode --check clean. Ran --save --lane homecoming twice — ep29 and ep30 both generated and saved without validator failures. ep30 shows the new Beat 4 validator triggered retry correctly on the homecoming pigeon story.
+
+**Next:** Real story image QC on ep28 (first post-repair homecoming story). Generate slides 1, 4, 8 images and audit for threat concreteness and payoff echo quality.
