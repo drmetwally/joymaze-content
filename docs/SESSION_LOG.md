@@ -194,6 +194,51 @@
 
 ---
 
+## 2026-05-08 — [Agent: OpenClaw] — Narrow animal species-family heuristic pass + practical Story reel QC slice
+
+**Files changed:** `scripts/generate-animal-facts-brief.mjs`, `docs/SESSION_LOG.md`
+
+**Why this pass happened:**
+- Followed the user-approved next step to do both:
+  1. a narrow animal heuristic cleanup focused on bird / aquatic / tool-use beats
+  2. a practical StoryReelV2 image QC slice on `ep28-the-last-light-of-day`
+
+**Animal heuristic work completed:**
+- Tightened `expandImagePromptHint()` so the deterministic enrichment layer now distinguishes:
+  - bird anatomy / flight / beak-with-fish cases
+  - aquatic floating / diving / tool-use cases
+  - generic mammal / burrow / defense / foraging cases
+- Added regex boundary cleanup after QC exposed accidental substring matches (`wing` inside `burrowing`, `home`-style leakage, similar false positives).
+- Added prompt cleanup for orphan possessive fragments like `"'s head"` after animal-name sanitizing.
+- Adjusted listening/hearing action text so non-desert animals no longer inherit the desert `movement below the sand` cue.
+
+**Validation and QC evidence:**
+- Fresh saves run during this pass:
+  - `output/longform/animal/ep15-armadillo`
+  - `output/longform/animal/ep16-okapi`
+- Practical Imagen QC slices run:
+  - `ep15-armadillo` slice caught the regex-regression immediately, which then got fixed.
+  - `ep16-okapi` slice succeeded after one transient Imagen 503 retry.
+- Post-fix animal judgment:
+  - broad regression from bird-logic leakage was fixed
+  - remaining animal weakness is now narrower, mostly taste and beat-specificity, not catastrophic prompt routing
+
+**Story reel QC slice completed:**
+- Ran `node scripts/generate-story-reel-images.mjs --story output/stories/ep28-the-last-light-of-day --slides 1,4,8 --force`
+- Generated real images for slides 1, 4, and 8.
+
+**What the Story QC slice showed:**
+- Slide 1 is strong: immediate rooftop loneliness, sunset urgency, readable protagonist.
+- Slide 4 is only partially successful: the atmosphere is usable, but Imagen collapses the intended city-window threat into a more generic bird-in-flight shot.
+- Slide 8 is the weakest: it renders as a close pigeon portrait instead of a strong landing-on-the-windowsill / warm-home payoff frame.
+
+**Current judgment after doing both tasks:**
+- Animal prompt work is in a healthier place than before; the main risk is now small heuristic overreach, not prompt thinness.
+- StoryReelV2 still has a real upstream image-prompt weakness at payoff/resolve moments. The validator-compliant prompt shape is not yet enough to guarantee storyboard-strong ending frames.
+- If continuing from here, the highest-value follow-up is a narrow Story prompt rewrite pass focused on final-frame payoff specificity and threat-frame staging, not engine work.
+
+---
+
 ## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
 
 **Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`

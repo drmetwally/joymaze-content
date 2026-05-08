@@ -443,6 +443,7 @@ function sanitizeAnimalPromptField(value = '', animalName = '') {
     .replace(/safe breathing room above and below the subject for reel framing/gi, '')
     .replace(/\b(ACTION|MEDIUM|ESTABLISHING|CLOSE-UP) framing,?\s*/gi, '')
     .replace(animalName ? new RegExp(`\\b${String(animalName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*,?\\s*`, 'gi') : /$^/, '')
+    .replace(/(^|\s)'s\s+/g, '$1')
     .replace(/\s+/g, ' ')
     .replace(/\s+,/g, ',')
     .replace(/\.{2,}/g, '.')
@@ -456,43 +457,85 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
   const factFocus = sanitizeAnimalPromptField(beat?.factFocus || '');
   const psychologyBeat = sanitizeAnimalPromptField(beat?.psychologyBeat || 'playful wonder') || 'playful wonder';
   const lyric = sanitizeAnimalPromptField(beat?.lyric || beat?.lyricFocus || '');
-  const signal = `${composition} ${factFocus} ${lyric}`.toLowerCase();
+  const signal = `${animalName} ${fallbackEnvironment} ${composition} ${factFocus} ${lyric}`.toLowerCase();
+  const isBird = /\b(bird|puffin|pigeon|owl|eagle|falcon|sparrow|parrot|penguin|beak|feather|wings?|nest|chick)\b/.test(signal);
+  const isAquatic = /\b(otter|seal|walrus|whale|dolphin|shark|ray|octopus|jellyfish|penguin|ocean|sea|coast|coastal|reef|kelp|water|underwater|swim|dive|floating)\b/.test(signal);
+  const isToolUse = /\b(tool|rock|shell|crack|stone|anvil)\b/.test(signal);
+  const isFishCarry = /\b(fish|beak)\b|several fish|mouth full of fish/.test(signal);
+  const isFlightBeat = /\b(fly|flight|wing|wings|sky|air|soar)\b/.test(signal);
+  const isBurrowNestBeat = /\b(burrow|burrows|den|nest|home|family|cozy|snuggle|pup|chick)\b|cliff nest/.test(signal);
 
   const lightingMood = /sunset|golden hour|late-afternoon|sunny|desert sun|warm desert/i.test(signal)
     ? 'warm late-afternoon sunlight with long readable shadows and a clean glow on the subject'
-    : /burrow|den|family|cozy|home/i.test(signal)
-      ? 'soft warm den light focused on faces and body contact, with darker edges kept simple'
-      : /night|moon|moonlit|sleep|dark|star/i.test(signal)
-        ? 'soft moonlit night with a gentle rim light that keeps the animal silhouette easy to read'
-        : /danger|fright|defen|hide/i.test(signal)
-          ? 'tense directional light with stronger contrast on the face and body'
-          : 'soft natural daylight with clear directional light on the subject';
+    : /night|moon|moonlit|sleep|dark|star/i.test(signal)
+      ? 'soft moonlit night with a gentle rim light that keeps the animal silhouette easy to read'
+      : isAquatic && /underwater|dive|swim/.test(signal)
+        ? 'clear underwater light with soft shafts through the water and enough contrast to keep the subject readable'
+        : isAquatic
+          ? 'clean coastal daylight with soft reflections on water and clear edge light on the subject'
+          : isBurrowNestBeat && !isAquatic
+            ? 'soft warm shelter light focused on faces and body contact, with darker edges kept simple'
+            : /danger|fright|defen|hide/i.test(signal)
+              ? 'tense directional light with stronger contrast on the face and body'
+              : 'soft natural daylight with clear directional light on the subject';
 
-  const focalAction = /hear|listen|ear|underground|prey moving/i.test(signal)
-    ? 'ears tilted and body held still in a listening pose, with one subtle ground cue that suggests movement below the sand'
-    : /heat|cool|survive the desert heat|giant ears/i.test(signal)
-      ? 'ears spread wide and held clearly in frame so their size and cooling function read instantly'
-      : /dig|burrow.*dig|claw/i.test(signal)
-        ? 'one clawed digging action frozen mid-scrape with dirt visibly moving'
-        : /curl|ball|defen/i.test(signal)
-          ? 'the body curling inward so the defense behavior reads instantly'
-          : /sniff|insect|hunt|track|forag/i.test(signal)
-            ? 'nose low and attention fixed on one food trail so the search behavior reads at a glance'
-            : /family|den|burrow|cozy|snuggle|pup|home/i.test(signal)
-              ? 'close body contact or a return-to-burrow pose that makes the home-and-family payoff unmistakable'
-              : /jump|run|speed|acrobat/i.test(signal)
-                ? 'one mid-motion leap or sprint pose that makes the agility obvious in a single glance'
-                : 'one instantly readable signature action that makes the fact obvious';
+  const focalAction = isBird && isFishCarry
+    ? 'beak gripping several small fish while the body balances clearly on rock or cliff edge'
+    : isAquatic && isToolUse
+      ? 'front paws gripping a rock against a shell so the tool-use action reads instantly'
+      : isAquatic && /float|floating|back|fur/.test(signal)
+        ? 'body floating on the back with paws lifted close to the chest so the fur and floating pose read immediately'
+        : isAquatic && /dive|swim|underwater/.test(signal)
+          ? 'body arcing into a dive or cutting through the water in one clean readable swimming pose'
+          : isBird && isFlightBeat
+            ? 'wings fully spread in a single clear airborne pose that makes the flight beat obvious at a glance'
+            : isBird && isBurrowNestBeat
+              ? 'body angled toward the burrow or nest entrance so the homecoming or care behavior reads instantly'
+              : /\b(hear|listen|ear|underground)\b|prey moving/i.test(signal)
+                ? /\b(desert|sand|underground)\b/i.test(signal)
+                  ? 'ears tilted and body held still in a listening pose, with one subtle ground cue that suggests movement below the sand'
+                  : 'ears tilted and body held still in a listening pose toward hidden movement in grass, leaves, or shadow'
+                : /\b(heat|cool)\b|survive the desert heat|giant ears/i.test(signal)
+                  ? 'ears spread wide and held clearly in frame so their size and cooling function read instantly'
+                  : /\b(dig|digging|claw|claws)\b|burrow.*dig/i.test(signal)
+                    ? 'one clawed digging action frozen mid-scrape with dirt visibly moving'
+                    : /\b(curl|curled|ball)\b|defen/i.test(signal)
+                      ? 'the body curling inward so the defense behavior reads instantly'
+                      : /\b(sniff|insect|insects|hunt|track|forage|foraging)\b/i.test(signal)
+                        ? 'nose low and attention fixed on one food trail so the search behavior reads at a glance'
+                        : isBurrowNestBeat
+                          ? 'close body contact or a return-to-burrow pose that makes the home-and-family payoff unmistakable'
+                          : /\b(jump|run|speed|acrobat)\b/i.test(signal)
+                            ? 'one mid-motion leap or sprint pose that makes the agility obvious in a single glance'
+                            : 'one instantly readable signature action that makes the fact obvious';
 
   const foregroundDetail = /close/i.test(String(shotType))
-    ? 'sharp eyes, whiskers, fur texture, and one key feature tied to the fact in the foreground'
+    ? isBird
+      ? 'sharp eye, beak edge, feather texture, and one species-defining detail in the foreground'
+      : isAquatic
+        ? 'sharp eye, whiskers or wet fur texture, and one key water detail in the foreground'
+        : 'sharp eyes, whiskers, fur texture, and one key feature tied to the fact in the foreground'
     : /action/i.test(String(shotType).toLowerCase())
-      ? 'one crisp contact detail like paws kicking sand, claws striking dirt, or a body edge cutting through motion'
-      : 'the animal large in frame with one clean foreground detail like paw prints, fur texture, leaf edge, or sand grain pattern';
+      ? isBird
+        ? 'one crisp contact detail like feather tips, wing edge, or claw grip cutting cleanly through motion'
+        : isAquatic
+          ? 'one crisp contact detail like water droplets, splash edge, shell contact, or paw movement'
+          : 'one crisp contact detail like paws kicking sand, claws striking dirt, or a body edge cutting through motion'
+      : isBird
+        ? 'the animal large in frame with one clean foreground detail like feather texture, claw grip, or cliff grass'
+        : isAquatic
+          ? 'the animal large in frame with one clean foreground detail like ripples, wet fur texture, kelp ribbon, or shell edge'
+          : 'the animal large in frame with one clean foreground detail like paw prints, fur texture, leaf edge, or sand grain pattern';
 
-  const backgroundDepth = /burrow|den|family|cozy|home/i.test(signal)
-    ? `simple layered ${fallbackEnvironment} depth that keeps the den or burrow readable first, with background shapes softened behind the family group`
-    : `layered ${fallbackEnvironment} depth behind the subject with one simple habitat cue, kept soft enough that the animal reads first`;
+  const backgroundDepth = isAquatic
+    ? `layered ${fallbackEnvironment} depth with water surface, kelp, or distant shoreline softened behind the subject so the animal reads first`
+    : isBird && isBurrowNestBeat
+      ? `layered ${fallbackEnvironment} depth with the nest, burrow, or cliff edge readable first and distant shapes softened behind it`
+      : isBird
+        ? `layered ${fallbackEnvironment} depth with one clear sky, rooftop, or cliff cue behind the subject, kept soft enough that the bird reads first`
+        : isBurrowNestBeat
+          ? `simple layered ${fallbackEnvironment} depth that keeps the den or burrow readable first, with background shapes softened behind the family group`
+          : `layered ${fallbackEnvironment} depth behind the subject with one simple habitat cue, kept soft enough that the animal reads first`;
 
   return [
     `${animalName}, ${shotType} framing, ${composition}.`,
