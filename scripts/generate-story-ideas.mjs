@@ -677,6 +677,23 @@ function buildStyleAnchor(style) {
   return `Keep the exact same illustration style across all slides: ${clause}. No photorealism, no glossy 3D, no live-action look.`;
 }
 
+const framingCueRegex = /\b(wide shot|wide establishing shot|establishing shot|mid-shot|mid shot|close-up|close up|extreme close-up|extreme close up|eye-level|eye level|low angle|slightly overhead|bird's eye|birds eye)\b/i;
+const lightingCueRegex = /\b(dawn|sunrise|morning|golden hour|afternoon|dusk|twilight|night|moonlight|sunlight|backlight|rim light|firelight|window light|storm light|overcast)\b/i;
+
+function getDefaultFramingCue(index = 0) {
+  return ['wide establishing shot', 'mid shot', 'slightly overhead mid shot', 'close-up', 'low angle mid shot', 'mid shot', 'wide shot', 'close-up'][index] || 'mid shot';
+}
+
+function getDefaultLightingCue(index = 0) {
+  return ['dawn light', 'morning sunlight', 'afternoon light', 'overcast storm light', 'dusk light', 'moonlight', 'golden hour light', 'window light at night'][index] || 'afternoon light';
+}
+
+function trimNarrationToWordLimit(text, maxWords) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return String(text || '').trim();
+  return `${words.slice(0, maxWords).join(' ').replace(/[,:;\-]+$/, '')}.`;
+}
+
 function repairStoryConsistency(story) {
   if (!story || !Array.isArray(story.slides)) return story;
   const character = String(story.character || '').trim();
@@ -684,7 +701,7 @@ function repairStoryConsistency(story) {
   if (!character || !characterName) return story;
   const styleAnchor = buildStyleAnchor(story.style);
 
-  story.slides = story.slides.map((slide) => {
+  story.slides = story.slides.map((slide, index) => {
     let prompt = String(slide.image_prompt || '').trim();
     if (!prompt) return slide;
 
@@ -699,6 +716,14 @@ function repairStoryConsistency(story) {
       prompt = `${intro}${prompt}`;
     }
 
+    if (!framingCueRegex.test(prompt)) {
+      prompt = `${prompt.replace(/\.*\s*$/, '')}. ${getDefaultFramingCue(index)}.`;
+    }
+
+    if (!lightingCueRegex.test(prompt)) {
+      prompt = `${prompt.replace(/\.*\s*$/, '')}. ${getDefaultLightingCue(index)}.`;
+    }
+
     if (styleAnchor && !prompt.toLowerCase().includes('keep the exact same illustration style across all slides')) {
       prompt = `${prompt.replace(/\.*\s*$/, '')}. ${styleAnchor}`;
     }
@@ -707,7 +732,13 @@ function repairStoryConsistency(story) {
       prompt = `${prompt.replace(/\.*\s*$/, '')}. Generate at 9:16 portrait ratio (1080×1920 pixels).`;
     }
 
-    return { ...slide, image_prompt: prompt };
+    const narration = index === 0
+      ? trimNarrationToWordLimit(slide.narration, 18)
+      : index === story.slides.length - 1
+        ? trimNarrationToWordLimit(slide.narration, 16)
+        : String(slide.narration || '').trim();
+
+    return { ...slide, narration, image_prompt: prompt };
   });
 
   return story;
@@ -731,8 +762,6 @@ function validateGeneratedStory(story) {
       .filter((word) => word.length >= 4)
   );
   const styleAnchor = buildStyleAnchor(story.style);
-  const framingCueRegex = /\b(wide shot|wide establishing shot|establishing shot|mid-shot|mid shot|close-up|close up|extreme close-up|extreme close up|eye-level|eye level|low angle|slightly overhead|bird's eye|birds eye)\b/i;
-  const lightingCueRegex = /\b(dawn|sunrise|morning|golden hour|afternoon|dusk|twilight|night|moonlight|sunlight|backlight|rim light|firelight|window light|storm light|overcast)\b/i;
   const genericNarrationRegex = /\b(once upon a time|from that day on|she learned that|he learned that|they learned that|everything changed|never gave up|deep in the forest|in a magical forest|more than ever)\b/i;
 
   if (!character || descriptorWords.size < 4) {

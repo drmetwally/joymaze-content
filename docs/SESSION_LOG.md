@@ -52,7 +52,44 @@
   - `AnimalFactsSongShort partial visualExpansionMoments image set detected... Present: moment1..moment9, Missing: moment10.png ... do not silently fall back to beat or legacy assets.`
 
 **Next recommended step:**
-- Regenerate one real Animal Facts episode brief and one real StoryReelV2 story after the upstream prompt changes, then inspect whether the new validators pass without manual rescue and whether the resulting content actually improves hook/payoff specificity.
+- Inspect the newly generated Armadillo and `The Last Light of Day` outputs more critically for qualitative strength, then decide whether to tighten Animal prompt expansion further or move on to reel-image generation/QC.
+
+---
+
+## 2026-05-08 — [Agent: OpenClaw] — Fresh post-tightening generation run for Animal Facts + StoryReelV2
+
+**Files changed:** `scripts/generate-story-ideas.mjs`, `output/longform/animal/ep09-armadillo/*`, `output/stories/ep28-the-last-light-of-day/*`, `docs/SESSION_LOG.md`
+
+**What was run:**
+- `node scripts/generate-animal-facts-brief.mjs --save`
+- `node scripts/generate-story-ideas.mjs --save --lane homecoming`
+
+**Observed outcomes:**
+- Animal Facts saved a fresh episode at `output/longform/animal/ep09-armadillo` after two validation rejections on earlier attempts.
+  - Rejections were useful and on-target:
+    - opener/payoff repeating same core fact
+    - adjacent late beats repeating same core fact
+  - Final saved Armadillo brief does clear the new anti-repetition gate and ends in a more concrete return-home beat than the older Sea Otter benchmark, though prompt richness still deserves a stricter qualitative look.
+- StoryReelV2 initially kept failing on output-shape issues after the new validator became stricter.
+  - First live failure: missing lighting/time-of-day cue in `image_prompt`
+  - Second live failure after that fix: final slide narration too long for a clean echo
+
+**Fix applied during run:**
+- Strengthened `repairStoryConsistency()` in `scripts/generate-story-ideas.mjs` so it now:
+  - injects default framing cues when missing
+  - injects default lighting/time-of-day cues when missing
+  - trims slide 1 narration to hook-safe length
+  - trims final slide narration to echo-safe length
+
+**Validated after fix:**
+- Fresh StoryReelV2 generation now saves successfully:
+  - `output/stories/ep28-the-last-light-of-day`
+  - theme: young pigeon trying to find home before nightfall
+  - hook: `Can she find the window before nightfall?`
+
+**Takeaway:**
+- The stricter validators are doing real work, but StoryReelV2 needed a deterministic cleanup layer to convert near-miss model outputs into valid storyboard prompts.
+- Animal Facts tightening is working, but the newly saved Armadillo brief should still be reviewed for whether the richer visual language is truly landing, not just passing validation.
 
 ---
 
