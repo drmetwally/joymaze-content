@@ -29,6 +29,33 @@
 
 ---
 
+## 2026-05-08 — [Agent: OpenClaw] — Benchmark/QC pass after upstream generator tightening
+
+**Files changed:** `scripts/render-video.mjs`, `docs/SESSION_LOG.md`
+
+**QC checks run:**
+- `node scripts/render-video.mjs --comp AnimalFactsSongShort --episode output/longform/animal/ep08-sea-otter --dry-run`
+- live StoryReelV2 generation attempt: `node scripts/generate-story-ideas.mjs --save --lane homecoming`
+- synthetic partial-asset Animal Facts render test against `ep08-sea-otter-partial-moment-test`
+
+**What the QC pass found:**
+- Existing `ep08-sea-otter` content still visibly reflects the older brief weakness: the opener and payoff both center on fur/warmth, so the tightened upstream rules are justified and should improve future episodes.
+- The first real StoryReelV2 generation attempt failed validation on retry 1 because `Slide 2 image_prompt` lacked a clear lighting/time-of-day cue. This confirms the new validation is actively catching weak storyboard prompts instead of letting them through.
+- The first partial-moment synthetic test exposed that the earlier fail-loud check was placed too late in the render path. It could still die on missing `moment10.png` rather than rejecting the partial set upfront.
+
+**Fix applied during QC:**
+- Moved the Animal Facts partial `moment*.png` guardrail into `scripts/render-video.mjs` preflight logic.
+- New behavior: if `visualExpansionMoments` exists and only some `moment*.png` files are present, render prep now fails immediately with an explicit partial-set error instead of attempting fallback.
+
+**Validated after fix:**
+- Synthetic render now fails with the intended explicit message:
+  - `AnimalFactsSongShort partial visualExpansionMoments image set detected... Present: moment1..moment9, Missing: moment10.png ... do not silently fall back to beat or legacy assets.`
+
+**Next recommended step:**
+- Regenerate one real Animal Facts episode brief and one real StoryReelV2 story after the upstream prompt changes, then inspect whether the new validators pass without manual rescue and whether the resulting content actually improves hook/payoff specificity.
+
+---
+
 ## 2026-05-07 — [Agent: OpenClaw] — Story Reel benchmark polish logged + roadmap/session state refreshed
 
 **Files changed:** `docs/AGENT_LOG.md`, `docs/SESSION_LOG.md`, `docs/CHAT_LOG.md`

@@ -507,22 +507,38 @@ async function animalEpisodeToSongShortProps(episode, episodeDir) {
     ? episode.visualExpansionMoments.map((moment, index) => moment.imageAsset || `moment${index + 1}.png`)
     : [];
 
+  const checkImageSet = async (filenames) => {
+    const present = [];
+    const missing = [];
+    for (const filename of filenames) {
+      const abs = path.join(episodeDir, filename);
+      const exists = await fs.access(abs).then(() => true).catch(() => false);
+      if (exists) present.push(filename);
+      else missing.push(filename);
+    }
+    return { present, missing };
+  };
+
+  if (expandedImages.length > 0) {
+    const expandedState = await checkImageSet(expandedImages);
+    if (expandedState.present.length > 0 && expandedState.missing.length > 0) {
+      throw new Error(
+        `AnimalFactsSongShort partial visualExpansionMoments image set detected for ${path.basename(episodeDir)}. Present: ${expandedState.present.join(', ')}. Missing: ${expandedState.missing.join(', ')}. Generate the full moment*.png set or remove visualExpansionMoments before rendering; do not silently fall back to beat or legacy assets.`
+      );
+    }
+  }
+
   const candidateSets = [expandedImages, beatImages, legacyImages].filter((set) => set.length > 0);
   let matchedSet = null;
   let lastMissingImages = [];
 
   for (const requiredImages of candidateSets) {
-    const missingImages = [];
-    for (const filename of requiredImages) {
-      const abs = path.join(episodeDir, filename);
-      const exists = await fs.access(abs).then(() => true).catch(() => false);
-      if (!exists) missingImages.push(filename);
-    }
-    if (missingImages.length === 0) {
+    const { missing } = await checkImageSet(requiredImages);
+    if (missing.length === 0) {
       matchedSet = requiredImages;
       break;
     }
-    lastMissingImages = missingImages;
+    lastMissingImages = missing;
   }
 
   if (!matchedSet) {
