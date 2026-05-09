@@ -3089,3 +3089,15 @@ ode --check clean. Ran --save --lane homecoming twice � ep29 and ep30 both gen
 4. **Final result** — 5/5 inspiration images generate daily. Full daily run (10 image posts + 5 puzzle posts + 5 inspiration images + ASMR + story + challenge + animal facts + X posts) is now fully automated.
 
 **Next steps:** Run full `npm run daily` tomorrow to confirm end-to-end. Visual QC on ep28 story slides (pending from prior session).
+
+---
+## Session 2026-05-09 (cont.) — Pipeline dry-run audit + archive gap
+
+**What was done:**
+1. Ran `npm run daily --dry-run` — first full end-to-end test of new automation.
+2. Found and fixed Bug 1 (real): `getLatestChallengeFolder()` was returning `generated-activity` (container dir) instead of a specific brief slug. Fixed by excluding `generated-activity` from the scan in `daily-run.mjs`.
+3. Bug 2 (dry-run artifact, not real): fact1-5 not found in ep18-hedgehog — expected because dry-run doesn't write a new brief folder; resolves in real run.
+4. Audited archive linkage for all engine outputs. One HIGH gap: `output/longform/animal/` has no archive sweep — episode folders (images, audio, B-roll) accumulate indefinitely.
+5. Planned two-part solution: Part A = copy moment*.png to assets/library/animals/ + reuse lookup; Part B = `npm run library` curation HTML. Saved to memory.
+
+**Next steps:** Implement archive sweep for output/longform/animal/ + Part B curation HTML. X automation enable on 2026-05-16.

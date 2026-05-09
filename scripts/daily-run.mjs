@@ -32,6 +32,7 @@ const WITH_STORY_REEL    = !args.includes('--no-story-reel');
 const WITH_ASMR_BRIEF    = !args.includes('--no-asmr');
 const WITH_CHALLENGE     = !args.includes('--no-challenge');
 const WITH_ANIMAL_BRIEF  = !args.includes('--no-animal-brief');
+const WITH_ANIMAL_REEL   = !args.includes('--no-animal-reel');
 const WITH_ANALYTICS     = args.includes('--with-analytics');
 
 const ANALYTICS_EVERY_N_DAYS = 3;
@@ -92,6 +93,66 @@ async function getLatestStoryFolder() {
     );
     const sorted = withMtime.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
     return sorted[0]?.full ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function getLatestAsmrFolder() {
+  const asmrDir = path.join(ROOT, 'output', 'asmr');
+  try {
+    const entries = await fs.readdir(asmrDir, { withFileTypes: true });
+    const dirs = entries.filter((e) => e.isDirectory());
+    if (dirs.length === 0) return null;
+    const withMtime = await Promise.all(
+      dirs.map(async (d) => {
+        const full = path.join(asmrDir, d.name);
+        const stat = await fs.stat(full).catch(() => null);
+        return stat ? { full, name: d.name, mtime: stat.mtimeMs } : null;
+      })
+    );
+    const sorted = withMtime.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
+    return sorted[0] ? { full: sorted[0].full, name: sorted[0].name } : null;
+  } catch {
+    return null;
+  }
+}
+
+async function getLatestChallengeFolder() {
+  const challengeDir = path.join(ROOT, 'output', 'challenge');
+  try {
+    const entries = await fs.readdir(challengeDir, { withFileTypes: true });
+    const dirs = entries.filter((e) => e.isDirectory() && e.name !== 'generated-activity');
+    if (dirs.length === 0) return null;
+    const withMtime = await Promise.all(
+      dirs.map(async (d) => {
+        const full = path.join(challengeDir, d.name);
+        const stat = await fs.stat(full).catch(() => null);
+        return stat ? { full, name: d.name, mtime: stat.mtimeMs } : null;
+      })
+    );
+    const sorted = withMtime.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
+    return sorted[0] ? { full: sorted[0].full, name: sorted[0].name } : null;
+  } catch {
+    return null;
+  }
+}
+
+async function getLatestAnimalFolder() {
+  const animalDir = path.join(ROOT, 'output', 'longform', 'animal');
+  try {
+    const entries = await fs.readdir(animalDir, { withFileTypes: true });
+    const dirs = entries.filter((e) => e.isDirectory() && /^ep\d+/.test(e.name));
+    if (dirs.length === 0) return null;
+    const withMtime = await Promise.all(
+      dirs.map(async (d) => {
+        const full = path.join(animalDir, d.name);
+        const stat = await fs.stat(full).catch(() => null);
+        return stat ? { full, name: d.name, mtime: stat.mtimeMs } : null;
+      })
+    );
+    const sorted = withMtime.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
+    return sorted[0] ? { full: sorted[0].full, name: sorted[0].name } : null;
   } catch {
     return null;
   }
@@ -172,6 +233,7 @@ async function runMain() {
     + (WITH_ASMR_BRIEF ? 1 : 0)
     + (WITH_CHALLENGE ? 1 : 0)
     + (WITH_ANIMAL_BRIEF ? 1 : 0)
+    + (WITH_ANIMAL_BRIEF && WITH_ANIMAL_REEL ? 1 : 0)
     + (WITH_ANALYTICS || daysSince(state.lastAnalyticsRun) >= ANALYTICS_EVERY_N_DAYS ? 1 : 0)
     + (isMonday ? 3 : 0);
 
@@ -351,6 +413,65 @@ async function runMain() {
     log(`Step ${stepNum}/${totalSteps}: Generating today's ASMR brief...`);
     const asmrOk = await runScript('generate-asmr-brief.mjs', ['--save']);
     if (asmrOk) {
+      const asmrFolder = await getLatestAsmrFolder();
+      if (asmrFolder) {
+        log(`ASMR: folder identified -> ${asmrFolder.name}`);
+        const activityJsonPath = path.join(asmrFolder.full, 'activity.json');
+        try {
+          const activity = JSON.parse(await fs.readFile(activityJsonPath, 'utf-8'));
+          const type = activity.type || activity.revealType;
+          log(`ASMR type: ${type}`);
+
+          let engineScript = '';
+          let extractScript = '';
+          if (type === 'maze') {
+            engineScript = 'generate-maze-assets.mjs';
+            extractScript = 'extract-maze-path.mjs';
+          } else if (type === 'wordsearch') {
+            engineScript = 'generate-wordsearch-assets.mjs';
+            extractScript = 'extract-wordsearch-path.mjs';
+          } else if (type === 'coloring') {
+            engineScript = 'generate-coloring-assets.mjs';
+            // coloring has no separate extract script
+          } else if (type === 'dotdot') {
+            engineScript = 'generate-imagen-dottodot-assets.mjs';
+            extractScript = 'extract-dotdot-path.mjs';
+          }
+
+          if (engineScript) {
+            log(`ASMR: running engine ${engineScript}...`);
+            // Save activity.json
+            const originalActivityJson = await fs.readFile(activityJsonPath, 'utf-8');
+            const engineOk = await runScript(engineScript, ['--out-dir', asmrFolder.full, '--difficulty', 'medium'], 180_000);
+            if (engineOk) {
+              // Restore activity.json (engines overwrite it)
+              await fs.writeFile(activityJsonPath, originalActivityJson);
+              log('ASMR: engine OK, activity.json restored');
+
+              if (extractScript) {
+                log(`ASMR: running extract ${extractScript}...`);
+                await runScript(extractScript, ['--asmr', activityJsonPath], 120_000);
+              }
+
+              log('ASMR: rendering video...');
+              const asmrActivityJsonRel = path.relative(ROOT, activityJsonPath).replace(/\\/g, '/');
+              const renderOk = await runScript('render-video.mjs', ['--comp', 'AsmrReveal', '--asmr', asmrActivityJsonRel], 600_000);
+              if (renderOk) {
+                log('ASMR video rendered OK');
+                await appendLog(`ASMR pipeline OK (${type})`);
+              } else {
+                log(`ASMR render failed — run manually: node scripts/render-video.mjs --comp AsmrReveal --asmr ${asmrActivityJsonRel}`);
+                await appendLog('ASMR render FAILED');
+              }
+            } else {
+              log('ASMR engine failed');
+              await appendLog('ASMR engine FAILED');
+            }
+          }
+        } catch (err) {
+          log(`ASMR: could not process pipeline: ${err.message}`);
+        }
+      }
       log('ASMR brief ready in output/asmr/');
       await appendLog('ASMR brief generated OK');
     } else {
@@ -361,11 +482,36 @@ async function runMain() {
 
   if (WITH_CHALLENGE) {
     stepNum++;
-    log(`Step ${stepNum}/${totalSteps}: Generating today's challenge brief...`);
+    log(`Step ${stepNum}/${totalSteps}: Generating today's challenge brief + video...`);
     const challengeOk = await runScript('generate-challenge-brief.mjs', ['--save']);
     if (challengeOk) {
       log('Challenge brief ready in output/challenge/');
       await appendLog('Challenge brief generated OK');
+
+      const challengeFolder = await getLatestChallengeFolder();
+      if (challengeFolder) {
+        log(`Challenge: folder identified -> ${challengeFolder.name}`);
+        log('Challenge: generating puzzle.png via Imagen...');
+        const puzzleOk = await runScript('generate-challenge-puzzle.mjs', ['--challenge', challengeFolder.full], 120_000);
+        if (puzzleOk) {
+          log('Challenge: puzzle.png generated OK');
+          log('Challenge: rendering video...');
+          const challengeFolderRel = path.relative(ROOT, challengeFolder.full).replace(/\\/g, '/');
+          const renderOk = await runScript('render-video.mjs', ['--comp', 'ActivityChallenge', '--challenge', challengeFolderRel], 180_000);
+          if (renderOk) {
+            log('Challenge video rendered OK');
+            await appendLog(`Challenge pipeline OK (${challengeFolder.name})`);
+          } else {
+            log(`Challenge render failed — run manually: node scripts/render-video.mjs --comp ActivityChallenge --challenge ${challengeFolderRel}`);
+            await appendLog('Challenge render FAILED');
+          }
+        } else {
+          log('Challenge: puzzle.png generation failed');
+          await appendLog('Challenge puzzle FAILED');
+        }
+      } else {
+        log('Challenge: no folder found after brief, skipping render');
+      }
     } else {
       log('Challenge brief failed, run manually: npm run brief:challenge');
       await appendLog('Challenge brief FAILED');
@@ -374,7 +520,7 @@ async function runMain() {
 
   if (WITH_ANIMAL_BRIEF) {
     stepNum++;
-    log(`Step ${stepNum}/${totalSteps}: Generating animal facts brief for next song short...`);
+    log(`Step ${stepNum}/${totalSteps}: Generating animal facts brief...`);
     const animalBriefOk = await runScript('generate-animal-facts-brief.mjs', ['--save'], 120_000);
     if (animalBriefOk) {
       log('Animal brief ready in output/longform/animal/');
@@ -382,6 +528,79 @@ async function runMain() {
     } else {
       log('Animal brief failed, run manually: npm run longform:animal:plan:save');
       await appendLog('Animal facts brief FAILED');
+    }
+  }
+
+  if (WITH_ANIMAL_BRIEF && WITH_ANIMAL_REEL) {
+    const animalFolder = await getLatestAnimalFolder();
+    if (animalFolder && await pathExists(path.join(animalFolder.full, 'episode.json'))) {
+      stepNum++;
+      log(`Step ${stepNum}/${totalSteps}: Generating Animal Facts Song Short (full pipeline)...`);
+      log(`  Episode: ${animalFolder.name}`);
+
+      // Step A — TTS narration
+      log('Animal: generating narration audio...');
+      const narrationOk = await runScript('generate-animal-narration.mjs', ['--episode', animalFolder.full], 90_000);
+      if (!narrationOk) {
+        log('Animal: narration failed — run manually: npm run longform:animal:narrate -- --episode ' + path.relative(ROOT, animalFolder.full));
+        await appendLog('Animal narration FAILED');
+      } else {
+        log('Animal: narration OK');
+      }
+
+      // Step B — Suno song (async, up to 4 min internal timeout)
+      log('Animal: submitting Suno song...');
+      const songOk = await runScript('generate-animal-song-sunoapi.mjs', ['--episode', animalFolder.full, '--kind', 'song', '--command', 'all'], 300_000);
+      if (!songOk) {
+        log('Animal: Suno song failed — run manually: node scripts/generate-animal-song-sunoapi.mjs --episode ' + path.relative(ROOT, animalFolder.full) + ' --kind song --command all');
+        await appendLog('Animal Suno song FAILED');
+      } else {
+        log('Animal: Suno song OK');
+      }
+
+      // Step C — Suno background music (async, up to 4 min)
+      log('Animal: submitting Suno background...');
+      const bgOk = await runScript('generate-animal-song-sunoapi.mjs', ['--episode', animalFolder.full, '--kind', 'background', '--command', 'all'], 300_000);
+      if (!bgOk) {
+        log('Animal: Suno background failed — run manually: node scripts/generate-animal-song-sunoapi.mjs --episode ' + path.relative(ROOT, animalFolder.full) + ' --kind background --command all');
+        await appendLog('Animal Suno background FAILED');
+      } else {
+        log('Animal: Suno background OK');
+      }
+
+      // Step D — Generate all moment images via Imagen
+      log('Animal: generating moment images (Imagen)...');
+      const momentsOk = await runScript('generate-animal-moments.mjs', ['--episode', animalFolder.full], 300_000);
+      if (!momentsOk) {
+        log('Animal: moment image gen failed — run manually: node scripts/generate-animal-moments.mjs --episode ' + path.relative(ROOT, animalFolder.full));
+        await appendLog('Animal moments FAILED');
+      } else {
+        log('Animal: moments OK');
+      }
+
+      // Step E — B-roll download + transcode
+      log('Animal: downloading B-roll...');
+      const brollOk = await runScript('download-broll.mjs', ['--episode', animalFolder.full], 120_000);
+      if (!brollOk) {
+        log('Animal: B-roll download failed — run manually: npm run longform:animal:broll -- --episode ' + path.relative(ROOT, animalFolder.full));
+        await appendLog('Animal B-roll FAILED');
+      } else {
+        log('Animal: B-roll OK');
+      }
+
+      // Step F — Remotion render
+      log('Animal: rendering video...');
+      const animalEpisodeRel = path.relative(ROOT, animalFolder.full).replace(/\\/g, '/');
+      const renderOk = await runScript('render-video.mjs', ['--comp', 'AnimalFactsSongShort', '--episode', animalEpisodeRel], 300_000);
+      if (renderOk) {
+        log('Animal Facts video rendered OK');
+        await appendLog(`Animal pipeline OK (${animalFolder.name})`);
+      } else {
+        log(`Animal render failed — run manually: node scripts/render-video.mjs --comp AnimalFactsSongShort --episode ${animalEpisodeRel}`);
+        await appendLog('Animal render FAILED');
+      }
+    } else {
+      log('Animal Reel: no episode folder found, skipping');
     }
   }
 

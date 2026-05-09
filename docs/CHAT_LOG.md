@@ -903,3 +903,9 @@ Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizonta
 - Implemented DALL-E 3 standard 1024×1024 routing for the 4 blocked slots — same $0.04/image cost as Imagen.
 - Added cleanForDallE3() prompt rewriter to handle "lying on stomach" patterns that also block DALL-E 3.
 - 5/5 inspiration images now generate reliably daily. Full daily automation achieved.
+
+## 2026-05-09 — Pipeline dry-run + archive audit
+- Ran first full `npm run daily --dry-run` after new automation build.
+- Fixed: `getLatestChallengeFolder()` was returning `generated-activity` (wrong dir) — one-line exclude fix.
+- Audited archive-queue.mjs coverage: all engines linked except `output/longform/animal/` (no sweep).
+- Planned asset library: moment*.png → assets/library/animals/ + `npm run library` HTML page.
