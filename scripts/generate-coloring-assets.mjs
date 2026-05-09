@@ -396,7 +396,7 @@ function buildColoringPagePrompt(theme) {
 
 async function callImagen(prompt, aspectRatio = '3:4') {
   const API_KEY = process.env.VERTEX_API_KEY;
-  const IMAGEN_URL = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=' + API_KEY;
+  const IMAGEN_URL = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=' + API_KEY;
 
   const body = {
     instances:  [{ prompt }],

@@ -24,7 +24,7 @@ import 'dotenv/config';
 
 // --- Config ---
 const API_KEY   = process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY;
-const MODEL     = 'imagen-4.0-generate-001';
+const MODEL     = 'imagen-4.0-fast-generate-001';
 const BASE_URL  = 'https://generativelanguage.googleapis.com/v1beta';
 
 const args = process.argv.slice(2);

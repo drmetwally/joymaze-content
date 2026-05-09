@@ -22,7 +22,7 @@ const OUT_DIR = path.join(ROOT, 'assets', 'stickers', 'matching');
 const INDEX_PATH = path.join(OUT_DIR, 'index.json');
 
 const API_KEY = process.env.VERTEX_API_KEY;
-const MODEL = 'imagen-4.0-generate-001';
+const MODEL = 'imagen-4.0-fast-generate-001';
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:predict?key=${API_KEY}`;
 const DELAY_MS = 2000;
 

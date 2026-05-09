@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const STORIES_DIR = path.join(ROOT, 'output', 'stories');
-const MODEL = 'imagen-4.0-generate-001';
+const MODEL = 'imagen-4.0-fast-generate-001';
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 const WIDTH = 1024;
 const HEIGHT = 1536;

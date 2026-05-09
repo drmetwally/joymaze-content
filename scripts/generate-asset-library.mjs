@@ -31,7 +31,7 @@ const LIBRARY_ROOT = path.join(ROOT, 'assets', 'generated');
 // API: POST https://generativelanguage.googleapis.com/v1beta/models/<model>:predict?key=<key>
 
 const API_KEY = process.env.VERTEX_API_KEY || process.env.GOOGLE_AI_API_KEY;
-const IMAGEN_MODEL = 'imagen-4.0-generate-001';
+const IMAGEN_MODEL = 'imagen-4.0-fast-generate-001';
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 const SAMPLE_COUNT = 1;
 
