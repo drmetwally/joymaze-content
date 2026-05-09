@@ -23,6 +23,11 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const WITH_STORY         = !args.includes('--no-story');
 const WITH_PUZZLE_POSTS  = !args.includes('--no-puzzle-posts');
+const WITH_COLORING      = !args.includes('--no-coloring');
+const WITH_DOTTODOT      = !args.includes('--no-dottodot');
+const WITH_MATCHING      = !args.includes('--no-matching');
+const FORCE_PUZZLES      = args.includes('--force-puzzles');
+const WITH_INSPIRATION_IMAGES = !args.includes('--no-inspiration-images');
 const WITH_STORY_REEL    = !args.includes('--no-story-reel');
 const WITH_ASMR_BRIEF    = !args.includes('--no-asmr');
 const WITH_CHALLENGE     = !args.includes('--no-challenge');
@@ -156,8 +161,12 @@ async function runMain() {
   const today = new Date().toISOString().slice(0, 10);
   let stepNum = 0;
   const isMonday = new Date().getDay() === 1;
-  const totalSteps = 3
+  const totalSteps = 4
+    + (WITH_INSPIRATION_IMAGES ? 1 : 0)
     + (WITH_PUZZLE_POSTS ? 1 : 0)
+    + (WITH_COLORING ? 1 : 0)
+    + (WITH_DOTTODOT ? 1 : 0)
+    + (WITH_MATCHING ? 1 : 0)
     + (WITH_STORY ? 1 : 0)
     + (WITH_STORY && WITH_STORY_REEL ? 1 : 0)
     + (WITH_ASMR_BRIEF ? 1 : 0)
@@ -227,19 +236,73 @@ async function runMain() {
     await appendLog('Prompt generation FAILED');
   }
 
-  if (WITH_PUZZLE_POSTS) {
+  if (WITH_INSPIRATION_IMAGES) {
     stepNum++;
-    log(`Step ${stepNum}/${totalSteps}: Generating today's deterministic puzzle posts...`);
-    const manifestPath = path.join('output', 'prompts', `activity-manifest-${today}.json`);
-    const puzzlePostsOk = await runScript('generate-puzzle-image-post.mjs', ['--manifest', manifestPath, '--all-supported'], 180_000);
-    if (puzzlePostsOk) {
-      log('Puzzle posts generated from today\'s activity manifest');
-      await appendLog('Puzzle posts generated OK');
+    log(`Step ${stepNum}/${totalSteps}: Auto-generating 5 inspiration images via Imagen...`);
+    const inspirationOk = await runScript('generate-images-vertex.mjs', ['--inspiration-only'], 300_000);
+    if (inspirationOk) {
+      log('Inspiration images generated OK');
+      await appendLog('Inspiration images generated OK');
     } else {
-      log('Puzzle post generation failed, run manually: npm run puzzlepost:generate -- --manifest ' + manifestPath + ' --all-supported');
-      await appendLog('Puzzle posts generation FAILED');
+      log('Inspiration image generation had issues (quota or API error), continuing');
+      await appendLog('Inspiration images generation WARNING/FAILED');
     }
   }
+
+  const manifestPath = path.join('output', 'prompts', `activity-manifest-${today}.json`);
+  let manifest = null;
+  try {
+    manifest = JSON.parse(await fs.readFile(path.join(ROOT, manifestPath), 'utf8'));
+  } catch (err) {
+    if (!DRY_RUN) log(`Warning: Could not read manifest at ${manifestPath}: ${err.message}`);
+  }
+
+  if (WITH_PUZZLE_POSTS) {
+    stepNum++;
+    log(`Step ${stepNum}/${totalSteps}: Generating today's deterministic puzzle posts (Maze/Wordsearch)...`);
+    const forceFlag = FORCE_PUZZLES ? ['--force'] : [];
+    // Only target maze and wordsearch in this legacy block
+    const puzzlePostsOk = await runScript('generate-puzzle-image-post.mjs', ['--manifest', manifestPath, '--category', 'activity-maze', ...forceFlag], 180_000)
+      && await runScript('generate-puzzle-image-post.mjs', ['--manifest', manifestPath, '--category', 'activity-word-search', ...forceFlag], 180_000);
+
+    if (puzzlePostsOk) {
+      log('Maze/Wordsearch puzzle posts generated OK');
+      await appendLog('Maze/Wordsearch puzzle posts generated OK');
+    } else {
+      log('Maze/Wordsearch puzzle post generation failed');
+      await appendLog('Maze/Wordsearch puzzle posts FAILED');
+    }
+  }
+
+  async function handlePuzzleType(type, category, script, flag) {
+    if (!flag || !manifest) return;
+    const slot = (manifest.activitySlots || []).find(s => s.category === category);
+    if (!slot) return;
+
+    stepNum++;
+    log(`Step ${stepNum}/${totalSteps}: Generating ${type} puzzle post...`);
+    try {
+      const forceFlag = FORCE_PUZZLES ? ['--force'] : [];
+      const assetOk = await runScript(script, ['--imagen', '--theme', slot.theme, '--difficulty', slot.difficulty, '--slug', slot.slug, ...forceFlag], 120_000);
+      if (assetOk) {
+        const postOk = await runScript('generate-puzzle-image-post.mjs', ['--type', type, '--slug', slot.slug, ...forceFlag], 120_000);
+        if (postOk) {
+          log(`${type} puzzle post generated OK`);
+          await appendLog(`${type} puzzle post generated OK`);
+        } else {
+          log(`${type} post rendering failed`);
+        }
+      } else {
+        log(`${type} asset generation failed`);
+      }
+    } catch (err) {
+      log(`ERROR in ${type} pipeline: ${err.message}`);
+    }
+  }
+
+  await handlePuzzleType('coloring', 'activity-coloring', 'generate-coloring-assets.mjs', WITH_COLORING);
+  await handlePuzzleType('dot-to-dot', 'activity-dot-to-dot', 'generate-imagen-dottodot-assets.mjs', WITH_DOTTODOT);
+  await handlePuzzleType('matching', 'activity-matching', 'generate-matching-assets.mjs', WITH_MATCHING);
 
   if (WITH_STORY) {
     stepNum++;

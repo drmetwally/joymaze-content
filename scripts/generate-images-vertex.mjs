@@ -39,6 +39,8 @@ const ONLY_INDEX    = args.includes('--index') ? parseInt(argVal('--index', '0')
 const DATE          = argVal('--date', new Date().toISOString().slice(0, 10));
 const INCLUDE_ALL   = args.includes('--all');
 const ACTIVITIES_ONLY = args.includes('--activities-only');
+const INSPIRATION_ONLY = args.includes('--inspiration-only');
+const DRY_RUN       = args.includes('--dry-run');
 
 const PROMPTS_FILE  = `output/prompts/prompts-${DATE}.md`;
 const OUT_DIR       = `output/vertex-gen/${DATE}`;
@@ -51,16 +53,17 @@ if (!API_KEY) {
 // --- Prompt parser ---
 function parsePromptsFile(text) {
   const prompts = [];
-  const blocks = text.split(/(?=^#{1,4}\s*\d+\.\s|\n(?=\d+\. \*\*\[))/m).filter(b => b.trim());
+  // Split by "### Prompt N" or "### 1." or "1. **["
+  const blocks = text.split(/(?=^#{1,4}\s*(?:Prompt\s+)?\d+[\.\s—]|\n(?=\d+\. \*\*\[))/m).filter(b => b.trim());
 
   for (const block of blocks) {
-    const indexMatch  = block.match(/(?:^#{1,4}\s*)?(\d+)\.\s/m);
+    const indexMatch  = block.match(/(?:^#{1,4}\s*)?(?:Prompt\s+)?(\d+)/m);
     if (!indexMatch) continue;
     const index = parseInt(indexMatch[1], 10);
 
     const typeMatch   = block.match(/\*\*Type:\*\*\s*(.+)/);
-    const promptMatch = block.match(/\*\*Image prompt:\*\*[ \t]*\n?([\s\S]+?)(?=\n\*\*Caption hook|\n---|\n#{1,4}\s*\d+\.|\n\d+\. \*\*|$)/);
-    const headerMatch = block.match(/(?:#{1,4}\s*)?\d+\.\s+(.+)/m);
+    const promptMatch = block.match(/\*\*Image prompt:\*\*[ \t]*\n?([\s\S]+?)(?=\n\*\*Caption hook|\n---|\n#{1,4}\s*(?:Prompt\s+)?\d+|\n\d+\. \*\*|$)/);
+    const headerMatch = block.match(/(?:#{1,4}\s*)?(?:Prompt\s+)?\d+(?:[\.\s—]+)(.+)/m);
 
     if (!promptMatch) continue;
 
@@ -92,6 +95,8 @@ function cleanForImagen(prompt) {
     // Remove age references (can trigger safety filters too)
     .replace(/for a \d+-\d+ year old,?\s*/gi, '')
     .replace(/suitable for a \d+-\d+ year old[,.]?\s*/gi, '')
+    .replace(/\b\d+-year-old\s+(boy|girl|child|kid)\b/gi, 'child')
+    .replace(/\ba\s+(boy|girl|child|kid)\s+aged\s+\d+\b/gi, 'a child')
     // Clean up whitespace
     .replace(/\s{2,}/g, ' ')
     .replace(/\.\s*\./g, '.')
@@ -148,13 +153,55 @@ function fallbackSafetyRewrite(prompt) {
     .trim();
 }
 
+// Inspiration slots that depict children/family — routed to DALL-E 3
+const DALLE3_SLOTS = new Set(['challenge', 'quiet', 'identity', 'fact-card']);
+
+// Extra safety-filter rewrites applied only on DALL-E 3 calls
+function cleanForDallE3(prompt) {
+  return prompt
+    .replace(/lying on (her|his|their) stomach\b/gi, 'sitting')
+    .replace(/\bon (the |a )bedroom floor\b/gi, 'on a cozy bedroom rug')
+    .replace(/\bbare feet\b/gi, 'feet');
+}
+
+// --- DALL-E 3 call (for child/family scenes that Imagen safety-filters) ---
+async function generateImageDallE3(promptText) {
+  if (DRY_RUN) return Buffer.from('dry-run');
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) throw new Error('OPENAI_API_KEY not set');
+  const res = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+    body: JSON.stringify({
+      model: 'dall-e-3',
+      prompt: promptText,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+      response_format: 'b64_json',
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`DALL-E 3 error ${res.status}: ${err.error?.message || res.statusText}`);
+  }
+  const data = await res.json();
+  return Buffer.from(data.data[0].b64_json, 'base64');
+}
+
 // --- Imagen 4.0 call ---
 async function generateImage(promptText) {
+  if (DRY_RUN) return Buffer.from('dry-run');
+
   const url = `${BASE_URL}/models/${MODEL}:predict?key=${API_KEY}`;
 
   const body = {
     instances:  [{ prompt: promptText }],
-    parameters: { sampleCount: 1 },
+    parameters: {
+      sampleCount: 1,
+      aspectRatio: "3:4",
+      outputMimeType: "image/png"
+    },
   };
 
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -191,6 +238,10 @@ function makeSlug(header) {
 async function main() {
   if (!fs.existsSync(PROMPTS_FILE)) {
     console.error(`Prompts file not found: ${PROMPTS_FILE}`);
+    if (INSPIRATION_ONLY) {
+      console.log('Skipping inspiration generation (no prompts file).');
+      process.exit(0);
+    }
     console.error('Run: npm run daily');
     process.exit(1);
   }
@@ -203,8 +254,18 @@ async function main() {
   // Filter by index
   if (ONLY_INDEX) prompts = prompts.filter(p => p.index === ONLY_INDEX);
 
-  // Filter by type (default: stories only unless --all or --activities-only)
-  if (!INCLUDE_ALL && !ONLY_INDEX) {
+  // Filter by type
+  if (INSPIRATION_ONLY) {
+    // Look for inspiration archetypes
+    prompts = prompts.filter(p => {
+      const header = p.header.toUpperCase();
+      return header.includes('FACT-CARD') ||
+             header.includes('ACTIVITY-CHALLENGE') ||
+             header.includes('QUIET-MOMENT') ||
+             header.includes('PRINTABLE-TEASE') ||
+             header.includes('IDENTITY');
+    });
+  } else if (!INCLUDE_ALL && !ONLY_INDEX) {
     if (ACTIVITIES_ONLY) {
       prompts = prompts.filter(p => p.type.toLowerCase() === 'activity');
     } else {
@@ -213,6 +274,10 @@ async function main() {
   }
 
   if (prompts.length === 0) {
+    if (INSPIRATION_ONLY) {
+      console.log('No inspiration slots found in prompts file.');
+      process.exit(0);
+    }
     console.error(`No prompts found. Check --index, --all, or --activities-only flags.`);
     process.exit(1);
   }
@@ -222,35 +287,28 @@ async function main() {
 
   console.log(`\n=== JoyMaze Vertex Track — Imagen 4.0 ===`);
   console.log(`Date     : ${DATE}`);
-  console.log(`Stories  : ${storyCount} (${STORY_COUNT} variant${STORY_COUNT > 1 ? 's' : ''} each)`);
-  console.log(`Activities: ${activityCount} (${COUNT} variant${COUNT > 1 ? 's' : ''} each)`);
-  console.log(`Output   : ${OUT_DIR}`);
-  if (activityCount > 0) {
-    console.log(`\n  NOTE: Activity prompts (mazes, word search) are hit-or-miss with`);
-    console.log(`  image generators. Expect to discard unusable outputs.`);
+  if (INSPIRATION_ONLY) {
+    console.log(`Mode     : Inspiration Only (5 slots)`);
+  } else {
+    console.log(`Stories  : ${storyCount} (${STORY_COUNT} variant${STORY_COUNT > 1 ? 's' : ''} each)`);
+    console.log(`Activities: ${activityCount} (${COUNT} variant${COUNT > 1 ? 's' : ''} each)`);
   }
+  console.log(`Output   : ${OUT_DIR}`);
+  if (DRY_RUN) console.log(`[DRY RUN] — no API calls will be made`);
   console.log('');
 
   const transformLog = {};
 
   for (const p of prompts) {
     const isActivity = p.type.toLowerCase() === 'activity';
-    const variants   = isActivity ? COUNT : STORY_COUNT;
+    const variants   = INSPIRATION_ONLY ? 1 : (isActivity ? COUNT : STORY_COUNT);
     const slug       = makeSlug(p.header);
     const prefix     = `${String(p.index).padStart(2, '0')}-${slug}`;
 
     console.log(`[${p.index}] ${p.header}`);
 
     // Prepare the prompt for Imagen
-    let activePrompt = p.imagePrompt;
-
-    if (!isActivity) {
-      // Story: just strip technical metadata (no safety rewrite — prompts include natural scene depictions)
-      activePrompt = cleanForImagen(p.imagePrompt);
-    } else {
-      // Activity: just strip technical metadata
-      activePrompt = cleanForImagen(p.imagePrompt);
-    }
+    let activePrompt = cleanForImagen(p.imagePrompt);
 
     transformLog[p.index] = {
       original: p.imagePrompt,
@@ -260,14 +318,43 @@ async function main() {
 
     console.log(`  Prompt: "${activePrompt.slice(0, 100)}..."`);
 
+    // Determine output folder for inspiration mode
+    let customDir = null;
+    if (INSPIRATION_ONLY) {
+      const h = p.header.toUpperCase();
+      if (h.includes('FACT-CARD')) customDir = 'output/raw/fact-card';
+      if (h.includes('ACTIVITY-CHALLENGE')) customDir = 'output/raw/challenge';
+      if (h.includes('QUIET-MOMENT')) customDir = 'output/raw/quiet';
+      if (h.includes('PRINTABLE-TEASE')) customDir = 'output/raw/printable';
+      if (h.includes('IDENTITY')) customDir = 'output/raw/identity';
+      if (customDir) {
+        fs.mkdirSync(customDir, { recursive: true });
+        console.log(`  Target : ${customDir}`);
+      }
+    }
+
     // Generate variants
     for (let v = 1; v <= variants; v++) {
-      const outFile = path.join(OUT_DIR, `${prefix}-v${v}.png`);
+      let outFile = path.join(OUT_DIR, `${prefix}-v${v}.png`);
+      if (INSPIRATION_ONLY && customDir) {
+        const typeSlug = customDir.split('/').pop();
+        outFile = path.join(customDir, `${typeSlug}-${DATE}.png`);
+
+        if (fs.existsSync(outFile) && !args.includes('--force')) {
+          console.log(`  v${v}... already exists, skipping.`);
+          continue;
+        }
+      }
+
       process.stdout.write(`  v${v}... `);
       try {
-        const imgBuf = await generateImage(activePrompt);
-        fs.writeFileSync(outFile, imgBuf);
-        console.log(`${(imgBuf.length / 1024).toFixed(0)} KB → ${path.basename(outFile)}`);
+        const slotType = customDir ? customDir.split('/').pop() : null;
+        const useDallE3 = INSPIRATION_ONLY && slotType && DALLE3_SLOTS.has(slotType);
+        if (useDallE3) process.stdout.write(`[DALL-E 3] `);
+        const finalPrompt = useDallE3 ? cleanForDallE3(activePrompt) : activePrompt;
+        const imgBuf = useDallE3 ? await generateImageDallE3(finalPrompt) : await generateImage(finalPrompt);
+        if (!DRY_RUN) fs.writeFileSync(outFile, imgBuf);
+        console.log(`${DRY_RUN ? '0' : (imgBuf.length / 1024).toFixed(0)} KB → ${path.basename(outFile)}`);
       } catch (err) {
         console.log(`FAILED: ${err.message}`);
       }
@@ -276,14 +363,21 @@ async function main() {
   }
 
   // Save transform log
-  const logFile = path.join(OUT_DIR, '_prompt-transforms.json');
-  fs.writeFileSync(logFile, JSON.stringify(transformLog, null, 2));
+  if (!DRY_RUN) {
+    const logFile = path.join(OUT_DIR, '_prompt-transforms.json');
+    fs.writeFileSync(logFile, JSON.stringify(transformLog, null, 2));
+    console.log(`Prompt log → ${logFile}`);
+  }
 
   console.log(`=== Done ===`);
-  console.log(`Prompt log → ${logFile}`);
-  console.log(`Review images in: ${OUT_DIR}`);
-  console.log(`Pick best → rename with keyword (e.g. maze-ocean.png) → copy to output/raw/`);
-  console.log(`Then: npm run import:raw && npm run generate:captions`);
+  if (!INSPIRATION_ONLY) {
+    console.log(`Review images in: ${OUT_DIR}`);
+    console.log(`Pick best → rename with keyword (e.g. maze-ocean.png) → copy to output/raw/`);
+    console.log(`Then: npm run import:raw && npm run generate:captions`);
+  } else {
+    console.log(`Inspiration images ready in output/raw/`);
+    console.log(`Then: npm run import:raw && npm run generate:captions`);
+  }
 }
 
 main().catch(err => { console.error('FATAL:', err.message); process.exit(1); });

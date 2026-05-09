@@ -213,7 +213,14 @@ function pickActivityThemes(count, usedThemes, daysBack = 7, boostThemes = []) {
 // Pick 5 activity types for today — random selection from the pool of 8
 // This creates natural daily rotation without any extra logic
 function pickTodaysActivities() {
-  return [...ACTIVITY_POOL].sort(() => Math.random() - 0.5).slice(0, 5);
+  const desired = [
+    'activity-maze',
+    'activity-word-search',
+    'activity-coloring',
+    'activity-dot-to-dot',
+    'activity-matching'
+  ];
+  return desired.map(cat => ACTIVITY_POOL.find(a => a.category === cat)).filter(Boolean);
 }
 
 // ── Art style rotation pool ──
@@ -708,6 +715,9 @@ function buildActivityManifest(date, mix, assignedThemes = []) {
         source: slot.source,
         skill: slot.skill,
         theme,
+        slug: theme
+          ? `${slot.archetype.replace('activity-', '')}-${theme.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}-${slot.difficulty}`
+          : null,
       };
     }),
   };

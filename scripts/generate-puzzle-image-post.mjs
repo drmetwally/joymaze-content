@@ -47,6 +47,9 @@ function normalizeType(input) {
 function categoryToPuzzleType(category) {
   if (category === 'activity-maze') return 'maze';
   if (category === 'activity-word-search') return 'word-search';
+  if (category === 'activity-coloring') return 'coloring';
+  if (category === 'activity-dot-to-dot') return 'dot-to-dot';
+  if (category === 'activity-matching') return 'matching';
   return '';
 }
 
@@ -76,7 +79,12 @@ function pickTitleText(activity, config, type) {
 
 function getDefaultTitle(type, theme) {
   const themeLabel = titleCase(theme);
-  return type === 'maze' ? `${themeLabel} Maze` : `${themeLabel} Word Search`;
+  if (type === 'maze') return `${themeLabel} Maze`;
+  if (type === 'word-search') return `${themeLabel} Word Search`;
+  if (type === 'coloring') return `${themeLabel} Coloring Page`;
+  if (type === 'dot-to-dot') return `${themeLabel} Dot-to-Dot`;
+  if (type === 'matching') return `${themeLabel} Matching Game`;
+  return `${themeLabel} Puzzle`;
 }
 
 function getScriptPath(type) {
@@ -142,7 +150,7 @@ function resolveManifestTargets(manifest) {
     const slotNum = Number(SLOT_ARG);
     const found = slots.find(slot => Number(slot.slotIndex) === slotNum);
     if (!found) throw new Error(`Slot ${SLOT_ARG} not found in manifest.`);
-    if (!categoryToPuzzleType(found.category)) throw new Error(`Slot ${SLOT_ARG} is ${found.category}, which is not a supported deterministic puzzle type yet.`);
+    if (!categoryToPuzzleType(found.category)) throw new Error(`Slot ${SLOT_ARG} is ${found.category}, which is not a supported deterministic puzzle type.`);
     return [found];
   }
   if (CATEGORY_ARG) {
@@ -151,7 +159,7 @@ function resolveManifestTargets(manifest) {
     return [found];
   }
   if (supported.length > 0) return [supported[0]];
-  throw new Error('Manifest has no supported puzzle slots for maze or word-search.');
+  throw new Error('Manifest has no supported deterministic puzzle slots.');
 }
 
 function buildConfigFromManifestSlot(manifest, slot) {
@@ -300,7 +308,7 @@ async function processOne(config) {
   const resolvedTitleText = pickTitleText(activity, config, config.type);
   const subject = config.title || resolvedTitleText || getDefaultTitle(config.type, activity.theme || config.theme);
   const sidecar = {
-    category: config.type === 'maze' ? 'activity-maze' : 'activity-word-search',
+    category: config.category || `activity-${config.type}`,
     subject,
     hookText: activity.hookText || activity.titleText || '',
     difficulty: puzzle.difficulty || activity.difficulty || config.difficulty,

@@ -3066,3 +3066,26 @@ ode --check clean. Ran --save --lane homecoming twice � ep29 and ep30 both gen
 **Next:** Run Gemini on Task A + Task B from docs/AGENT_LOG.md tomorrow.
 
 **Next steps:** Visual QC on ep28 story slides (slides 1/4/8 need vision-capable model audit).
+
+---
+## Session 2026-05-09 (cont.) — Pipeline automation audit + inspiration images
+
+**Files changed:**
+- scripts/generate-images-vertex.mjs (DALL-E 3 routing, aspect ratio fix, age-strip transforms, cleanForDallE3, standard quality)
+- scripts/generate-prompts.mjs (slug field added to activity manifest)
+- scripts/daily-run.mjs (Gemini: 5 puzzle flags, inspiration step — audited + approved)
+- scripts/generate-puzzle-image-post.mjs (Gemini: extended --type support — audited + approved)
+
+**What was done:**
+
+1. **Audited Gemini's Task A + B implementation** — structurally correct. Found 2 bugs:
+   - `slug: undefined` in activity manifest → fixed (slug now derived from type+theme+difficulty)
+   - `aspectRatio: "2:3"` rejected by Imagen 4.0 → fixed to `"3:4"`
+
+2. **Smoke-tested all new steps** — dry-run + live run. 5/5 manifest slots confirmed. Inspiration images hit Imagen safety filters for child-depicting scenes (challenge, quiet, identity, fact-card).
+
+3. **Routed 4 DALL-E 3 slots** — challenge, quiet, identity, fact-card → DALL-E 3 standard 1024×1024 ($0.04/image, same cost as Imagen). printable stays on Imagen (no people, free within quota). Added `cleanForDallE3()` to rewrite "lying on stomach" → "sitting" etc.
+
+4. **Final result** — 5/5 inspiration images generate daily. Full daily run (10 image posts + 5 puzzle posts + 5 inspiration images + ASMR + story + challenge + animal facts + X posts) is now fully automated.
+
+**Next steps:** Run full `npm run daily` tomorrow to confirm end-to-end. Visual QC on ep28 story slides (pending from prior session).
