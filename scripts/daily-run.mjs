@@ -385,23 +385,27 @@ async function runMain() {
       stepNum++;
       log(`Step ${stepNum}/${totalSteps}: Generating Story Reel V2 (Imagen -> Remotion)...`);
       log(`  Story: ${path.relative(ROOT, storyFolder)}`);
-      const reelImagesOk = await runScript('generate-story-reel-images.mjs', ['--story', storyFolder], 180_000);
-      if (reelImagesOk) {
-        const reelAudioOk = await runScript('generate-story-reel-audio.mjs', ['--story', storyFolder], 60_000);
-        if (reelAudioOk) log('Story Reel V2 audio generated');
-        else log('Story Reel V2 audio skipped, proceeding without narration');
-
-        const reelRenderOk = await runScript('render-video.mjs', ['--comp', 'StoryReelV2', '--story', storyFolder], 180_000);
-        if (reelRenderOk) {
-          log('Story Reel V2 rendered -> output/videos/');
-          await appendLog('Story Reel V2 render OK');
+      // Audio runs first — it may expand story.json slide count; images must reflect final slide list
+      const reelAudioOk = await runScript('generate-story-reel-audio.mjs', ['--story', storyFolder], 300_000);
+      if (reelAudioOk) {
+        log('Story Reel V2 audio generated');
+        const reelImagesOk = await runScript('generate-story-reel-images.mjs', ['--story', storyFolder], 180_000);
+        if (reelImagesOk) {
+          const reelRenderOk = await runScript('render-video.mjs', ['--comp', 'StoryReelV2', '--story', storyFolder], 180_000);
+          if (reelRenderOk) {
+            log('Story Reel V2 rendered -> output/videos/');
+            await appendLog('Story Reel V2 render OK');
+          } else {
+            log('Story Reel V2 render failed, run manually: node scripts/render-video.mjs --comp StoryReelV2 --story ' + path.relative(ROOT, storyFolder));
+            await appendLog('Story Reel V2 render FAILED');
+          }
         } else {
-          log('Story Reel V2 render failed, run manually: node scripts/render-video.mjs --comp StoryReelV2 --story ' + path.relative(ROOT, storyFolder));
-          await appendLog('Story Reel V2 render FAILED');
+          log('Story Reel V2 image gen failed, run manually: npm run generate:story:reel-images -- --story ' + path.relative(ROOT, storyFolder));
+          await appendLog('Story Reel V2 image gen FAILED');
         }
       } else {
-        log('Story Reel V2 image gen failed, run manually: npm run generate:story:reel-images -- --story ' + path.relative(ROOT, storyFolder));
-        await appendLog('Story Reel V2 image gen FAILED');
+        log('Story Reel V2 audio FAILED — run manually: node scripts/generate-story-reel-audio.mjs --story ' + path.relative(ROOT, storyFolder));
+        await appendLog('Story Reel V2 audio FAILED');
       }
     } else {
       log('Story Reel V2: no story folder found, skipping');

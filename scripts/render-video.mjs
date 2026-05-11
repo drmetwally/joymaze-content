@@ -411,10 +411,8 @@ async function storyJsonToReelV2Props(story, storyDir) {
   const missingHookNarration = Boolean(story.hookQuestion || story.hook) && !story.hookNarrationPath;
   if (missingHookNarration || missingNarrationSlides.length) {
     const targetStory = path.basename(storyDir);
-    const parts = [];
-    if (missingHookNarration) parts.push('hook.wav');
-    if (missingNarrationSlides.length) parts.push(`reel slides ${missingNarrationSlides.join(', ')}`);
-    throw new Error(`StoryReelV2 is missing narration audio for ${parts.join(' and ')}. Run: node scripts/generate-story-reel-audio.mjs --story ${targetStory}`);
+    console.log(`Story Reel render skipped — narration audio not ready. Run: node scripts/generate-story-reel-audio.mjs && node scripts/render-video.mjs --comp StoryReelV2`);
+    process.exit(0);
   }
 
   const resolvedImageEntries = selectedSlides.map((slide) => {
@@ -546,10 +544,35 @@ async function animalEpisodeToSongShortProps(episode, episodeDir) {
   }
 
   const songAudioFile = episode?.jingleDropPaths?.fullSong || episode?.jingleDropPaths?.sungRecap || 'song.mp3';
-  const songAudioPath = path.resolve(episodeDir, songAudioFile);
+  let resolvedSongAudioFile = songAudioFile;
+  const songAudioPathDirect = path.resolve(episodeDir, songAudioFile);
+  const songExists = await fs.access(songAudioPathDirect).then(() => true).catch(() => false);
+  if (!songExists) {
+    // Suno downloader saves as song-option-1.mp3 / song-option-2.mp3 — pick first available
+    const entries = await fs.readdir(episodeDir).catch(() => []);
+    const fallback = entries.find((f) => /^song-option-\d+\.mp3$/i.test(f));
+    if (fallback) {
+      console.warn(`[warn] ${songAudioFile} not found — using ${fallback} for duration probe`);
+      resolvedSongAudioFile = fallback;
+    }
+  }
+  const songAudioPath = path.resolve(episodeDir, resolvedSongAudioFile);
   const selectedSongDurationSec = await parseAudioFile(songAudioPath)
     .then((meta) => meta?.format?.duration || null)
     .catch(() => null);
+
+  // Resolve background file the same way — fall back to background-option-1.mp3 if background.mp3 missing
+  const bgAudioFile = episode?.jingleDropPaths?.background || 'background.mp3';
+  let resolvedBgAudioFile = bgAudioFile;
+  const bgExists = await fs.access(path.resolve(episodeDir, bgAudioFile)).then(() => true).catch(() => false);
+  if (!bgExists) {
+    const entries2 = await fs.readdir(episodeDir).catch(() => []);
+    const bgFallback = entries2.find((f) => /^background-option-\d+\.mp3$/i.test(f));
+    if (bgFallback) {
+      console.warn(`[warn] ${bgAudioFile} not found — using ${bgFallback}`);
+      resolvedBgAudioFile = bgFallback;
+    }
+  }
 
   const normalizedEpisode = {
     ...episode,
@@ -558,6 +581,11 @@ async function animalEpisodeToSongShortProps(episode, episodeDir) {
     songTimingSource: selectedSongDurationSec ? 'selected-song-audio' : (episode?.selectedSongDurationSec ? 'episode-selected-duration' : 'fallback-target-duration'),
     visualExpansionMoments: normalizeAnimalVisualExpansionMoments(episode),
     songScenePlan: normalizeAnimalSongScenePlan(episode),
+    jingleDropPaths: {
+      ...episode?.jingleDropPaths,
+      fullSong: resolvedSongAudioFile,
+      background: resolvedBgAudioFile,
+    },
   };
 
   return {
@@ -1163,6 +1191,7 @@ async function main() {
     composition,
     serveUrl,
     codec:          'h264',
+    pixelFormat:    'yuv420p',
     outputLocation: outputPath,
     inputProps:     cleanProps,
     scale:          previewMode ? PREVIEW_SCALE : 1,
