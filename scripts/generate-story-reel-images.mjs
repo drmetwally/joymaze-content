@@ -207,6 +207,9 @@ function classifyGenerationError(err) {
   if (/timed out|timeout|fetch failed|network|econnreset|socket/i.test(message)) {
     return { type: 'network', retryable: true, message };
   }
+  if (/503|service unavailable|rai response|failed to retrieve|server error|internal server/i.test(message)) {
+    return { type: 'transient', retryable: true, message };
+  }
   return { type: 'unknown', retryable: false, message };
 }
 
@@ -237,10 +240,6 @@ async function generateWithImagen(prompt) {
   let lastError;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      if (attempt > 1) {
-        console.log(`Retry attempt ${attempt}/${MAX_ATTEMPTS} for slide...`);
-        await new Promise((r) => setTimeout(r, 2000));
-      }
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -264,7 +263,10 @@ async function generateWithImagen(prompt) {
     } catch (err) {
       lastError = err;
       const classification = classifyGenerationError(err);
-      if (!classification.retryable) break;
+      if (!classification.retryable || attempt === MAX_ATTEMPTS) break;
+      const delayMs = classification.type === 'transient' ? attempt * 30_000 : 2_000;
+      console.log(`  Retry ${attempt}/${MAX_ATTEMPTS} after ${delayMs / 1000}s (${classification.type})...`);
+      await new Promise((r) => setTimeout(r, delayMs));
     }
   }
   throw lastError;

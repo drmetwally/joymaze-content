@@ -389,7 +389,7 @@ async function runMain() {
       const reelAudioOk = await runScript('generate-story-reel-audio.mjs', ['--story', storyFolder], 300_000);
       if (reelAudioOk) {
         log('Story Reel V2 audio generated');
-        const reelImagesOk = await runScript('generate-story-reel-images.mjs', ['--story', storyFolder], 180_000);
+        const reelImagesOk = await runScript('generate-story-reel-images.mjs', ['--story', storyFolder, '--continue-on-error'], 180_000);
         if (reelImagesOk) {
           const reelRenderOk = await runScript('render-video.mjs', ['--comp', 'StoryReelV2', '--story', storyFolder], 180_000);
           if (reelRenderOk) {
