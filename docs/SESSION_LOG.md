@@ -3101,3 +3101,27 @@ ode --check clean. Ran --save --lane homecoming twice � ep29 and ep30 both gen
 5. Planned two-part solution: Part A = copy moment*.png to assets/library/animals/ + reuse lookup; Part B = `npm run library` curation HTML. Saved to memory.
 
 **Next steps:** Implement archive sweep for output/longform/animal/ + Part B curation HTML. X automation enable on 2026-05-16.
+
+---
+
+## Session 2026-05-11 — Daily pipeline bug fixes (5 fixes)
+
+**Fixes applied:** Kokoro TTS voice junction, story reel audio timeout raised to 300s, render gated on audio success, challenge puzzle imagePrompt fallback, animal render song filename scan.
+**Kokoro:** `D:\voices` junction recreated → TTS works. Must recreate after any `npm install` or drive wipe.
+**Story reel:** 60s timeout → 300s in daily-run.mjs; render now only fires when audio step returns success.
+**Challenge + Animal:** Null imagePrompt no longer crashes; render-video.mjs scans `song-option-N.mp3` when `song.mp3` absent.
+**Next:** Full unattended daily run test to confirm all 5 content types render end-to-end.
+
+---
+
+## 2026-05-12 — Daily pipeline audit + Story Reel V2 permanent fix
+
+**What was done:**
+- Audited yesterday's (2026-05-11) output: 10 images ✅, ASMR ✅, StoryReelV2 ✅, ActivityChallenge ✅, AnimalFactsSongShort ✅, X posts ✅. 3 failures (story reel images, challenge puzzle, animal render) were confirmed manually fixed and run separately.
+- Diagnosed today's scheduler failure: task fired at 8:54 UTC, crashed immediately on `generate-prompts.mjs` (transient Groq API error), left stale lock file PID 7956. Deleted lock, re-ran pipeline manually — completed cleanly except Story Reel V2 image gen.
+- Windows task recreated with resume-from-sleep trigger (Event ID 1, 2-min delay) + `StartWhenAvailable=true`.
+- **Story Reel V2 fix (3 commits):** Imagen 503/500 errors were classified as `unknown/non-retryable` causing immediate FATAL exit. Added `transient` type to `classifyGenerationError` covering `50[0-9]/RAI response/Internal error`. Added type-aware backoff: 30s/60s for transient, 2s for quota. Added `--continue-on-error` to daily-run.mjs as last-resort fallback.
+- Ran story reel for ep33 — all 8 slides generated (slides 01, 03, 04, 07, 08 needed retries). Video rendered and audited frame-by-frame.
+- **Quality fixes (1 commit):** `sideCharacterGuard` strengthened to block background sounds from rendering as foreground animals. `styleGuard` moved to front of prompt. Story generator example style changed from "soft watercolor" → "digital 2D painterly children's book illustration".
+
+**What's next:** Full unattended daily run tomorrow to confirm all fixes hold end-to-end.

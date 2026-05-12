@@ -909,3 +909,17 @@ Fixed longform engine: all 3 tracks (story/animal/puzzle) now register horizonta
 - Fixed: `getLatestChallengeFolder()` was returning `generated-activity` (wrong dir) — one-line exclude fix.
 - Audited archive-queue.mjs coverage: all engines linked except `output/longform/animal/` (no sweep).
 - Planned asset library: moment*.png → assets/library/animals/ + `npm run library` HTML page.
+
+## 2026-05-11 — Daily pipeline debug + log cleanup
+- Fixed daily-scheduler.mjs to stream real-time output (spawn vs execAsync).
+- Diagnosed 3 recurring daily failures: Kokoro TTS voice path (Windows junction bug), story reel 60s timeout, render not gated on audio, challenge puzzle null imagePrompt crash, animal render wrong song filename.
+- All 5 fixes applied. 5 locked decisions added to CLAUDE.md. Memory + logs updated.
+- Log cleanup: 35 stale docs archived to docs/archive/. Live docs consolidated.
+
+## 2026-05-12 — Pipeline audit + Story Reel V2 fix session
+- Confirmed yesterday's 3 failures (story reel images, challenge puzzle, animal render) were manually fixed and rendered separately at 11:20–11:53 AM.
+- Found today's scheduler failure: transient Groq 503 at 8:54 AM → stale lock → pipeline never ran. Deleted lock, re-ran manually (completed with 1 remaining failure: Story Reel V2).
+- Fixed Windows task: added resume-from-sleep trigger + StartWhenAvailable.
+- Fixed Story Reel V2: Imagen 503/500 now retries with 30s/60s backoff instead of immediate FATAL. All 8 slides for ep33 generated and rendered.
+- Fixed frame audit quality issues: uninvited bird characters (background sounds rendered as foreground animals) + style inconsistency (watercolor → digital painterly, styleGuard front-loaded).
+- 4 commits total on main branch.
