@@ -287,7 +287,8 @@ Each image_prompt is fed directly to Gemini or ChatGPT. Vague prompts produce ne
 
 5. **ART STYLE** — Defined once in the "style" field and referenced briefly per slide:
    - Never use mood filler words: "cozy," "dreamy," "warm and nice," "whimsical atmosphere"
-   - Instead: "soft watercolor, wet-on-wet edges, visible paper grain" or "3D Pixar render, subsurface skin scatter, soft rim light"
+   - Instead: "digital 2D painterly children's book illustration, soft consistent brushwork, warm unified palette" or "3D Pixar render, subsurface skin scatter, soft rim light"
+   - AVOID "watercolor" alone — it produces inconsistent art-medium switching across slides in Imagen. If you want a painterly feel, use "digital painterly illustration, soft brushwork, storybook finish" instead.
 
 6. **CHARACTER REPETITION** — Every image_prompt must include the character's full physical description inline, not just their name. Do NOT write "Luna hovers above the river." Write "Luna — a firefly the size of a thumbnail, mahogany body, iridescent wings with faint blue veins, soft amber glow from her abdomen, oversized green eyes — hovers above the river." The AI generating the image has no memory between slides. Write every prompt as if it is the first one.
    - The protagonist name must stay identical across all slides. Never rename the hero.
