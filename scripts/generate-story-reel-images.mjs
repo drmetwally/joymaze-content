@@ -207,7 +207,7 @@ function classifyGenerationError(err) {
   if (/timed out|timeout|fetch failed|network|econnreset|socket/i.test(message)) {
     return { type: 'network', retryable: true, message };
   }
-  if (/503|service unavailable|rai response|failed to retrieve|server error|internal server/i.test(message)) {
+  if (/50[0-9]|service unavailable|rai response|failed to retrieve|server error|internal (server|error)/i.test(message)) {
     return { type: 'transient', retryable: true, message };
   }
   return { type: 'unknown', retryable: false, message };
