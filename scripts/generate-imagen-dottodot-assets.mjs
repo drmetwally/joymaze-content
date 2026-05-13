@@ -21,6 +21,7 @@ const DIFFICULTY  = (getArg('--difficulty', 'medium') || 'medium').toLowerCase()
 const TITLE       = getArg('--title', `${THEME} Dot to Dot`);
 const SEED        = getArg('--seed');
 const SLUG        = getArg('--slug');
+const OUT_DIR_ARG = getArg('--out-dir');
 const FORCE       = hasFlag('--force');
 const DRY_RUN     = hasFlag('--dry-run');
 
@@ -28,10 +29,12 @@ async function main() {
   const themeSlug = THEME.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30);
   const finalSlug = SLUG || `imagen-dottodot-${themeSlug}-${DIFFICULTY}`;
   
-  const outDir = path.join('output', 'challenge', 'generated-activity', finalSlug);
-  const coloringDir = path.join('output', 'challenge', 'generated-activity', `${finalSlug}-coloring-tmp`);
+  const outDir = OUT_DIR_ARG || path.join('output', 'challenge', 'generated-activity', finalSlug);
+  const coloringDir = OUT_DIR_ARG ? path.join(OUT_DIR_ARG, 'coloring-tmp') : path.join('output', 'challenge', 'generated-activity', `${finalSlug}-coloring-tmp`);
 
   // Step 1: Generate coloring page via Imagen
+  // Always pass --force to the coloring step so the coloring-tmp is never stale
+  // (a stale coloring-tmp from a previous theme run would produce a mismatched activity.json)
   const coloringCmd = [
     'node', 'scripts/generate-coloring-assets.mjs',
     '--imagen',
@@ -40,7 +43,7 @@ async function main() {
     '--difficulty', DIFFICULTY,
     '--out-dir', coloringDir,
     SEED ? `--seed ${SEED}` : '',
-    FORCE ? '--force' : '',
+    '--force',
     DRY_RUN ? '--dry-run' : '',
   ].filter(Boolean).join(' ');
 

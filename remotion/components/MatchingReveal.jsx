@@ -18,6 +18,17 @@ const OCEAN_STICKER_MAP = {
   SEAHORSE: 'seahorse',
 };
 
+// Sticker pool per theme — must match filenames in assets/stickers/matching/<theme>/
+const THEME_STICKER_POOL = {
+  animals:   ['cat', 'dog', 'rabbit', 'elephant', 'lion', 'penguin'],
+  ocean:     ['fish', 'crab', 'seahorse', 'octopus', 'turtle', 'dolphin'],
+  space:     ['rocket', 'planet', 'astronaut', 'star', 'ufo', 'moon'],
+  dinosaurs: ['trex', 'triceratops', 'stegosaurus', 'pterodactyl', 'brachiosaurus', 'raptor'],
+  farm:      ['cow', 'pig', 'chicken', 'horse', 'sheep', 'duck'],
+  vehicles:  ['car', 'bus', 'train', 'airplane', 'boat', 'bicycle'],
+  baking:    ['cupcake', 'cookie', 'cake', 'muffin', 'bread', 'pie', 'whisk', 'spatula'],
+};
+
 function resolveStickerThemeKey(themeStr) {
   const t = String(themeStr || '').toLowerCase();
   if (t.includes('ocean') || t.includes('sea') || t.includes('fish') || t.includes('marine')) return 'ocean';
@@ -25,15 +36,18 @@ function resolveStickerThemeKey(themeStr) {
   if (t.includes('dino') || t.includes('jurassic')) return 'dinosaurs';
   if (t.includes('farm') || t.includes('cow') || t.includes('pig')) return 'farm';
   if (t.includes('vehicle') || t.includes('car') || t.includes('bus')) return 'vehicles';
+  if (t.includes('bak') || t.includes('cook') || t.includes('cake') || t.includes('bread')) return 'baking';
   return 'animals';
 }
 
-function getStickerAsset(label, themeKey) {
+// pairIndex: 0-based index of this pair — used to cycle through sticker pool
+// so each pair gets a different sticker even when word labels don't match sticker names.
+function getStickerAsset(label, themeKey, pairIndex = 0) {
   if (themeKey === 'ocean' && OCEAN_STICKER_MAP[label]) {
     return `assets/stickers/matching/ocean/${OCEAN_STICKER_MAP[label]}.png`;
   }
-  const fallback = { animals: 'cat', space: 'rocket', dinosaurs: 'trex', farm: 'cow', vehicles: 'car' };
-  return `assets/stickers/matching/${themeKey}/${fallback[themeKey] || 'cat'}.png`;
+  const pool = THEME_STICKER_POOL[themeKey] || THEME_STICKER_POOL.animals;
+  return `assets/stickers/matching/${themeKey}/${pool[pairIndex % pool.length]}.png`;
 }
 
 // ── Revealed face-up card (transparent — ocean shows through) ─────────────────
@@ -193,14 +207,15 @@ export const MatchingReveal = ({
       {isPhase1 && matchRects.map((r) => {
         const rect = rectByIndex[r.gridIndex];
         if (!rect) return null;
-        const label = matchPairs.find(p => p.positions.includes(r.gridIndex))?.label;
-        if (!label) return null;
+        const pair = matchPairs.find(p => p.positions.includes(r.gridIndex));
+        if (!pair) return null;
+        const pairIdx = matchPairs.findIndex(p => p.id === pair.id);
         return (
           <RevealedCard
             key={`p1-${r.gridIndex}`}
             rect={rect}
-            label={label}
-            stickerSrc={getStickerAsset(label, themeKey)}
+            label={pair.label}
+            stickerSrc={getStickerAsset(pair.label, themeKey, pairIdx)}
             appearFrame={-9999}
           />
         );
@@ -225,6 +240,7 @@ export const MatchingReveal = ({
         }
         // Revealed: transparent sticker overlay (ocean shows through)
         const appearF = pairAppearFrame(pair.id);
+        const pairIdx = matchPairs.findIndex(p => p.id === pair.id);
         return pair.positions.map((pos, pi) => {
           const rect = rectByIndex[pos];
           if (!rect) return null;
@@ -233,7 +249,7 @@ export const MatchingReveal = ({
               key={`${pair.id}-${pi}`}
               rect={rect}
               label={pair.label}
-              stickerSrc={getStickerAsset(pair.label, themeKey)}
+              stickerSrc={getStickerAsset(pair.label, themeKey, pairIdx)}
               appearFrame={appearF}
             />
           );

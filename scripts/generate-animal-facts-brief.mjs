@@ -15,21 +15,23 @@ const ANIMAL_SONG_TOPIC_BANK_PATH = path.join(ROOT, 'config', 'animal-song-topic
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GROQ_MAX_TOKENS = 4000;
 
-// 12-style pool — nature/documentary illustration styles for visual consistency per episode
-// One picked deterministically per episode so all 4 images look like the same show
+// 12-style pool — all digital 2D painterly children's book styles for visual consistency per episode
+// One picked deterministically per episode so all images look like the same show
+// IMPORTANT: No "watercolor", "oil painting", "pen-and-ink", or live-action media — they cause Imagen
+// to switch art mediums mid-episode. All styles must be digital 2D painterly or digital illustration.
 const ANIMAL_ART_STYLES = [
-  'warm gouache illustration, nature documentary style, painterly brushwork, rich natural tones',
-  'NatGeo Kids editorial illustration, clean linework, vibrant natural palette, flat digital painterly',
-  'watercolor wildlife illustration, loose wet-on-wet washes, botanical detail, soft earth tones',
-  'cinematic painted nature scene, dramatic sky lighting, photorealistic painterly, deep saturated colors',
-  'vintage nature journal illustration, pen-and-ink with watercolor wash, scientific warmth, aged paper tone',
-  'soft pastel children\'s nature book, gouache texture, gentle dappled sunlight, storybook warmth',
-  'bold children\'s educational illustration, clean outlines, flat bright colors, playful expressive energy',
-  'atmospheric oil painting nature style, thick impasto texture, dramatic rim lighting, rich jewel tones',
-  'Japanese nature illustration style, delicate linework, muted ink washes, serene open composition',
-  'Studio Ghibli-inspired nature scene, lush painterly backgrounds, warm golden-hour light, detailed foliage',
-  'folk art nature illustration, hand-painted naive style, earthy palette, decorative organic patterning',
-  'cinematic concept art nature style, volumetric light rays, atmospheric depth, detailed texture rendering',
+  'digital 2D painterly children\'s-book illustration, warm gouache-style digital brushwork, rich natural tones, soft consistent finish',
+  'digital 2D editorial children\'s illustration, clean vector-like linework, vibrant natural palette, flat digital painterly, consistent digital finish',
+  'digital 2D soft painterly nature illustration, gentle digital brushwork, botanical detail, warm pastel palette, consistent storybook finish',
+  'digital 2D cinematic children\'s illustration, dramatic painted sky, soft digital brushwork, deep saturated colors, consistent digital finish',
+  'digital 2D storybook nature illustration, warm friendly linework, soft digital painterly texture, golden light, aged-paper warmth, consistent digital finish',
+  'digital 2D soft pastel children\'s nature illustration, gentle dappled sunlight, digital gouache texture, storybook warmth, consistent soft finish',
+  'digital 2D bold children\'s educational illustration, clean digital outlines, flat bright colors, playful expressive energy, consistent digital finish',
+  'digital 2D atmospheric painted children\'s illustration, dramatic rim lighting, digital painterly texture, rich jewel tones, consistent digital finish',
+  'digital 2D delicate children\'s nature illustration, fine clean linework, muted soft ink-style washes, serene open composition, consistent digital finish',
+  'digital 2D Studio Ghibli-inspired nature illustration, lush painterly digital backgrounds, warm golden-hour light, detailed foliage, consistent digital finish',
+  'digital 2D folk-art children\'s illustration, hand-painted naive digital style, earthy palette, decorative organic patterning, consistent digital finish',
+  'digital 2D concept-art children\'s nature illustration, volumetric light rays, atmospheric depth, detailed digital texture, consistent digital finish',
 ];
 
 function pickEpisodeStyle(episodeNumber) {
@@ -306,6 +308,8 @@ Write the song beats so they activate these feelings:
 - Compose with safe breathing room above and below the main subject so vertical reel framing does not crop away the core action.
 - BOTTOM FADE (mandatory every scene): ground or environment at the lower edge must dissolve softly into light cream or pale white — like paint fading into paper. Include "ground fades softly to pale cream at lower edge" in every imagePromptHint.
 - Art style for this episode (use EXACTLY this style across ALL images — never deviate): ${artStyle}
+- CRITICAL: Do NOT use the word "watercolor" anywhere in any imagePromptHint. "Watercolor" causes the image generator to switch to actual watercolor medium mid-episode, breaking visual consistency. Use "digital 2D painterly" or "soft digital illustration" instead.
+- Every imagePromptHint MUST begin with "Digital 2D painterly children's-book illustration, soft consistent brushwork — " before the scene description, to lock the art medium across all images.
 - No text, logos, watermarks, or human characters in any image.
 - 3-SECOND VISUAL RULE: each image must communicate the beat visually in 3 seconds without audio. If the image prompt doesn't make this possible, rewrite it.
 
@@ -546,7 +550,7 @@ function expandImagePromptHint({ animalName, artStyle, beat, fallbackEnvironment
     'Keep one dominant fact and one dominant behavior in the frame. Avoid decorative patterning or literal written words in the artwork.',
     `Show the factual idea clearly: ${factFocus}.`,
     `Lyric support: ${lyric || 'make the sung line feel obvious in one glance'}.`,
-    `Mood should feel like ${psychologyBeat}, with child-friendly readability and strong visual clarity in 2-3 seconds.`,
+    `Emotional tone: the image should evoke a sense of ${psychologyBeat} — do not render this as text or a label anywhere in the artwork.`,
     `Use ${artStyle}.`,
     `Keep the scene in ${fallbackEnvironment}, no text, no letters, no logos, ground fades softly to pale cream at lower edge, vertical portrait format, 1024×1536 px, with safe breathing room above and below the subject for reel framing.`,
   ].join(' ');

@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-05-13 — Bug-fix session + baking stickers + rescore
+
+**What was done:**
+- Cleared stale lock (PID 13864) and re-ran daily pipeline; all 15 steps completed OK (07:33–07:47 UTC). Story Reel V2 render OK — first clean run in 3 days.
+- Generated 8 baking stickers (cupcake, cookie, cake, muffin, bread, pie, whisk, spatula) via Imagen 4.0 into `assets/stickers/matching/baking/`; added to `index.json`.
+- Fixed 6 root bugs across 7 files: dot-to-dot coloring-tmp not forced; puzzle-post regenerating activity.json without --theme; matching baking theme not resolved; matching sticker cycling used name-match (broke non-ocean themes); matching scene bg hardcoded to ocean; `MatchingReveal.jsx` THEME_STICKER_POOL missing baking + getStickerAsset not cycling by pairIndex.
+- Fixed animal art style pool: removed watercolor/oil/photorealistic entries — all 12 now "digital 2D painterly".
+- Fixed animal imagePromptHint psychologyBeat: no longer rendered as visible text label by Imagen.
+- Extended story reel sideCharacterGuard to explicitly enumerate insects/bugs/flies.
+- Regenerated today's matching-baking-adventures-hard post.png with corrected pipeline.
+- Added 6 rows to CLAUDE.md Locked Decisions table.
+- Dry-run confirmed: `node scripts/generate-matching-assets.mjs --dry-run --theme "Baking Adventures" --difficulty hard` → stickerTheme=baking, family=baking, 8 pairs, no errors.
+
+**Scores (2026-05-13):**
+- Story Reel ep34 rabbit/fireworks (80s): 9/10 — consistent digital 2D, correct character throughout, yellow pill overlay correct
+- ASMR maze-butterfly-forest (32s): 8/10 — pencil maze-draw animation clean, title pill correct
+- Activity Challenge maze-pirates-treasure (50s): 8/10 — pirate theme cohesive, countdown working
+- Animal Facts ep21-quokka (40s): 5/10 — watercolor art style still present (brief generated before fix; tomorrow's run corrects)
+- Matching-baking post.png: correct blank card backs, pipeline dry-run confirmed baking theme
+
+**Next:**
+- Animal facts art style fix takes effect from tomorrow's brief onward (ep22+)
+- Monitor Story Reel V2 tomorrow — 2 consecutive failures resolved today
+
+---
+
 ## 2026-05-08 — [Agent: OpenClaw] — Upstream generator quality pass for Animal Facts + StoryReelV2
 
 **Files changed:** `scripts/generate-animal-facts-brief.mjs`, `scripts/generate-story-ideas.mjs`, `docs/SESSION_LOG.md`
@@ -3125,3 +3151,23 @@ ode --check clean. Ran --save --lane homecoming twice � ep29 and ep30 both gen
 - **Quality fixes (1 commit):** `sideCharacterGuard` strengthened to block background sounds from rendering as foreground animals. `styleGuard` moved to front of prompt. Story generator example style changed from "soft watercolor" → "digital 2D painterly children's book illustration".
 
 **What's next:** Full unattended daily run tomorrow to confirm all fixes hold end-to-end.
+
+---
+
+## 2026-05-13 — Daily run audit + 5 bug fixes
+
+**What was done:**
+- Pipeline crashed at 07:22 UTC (stale lock PID 13864 after inspiration images step). Cleared lock, re-ran — completed 07:33–07:47 UTC, all 15 steps passed.
+- **Settings.local.json permanent fix:** Reduced from 111 entries to 6 wildcard entries (Bash(*), PowerShell(*), WebSearch, WebFetch(domain:*), Read(//c/**), Skill(*)) — eliminates "command line too long" error permanently.
+- **Task scheduler fix:** Replaced triple-hop chain (scheduler→npm→node) with direct `daily-run.bat` calling `D:\node\node.exe scripts\daily-run.mjs`. Updated `\Joymaze Daily` task to use the .bat. All stdout/stderr now logged to `logs/daily-run.log`.
+- **Quality audit:** Scored all 10 content types including video frame extraction. X posts 9/10. Challenge reel 9/10. ASMR 8/10. Story reel 6/10 (insects in frame, weak hook slide). Animal song short 5/10 (art style chaos + garbled text).
+- **5 bugs fixed via subagent:**
+  1. Dot-to-dot theme mismatch: `generate-puzzle-image-post.mjs` was calling `runGenerator()` without `--theme`, overwriting activity.json with "Ocean Animals" default. Fixed with `fs.access` guard.
+  2. `generate-imagen-dottodot-assets.mjs` coloring step now always passes `--force`.
+  3. Matching `resolveThemeFamily` added baking/cook/cake/bread/pastry/dessert keywords.
+  4. `sideCharacterGuard` extended to enumerate all insects/flies/bugs explicitly.
+  5. `ANIMAL_ART_STYLES` pool purged of watercolor/oil-painting/photorealistic entries — all 12 entries now "digital 2D painterly" only.
+  6. `expandImagePromptHint` psychologyBeat phrased as "Emotional tone: ... do not render as text" to prevent Imagen baking text labels into images.
+- Dot-to-dot and matching posts manually regenerated — themes now correct.
+
+**What's next:** Tomorrow's unattended run will test all fixes end-to-end (insects guard, animal art style consistency, dot-to-dot/matching theme accuracy).

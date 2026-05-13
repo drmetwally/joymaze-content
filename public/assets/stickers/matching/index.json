@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-05-01",
+  "last_updated": "2026-05-13",
   "themes": {
     "animals": [
       "cat",
@@ -49,6 +49,16 @@
       "airplane",
       "boat",
       "bicycle"
+    ],
+    "baking": [
+      "cupcake",
+      "cookie",
+      "cake",
+      "muffin",
+      "bread",
+      "pie",
+      "whisk",
+      "spatula"
     ]
   },
   "notes": "PNG files, white background, 400x400px approx. Named exactly as listed. Add new theme key + filenames to expand; place PNGs in the matching subfolder."

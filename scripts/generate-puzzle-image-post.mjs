@@ -201,14 +201,24 @@ function buildDirectConfig() {
 
 async function readCroppedSvg(activityDir, puzzleType) {
   let svgFile = path.join(activityDir, 'blank.svg');
-  const svgRaw = await fs.readFile(svgFile, 'utf8');
+  let svgRaw;
+  try {
+    svgRaw = await fs.readFile(svgFile, 'utf8');
+  } catch {
+    // Imagen-mode coloring has no blank.svg — caller handles the null case
+    return { svgContent: null, layoutMeta: null };
+  }
   let metaFile = null;
   if (puzzleType === 'maze') {
     metaFile = path.join(activityDir, 'maze.json');
   } else if (puzzleType === 'word-search') {
     metaFile = path.join(activityDir, 'wordsearch.json');
   } else if (puzzleType === 'coloring') {
-    metaFile = path.join(activityDir, 'coloring.json');
+    // coloring.json only exists for SVG-generated coloring pages; Imagen and library-PNG
+    // paths write activity.json only. Fall back gracefully — meta is optional for coloring.
+    const coloringJsonPath = path.join(activityDir, 'coloring.json');
+    const activityJsonPath = path.join(activityDir, 'activity.json');
+    try { await fs.access(coloringJsonPath); metaFile = coloringJsonPath; } catch { metaFile = activityJsonPath; }
   } else if (puzzleType === 'matching') {
     metaFile = path.join(activityDir, 'matching.json');
   }
@@ -250,6 +260,11 @@ async function buildPostImage(activityDir, activity, outputPath, type) {
   // For matching, use solved.svg (labeled face-up cards) as the social post image
   const svgFile = type === 'matching' ? 'solved.svg' : 'blank.svg';
   const { svgContent, layoutMeta } = await readCroppedSvg(activityDir, type);
+  // Imagen-mode coloring has no SVG — use blank.png directly as the post image
+  if (!svgContent && type === 'coloring') {
+    await fs.copyFile(path.join(activityDir, 'blank.png'), outputPath);
+    return;
+  }
   // Use the cropped SVG when available; fall back to raw file for types without a crop (e.g. matching)
   const svgToRender = svgContent || await fs.readFile(path.join(activityDir, svgFile), 'utf8');
   const postMeta = {
@@ -265,7 +280,11 @@ async function buildPostImage(activityDir, activity, outputPath, type) {
 
 async function processOne(config) {
   const activityDir = config.activityDir || path.join(GENERATED_DIR, config.slug);
-  if (!config.activityDir) {
+  // If the target folder already has activity.json, use existing assets rather than
+  // regenerating with the default theme (which would overwrite the correct theme)
+  const existingActivityPath = path.join(activityDir, 'activity.json');
+  const folderAlreadyExists = await fs.access(existingActivityPath).then(() => true).catch(() => false);
+  if (!config.activityDir && !folderAlreadyExists) {
     console.log(`[puzzle-post] generating ${config.type} assets for theme: ${config.theme}`);
     const output = runGenerator(config.type, config, DRY_RUN);
     process.stdout.write(output);
@@ -273,12 +292,15 @@ async function processOne(config) {
       console.log(`[puzzle-post] dry-run target dir: ${activityDir}`);
       return;
     }
+  } else if (!config.activityDir && folderAlreadyExists) {
+    console.log(`[puzzle-post] using existing assets in ${path.relative(ROOT, activityDir)} (skipping generator to preserve theme)`);
   }
   const activityPath = path.join(activityDir, 'activity.json');
-  const puzzleJsonName = config.type === 'maze' ? 'maze.json' : config.type === 'coloring' ? 'coloring.json' : config.type === 'matching' ? 'matching.json' : config.type === 'find-diff' ? 'diff.json' : config.type === 'dot-to-dot' ? 'dots.json' : 'puzzle.json';
-  const puzzlePath = path.join(activityDir, puzzleJsonName);
+  const puzzleJsonName = config.type === 'maze' ? 'maze.json' : config.type === 'coloring' ? null : config.type === 'matching' ? 'matching.json' : config.type === 'find-diff' ? 'diff.json' : config.type === 'dot-to-dot' ? 'dots.json' : 'puzzle.json';
+  const puzzlePath = puzzleJsonName ? path.join(activityDir, puzzleJsonName) : null;
   const activity = JSON.parse(await fs.readFile(activityPath, 'utf8'));
-  const puzzle = JSON.parse(await fs.readFile(puzzlePath, 'utf8'));
+  // coloring: no separate puzzle JSON — activity.json holds all fields including difficulty
+  const puzzle = puzzlePath ? JSON.parse(await fs.readFile(puzzlePath, 'utf8')) : activity;
   const postPath = path.join(activityDir, 'post.png');
   console.log(`[puzzle-post] activityDir: ${activityDir}`);
   if (DRY_RUN) {

@@ -122,6 +122,7 @@ function resolveStickerTheme(themeFamily) {
     vehicles: 'vehicles',
     fairy: 'animals',
     jungle: 'animals',
+    baking: 'baking',
     default: 'animals',
   };
   return map[themeFamily] || 'animals';
@@ -147,7 +148,7 @@ function resolveThemeFamily(themeStr) {
   if (t.includes('dog') || t.includes('cat') || t.includes('puppy') || t.includes('kitten') || t.includes('pet') || t.includes('animal')) return 'animals';
   if (t.includes('fairy') || t.includes('princess') || t.includes('magic')) return 'fairy';
   if (t.includes('vehicle') || t.includes('car') || t.includes('truck')) return 'vehicles';
-  if (t.includes('food') || t.includes('kitchen') || t.includes('fruit')) return 'food';
+  if (t.includes('baking') || t.includes('cook') || t.includes('cake') || t.includes('bread') || t.includes('pastry') || t.includes('dessert') || t.includes('food') || t.includes('kitchen') || t.includes('fruit')) return 'baking';
   if (t.includes('workshop') || t.includes('tool')) return 'workshop';
   return 'default';
 }
@@ -247,13 +248,14 @@ async function resolveStickerAssignments(selectedPairs, grid, stickerTheme, rng)
   if (!index?.themes?.[stickerTheme]) return null;
 
   const names = index.themes[stickerTheme];
-  if (names.length < selectedPairs.length) return null;
+  if (names.length === 0) return null;
 
   const shuffled = shuffleInPlace([...names], rng);
-  const selected = shuffled.slice(0, selectedPairs.length);
 
-  // Build label→sticker mapping: each pair label gets exactly one matching sticker.
-  // Ocean uses explicit verified mapping; other themes use exact name match.
+  // Build label→sticker mapping.
+  // Ocean: explicit verified label→name map (labels are ocean animal words).
+  // All other themes: random assignment — sticker order is shuffled then assigned
+  // positionally to pairs, cycling if sticker count < pair count.
   const pairStickerMap = {};
   if (stickerTheme === 'ocean') {
     const oceanLabelToSticker = {
@@ -268,14 +270,10 @@ async function resolveStickerAssignments(selectedPairs, grid, stickerTheme, rng)
       if (oceanLabelToSticker[label]) pairStickerMap[label] = oceanLabelToSticker[label];
     }
   } else {
-    const usedStickers = new Set();
-    for (const label of selectedPairs) {
-      const l = label.toLowerCase();
-      if (names.some(n => n.toLowerCase() === l) && !usedStickers.has(l)) {
-        pairStickerMap[label] = l;
-        usedStickers.add(l);
-      }
-    }
+    // Random positional assignment: sticker[i % stickers.length] → pair[i]
+    selectedPairs.forEach((label, i) => {
+      pairStickerMap[label] = shuffled[i % shuffled.length];
+    });
   }
 
   const assignments = {};
@@ -339,10 +337,12 @@ function buildSolvedSvg(layout, pairs, grid, sceneBgDataUrl = null) {
   const lines = pairs.map(pair => {
     const a = grid.find(c => c.index === pair.positions[0]);
     const b = grid.find(c => c.index === pair.positions[1]);
+    // Guard: skip line if either cell is missing (grid may be smaller than pair list)
+    if (!a || !b) return null;
     const ca = cardPixelCenter(layout, a.col, a.row);
     const cb = cardPixelCenter(layout, b.col, b.row);
     return `  <line x1="${ca.x}" y1="${ca.y}" x2="${cb.x}" y2="${cb.y}" stroke="${MATCH_COLOR}" stroke-width="${MATCH_STROKE}" stroke-linecap="round" opacity="0.85"/>`;
-  }).join('\n');
+  }).filter(Boolean).join('\n');
 
   // Labels on cards
   const labels = pairs.flatMap(pair => {
@@ -386,7 +386,7 @@ function computeMatchRects(grid, layout) {
   });
 }
 
-function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, pairOrder, folderRel }) {
+function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, pairOrder, folderRel, stickerTheme, stickerNameMap }) {
   const matchRects = computeMatchRects(grid, layout);
   return {
     version: 1,
@@ -412,12 +412,14 @@ function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, pair
       canvasH: CANVAS_H,
     },
     matchRects,
-    connections: pairs.map(p => {
+    connections: pairs.flatMap(p => {
       const a = grid.find(c => c.index === p.positions[0]);
       const b = grid.find(c => c.index === p.positions[1]);
+      // Guard: skip connection if either grid cell is missing (grid may have fewer slots than pair positions)
+      if (!a || !b) return [];
       const ca = cardPixelCenter(layout, a.col, a.row);
       const cb = cardPixelCenter(layout, b.col, b.row);
-      return {
+      return [{
         from: p.positions[0],
         to: p.positions[1],
         label: p.label,
@@ -425,7 +427,7 @@ function buildMatchingJson({ title, theme, difficulty, pairs, grid, layout, pair
         x2: cb.x, y2: cb.y,
         centerA: p.centerA,
         centerB: p.centerB,
-      };
+      }];
     }),
     pairOrder,
   };
@@ -544,15 +546,24 @@ async function main() {
   // or null if no images exist for this theme. Fallback = white SVG background.
   // Ocean scene PNG — embedded as base64 in blank.svg/solved.svg for sharp to composite.
   // ENOENT on copy is expected intermittently on Windows; SVG output is unaffected.
-  const oceanScenePath = path.join(ROOT, 'assets', 'generated', 'coloring-pages', 'ocean', 'ocean-animals-1.png');
+  // Scene background: theme-specific PNG from assets/generated/matching-scenes/<stickerTheme>/
+  // Falls back to ocean coloring page for ocean theme only; other themes use plain BG_COLOR.
+  const sceneBgCandidates = [
+    path.join(ROOT, 'assets', 'generated', 'matching-scenes', stickerTheme, 'main.png'),
+    stickerTheme === 'ocean' ? path.join(ROOT, 'assets', 'generated', 'coloring-pages', 'ocean', 'ocean-animals-1.png') : null,
+  ].filter(Boolean);
   let sceneBgDataUrl = null;
-  try {
-    const buf = await fs.readFile(oceanScenePath);
-    sceneBgDataUrl = `data:image/png;base64,${buf.toString('base64')}`;
-    console.log(`[matching-factory] scene bg    : ${path.relative(ROOT, oceanScenePath)}`);
-  } catch (err) {
-    console.log(`[matching-factory] scene bg    : none (ocean PNG unavailable: ${err.code})`);
+  for (const candidate of sceneBgCandidates) {
+    try {
+      const buf = await fs.readFile(candidate);
+      sceneBgDataUrl = `data:image/png;base64,${buf.toString('base64')}`;
+      console.log(`[matching-factory] scene bg    : ${path.relative(ROOT, candidate)}`);
+      break;
+    } catch {
+      // try next
+    }
   }
+  if (!sceneBgDataUrl) console.log(`[matching-factory] scene bg    : none (using solid fill)`);
 
   const matchingJson = buildMatchingJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, pairs, grid, layout, pairOrder, folderRel });
   const activityJson = buildActivityJson({ title: TITLE, theme: THEME, difficulty: DIFFICULTY, hookTitle, folderRel, matchRects: matchingJson.matchRects });
@@ -581,7 +592,7 @@ async function main() {
   ]);
 
   // Build blank.png — scene background (if available) + card stickers as overlays in Remotion
-  const blankSvg = buildBlankSvg(layout, grid, null, sceneBgDataUrl);
+  const blankSvg = buildBlankSvg(layout, grid, stickerAssignments, sceneBgDataUrl);
   await fs.writeFile(path.join(outDir, 'blank.svg'), blankSvg, 'utf8');
   const blankPng = await sharp(Buffer.from(blankSvg)).png().toBuffer();
   await fs.writeFile(path.join(outDir, 'blank.png'), blankPng);
