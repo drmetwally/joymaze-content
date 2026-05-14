@@ -1,0 +1,2030 @@
+[05/13/2026, 10:33:51] === Daily Morning Job Starting ===
+[05/13/2026, 10:33:51] Step 1/15: Archiving yesterday's queue...
+[05/13/2026, 10:33:51] Running: archive-queue.mjs 
+[05/13/2026, 10:33:51]   === JoyMaze Queue Archive ===
+[05/13/2026, 10:33:51]   Mode: LIVE
+[05/13/2026, 10:33:51]   Today: 2026-05-13
+[05/13/2026, 10:33:51]   Archive scope: Items older than today
+[05/13/2026, 10:33:51]   
+[05/13/2026, 10:33:51]   Queue is empty. Continuing with other sweeps...
+[05/13/2026, 10:33:51]     Archive ASMR: coloring-forest-animals → archive/asmr/
+[05/13/2026, 10:33:51]     Archive story: ep01-the-little-turtle-who-saved-the-pond → archive/stories/
+[05/13/2026, 10:33:51]     Archive challenge: word-search-garden-friends → archive/challenge/
+[05/13/2026, 10:33:51]     Archive generated activity: 2026-04-23-activity-maze-archive-test → archive/challenge-generated/
+[05/13/2026, 10:33:51]     Skip prompt: activity-manifest-2026-05-13.json (today)
+[05/13/2026, 10:33:51]     Skip prompt: prompts-2026-05-13.md (today)
+[05/13/2026, 10:33:51]   
+[05/13/2026, 10:33:51]   --- Summary ---
+[05/13/2026, 10:33:51]   Nothing to archive. All items are from today.
+[05/13/2026, 10:33:51] Done: archive-queue.mjs
+[05/13/2026, 10:33:51] Step 2/15: Generating today's image prompts...
+[05/13/2026, 10:33:51] Running: generate-prompts.mjs --save
+[05/13/2026, 10:34:07]   🎨 JoyMaze Image Prompt Generator
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   Loading strategy context + dynamic pools...
+[05/13/2026, 10:34:07]     Style guide: 36693 chars
+[05/13/2026, 10:34:07]     Archetypes: 24279 chars
+[05/13/2026, 10:34:07]     Theme pool: 61 hardcoded + 30 dynamic = 91 total
+[05/13/2026, 10:34:07]     Pattern interrupts: 25 dynamic added
+[05/13/2026, 10:34:07]     Hook examples: 4 for system prompt injection
+[05/13/2026, 10:34:07]     Audit learnings: 5 rules loaded (injected into generation + scorer)
+[05/13/2026, 10:34:07]     Competitor intelligence: loaded (2026-05-11) — formats, hooks, gaps injected
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   Today's rotation: Wed — Intelligence Mix + Activities (hard)
+[05/13/2026, 10:34:07]   Generating 10 prompts...
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   Loading performance context...
+[05/13/2026, 10:34:07]     No analytics data yet — skipping performance context.
+[05/13/2026, 10:34:07]   Checking recent themes for diversity...
+[05/13/2026, 10:34:07]   Loading trend signals...
+[05/13/2026, 10:34:07]     Trend signals found — boosting: Pets Home, Garden Flowers, Birds Sky.
+[05/13/2026, 10:34:07]     Assigned themes (code-enforced): Camping Outdoors, Construction and Building, Sea Turtles, Ancient Egypt, Baking Adventures
+[05/13/2026, 10:34:07]     Story settings: 
+[05/13/2026, 10:34:07]     Psychology layer: 7 triggers loaded
+[05/13/2026, 10:34:07]   Calling Groq (llama-3.3-70b-versatile)...
+[05/13/2026, 10:34:07]   Groq response received.
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ================================================================================
+[05/13/2026, 10:34:07]   ### Prompt 1 — FACT-CARD — Educational Poster
+[05/13/2026, 10:34:07]   **Type:** Story
+[05/13/2026, 10:34:07]   **Emotional target:** Surprise → Learning
+[05/13/2026, 10:34:07]   **Primary trigger:** Visual metaphor for child development
+[05/13/2026, 10:34:07]   **Activity shown:** None
+[05/13/2026, 10:34:07]   **Hook type:** Sensory Hook
+[05/13/2026, 10:34:07]   **Skill shown:** Child development insight
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   Generate a bold educational poster visual — infographic-style layout with strong activity imagery. The poster should feature a stylized illustration of a child's brain with different areas highlighted, surrounded by colorful, swirling patterns that evoke a sense of growth and learning. Incorporate icons or simple graphics representing various child development milestones, such as speech bubbles for language skills or musical notes for creativity. The background should be a bright, poppy blue (#87CEEB) with clean, white typography for any text elements. Style: flat vector cartoon, clean geometry, bright primary colors. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Did you know that puzzles can improve cognitive skills by up to 30%? Create a smarter tomorrow, today."
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 2 — ACTIVITY-CHALLENGE — Challenge-Framed Lifestyle Scene
+[05/13/2026, 10:34:07]   **Type:** Story
+[05/13/2026, 10:34:07]   **Emotional target:** Competitive curiosity
+[05/13/2026, 10:34:07]   **Primary trigger:** Activity printable as the hero
+[05/13/2026, 10:34:07]   **Activity shown:** Maze Puzzle
+[05/13/2026, 10:34:07]   **Hook type:** Challenge Hook
+[05/13/2026, 10:34:07]   **Skill shown:** Problem-solving, spatial reasoning
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   A 7-year-old boy sits at a wooden table, engaged with a maze puzzle printable. The maze is 30% solved, with a pencil lying across it. Soft pastel colors and warm lighting create a cozy atmosphere. In the background, a blurred image of a cat on a windowsill adds a touch of home. The boy's face is focused, his brow slightly furrowed in concentration. Style: soft pastel children's book illustration, gouache texture. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Can your kid solve this Puzzle Power Wednesday challenge? Time them — drop the result below!"
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 3 — QUIET-MOMENT — Sensory Lifestyle Scene
+[05/13/2026, 10:34:07]   **Type:** Story
+[05/13/2026, 10:34:07]   **Emotional target:** Peaceful, sensory
+[05/13/2026, 10:34:07]   **Primary trigger:** Absorbed child, eraser marks
+[05/13/2026, 10:34:07]   **Activity shown:** Kids Sudoku
+[05/13/2026, 10:34:07]   **Hook type:** Sensory Hook
+[05/13/2026, 10:34:07]   **Skill shown:** Focus, critical thinking
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   An 8-year-old girl sits at a dining table on a weekend morning, intensely focused on a sudoku puzzle. The table is made of dark wood, and the room is lit by soft, warm morning light. Eraser marks and a serious expression convey her engagement. An older sibling is visible in the background, not helping, adding a sense of quiet independence. Style: claymation-style 3D, matte clay surfaces, soft studio lighting. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "The good kind of quiet. When was the last time you had a morning like this?"
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 4 — PRINTABLE-TEASE — Beautiful Flat-Lay
+[05/13/2026, 10:34:07]   **Type:** Story
+[05/13/2026, 10:34:07]   **Emotional target:** Anticipation
+[05/13/2026, 10:34:07]   **Primary trigger:** Beautiful, inviting printable
+[05/13/2026, 10:34:07]   **Activity shown:** Maze Puzzle
+[05/13/2026, 10:34:07]   **Hook type:** Transformation Hint
+[05/13/2026, 10:34:07]   **Skill shown:** Problem-solving
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   A beautiful flat-lay of a maze puzzle printable on a wooden table, with a pencil lying across it and warm side-lighting. The maze is intricate but not intimidating, with a fun camping theme. The paper has a slightly worn feel, looking like it's been handled before. Style: vintage storybook illustration, crosshatching, muted earthy tones. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Need something for the weekend? Bookmark this Puzzle Power Wednesday maze for a fun challenge."
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 5 — IDENTITY — Parent Identity Scene
+[05/13/2026, 10:34:07]   **Type:** Story
+[05/13/2026, 10:34:07]   **Emotional target:** Aspirational
+[05/13/2026, 10:34:07]   **Primary trigger:** Parent watching child with pride
+[05/13/2026, 10:34:07]   **Activity shown:** Child absorbed in activity
+[05/13/2026, 10:34:07]   **Hook type:** Identity Hook
+[05/13/2026, 10:34:07]   **Skill shown:** Intentional parenting
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   A quiet moment with a 4-year-old girl absorbed in a coloring activity while her parent watches with quiet pride from a distance. The scene is simple, with natural light and a sense of calm. The parent's expression is warm, observing without interrupting. Style: ink-and-wash, bold black lines with loose watercolor fill. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "For the parent who chooses what their kid does, not just how long. Recognize yourself?"
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 6 — ACTIVITY: Maze Puzzle
+[05/13/2026, 10:34:07]   **Type:** Activity
+[05/13/2026, 10:34:07]   **Activity type:** Maze
+[05/13/2026, 10:34:07]   **Difficulty:** Hard
+[05/13/2026, 10:34:07]   **Theme:** Camping Outdoors
+[05/13/2026, 10:34:07]   **Skill target:** Problem-solving, spatial reasoning
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   Generate a maze with a picture of a cartoon bear at the start point, with a challenging path to follow. The maze should be designed for a 7-8 year old, with thick lines and a clear start and end point. The theme should be Camping Outdoors, with trees, tents, and a campfire incorporated into the design. Add small decorative elements, such as tiny animals and clouds, to the corners of the page. Leave the bottom 10% of the image completely empty (white space for watermark). Style: warm watercolor illustration, textured paper feel. Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Only 1 in 5 kids can solve this Puzzle Power Wednesday camping maze! Can yours?"
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 7 — ACTIVITY: Word Search
+[05/13/2026, 10:34:07]   **Type:** Activity
+[05/13/2026, 10:34:07]   **Activity type:** Word Search
+[05/13/2026, 10:34:07]   **Difficulty:** Hard
+[05/13/2026, 10:34:07]   **Theme:** Construction and Building
+[05/13/2026, 10:34:07]   **Skill target:** Vocabulary, letter recognition
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   Generate a word search grid with a construction theme, featuring words like 'hammer', 'nail', and 'cement'. The grid should be large enough to read individual letters clearly, with a fun illustrated header and decorative elements around the borders. Style: 3D Pixar-style render, bright colors, and fun textures. Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Find all 10 construction-themed words hidden in this grid! Time your little one — drop the result below."
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 8 — ACTIVITY: Coloring Page
+[05/13/2026, 10:34:07]   **Type:** Activity
+[05/13/2026, 10:34:07]   **Activity type:** Coloring
+[05/13/2026, 10:34:07]   **Difficulty:** Hard
+[05/13/2026, 10:34:07]   **Theme:** Sea Turtles
+[05/13/2026, 10:34:07]   **Skill target:** Creativity, color recognition
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   Generate a coloring page featuring an intricate sea turtle design, with clearly defined sections and no color fills. The outline should be in black, with a fun and engaging illustration style. Style: vintage storybook illustration, crosshatching, muted earthy tones. Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Color in this beautiful sea turtle and learn about these amazing creatures! Save this for a rainy day."
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 9 — ACTIVITY: Dot-to-Dot
+[05/13/2026, 10:34:07]   **Type:** Activity
+[05/13/2026, 10:34:07]   **Activity type:** Dot-to-Dot
+[05/13/2026, 10:34:07]   **Difficulty:** Hard
+[05/13/2026, 10:34:07]   **Theme:** Ancient Egypt
+[05/13/2026, 10:34:07]   **Skill target:** Number sequencing, fine motor
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   Generate a dot-to-dot activity page featuring an Ancient Egypt theme, with numbered dots forming the outline of a pyramid. The dots should be large and bold, with no pre-drawn outline. Style: warm watercolor illustration, textured paper feel. Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Connect the dots to reveal the ancient wonder! How fast can your kid complete this?"
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ### Prompt 10 — ACTIVITY: Matching / Spot-the-Difference
+[05/13/2026, 10:34:07]   **Type:** Activity
+[05/13/2026, 10:34:07]   **Activity type:** Matching
+[05/13/2026, 10:34:07]   **Difficulty:** Hard
+[05/13/2026, 10:34:07]   **Theme:** Baking Adventures
+[05/13/2026, 10:34:07]   **Skill target:** Observation, memory
+[05/13/2026, 10:34:07]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Image prompt:**
+[05/13/2026, 10:34:07]   Generate a matching game with a baking theme, featuring pairs of illustrations with subtle differences. The game should have a fun and colorful design, with clear and legible graphics. Style: 3D Pixar-style render, bright colors, and fun textures. Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark).
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   **Caption hook idea:** "Find the matching pairs in this baking adventure! Can your kid spot all the differences?"
+[05/13/2026, 10:34:07]   ================================================================================
+[05/13/2026, 10:34:07]     ⚠ Pre-check Prompt 1: fabricated-stat(-4)
+[05/13/2026, 10:34:07]     ⚠ Pre-check Prompt 3: illustration-on-story(-3)
+[05/13/2026, 10:34:07]     ⚠ Pre-check Prompt 4: illustration-on-story(-3)
+[05/13/2026, 10:34:07]     ⚠ Pre-check Prompt 5: illustration-on-story(-3)
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   Running quality gate scoring...
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]     Auto-regenerating 4 rejected prompt(s) (attempt 1/2)...
+[05/13/2026, 10:34:07]       Prompt 1 (score 5.5/10): rule-violations: fabricated-stat
+[05/13/2026, 10:34:07]       → Rewritten. Re-scoring...
+[05/13/2026, 10:34:07]       Prompt 3 (score 6.5/10): rule-violations: illustration-on-story
+[05/13/2026, 10:34:07]       → Rewritten. Re-scoring...
+[05/13/2026, 10:34:07]       Prompt 4 (score 6.5/10): rule-violations: illustration-on-story
+[05/13/2026, 10:34:07]       → Rewritten. Re-scoring...
+[05/13/2026, 10:34:07]       Prompt 5 (score 6.5/10): rule-violations: illustration-on-story
+[05/13/2026, 10:34:07]       → Rewritten. Re-scoring...
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ┌─ Quality Gate Results ───────────────────────────────────────┐
+[05/13/2026, 10:34:07]   │ Prompt 1   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 2   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 3   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 4   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 5   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 6   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 7   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 8   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 9   PASS  9    
+[05/13/2026, 10:34:07]   │ Prompt 10  PASS  9    
+[05/13/2026, 10:34:07]   └─ 10 pass · 0 flagged · 0 rejected ──────────────────────────┘
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   Saved to: D:\Joymaze-Content\output\prompts\prompts-2026-05-13.md
+[05/13/2026, 10:34:07]   Activity manifest saved to: D:\Joymaze-Content\output\prompts\activity-manifest-2026-05-13.json
+[05/13/2026, 10:34:07]   
+[05/13/2026, 10:34:07]   ✅ Copy the prompts above into ChatGPT or Gemini image generation.
+[05/13/2026, 10:34:07]   Save generated images to output/raw/ then run: npm run import:raw
+[05/13/2026, 10:34:07] Done: generate-prompts.mjs
+[05/13/2026, 10:34:07] Image prompts saved to output/prompts/
+[05/13/2026, 10:34:07] Step 3/15: Auto-generating 5 inspiration images via Imagen...
+[05/13/2026, 10:34:07] Running: generate-images-vertex.mjs --inspiration-only
+[05/13/2026, 10:34:18]   === JoyMaze Vertex Track — Imagen 4.0 ===
+[05/13/2026, 10:34:18]   Date     : 2026-05-13
+[05/13/2026, 10:34:18]   Mode     : Inspiration Only (5 slots)
+[05/13/2026, 10:34:18]   Output   : output/vertex-gen/2026-05-13
+[05/13/2026, 10:34:18]   
+[05/13/2026, 10:34:18]   [1] FACT-CARD — Educational Poster
+[05/13/2026, 10:34:18]     Prompt: "Generate a bold educational poster visual — infographic-style layout with strong activity imagery. T..."
+[05/13/2026, 10:34:18]     Target : output/raw/fact-card
+[05/13/2026, 10:34:18]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/13/2026, 10:34:18]   
+[05/13/2026, 10:34:18]   [2] ACTIVITY-CHALLENGE — Challenge-Framed Lifestyle Scene
+[05/13/2026, 10:34:18]     Prompt: "A child sits at a wooden table, engaged with a maze puzzle printable. The maze is 30% solved, with a..."
+[05/13/2026, 10:34:18]     Target : output/raw/challenge
+[05/13/2026, 10:34:18]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/13/2026, 10:34:18]   
+[05/13/2026, 10:34:18]   [3] QUIET-MOMENT — Sensory Lifestyle Scene
+[05/13/2026, 10:34:18]     Prompt: "An child sits at a dining table on a weekend morning, intensely focused on a sudoku puzzle. The tabl..."
+[05/13/2026, 10:34:18]     Target : output/raw/quiet
+[05/13/2026, 10:34:18]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/13/2026, 10:34:18]   
+[05/13/2026, 10:34:18]   [4] PRINTABLE-TEASE — Beautiful Flat-Lay
+[05/13/2026, 10:34:18]     Prompt: "A beautiful flat-lay photography shot of a maze puzzle printable on a real wooden table, with a penc..."
+[05/13/2026, 10:34:18]     Target : output/raw/printable
+[05/13/2026, 10:34:18]     v1... 1743 KB → printable-2026-05-13.png
+[05/13/2026, 10:34:18]   
+[05/13/2026, 10:34:18]   [5] IDENTITY — Parent Identity Scene
+[05/13/2026, 10:34:18]     Prompt: "A quiet moment with a child absorbed in a coloring activity while her parent watches with quiet prid..."
+[05/13/2026, 10:34:18]     Target : output/raw/identity
+[05/13/2026, 10:34:18]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/13/2026, 10:34:18]   
+[05/13/2026, 10:34:18]   Prompt log → output\vertex-gen\2026-05-13\_prompt-transforms.json
+[05/13/2026, 10:34:18]   === Done ===
+[05/13/2026, 10:34:18]   Inspiration images ready in output/raw/
+[05/13/2026, 10:34:18]   Then: npm run import:raw && npm run generate:captions
+[05/13/2026, 10:34:18] Done: generate-images-vertex.mjs
+[05/13/2026, 10:34:18] Inspiration images generated OK
+[05/13/2026, 10:34:18] Step 4/15: Generating today's deterministic puzzle posts (Maze/Wordsearch)...
+[05/13/2026, 10:34:18] Running: generate-puzzle-image-post.mjs --manifest output\prompts\activity-manifest-2026-05-13.json --category activity-maze
+[05/13/2026, 10:34:21]   [puzzle-post] manifest   : D:\Joymaze-Content\output\prompts\activity-manifest-2026-05-13.json
+[05/13/2026, 10:34:21]   [puzzle-post] targets    : 1:activity-maze:Camping Outdoors
+[05/13/2026, 10:34:21]   [puzzle-post] generating maze assets for theme: Camping Outdoors
+[05/13/2026, 10:34:21]   [maze-factory] title       : Camping Outdoors Maze Puzzle
+[05/13/2026, 10:34:21]   [maze-factory] theme       : Camping Outdoors
+[05/13/2026, 10:34:21]   [maze-factory] outDir      : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze
+[05/13/2026, 10:34:21]   [maze-factory] seed        : 3930875768
+[05/13/2026, 10:34:21]   [maze-factory] shape       : rectangle
+[05/13/2026, 10:34:21]   [maze-factory] difficulty  : hard
+[05/13/2026, 10:34:21]   [maze-factory] grid        : 15x11
+[05/13/2026, 10:34:21]   [maze-factory] solution    : 85 cells, 15 dead ends
+[05/13/2026, 10:34:21]   [maze-factory] wrote files:
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\activity.json
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\maze.json
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\path.json
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\blank.svg
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\blank.png
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\puzzle.png
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\solved.svg
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\solved.png
+[05/13/2026, 10:34:21]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\_benchmark-notes.json
+[05/13/2026, 10:34:21]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze
+[05/13/2026, 10:34:21]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\maze\maze-2026-05-13-slot01-camping-outdoors.png
+[05/13/2026, 10:34:21]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot01-camping-outdoors-maze\post.png
+[05/13/2026, 10:34:21]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\maze\maze-2026-05-13-slot01-camping-outdoors.png
+[05/13/2026, 10:34:21]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\maze\maze-2026-05-13-slot01-camping-outdoors.json
+[05/13/2026, 10:34:21] Done: generate-puzzle-image-post.mjs
+[05/13/2026, 10:34:21] Running: generate-puzzle-image-post.mjs --manifest output\prompts\activity-manifest-2026-05-13.json --category activity-word-search
+[05/13/2026, 10:34:23]   [puzzle-post] manifest   : D:\Joymaze-Content\output\prompts\activity-manifest-2026-05-13.json
+[05/13/2026, 10:34:23]   [puzzle-post] targets    : 2:activity-word-search:Construction and Building
+[05/13/2026, 10:34:23]   [puzzle-post] generating word-search assets for theme: Construction and Building
+[05/13/2026, 10:34:23]   [wordsearch-factory] title      : Construction and Building Word Search
+[05/13/2026, 10:34:23]   [wordsearch-factory] theme      : Construction and Building
+[05/13/2026, 10:34:23]   [wordsearch-factory] outDir     : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search
+[05/13/2026, 10:34:23]   [wordsearch-factory] seed       : 4200987516
+[05/13/2026, 10:34:23]   [wordsearch-factory] difficulty : hard
+[05/13/2026, 10:34:23]   [wordsearch-factory] grid       : 14x14
+[05/13/2026, 10:34:23]   [wordsearch-factory] words      : SPANNER, HAMMER, SPRING, LEVEL, PLANK, RIVET
+[05/13/2026, 10:34:23]   [wordsearch-factory] directions : right, down
+[05/13/2026, 10:34:23]   [wordsearch-factory] wrote files:
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\activity.json
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\wordsearch.json
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\puzzle.json
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\blank.svg
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\blank.png
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\puzzle.png
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\solved.svg
+[05/13/2026, 10:34:23]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\solved.png
+[05/13/2026, 10:34:23]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search
+[05/13/2026, 10:34:23]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\wordsearch\wordsearch-2026-05-13-slot02-construction-and-building.png
+[05/13/2026, 10:34:23]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-13-slot02-construction-and-building-word-search\post.png
+[05/13/2026, 10:34:23]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\wordsearch\wordsearch-2026-05-13-slot02-construction-and-building.png
+[05/13/2026, 10:34:23]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\wordsearch\wordsearch-2026-05-13-slot02-construction-and-building.json
+[05/13/2026, 10:34:23] Done: generate-puzzle-image-post.mjs
+[05/13/2026, 10:34:23] Maze/Wordsearch puzzle posts generated OK
+[05/13/2026, 10:34:23] Step 5/15: Generating coloring puzzle post...
+[05/13/2026, 10:34:23] Running: generate-coloring-assets.mjs --imagen --theme Sea Turtles --difficulty hard --slug coloring-sea-turtles-hard
+[05/13/2026, 10:34:28]   [coloring-factory] imagen mode — calling Imagen 4.0
+[05/13/2026, 10:34:28]   [coloring-factory] wrote files (imagen mode):
+[05/13/2026, 10:34:28]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard\activity.json
+[05/13/2026, 10:34:28]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard\blank.png
+[05/13/2026, 10:34:28]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard\colored.png
+[05/13/2026, 10:34:28]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard\puzzle.png
+[05/13/2026, 10:34:28] Done: generate-coloring-assets.mjs
+[05/13/2026, 10:34:28] Running: generate-puzzle-image-post.mjs --type coloring --slug coloring-sea-turtles-hard
+[05/13/2026, 10:34:28]   [puzzle-post] generating coloring assets for theme: Ocean Animals
+[05/13/2026, 10:34:28]   [coloring-factory] skip — output already exists: D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard
+[05/13/2026, 10:34:28]   [coloring-factory] use --force to regenerate
+[05/13/2026, 10:34:28]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard
+[05/13/2026, 10:34:28]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\coloring\coloring-sea-turtles.png
+[05/13/2026, 10:34:28]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\coloring-sea-turtles-hard\post.png
+[05/13/2026, 10:34:28]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\coloring\coloring-sea-turtles.png
+[05/13/2026, 10:34:28]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\coloring\coloring-sea-turtles.json
+[05/13/2026, 10:34:28] Done: generate-puzzle-image-post.mjs
+[05/13/2026, 10:34:28] coloring puzzle post generated OK
+[05/13/2026, 10:34:28] Step 6/15: Generating dot-to-dot puzzle post...
+[05/13/2026, 10:34:28] Running: generate-imagen-dottodot-assets.mjs --imagen --theme Ancient Egypt --difficulty hard --slug dot-to-dot-ancient-egypt-hard
+[05/13/2026, 10:34:34]   [imagen-dottodot] Step 1: generating coloring page...
+[05/13/2026, 10:34:34]   [coloring-factory] imagen mode — calling Imagen 4.0
+[05/13/2026, 10:34:34]   [coloring-factory] wrote files (imagen mode):
+[05/13/2026, 10:34:34]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard-coloring-tmp\activity.json
+[05/13/2026, 10:34:34]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard-coloring-tmp\blank.png
+[05/13/2026, 10:34:34]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard-coloring-tmp\colored.png
+[05/13/2026, 10:34:34]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard-coloring-tmp\puzzle.png
+[05/13/2026, 10:34:34]   [imagen-dottodot] Step 2: extracting dot-to-dot...
+[05/13/2026, 10:34:34]   [dottodot-extractor] processing image: output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard-coloring-tmp\blank.png
+[05/13/2026, 10:34:34]   [dottodot-extractor] done → D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard
+[05/13/2026, 10:34:34]   [imagen-dottodot] done → output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard
+[05/13/2026, 10:34:34] Done: generate-imagen-dottodot-assets.mjs
+[05/13/2026, 10:34:34] Running: generate-puzzle-image-post.mjs --type dot-to-dot --slug dot-to-dot-ancient-egypt-hard
+[05/13/2026, 10:34:36]   [puzzle-post] generating dot-to-dot assets for theme: Ocean Animals
+[05/13/2026, 10:34:36]   [dottodot-factory] title     : Ocean Animals Dot-to-Dot
+[05/13/2026, 10:34:36]   [dottodot-factory] theme     : Ocean Animals
+[05/13/2026, 10:34:36]   [dottodot-factory] family    : ocean
+[05/13/2026, 10:34:36]   [dottodot-factory] outDir    : D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard
+[05/13/2026, 10:34:36]   [dottodot-factory] seed      : 2474981881
+[05/13/2026, 10:34:36]   [dottodot-factory] difficulty: medium
+[05/13/2026, 10:34:36]   [dottodot-factory] shape     : seahorse (21 dots)
+[05/13/2026, 10:34:36]   [dottodot-factory] countdown: 17s
+[05/13/2026, 10:34:36]   [dottodot-factory] wrote files:
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\activity.json
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\dots.json
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\blank.svg
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\blank.png
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\solved.svg
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\solved.png
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\puzzle.png
+[05/13/2026, 10:34:36]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard
+[05/13/2026, 10:34:36]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\dot-to-dot\dot-to-dot-ocean-animals.png
+[05/13/2026, 10:34:36]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-ancient-egypt-hard\post.png
+[05/13/2026, 10:34:36]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\dot-to-dot\dot-to-dot-ocean-animals.png
+[05/13/2026, 10:34:36]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\dot-to-dot\dot-to-dot-ocean-animals.json
+[05/13/2026, 10:34:36] Done: generate-puzzle-image-post.mjs
+[05/13/2026, 10:34:36] dot-to-dot puzzle post generated OK
+[05/13/2026, 10:34:36] Step 7/15: Generating matching puzzle post...
+[05/13/2026, 10:34:36] Running: generate-matching-assets.mjs --imagen --theme Baking Adventures --difficulty hard --slug matching-baking-adventures-hard
+[05/13/2026, 10:34:36]   [matching-factory] stickerTheme: animals (no PNGs found — using card backs)
+[05/13/2026, 10:34:36]   [matching-factory] scene bg    : assets\generated\coloring-pages\ocean\ocean-animals-1.png
+[05/13/2026, 10:34:36]   [matching-factory] title      : Animal Match
+[05/13/2026, 10:34:36]   [matching-factory] theme      : Baking Adventures
+[05/13/2026, 10:34:36]   [matching-factory] family    : default
+[05/13/2026, 10:34:36]   [matching-factory] stickerTheme: animals
+[05/13/2026, 10:34:36]   [matching-factory] outDir    : D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard
+[05/13/2026, 10:34:36]   [matching-factory] seed      : 2624979080
+[05/13/2026, 10:34:36]   [matching-factory] difficulty: hard
+[05/13/2026, 10:34:36]   [matching-factory] pairs     : 8 (6×2 grid)
+[05/13/2026, 10:34:36]   [matching-factory] words     : SOLVE, EXPLORE, CLEVER, PUZZLE, TROPHY, MEMORY, LOGIC, PATTERN
+[05/13/2026, 10:34:36]   [matching-factory] wrote files:
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\activity.json
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\matching.json
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\blank.svg
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\blank.png
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\solved.svg
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\solved.png
+[05/13/2026, 10:34:36]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\puzzle.png
+[05/13/2026, 10:34:36] Done: generate-matching-assets.mjs
+[05/13/2026, 10:34:36] Running: generate-puzzle-image-post.mjs --type matching --slug matching-baking-adventures-hard
+[05/13/2026, 10:34:39]   [puzzle-post] generating matching assets for theme: Ocean Animals
+[05/13/2026, 10:34:39]   [matching-factory] stickerTheme: ocean (12 cards wired)
+[05/13/2026, 10:34:39]   [matching-factory] scene bg    : assets\generated\coloring-pages\ocean\ocean-animals-1.png
+[05/13/2026, 10:34:39]   [matching-factory] title      : Ocean Animals Matching Game
+[05/13/2026, 10:34:39]   [matching-factory] theme      : Ocean Animals
+[05/13/2026, 10:34:39]   [matching-factory] family    : ocean
+[05/13/2026, 10:34:39]   [matching-factory] stickerTheme: ocean
+[05/13/2026, 10:34:39]   [matching-factory] outDir    : D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard
+[05/13/2026, 10:34:39]   [matching-factory] seed      : 3314830120
+[05/13/2026, 10:34:39]   [matching-factory] difficulty: medium
+[05/13/2026, 10:34:39]   [matching-factory] pairs     : 6 (6×2 grid)
+[05/13/2026, 10:34:39]   [matching-factory] words     : DOLPHIN, OCTOPUS, TURTLE, CRAB, FISH, SEAHORSE
+[05/13/2026, 10:34:39]   [matching-factory] wrote files:
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\activity.json
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\matching.json
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\blank.svg
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\blank.png
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\solved.svg
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\solved.png
+[05/13/2026, 10:34:39]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\puzzle.png
+[05/13/2026, 10:34:39]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard
+[05/13/2026, 10:34:39]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\matching\matching-ocean-animals.png
+[05/13/2026, 10:34:39]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\matching-baking-adventures-hard\post.png
+[05/13/2026, 10:34:39]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\matching\matching-ocean-animals.png
+[05/13/2026, 10:34:39]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\matching\matching-ocean-animals.json
+[05/13/2026, 10:34:39] Done: generate-puzzle-image-post.mjs
+[05/13/2026, 10:34:39] matching puzzle post generated OK
+[05/13/2026, 10:34:39] Step 8/15: Generating story idea for next episode...
+[05/13/2026, 10:34:39] Running: generate-story-ideas.mjs --save
+[05/13/2026, 10:34:46]   === Joyo's Story Corner — Idea Generator ===
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]     Trends loaded: Pets/Home, Garden/Flowers, Birds/Sky ...
+[05/13/2026, 10:34:46]     Competitor intelligence loaded (2026-05-11)
+[05/13/2026, 10:34:46]     Hooks library loaded: 63 hooks
+[05/13/2026, 10:34:46]     Dynamic themes loaded: 30 themes
+[05/13/2026, 10:34:46]     Psychology triggers loaded: 7 triggers
+[05/13/2026, 10:34:46]     Story source bank loaded: 54 seeds
+[05/13/2026, 10:34:46]   Generating story concept...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   ════════════════════════════════════════════════════════════
+[05/13/2026, 10:34:46]     Episode 34: The Little Rabbit's Big Scare
+[05/13/2026, 10:34:46]   ════════════════════════════════════════════════════════════
+[05/13/2026, 10:34:46]   Theme: A frightened young rabbit finds her way back home after a chaotic night of fireworks
+[05/13/2026, 10:34:46]   Hook: What happens when the noise is too much?
+[05/13/2026, 10:34:46]   Outro echo: Safe at last
+[05/13/2026, 10:34:46]   Reel cut: 1, 2, 3, 4, 5, 6, 7, 8
+[05/13/2026, 10:34:46]   Style: Soft watercolor, warm pastel palette, visible paper grain
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 01 | ACT 1 | 7s]
+[05/13/2026, 10:34:46]     Narration: "The rabbit bolts into the unknown as fireworks explode above."
+[05/13/2026, 10:34:46]     Image: Wide establishing shot, low angle looking up from the grass. A young rabbit — the size of a fist, with bright brown eyes...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 02 | ACT 1 | 7s]
+[05/13/2026, 10:34:46]     Narration: "If she doesn't find her burrow before dawn, the open ground becomes a dangerous place."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Mid-shot, slightly ...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 03 | ACT 2 | 8s]
+[05/13/2026, 10:34:46]     Narration: "She tries to follow the scent of her family, but it's masked by the smell of smoke and grass."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Close-up, low angle...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 04 | ACT 2 | 8s]
+[05/13/2026, 10:34:46]     Narration: "The farther she runs, the more lost she becomes, and the first light of dawn starts to creep over the horizon."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Wide shot, high ang...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 05 | ACT 3 | 8s]
+[05/13/2026, 10:34:46]     Narration: "Alone and scared, she curls up beneath a bush, wondering if she'll ever find her way home."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Close-up, low angle...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 06 | ACT 3 | 8s]
+[05/13/2026, 10:34:46]     Narration: "She remembers the familiar smell of a patch of clover near her burrow and decides to follow it."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Mid-shot, slightly ...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 07 | ACT 3 | 8s]
+[05/13/2026, 10:34:46]     Narration: "With newfound determination, she navigates through the fading darkness, using the clover scent to guide her."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Wide shot, low angl...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   [Slide 08 | ACT 3 | 7s]
+[05/13/2026, 10:34:46]     Narration: "She sees the welcoming mouth of her burrow, a haven of warmth and safety, just as."
+[05/13/2026, 10:34:46]     Image: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Close-up, low angle...
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   Saved: D:\Joymaze-Content\output\stories\ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:34:46]     → story.json (ready for generate-story-video.mjs)
+[05/13/2026, 10:34:46]     → image-prompts.md (full prompt set for Gemini/ChatGPT)
+[05/13/2026, 10:34:46]     → reel-image-prompts.md (generate these 5 slides first for StoryReelV2)
+[05/13/2026, 10:34:46]   
+[05/13/2026, 10:34:46]   Next: generate the 5 selected reel images from reel-image-prompts.md first, then backfill the rest if needed.
+[05/13/2026, 10:34:46]   Then: npm run generate:story:openai -- --story ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:34:46] Done: generate-story-ideas.mjs
+[05/13/2026, 10:34:46] Story idea scaffolded in output/stories/
+[05/13/2026, 10:34:46] Step 9/15: Generating Story Reel V2 (Imagen -> Remotion)...
+[05/13/2026, 10:34:46]   Story: output\stories\ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:34:46] Running: generate-story-reel-audio.mjs --story D:\Joymaze-Content\output\stories\ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:36:17]   === JoyMaze Story Reel Audio Generator ===
+[05/13/2026, 10:36:17]   Story    : output\stories\ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:36:17]   Episode : 34 — The Little Rabbit's Big Scare
+[05/13/2026, 10:36:17]   TTS     : Kokoro TTS (af_bella)
+[05/13/2026, 10:36:17]   Reel    : slides 1, 2, 3, 4, 5, 6, 7, 8
+[05/13/2026, 10:36:17]   
+[05/13/2026, 10:36:17]     [Intro]: "Episode 34. The Little Rabbit's Big Scare."... done (?)
+[05/13/2026, 10:36:17]     [Hook]: "A summer evening after a fireworks display. What happens when the noise is too much?"... done (?)
+[05/13/2026, 10:36:17]     Slide 1: "The rabbit bolts into the unknown as fireworks explode above."... done (?)
+[05/13/2026, 10:36:17]     Slide 2: "If she doesn't find her burrow before dawn, the open ground becomes a dangerous place."... done (?)
+[05/13/2026, 10:36:17]     Slide 3: "She tries to follow the scent of her family, but it's masked by the smell of smoke and grass."... done (?)
+[05/13/2026, 10:36:17]     Slide 4: "The farther she runs, the more lost she becomes, and the first light of dawn starts to creep over the horizon."... done (?)
+[05/13/2026, 10:36:17]     Slide 5: "Alone and scared, she curls up beneath a bush, wondering if she'll ever find her way home."... done (?)
+[05/13/2026, 10:36:17]     Slide 6: "She remembers the familiar smell of a patch of clover near her burrow and decides to follow it."... done (?)
+[05/13/2026, 10:36:17]     Slide 7: "With newfound determination, she navigates through the fading darkness, using the clover scent to guide her."... done (?)
+[05/13/2026, 10:36:17]     Slide 8: "She sees the welcoming mouth of her burrow, a haven of warmth and safety, just as."... done (?)
+[05/13/2026, 10:36:17]   
+[05/13/2026, 10:36:17]     Updated story.json with narrationPath entries.
+[05/13/2026, 10:36:17]     Audio: output\stories\ep34-the-little-rabbit-s-big-scare\tts
+[05/13/2026, 10:36:17]   
+[05/13/2026, 10:36:17]     Next: run the scheduler — render-video.mjs will pick up narration automatically.
+[05/13/2026, 10:36:17] Done: generate-story-reel-audio.mjs
+[05/13/2026, 10:36:17] Story Reel V2 audio generated
+[05/13/2026, 10:36:17] Running: generate-story-reel-images.mjs --story D:\Joymaze-Content\output\stories\ep34-the-little-rabbit-s-big-scare --continue-on-error
+[05/13/2026, 10:36:55]   === JoyMaze Story Reel Image Generator ===
+[05/13/2026, 10:36:55]   Story    : output\stories\ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:36:55]   Title    : The Little Rabbit's Big Scare
+[05/13/2026, 10:36:55]   Mode     : reel-first
+[05/13/2026, 10:36:55]   Slides   : 1, 2, 3, 4, 5, 6, 7, 8
+[05/13/2026, 10:36:55]   Prompt   : output\stories\ep34-the-little-rabbit-s-big-scare\reel-image-prompts.md
+[05/13/2026, 10:36:55]   Output   : 1024x1536 PNG (vertical default)
+[05/13/2026, 10:36:55]   Fallback : none
+[05/13/2026, 10:36:55]   On error : continue and log fallback-needed slides
+[05/13/2026, 10:36:55]   
+[05/13/2026, 10:36:55]   Slide 01 -> 01.png
+[05/13/2026, 10:36:55]     Narration: "The rabbit bolts into the unknown as fireworks explode above."
+[05/13/2026, 10:36:55]     Prompt: Wide establishing shot, low angle looking up from the grass. A young rabbit — the size of a fist, with bright brown eyes, fluffy grey fur, a...
+[05/13/2026, 10:36:55]     Saved 01.png (2873 KB)
+[05/13/2026, 10:36:55]   Slide 02 -> 02.png
+[05/13/2026, 10:36:55]     Narration: "If she doesn't find her burrow before dawn, the open ground becomes a dangerous place."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Mid-shot, slightly overhead angle. The ...
+[05/13/2026, 10:36:55]     Saved 02.png (3367 KB)
+[05/13/2026, 10:36:55]   Slide 03 -> 03.png
+[05/13/2026, 10:36:55]     Narration: "She tries to follow the scent of her family, but it's masked by the smell of smoke and grass."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Close-up, low angle. The rabbit — the s...
+[05/13/2026, 10:36:55]     Saved 03.png (3066 KB)
+[05/13/2026, 10:36:55]   Slide 04 -> 04.png
+[05/13/2026, 10:36:55]     Narration: "The farther she runs, the more lost she becomes, and the first light of dawn starts to creep over the horizon."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Wide shot, high angle. The rabbit — the...
+[05/13/2026, 10:36:55]     Saved 04.png (3231 KB)
+[05/13/2026, 10:36:55]   Slide 05 -> 05.png
+[05/13/2026, 10:36:55]     Narration: "Alone and scared, she curls up beneath a bush, wondering if she'll ever find her way home."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Close-up, low angle. The rabbit — the s...
+[05/13/2026, 10:36:55]     Saved 05.png (3232 KB)
+[05/13/2026, 10:36:55]   Slide 06 -> 06.png
+[05/13/2026, 10:36:55]     Narration: "She remembers the familiar smell of a patch of clover near her burrow and decides to follow it."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Mid-shot, slightly overhead angle. The ...
+[05/13/2026, 10:36:55]     Saved 06.png (3640 KB)
+[05/13/2026, 10:36:55]   Slide 07 -> 07.png
+[05/13/2026, 10:36:55]     Narration: "With newfound determination, she navigates through the fading darkness, using the clover scent to guide her."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Wide shot, low angle. The rabbit — the ...
+[05/13/2026, 10:36:55]     Saved 07.png (2772 KB)
+[05/13/2026, 10:36:55]   Slide 08 -> 08.png
+[05/13/2026, 10:36:55]     Narration: "She sees the welcoming mouth of her burrow, a haven of warmth and safety, just as."
+[05/13/2026, 10:36:55]     Prompt: A young rabbit, the size of a fist, with bright brown eyes, fluffy grey fur, and a little pink nose. Close-up, low angle. The rabbit — the s...
+[05/13/2026, 10:36:55]     Saved 08.png (3151 KB)
+[05/13/2026, 10:36:55]   
+[05/13/2026, 10:36:55]   Done. Log -> output\stories\ep34-the-little-rabbit-s-big-scare\_reel-image-generation.json
+[05/13/2026, 10:36:55]   Summary  : generated=8, skipped=0, fallback-needed=0
+[05/13/2026, 10:36:55] Done: generate-story-reel-images.mjs
+[05/13/2026, 10:36:55] Running: render-video.mjs --comp StoryReelV2 --story D:\Joymaze-Content\output\stories\ep34-the-little-rabbit-s-big-scare
+[05/13/2026, 10:39:27]   🎬  Remotion Render
+[05/13/2026, 10:39:27]       Composition : StoryReelV2
+[05/13/2026, 10:39:27]       Duration    : 2414 frames (80.5s @ 30fps)
+[05/13/2026, 10:39:27]       Slides      : 8
+[05/13/2026, 10:39:27]       Output      : D:\Joymaze-Content\output\videos\StoryReelV2-1778657815948.mp4
+[05/13/2026, 10:39:27]   
+[05/13/2026, 10:39:27]       Bundling compositions...
+[05/13/2026, 10:39:27]       Bundled in 17.4s
+[05/13/2026, 10:39:27]   
+[05/13/2026, 10:39:27]       Rendering...
+[05/13/2026, 10:39:27]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 93%       Progress: 94%       Progress: 100%   
+[05/13/2026, 10:39:27]   
+[05/13/2026, 10:39:27]       ✓ Done in 116.7s → D:\Joymaze-Content\output\videos\StoryReelV2-1778657815948.mp4
+[05/13/2026, 10:39:27]   
+[05/13/2026, 10:39:27]       Extracting thumbnail (frame 90)...
+[05/13/2026, 10:39:27]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\StoryReelV2-1778657815948-thumb.jpg
+[05/13/2026, 10:39:27] Done: render-video.mjs
+[05/13/2026, 10:39:27] Story Reel V2 rendered -> output/videos/
+[05/13/2026, 10:39:27] Step 10/15: Generating today's ASMR brief...
+[05/13/2026, 10:39:27] Running: generate-asmr-brief.mjs --save
+[05/13/2026, 10:39:30]   JoyMaze ASMR Brief Generator
+[05/13/2026, 10:39:30]     Type: maze | Date: 2026-05-13
+[05/13/2026, 10:39:30]   
+[05/13/2026, 10:39:30]     Loading context (style guide + archetypes + analytics)...
+[05/13/2026, 10:39:30]       Recent themes: magical forest, rainbow islands, rainbow maze, wordsearch butterfly garden, wordsearch cloud kingdom
+[05/13/2026, 10:39:30]     Calling Groq (llama-3.3-70b-versatile)...
+[05/13/2026, 10:39:30]   
+[05/13/2026, 10:39:30]     ================================================================================
+[05/13/2026, 10:39:30]     ASMR Brief — Butterfly Forest (maze)
+[05/13/2026, 10:39:30]     Folder: output/asmr/maze-butterfly-forest/
+[05/13/2026, 10:39:30]     Hook:   "What Path Unfolds"
+[05/13/2026, 10:39:30]   
+[05/13/2026, 10:39:30]     Image 1 prompt (blank):
+[05/13/2026, 10:39:30]       A 9x9 maze with a butterfly character at the start and a flower at the finish, with black lines on a white background and no solution path visible. Portrait orientation, 9:16 aspect ratio (1080x1920 pixels). White background.
+[05/13/2026, 10:39:30]   
+[05/13/2026, 10:39:30]     Image 2 prompt (finished):
+[05/13/2026, 10:39:30]       The same 9x9 maze with the solution path drawn in bright yellow from the butterfly to the flower, with the rest of the maze unchanged. Portrait orientation, 9:16 aspect ratio (1080x1920 pixels). White background.
+[05/13/2026, 10:39:30]     ================================================================================
+[05/13/2026, 10:39:30]   
+[05/13/2026, 10:39:30]     Saved to: output/asmr/maze-butterfly-forest/
+[05/13/2026, 10:39:30]       activity.json  — ready for npm run generate:asmr
+[05/13/2026, 10:39:30]       brief.md       — your Gemini image prompts
+[05/13/2026, 10:39:30]   
+[05/13/2026, 10:39:30]     Next: open output/asmr/maze-butterfly-forest/brief.md
+[05/13/2026, 10:39:30] Done: generate-asmr-brief.mjs
+[05/13/2026, 10:39:30] ASMR: folder identified -> maze-butterfly-forest
+[05/13/2026, 10:39:30] ASMR type: maze
+[05/13/2026, 10:39:30] ASMR: running engine generate-maze-assets.mjs...
+[05/13/2026, 10:39:30] Running: generate-maze-assets.mjs --out-dir D:\Joymaze-Content\output\asmr\maze-butterfly-forest --difficulty medium
+[05/13/2026, 10:39:30]   [maze-factory] title       : Garden Maze
+[05/13/2026, 10:39:30]   [maze-factory] theme       : Garden Maze
+[05/13/2026, 10:39:30]   [maze-factory] outDir      : D:\Joymaze-Content\output\asmr\maze-butterfly-forest
+[05/13/2026, 10:39:30]   [maze-factory] seed        : 2869565465
+[05/13/2026, 10:39:30]   [maze-factory] shape       : rectangle
+[05/13/2026, 10:39:30]   [maze-factory] difficulty  : medium
+[05/13/2026, 10:39:30]   [maze-factory] grid        : 12x9
+[05/13/2026, 10:39:30]   [maze-factory] solution    : 36 cells, 9 dead ends
+[05/13/2026, 10:39:30]   [maze-factory] wrote files:
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\activity.json
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\maze.json
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\path.json
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\blank.svg
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\blank.png
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\puzzle.png
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\solved.svg
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\solved.png
+[05/13/2026, 10:39:30]     - D:\Joymaze-Content\output\asmr\maze-butterfly-forest\_benchmark-notes.json
+[05/13/2026, 10:39:30] Done: generate-maze-assets.mjs
+[05/13/2026, 10:39:30] ASMR: engine OK, activity.json restored
+[05/13/2026, 10:39:30] ASMR: running extract extract-maze-path.mjs...
+[05/13/2026, 10:39:30] Running: extract-maze-path.mjs --asmr D:\Joymaze-Content\output\asmr\maze-butterfly-forest\activity.json
+[05/13/2026, 10:39:31]   Blank : D:\Joymaze-Content\output\asmr\maze-butterfly-forest\blank.png
+[05/13/2026, 10:39:31]   Solved: D:\Joymaze-Content\output\asmr\maze-butterfly-forest\solved.png
+[05/13/2026, 10:39:31]   Image : 1700×2200 → analysing at 340×440 (20%)
+[05/13/2026, 10:39:31]   Computing diff mask...
+[05/13/2026, 10:39:31]   Isolating path component...
+[05/13/2026, 10:39:31]     Path pixels: 7159
+[05/13/2026, 10:39:31]   Thinning to skeleton...
+[05/13/2026, 10:39:31]     Skeleton pixels: 868
+[05/13/2026, 10:39:31]   Tracing path...
+[05/13/2026, 10:39:31]     Raw path length: 852 pixels
+[05/13/2026, 10:39:31]   Sampling path color...
+[05/13/2026, 10:39:31]   
+[05/13/2026, 10:39:31]   ✓ 400 waypoints → D:\Joymaze-Content\output\asmr\maze-butterfly-forest\path.json
+[05/13/2026, 10:39:31]     Path color  : #33c053 (62 samples)
+[05/13/2026, 10:39:31]     X range     : 355–1335 px
+[05/13/2026, 10:39:31]     Y range     : 325–1830 px
+[05/13/2026, 10:39:31] Done: extract-maze-path.mjs
+[05/13/2026, 10:39:31] ASMR: rendering video...
+[05/13/2026, 10:39:31] Running: render-video.mjs --comp AsmrReveal --asmr output/asmr/maze-butterfly-forest/activity.json
+[05/13/2026, 10:40:29]   🎬  Remotion Render
+[05/13/2026, 10:40:29]       Composition : AsmrReveal
+[05/13/2026, 10:40:29]       Duration    : 960 frames (32.0s @ 30fps)
+[05/13/2026, 10:40:29]       Blank       : output/asmr/maze-butterfly-forest/blank.png
+[05/13/2026, 10:40:29]       Solved      : output/asmr/maze-butterfly-forest/solved.png
+[05/13/2026, 10:40:29]       Hook        : "What Path Unfolds"
+[05/13/2026, 10:40:29]       Audio       : assets/audio/crayon.mp3
+[05/13/2026, 10:40:29]       Path pts    : 400 waypoints (solver active)
+[05/13/2026, 10:40:29]       Path color  : #33c053
+[05/13/2026, 10:40:29]       Output      : D:\Joymaze-Content\output\videos\AsmrReveal-1778657971665.mp4
+[05/13/2026, 10:40:29]   
+[05/13/2026, 10:40:29]       Bundling compositions...
+[05/13/2026, 10:40:29]       Bundled in 15.6s
+[05/13/2026, 10:40:29]   
+[05/13/2026, 10:40:29]       Rendering...
+[05/13/2026, 10:40:29]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 94%       Progress: 100%   
+[05/13/2026, 10:40:29]   
+[05/13/2026, 10:40:29]       ✓ Done in 32.8s → D:\Joymaze-Content\output\videos\AsmrReveal-1778657971665.mp4
+[05/13/2026, 10:40:29]   
+[05/13/2026, 10:40:29]       Extracting thumbnail (frame 90)...
+[05/13/2026, 10:40:29]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\AsmrReveal-1778657971665-thumb.jpg
+[05/13/2026, 10:40:29] Done: render-video.mjs
+[05/13/2026, 10:40:29] ASMR video rendered OK
+[05/13/2026, 10:40:29] ASMR brief ready in output/asmr/
+[05/13/2026, 10:40:29] Step 11/15: Generating today's challenge brief + video...
+[05/13/2026, 10:40:29] Running: generate-challenge-brief.mjs --save
+[05/13/2026, 10:40:31]   JoyMaze Challenge Brief Generator
+[05/13/2026, 10:40:31]     Type: maze (MAZE) | Date: 2026-05-13
+[05/13/2026, 10:40:31]   
+[05/13/2026, 10:40:31]     Loading context...
+[05/13/2026, 10:40:31]       Recent themes: generated activity, garden friends, summer vacation
+[05/13/2026, 10:40:31]     Calling Groq (llama-3.3-70b-versatile)...
+[05/13/2026, 10:40:31]   
+[05/13/2026, 10:40:31]     ================================================================================
+[05/13/2026, 10:40:31]     Challenge Brief — Pirate's Treasure (MAZE)
+[05/13/2026, 10:40:31]     Folder: output/challenge/maze-pirates-treasure/
+[05/13/2026, 10:40:31]     Hook:   "Can Your Kid Find The Loot?"
+[05/13/2026, 10:40:31]     CTA:    "Drop Your Time Below!"
+[05/13/2026, 10:40:31]   
+[05/13/2026, 10:40:31]     Image prompt:
+[05/13/2026, 10:40:31]       A maze with a pirate theme, featuring a hidden treasure at the center. The maze has a moderate level of difficulty suitable for kids aged 4-8. Black lines on a white background, with clear start and finish labels. Portrait orientation, 9:16 aspect ratio (1080x1920 pixels). White background.
+[05/13/2026, 10:40:31]     ================================================================================
+[05/13/2026, 10:40:31]   
+[05/13/2026, 10:40:31]     Saved to: output/challenge/maze-pirates-treasure/
+[05/13/2026, 10:40:31]       activity.json  — ready for npm run animate:challenge
+[05/13/2026, 10:40:31]       brief.md       — your Gemini image prompt
+[05/13/2026, 10:40:31]   
+[05/13/2026, 10:40:31]     Next: open output/challenge/maze-pirates-treasure/brief.md
+[05/13/2026, 10:40:31] Done: generate-challenge-brief.mjs
+[05/13/2026, 10:40:31] Challenge brief ready in output/challenge/
+[05/13/2026, 10:40:31] Challenge: folder identified -> maze-pirates-treasure
+[05/13/2026, 10:40:31] Challenge: generating puzzle.png via Imagen...
+[05/13/2026, 10:40:31] Running: generate-challenge-puzzle.mjs --challenge D:\Joymaze-Content\output\challenge\maze-pirates-treasure
+[05/13/2026, 10:40:37]   GEN   puzzle.png in output\challenge\maze-pirates-treasure ...
+[05/13/2026, 10:40:37]   OK    (933KB)
+[05/13/2026, 10:40:37] Done: generate-challenge-puzzle.mjs
+[05/13/2026, 10:40:37] Challenge: puzzle.png generated OK
+[05/13/2026, 10:40:37] Challenge: rendering video...
+[05/13/2026, 10:40:37] Running: render-video.mjs --comp ActivityChallenge --challenge output/challenge/maze-pirates-treasure
+[05/13/2026, 10:42:12]   🎬  Remotion Render
+[05/13/2026, 10:42:12]       Composition : ActivityChallenge
+[05/13/2026, 10:42:12]       Duration    : 1500 frames (50.0s @ 30fps)
+[05/13/2026, 10:42:12]       Hook        : "Can Your Kid Find The Loot?"
+[05/13/2026, 10:42:12]       Path color  : #22BB44
+[05/13/2026, 10:42:12]       Output      : D:\Joymaze-Content\output\videos\ActivityChallenge-1778658037797.mp4
+[05/13/2026, 10:42:12]   
+[05/13/2026, 10:42:12]       Bundling compositions...
+[05/13/2026, 10:42:12]       Bundled in 17.9s
+[05/13/2026, 10:42:12]   
+[05/13/2026, 10:42:12]       Rendering...
+[05/13/2026, 10:42:12]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 93%       Progress: 94%       Progress: 100%   
+[05/13/2026, 10:42:12]   
+[05/13/2026, 10:42:12]       ✓ Done in 63.6s → D:\Joymaze-Content\output\videos\ActivityChallenge-1778658037797.mp4
+[05/13/2026, 10:42:12]   
+[05/13/2026, 10:42:12]       Extracting thumbnail (frame 90)...
+[05/13/2026, 10:42:12]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\ActivityChallenge-1778658037797-thumb.jpg
+[05/13/2026, 10:42:12] Done: render-video.mjs
+[05/13/2026, 10:42:12] Challenge video rendered OK
+[05/13/2026, 10:42:12] Step 12/15: Generating animal facts brief...
+[05/13/2026, 10:42:12] Running: generate-animal-facts-brief.mjs --save
+[05/13/2026, 10:42:22]   JoyMaze Animal Facts Planner
+[05/13/2026, 10:42:22]     Date: 2026-05-13
+[05/13/2026, 10:42:22]   
+[05/13/2026, 10:42:22]     Next episode: 21
+[05/13/2026, 10:42:22]     Recent episodes: ep16-okapi, ep17-fennec-fox, ep18-hedgehog, ep19-pangolin, ep20-sea-otter
+[05/13/2026, 10:42:22]     Calling Groq (llama-3.3-70b-versatile)...
+[05/13/2026, 10:42:22]     Brief retry attempt 2/3 (validation failed)...
+[05/13/2026, 10:42:22]     Calling Groq (llama-3.3-70b-versatile)...
+[05/13/2026, 10:42:22]   
+[05/13/2026, 10:42:22]     Animal: Quokka
+[05/13/2026, 10:42:22]     Open:   "Quokka, the smiley face of the forest, with a grin that's simply contagious!"
+[05/13/2026, 10:42:22]     Beat 1: Quokka, little smile, sunshine in its face
+[05/13/2026, 10:42:22]     Loop:   Quokka, little smile, back to its sunny isle
+[05/13/2026, 10:42:22]   
+[05/13/2026, 10:42:22]     Saved to: output/longform/animal/ep21-quokka
+[05/13/2026, 10:42:22]   [stderr] Attempt 1/3 failed validation: songBeats[0] and songBeats[1] repeat the same core fact instead of escalating.
+[05/13/2026, 10:42:22] Done: generate-animal-facts-brief.mjs
+[05/13/2026, 10:42:22] Animal brief ready in output/longform/animal/
+[05/13/2026, 10:42:22] Step 13/15: Generating Animal Facts Song Short (full pipeline)...
+[05/13/2026, 10:42:22]   Episode: ep21-quokka
+[05/13/2026, 10:42:22] Animal: generating narration audio...
+[05/13/2026, 10:42:22] Running: generate-animal-narration.mjs --episode D:\Joymaze-Content\output\longform\animal\ep21-quokka
+[05/13/2026, 10:42:38]   JoyMaze Animal Facts Narration Generator
+[05/13/2026, 10:42:38]     Animal: Quokka
+[05/13/2026, 10:42:38]     Episode: D:\Joymaze-Content\output\longform\animal\ep21-quokka
+[05/13/2026, 10:42:38]     Writing style: loaded
+[05/13/2026, 10:42:38]     Psychology triggers: 7 loaded
+[05/13/2026, 10:42:38]     Intelligence context: loaded
+[05/13/2026, 10:42:38]     TTS provider: openai
+[05/13/2026, 10:42:38]   
+[05/13/2026, 10:42:38]     HOOK
+[05/13/2026, 10:42:38]       Skip: no copy generated
+[05/13/2026, 10:42:38]     NAME REVEAL
+[05/13/2026, 10:42:38]       "It's a Quokka!"
+[05/13/2026, 10:42:38]       Generating TTS... done
+[05/13/2026, 10:42:38]       narration-namereveal.mp3 → 0.7s audio
+[05/13/2026, 10:42:38]   
+[05/13/2026, 10:42:38]     Skip: fact1 — not found in episode.json
+[05/13/2026, 10:42:38]     Skip: fact2 — not found in episode.json
+[05/13/2026, 10:42:38]     Skip: fact3 — not found in episode.json
+[05/13/2026, 10:42:38]     Skip: fact4 — not found in episode.json
+[05/13/2026, 10:42:38]     Skip: fact5 — not found in episode.json
+[05/13/2026, 10:42:38]     OUTRO CTA
+[05/13/2026, 10:42:38]       Generating copy... done
+[05/13/2026, 10:42:38]       "What's the craziest Quokka smile you can draw? Ask a grown-up to help you write your answer in the c..."
+[05/13/2026, 10:42:38]       Generating TTS... done
+[05/13/2026, 10:42:38]       narration-outro-cta.mp3 → 5.9s audio
+[05/13/2026, 10:42:38]   
+[05/13/2026, 10:42:38]     OUTRO CTA SHORT
+[05/13/2026, 10:42:38]       Generating copy... done
+[05/13/2026, 10:42:38]       "Can Quokka find his hidden smile?"
+[05/13/2026, 10:42:38]       Generating TTS... done
+[05/13/2026, 10:42:38]       narration-outro-cta-short.mp3 → 1.9s audio
+[05/13/2026, 10:42:38]   
+[05/13/2026, 10:42:38]     episode.json updated.
+[05/13/2026, 10:42:38]   
+[05/13/2026, 10:42:38]     Narration complete.
+[05/13/2026, 10:42:38]     Files: narration-hook.mp3, narration-namereveal.mp3, narration-fact1.mp3, narration-fact2.mp3, narration-fact3.mp3, narration-fact4.mp3, narration-fact5.mp3, narration-outro-cta.mp3, narration-outro-cta-short.mp3
+[05/13/2026, 10:42:38] Done: generate-animal-narration.mjs
+[05/13/2026, 10:42:38] Animal: narration OK
+[05/13/2026, 10:42:38] Animal: submitting Suno song...
+[05/13/2026, 10:42:38] Running: generate-animal-song-sunoapi.mjs --episode D:\Joymaze-Content\output\longform\animal\ep21-quokka --kind song --command all
+[05/13/2026, 10:43:16]   Submitted song task: 014defc378340ad7783c1e62a2075b3b
+[05/13/2026, 10:43:16]   Status: PENDING
+[05/13/2026, 10:43:16]   Status: PENDING
+[05/13/2026, 10:43:16]   Status: SUCCESS
+[05/13/2026, 10:43:16]   {
+[05/13/2026, 10:43:16]     "ok": true,
+[05/13/2026, 10:43:16]     "command": "all",
+[05/13/2026, 10:43:16]     "kind": "song",
+[05/13/2026, 10:43:16]     "taskId": "014defc378340ad7783c1e62a2075b3b",
+[05/13/2026, 10:43:16]     "status": "SUCCESS",
+[05/13/2026, 10:43:16]     "downloads": [
+[05/13/2026, 10:43:16]       {
+[05/13/2026, 10:43:16]         "option": 1,
+[05/13/2026, 10:43:16]         "file": "song-option-1.mp3",
+[05/13/2026, 10:43:16]         "title": "Quokka Animal Facts Song",
+[05/13/2026, 10:43:16]         "duration": 39.64,
+[05/13/2026, 10:43:16]         "audioUrl": "https://tempfile.aiquickdraw.com/r/9d51ef5dbe774b02aded46f1b8c74e5b.mp3",
+[05/13/2026, 10:43:16]         "streamAudioUrl": "https://musicfile.removeai.ai/NmQxZGMwMzQtNWE5Ni00NDBjLTk5NzItYTZkZWUwYjZhN2Vm"
+[05/13/2026, 10:43:16]       },
+[05/13/2026, 10:43:16]       {
+[05/13/2026, 10:43:16]         "option": 2,
+[05/13/2026, 10:43:16]         "file": "song-option-2.mp3",
+[05/13/2026, 10:43:16]         "title": "Quokka Animal Facts Song",
+[05/13/2026, 10:43:16]         "duration": 45.12,
+[05/13/2026, 10:43:16]         "audioUrl": "https://tempfile.aiquickdraw.com/r/074038ec36894d058253076dea44f29a.mp3",
+[05/13/2026, 10:43:16]         "streamAudioUrl": "https://musicfile.removeai.ai/MTViNTkyYzgtMDNjYi00N2UxLWE2MmEtZjJmYzk5M2FjNGY2"
+[05/13/2026, 10:43:16]       }
+[05/13/2026, 10:43:16]     ]
+[05/13/2026, 10:43:16]   }
+[05/13/2026, 10:43:16] Done: generate-animal-song-sunoapi.mjs
+[05/13/2026, 10:43:16] Animal: Suno song OK
+[05/13/2026, 10:43:16] Animal: submitting Suno background...
+[05/13/2026, 10:43:16] Running: generate-animal-song-sunoapi.mjs --episode D:\Joymaze-Content\output\longform\animal\ep21-quokka --kind background --command all
+[05/13/2026, 10:44:55]   Submitted background task: 10b51ff8398b8f50840d045594be1e9f
+[05/13/2026, 10:44:55]   Status: PENDING
+[05/13/2026, 10:44:55]   Status: PENDING
+[05/13/2026, 10:44:55]   Status: TEXT_SUCCESS
+[05/13/2026, 10:44:55]   Status: TEXT_SUCCESS
+[05/13/2026, 10:44:55]   Status: SUCCESS
+[05/13/2026, 10:44:55]   {
+[05/13/2026, 10:44:55]     "ok": true,
+[05/13/2026, 10:44:55]     "command": "all",
+[05/13/2026, 10:44:55]     "kind": "background",
+[05/13/2026, 10:44:55]     "taskId": "10b51ff8398b8f50840d045594be1e9f",
+[05/13/2026, 10:44:55]     "status": "SUCCESS",
+[05/13/2026, 10:44:55]     "downloads": [
+[05/13/2026, 10:44:55]       {
+[05/13/2026, 10:44:55]         "option": 1,
+[05/13/2026, 10:44:55]         "file": "background-option-1.mp3",
+[05/13/2026, 10:44:55]         "title": "Quokka Background",
+[05/13/2026, 10:44:55]         "duration": 141.16,
+[05/13/2026, 10:44:55]         "audioUrl": "https://tempfile.aiquickdraw.com/r/30c72ffa65e941e696ad58f50392a308.mp3",
+[05/13/2026, 10:44:55]         "streamAudioUrl": "https://musicfile.removeai.ai/MDNhZGQxOGQtMDY0Yy00NjAzLWExY2ItODFlODhjNWI4ZGUx"
+[05/13/2026, 10:44:55]       },
+[05/13/2026, 10:44:55]       {
+[05/13/2026, 10:44:55]         "option": 2,
+[05/13/2026, 10:44:55]         "file": "background-option-2.mp3",
+[05/13/2026, 10:44:55]         "title": "Quokka Background",
+[05/13/2026, 10:44:55]         "duration": 163.76,
+[05/13/2026, 10:44:55]         "audioUrl": "https://tempfile.aiquickdraw.com/r/d9d165d17d0144e190f222ee65dc4431.mp3",
+[05/13/2026, 10:44:55]         "streamAudioUrl": "https://musicfile.removeai.ai/YWRiZDZkMzQtZDUyMi00YTk2LWE1ZjEtNGFlYWU0ZTk0M2Vm"
+[05/13/2026, 10:44:55]       }
+[05/13/2026, 10:44:55]     ]
+[05/13/2026, 10:44:55]   }
+[05/13/2026, 10:44:55] Done: generate-animal-song-sunoapi.mjs
+[05/13/2026, 10:44:55] Animal: Suno background OK
+[05/13/2026, 10:44:55] Animal: generating moment images (Imagen)...
+[05/13/2026, 10:44:55] Running: generate-animal-moments.mjs --episode D:\Joymaze-Content\output\longform\animal\ep21-quokka
+[05/13/2026, 10:46:02]   Generating animal moments for Quokka in output\longform\animal\ep21-quokka
+[05/13/2026, 10:46:02]   GEN   moment1.png ... OK (1366KB)
+[05/13/2026, 10:46:02]   GEN   moment2.png ... OK (1195KB)
+[05/13/2026, 10:46:02]   GEN   moment3.png ... OK (1134KB)
+[05/13/2026, 10:46:02]   GEN   moment4.png ... OK (1359KB)
+[05/13/2026, 10:46:02]   GEN   moment5.png ... OK (1500KB)
+[05/13/2026, 10:46:02]     [rate limit pause] GEN   moment6.png ... OK (1404KB)
+[05/13/2026, 10:46:02]   GEN   moment7.png ... OK (1508KB)
+[05/13/2026, 10:46:02]   GEN   moment8.png ... OK (1471KB)
+[05/13/2026, 10:46:02]   GEN   moment9.png ... OK (1117KB)
+[05/13/2026, 10:46:02]   GEN   moment10.png ... OK (1270KB)
+[05/13/2026, 10:46:02]   
+[05/13/2026, 10:46:02]   Done. 10 generated, 0 skipped, 0 failed / 10 total
+[05/13/2026, 10:46:02] Done: generate-animal-moments.mjs
+[05/13/2026, 10:46:02] Animal: moments OK
+[05/13/2026, 10:46:02] Animal: downloading B-roll...
+[05/13/2026, 10:46:02] Running: download-broll.mjs --episode D:\Joymaze-Content\output\longform\animal\ep21-quokka
+[05/13/2026, 10:46:02]   JoyMaze B-Roll Downloader
+[05/13/2026, 10:46:02]     Animal: Quokka
+[05/13/2026, 10:46:02]     Episode: D:\Joymaze-Content\output\longform\animal\ep21-quokka
+[05/13/2026, 10:46:02]     Sources: Pixabay (animated) → Pexels (live)
+[05/13/2026, 10:46:02]     Mode: normal
+[05/13/2026, 10:46:02]   
+[05/13/2026, 10:46:02]     Skip: fact1 — not in episode.json
+[05/13/2026, 10:46:02]     Skip: fact2 — not in episode.json
+[05/13/2026, 10:46:02]     Skip: fact3 — not in episode.json
+[05/13/2026, 10:46:02]     Skip: fact4 — not in episode.json
+[05/13/2026, 10:46:02]     Skip: fact5 — not in episode.json
+[05/13/2026, 10:46:02]   
+[05/13/2026, 10:46:02]     B-roll complete: 0/5 clips downloaded, 5 using illustrated image fallback
+[05/13/2026, 10:46:02] Done: download-broll.mjs
+[05/13/2026, 10:46:02] Animal: B-roll OK
+[05/13/2026, 10:46:02] Animal: rendering video...
+[05/13/2026, 10:46:02] Running: render-video.mjs --comp AnimalFactsSongShort --episode output/longform/animal/ep21-quokka
+[05/13/2026, 10:47:56]   🎬  Remotion Render
+[05/13/2026, 10:47:56]       Composition : AnimalFactsSongShort
+[05/13/2026, 10:47:56]       Duration    : 1190 frames (39.7s @ 30fps)
+[05/13/2026, 10:47:56]       Output      : D:\Joymaze-Content\output\videos\AnimalFactsSongShort-1778658363557.mp4
+[05/13/2026, 10:47:56]   
+[05/13/2026, 10:47:56]       Bundling compositions...
+[05/13/2026, 10:47:56]       Bundled in 18.9s
+[05/13/2026, 10:47:56]   
+[05/13/2026, 10:47:56]       Rendering...
+[05/13/2026, 10:47:56]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 93%       Progress: 94%       Progress: 100%   
+[05/13/2026, 10:47:56]   
+[05/13/2026, 10:47:56]       ✓ Done in 80.4s → D:\Joymaze-Content\output\videos\AnimalFactsSongShort-1778658363557.mp4
+[05/13/2026, 10:47:56]   
+[05/13/2026, 10:47:56]       Extracting thumbnail (frame 90)...
+[05/13/2026, 10:47:56]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\AnimalFactsSongShort-1778658363557-thumb.jpg
+[05/13/2026, 10:47:56]   [stderr] [warn] song.mp3 not found — using song-option-1.mp3 for duration probe
+[05/13/2026, 10:47:56]   [stderr] [warn] background.mp3 not found — using background-option-1.mp3
+[05/13/2026, 10:47:56] Done: render-video.mjs
+[05/13/2026, 10:47:56] Animal Facts video rendered OK
+[05/13/2026, 10:47:56] Step 14/15: Generating today's X text posts...
+[05/13/2026, 10:47:56] Running: generate-x-posts.mjs 
+[05/13/2026, 10:47:59]   === JoyMaze X Text Post Generator ===
+[05/13/2026, 10:47:59]   Mode: LIVE | Date: 2026-05-13
+[05/13/2026, 10:47:59]   Calling Groq...
+[05/13/2026, 10:47:59]   
+[05/13/2026, 10:47:59]   ── Post scores ──
+[05/13/2026, 10:47:59]   ✓ [1] story-hook | total: 0.82 | scroll:0.7 rel:0.9 promo:1 eng:0.7 clr:0.8
+[05/13/2026, 10:47:59]   ✓ [2] puzzle | total: 0.72 | scroll:0.78 rel:0.3 promo:1 eng:0.7 clr:0.8
+[05/13/2026, 10:47:59]   ✓ [3] insight | total: 0.83 | scroll:0.85 rel:0.8 promo:1 eng:0.7 clr:0.8
+[05/13/2026, 10:47:59]   ✓ [4] identity | total: 0.7 | scroll:0.7 rel:0.3 promo:1 eng:0.7 clr:0.8
+[05/13/2026, 10:47:59]   
+[05/13/2026, 10:47:59]   Saved 4 X text posts → D:\Joymaze-Content\output\queue\x-text-2026-05-13.json
+[05/13/2026, 10:47:59]   Scores saved → output/scores/x-text-scores-2026-05-13.json | batch avg: 0.77
+[05/13/2026, 10:47:59]   All posts passed quality threshold.
+[05/13/2026, 10:47:59] Done: generate-x-posts.mjs
+[05/13/2026, 10:47:59] X text posts saved to output/queue/x-text-YYYY-MM-DD.json
+[05/13/2026, 10:47:59] Analytics: skipping (next auto-run in 1 day(s), use --with-analytics to force)
+[05/13/2026, 10:47:59] Note: posting handled by hourly Task Scheduler (post-content.mjs --scheduled --limit 2)
+[05/13/2026, 10:47:59] === Daily Morning Job Complete ===
+[Thu 05/14/2026  9:00:03.05] === Scheduled daily run starting === 
+[05/14/2026, 09:00:03] === Daily Morning Job Starting ===
+[05/14/2026, 09:00:03] Step 1/16: Archiving yesterday's queue...
+[05/14/2026, 09:00:03] Running: archive-queue.mjs 
+[05/14/2026, 09:00:03]   === JoyMaze Queue Archive ===
+[05/14/2026, 09:00:03]   Mode: LIVE
+[05/14/2026, 09:00:03]   Today: 2026-05-14
+[05/14/2026, 09:00:03]   Archive scope: Items older than today
+[05/14/2026, 09:00:03]   
+[05/14/2026, 09:00:03]   Found 1 item(s) in queue.
+[05/14/2026, 09:00:03]   
+[05/14/2026, 09:00:03]     Skip: x-text-2026-05-13.json (x-text — managed by post-x-scheduled.mjs)
+[05/14/2026, 09:00:03]     Archive raw: coloring-sea-turtles.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: dot-to-dot-ancient-egypt.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: dot-to-dot-ocean-animals.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: matching-baking-adventures.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: matching-ocean-animals.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: maze-2026-05-13-slot01-camping-outdoors.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: printable-2026-05-13.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive raw: wordsearch-2026-05-13-slot02-construction-and-building.png → 2026-05-13/raw/
+[05/14/2026, 09:00:03]     Archive ASMR: coloring-forest-animals → archive/asmr/
+[05/14/2026, 09:00:03]     Archive story: ep01-the-little-turtle-who-saved-the-pond → archive/stories/
+[05/14/2026, 09:00:03]     Archive challenge: maze-pirates-treasure → archive/challenge/
+[05/14/2026, 09:00:03]     Archive challenge: word-search-garden-friends → archive/challenge/
+[05/14/2026, 09:00:03]     Archive generated activity: 2026-04-23-activity-maze-archive-test → archive/challenge-generated/
+[05/14/2026, 09:00:03]     Archive video: ActivityChallenge-1778658037797.mp4 → archive/videos/
+[05/14/2026, 09:00:03]     Archive video: AnimalFactsSongShort-1778658363557.mp4 → archive/videos/
+[05/14/2026, 09:00:03]     Archive video: AsmrReveal-1778657971665.mp4 → archive/videos/
+[05/14/2026, 09:00:03]     Archive video: StoryReelV2-1778657815948.mp4 → archive/videos/
+[05/14/2026, 09:00:03]     Archive x-text: x-text-2026-05-13.json → archive/x-text/
+[05/14/2026, 09:00:03]     Archive prompt: activity-manifest-2026-05-13.json → archive/prompts/
+[05/14/2026, 09:00:03]     Archive prompt: prompts-2026-05-13.md → archive/prompts/
+[05/14/2026, 09:00:03]   
+[05/14/2026, 09:00:03]   --- Summary ---
+[05/14/2026, 09:00:03]     raw files: 8 image(s)
+[05/14/2026, 09:00:03]     challenge briefs: 1 folder(s)
+[05/14/2026, 09:00:03]     videos: 4 file(s)
+[05/14/2026, 09:00:03]     prompts: 2 file(s)
+[05/14/2026, 09:00:03]     x-text posts: 1 file(s)
+[05/14/2026, 09:00:03]   
+[05/14/2026, 09:00:03]   Archived: 0 queue + 8 raw + 0 ASMR + 0 stories + 1 challenge briefs + 0 generated challenge activities + 4 videos + 2 prompts + 1 x-text
+[05/14/2026, 09:00:03]   Skipped: 1 item(s)
+[05/14/2026, 09:00:03] Done: archive-queue.mjs
+[05/14/2026, 09:00:03] Step 2/16: Generating today's image prompts...
+[05/14/2026, 09:00:03] Running: generate-prompts.mjs --save
+[05/14/2026, 09:00:24]   🎨 JoyMaze Image Prompt Generator
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   Loading strategy context + dynamic pools...
+[05/14/2026, 09:00:24]     Style guide: 36693 chars
+[05/14/2026, 09:00:24]     Archetypes: 24279 chars
+[05/14/2026, 09:00:24]     Theme pool: 61 hardcoded + 30 dynamic = 91 total
+[05/14/2026, 09:00:24]     Pattern interrupts: 25 dynamic added
+[05/14/2026, 09:00:24]     Hook examples: 4 for system prompt injection
+[05/14/2026, 09:00:24]     Audit learnings: 5 rules loaded (injected into generation + scorer)
+[05/14/2026, 09:00:24]     Competitor intelligence: loaded (2026-05-11) — formats, hooks, gaps injected
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   Today's rotation: Thu — Intelligence Mix + Activities (easy)
+[05/14/2026, 09:00:24]   Generating 10 prompts...
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   Loading performance context...
+[05/14/2026, 09:00:24]     No analytics data yet — skipping performance context.
+[05/14/2026, 09:00:24]   Checking recent themes for diversity...
+[05/14/2026, 09:00:24]   Loading trend signals...
+[05/14/2026, 09:00:24]     Trend signals found — boosting: Pets Home, Garden Flowers, Birds Sky.
+[05/14/2026, 09:00:24]     Assigned themes (code-enforced): Airplanes, Baby Animals, Farm Animals, Mermaids, Treasure Map
+[05/14/2026, 09:00:24]     Story settings: 
+[05/14/2026, 09:00:24]     Psychology layer: 7 triggers loaded
+[05/14/2026, 09:00:24]   Calling Groq (llama-3.3-70b-versatile)...
+[05/14/2026, 09:00:24]   Groq response received.
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ================================================================================
+[05/14/2026, 09:00:24]   ### Prompt 1 — FACT-CARD
+[05/14/2026, 09:00:24]   **Type:** Story
+[05/14/2026, 09:00:24]   **Emotional target:** Confidence → Pride
+[05/14/2026, 09:00:24]   **Primary trigger:** Surprising child-development insight through visual metaphor
+[05/14/2026, 09:00:24]   **Activity shown:** None — infographic focus
+[05/14/2026, 09:00:24]   **Hook type:** Sensational Hook
+[05/14/2026, 09:00:24]   **Skill shown:** Child development awareness
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   Generate a bold, eye-catching educational poster featuring a mixed-media collage visual metaphor that represents the development of a child's fine motor skills through Mothers Day-themed activities. A large, colorful handprint with visible brush strokes and layered paper textures dominates the center, symbolizing creativity and growth. The handprint morphs into a blooming flower with green stems and leaves made from cut-out magazine pages, signifying nurturing and care. The background is a warm, sunny yellow, with subtle torn-paper edges and painted brush marks adding a tactile feel. A few, strategically placed, small toys and colorful blocks are shown around the handprint, made from a combination of paint and collage elements. The overall mood is confident, surprising, and educational, like a viral infographic. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "This one surprising activity can boost your child's fine motor skills by 30% — and it's perfect for Mothers Day."
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 2 — ACTIVITY-CHALLENGE
+[05/14/2026, 09:00:24]   **Type:** Story
+[05/14/2026, 09:00:24]   **Emotional target:** Competitive curiosity
+[05/14/2026, 09:00:24]   **Primary trigger:** Challenging activity printable
+[05/14/2026, 09:00:24]   **Activity shown:** Maze puzzle
+[05/14/2026, 09:00:24]   **Hook type:** Challenge Hook
+[05/14/2026, 09:00:24]   **Skill shown:** Problem-solving, spatial reasoning
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   An 8-year-old girl sits at a wooden table, facing a challenging airplane-themed maze puzzle. The maze is partially solved, with a pencil trail visible halfway through. The girl's hands are engaged, with one hand holding the pencil and the other resting on the table, slightly blurred from movement. The maze itself is beautiful, with bold black outlines and fun airplane decorations, such as clouds and propellers, in a golden-hour photography style with lens flare and bokeh leaves. The background is a warm, soft focus, with a few props like a small toy airplane and a book about flying, adding to the theme. The overall energy is competitive curiosity, inviting the viewer to participate. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "Can your kid navigate this maze and reach the finish line?"
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 3 — QUIET-MOMENT
+[05/14/2026, 09:00:24]   **Type:** Story
+[05/14/2026, 09:00:24]   **Emotional target:** Peaceful, sensory
+[05/14/2026, 09:00:24]   **Primary trigger:** Small hand tracing carefully
+[05/14/2026, 09:00:24]   **Activity shown:** Tracing activity printable
+[05/14/2026, 09:00:24]   **Hook type:** Sensory Hook
+[05/14/2026, 09:00:24]   **Skill shown:** Fine motor skills, hand-eye coordination
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   A 4-year-old girl sits on a soft, plush rug in a cozy bedroom, surrounded by warm lighting from a table lamp. She is tracing a simple, spring-themed line art design with a yellow pencil, her tongue out in concentration. The tracing sheet is on a small, wooden table in front of her, with a few crayons and a pencil sharpener nearby. The atmosphere is peaceful and sensory, with a few toys and books scattered around, such as a stuffed rabbit and a board book about spring. The overall style is reminiscent of a Japanese woodblock print, with flat areas of color, bold outlines, and decorative borders. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "The good kind of quiet — when all that's left is the sound of a pencil on paper."
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 4 — PRINTABLE-TEASE
+[05/14/2026, 09:00:24]   **Type:** Story
+[05/14/2026, 09:00:24]   **Emotional target:** Save-bait energy
+[05/14/2026, 09:00:24]   **Primary trigger:** Beautiful flat-lay of a printable
+[05/14/2026, 09:00:24]   **Activity shown:** Maze puzzle
+[05/14/2026, 09:00:24]   **Hook type:** Relief Hook
+[05/14/2026, 09:00:24]   **Skill shown:** Problem-solving, spatial reasoning
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   A beautiful, flat-lay close-up of a printed airplane-themed maze puzzle on a wooden table. A pencil lies next to the puzzle, with a few sheets of paper and a small notebook in the background. The maze is partially solved, with a few paths filled in, and the overall design is inviting and easy to follow. The style is soft and felt-craft-like, with wool textures and hand-stitched outlines, giving the image a warm and inviting feel. A few props, such as a small toy airplane and a spring-themed decoration, are placed around the puzzle, adding to the theme. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "Bookmark this for the weekend — your kid will love it."
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 5 — IDENTITY
+[05/14/2026, 09:00:24]   **Type:** Story
+[05/14/2026, 09:00:24]   **Emotional target:** Aspirational, real-feeling
+[05/14/2026, 09:00:24]   **Primary trigger:** Quiet parenting moment
+[05/14/2026, 09:00:24]   **Activity shown:** None — lifestyle focus
+[05/14/2026, 09:00:24]   **Hook type:** Identity Hook
+[05/14/2026, 09:00:24]   **Skill shown:** Intentional parenting
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   A quiet, real-feeling moment showing a 6-year-old boy engaged in a spring-themed coloring activity at a small table, while his parent watches with quiet pride from a nearby chair. The atmosphere is calm and peaceful, with a few books and toys scattered around, such as a spring-themed coloring book and a small potted plant. The parent's expression is warm and supportive, with a subtle smile, and the overall mood is aspirational and real. The style is reminiscent of children's editorial illustration, with clean ink lines, limited color palette, and white space. Portrait orientation, 2:3 aspect ratio (1000×1500 px).
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "This is the kind of Saturday morning you want to have — peaceful, engaged, and present."
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 6 — Activity: Maze Puzzle
+[05/14/2026, 09:00:24]   **Type:** Activity
+[05/14/2026, 09:00:24]   **Activity type:** Maze
+[05/14/2026, 09:00:24]   **Difficulty:** Easy
+[05/14/2026, 09:00:24]   **Theme:** Airplanes
+[05/14/2026, 09:00:24]   **Skill target:** Problem-solving, spatial reasoning
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   Generate a maze with a picture of a smiling airplane at the start point, with an easy-to-follow path. The maze should be designed for a 4-5 year old, moderately challenging with thick lines and a clear start and end point. The theme should be airplanes, with airplane decorations and symbols incorporated into the design. Add small decorative elements, such as tiny clouds and airplanes, to the corners of the page. Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px). Leave the bottom 10% of the image completely empty (white space for watermark).
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "Can your kid find the path to the airport?"
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 7 — Activity: Word Search
+[05/14/2026, 09:00:24]   **Type:** Activity
+[05/14/2026, 09:00:24]   **Activity type:** Word Search
+[05/14/2026, 09:00:24]   **Difficulty:** Easy
+[05/14/2026, 09:00:24]   **Theme:** Baby Animals
+[05/14/2026, 09:00:24]   **Skill target:** Vocabulary, letter recognition
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   Generate a word search grid with a baby animal theme, featuring cute illustrations of spring-themed animals, such as lambs and chicks, above the grid. The grid should be large enough to read individual letters clearly, with a clear and easy-to-understand layout. The words to find should be related to baby animals, such as "lamb" and "chick". Add small decorative elements, such as tiny flowers and leaves, to the corners of the page. Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px). Illustrated in a warm watercolor style.
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "How fast can your kid find all the baby animal words?"
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 8 — Activity: Coloring Page
+[05/14/2026, 09:00:24]   **Type:** Activity
+[05/14/2026, 09:00:24]   **Activity type:** Coloring
+[05/14/2026, 09:00:24]   **Difficulty:** Easy
+[05/14/2026, 09:00:24]   **Theme:** Farm Animals
+[05/14/2026, 09:00:24]   **Skill target:** Creativity, color recognition
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   Generate a kids' coloring page featuring a farm animal scene, with a tractor, barn, and animals, such as cows and pigs, in a spring-themed setting with flowers and trees. The outline should be bold and black, with no color fills, on a white background. Add small decorative elements, such as tiny hay bales and farm tools, to the corners of the page. Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px). Illustrated in a vintage storybook style.
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "Save this for a fun spring afternoon — your kid will love coloring these farm animals.
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 9 — Activity: Dot-to-Dot
+[05/14/2026, 09:00:24]   **Type:** Activity
+[05/14/2026, 09:00:24]   **Activity type:** Dot-to-Dot
+[05/14/2026, 09:00:24]   **Difficulty:** Easy
+[05/14/2026, 09:00:24]   **Theme:** Mermaids
+[05/14/2026, 09:00:24]   **Skill target:** Number sequencing, fine motor
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   Generate a dot-to-dot activity page for kids, featuring a mermaid-themed design with a mermaid tail and seaweed. Number all dots clearly from 1 to 25 in sequence, with bold and clearly spaced numbered dots. The dots should form the outline of a mermaid, with no pre-drawn outline between them. Add small decorative elements, such as tiny seashells and fish, to the corners of the page. Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px). Illustrated in a 3D Pixar-style render.
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "Can your kid connect the dots to reveal the hidden mermaid?"
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ### Prompt 10 — Activity: Matching / Spot-the-Difference
+[05/14/2026, 09:00:24]   **Type:** Activity
+[05/14/2026, 09:00:24]   **Activity type:** Matching
+[05/14/2026, 09:00:24]   **Difficulty:** Easy
+[05/14/2026, 09:00:24]   **Theme:** Treasure Map
+[05/14/2026, 09:00:24]   **Skill target:** Observation, memory
+[05/14/2026, 09:00:24]   **Output dimensions:** 2:3 portrait — 1000×1500 px
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Image prompt:**
+[05/14/2026, 09:00:24]   Generate a matching game page for kids, featuring a treasure map theme with two identical maps side by side, except for 4-6 differences, such as a missing X or a different symbol. The maps should be colorful and fun, with a clear and easy-to-understand layout. Add small decorative elements, such as tiny coins and jewels, to the corners of the page. Leave the bottom 10% of the image completely empty (white space for watermark). Portrait orientation, 2:3 aspect ratio (1000×1500 px). Illustrated in an ink-and-wash bold lines style.
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   **Caption hook idea:** "Can your kid spot all the differences between the two treasure maps?"
+[05/14/2026, 09:00:24]   ================================================================================
+[05/14/2026, 09:00:24]     ⚠ Pre-check Prompt 1: fabricated-stat(-4)
+[05/14/2026, 09:00:24]     ⚠ Pre-check Prompt 3: illustration-on-story(-3)
+[05/14/2026, 09:00:24]     ⚠ Pre-check Prompt 4: illustration-on-story(-3)
+[05/14/2026, 09:00:24]     ⚠ Pre-check Prompt 5: illustration-on-story(-3)
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   Running quality gate scoring...
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]     Auto-regenerating 4 rejected prompt(s) (attempt 1/2)...
+[05/14/2026, 09:00:24]       Prompt 1 (score 5.5/10): rule-violations: fabricated-stat
+[05/14/2026, 09:00:24]       → Rewritten. Re-scoring...
+[05/14/2026, 09:00:24]       Prompt 3 (score 6.5/10): rule-violations: illustration-on-story
+[05/14/2026, 09:00:24]       → Rewritten. Re-scoring...
+[05/14/2026, 09:00:24]       Prompt 4 (score 6.5/10): rule-violations: illustration-on-story
+[05/14/2026, 09:00:24]       → Rewritten. Re-scoring...
+[05/14/2026, 09:00:24]       Prompt 5 (score 6.5/10): rule-violations: illustration-on-story
+[05/14/2026, 09:00:24]       → Rewritten. Re-scoring...
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ┌─ Quality Gate Results ───────────────────────────────────────┐
+[05/14/2026, 09:00:24]   │ Prompt 1   PASS  9    
+[05/14/2026, 09:00:24]   │ Prompt 2   PASS  9    
+[05/14/2026, 09:00:24]   │ Prompt 3   PASS  9    
+[05/14/2026, 09:00:24]   │ Prompt 4   PASS  9    
+[05/14/2026, 09:00:24]   │ Prompt 5   PASS  9    
+[05/14/2026, 09:00:24]   │ Prompt 6   PASS  9    
+[05/14/2026, 09:00:24]   │ Prompt 7   PASS  8     — missing art style named, missing template style, missing dimensions line, missing caption hook, missing puzzle specced, missing color page correctness, missing dot-to-dot correctness
+[05/14/2026, 09:00:24]   │ Prompt 8   PASS  8     — missing puzzle specced, missing dimensions line, missing template style, missing caption hook, missing color page correctness, missing dot-to-dot correctness
+[05/14/2026, 09:00:24]   │ Prompt 9   PASS  8     — missing puzzle specced, missing dimensions line, missing template style, missing caption hook, missing dot-to-dot correctness
+[05/14/2026, 09:00:24]   │ Prompt 10  PASS  8     — missing puzzle specced, missing dimensions line, missing template style, missing caption hook, missing dot-to-dot correctness
+[05/14/2026, 09:00:24]   └─ 10 pass · 0 flagged · 0 rejected ──────────────────────────┘
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   Saved to: D:\Joymaze-Content\output\prompts\prompts-2026-05-14.md
+[05/14/2026, 09:00:24]   Activity manifest saved to: D:\Joymaze-Content\output\prompts\activity-manifest-2026-05-14.json
+[05/14/2026, 09:00:24]   
+[05/14/2026, 09:00:24]   ✅ Copy the prompts above into ChatGPT or Gemini image generation.
+[05/14/2026, 09:00:24]   Save generated images to output/raw/ then run: npm run import:raw
+[05/14/2026, 09:00:24] Done: generate-prompts.mjs
+[05/14/2026, 09:00:24] Image prompts saved to output/prompts/
+[05/14/2026, 09:00:24] Step 3/16: Auto-generating 5 inspiration images via Imagen...
+[05/14/2026, 09:00:24] Running: generate-images-vertex.mjs --inspiration-only
+[05/14/2026, 09:00:40]   === JoyMaze Vertex Track — Imagen 4.0 ===
+[05/14/2026, 09:00:40]   Date     : 2026-05-14
+[05/14/2026, 09:00:40]   Mode     : Inspiration Only (5 slots)
+[05/14/2026, 09:00:40]   Output   : output/vertex-gen/2026-05-14
+[05/14/2026, 09:00:40]   
+[05/14/2026, 09:00:40]   [1] FACT-CARD
+[05/14/2026, 09:00:40]     Prompt: "Generate a bold, eye-catching educational poster featuring a mixed-media collage visual metaphor tha..."
+[05/14/2026, 09:00:40]     Target : output/raw/fact-card
+[05/14/2026, 09:00:40]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/14/2026, 09:00:40]   
+[05/14/2026, 09:00:40]   [2] ACTIVITY-CHALLENGE
+[05/14/2026, 09:00:40]     Prompt: "An child sits at a wooden table, facing a challenging airplane-themed maze puzzle. The maze is parti..."
+[05/14/2026, 09:00:40]     Target : output/raw/challenge
+[05/14/2026, 09:00:40]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/14/2026, 09:00:40]   
+[05/14/2026, 09:00:40]   [3] QUIET-MOMENT
+[05/14/2026, 09:00:40]     Prompt: "A child sits on a soft, plush rug in a cozy bedroom, surrounded by warm lighting from a table lamp. ..."
+[05/14/2026, 09:00:40]     Target : output/raw/quiet
+[05/14/2026, 09:00:40]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/14/2026, 09:00:40]   
+[05/14/2026, 09:00:40]   [4] PRINTABLE-TEASE
+[05/14/2026, 09:00:40]     Prompt: "A beautiful, flat-lay photograph of a printed airplane-themed maze puzzle on a real, worn wooden tab..."
+[05/14/2026, 09:00:40]     Target : output/raw/printable
+[05/14/2026, 09:00:40]     v1... 1590 KB → printable-2026-05-14.png
+[05/14/2026, 09:00:40]   
+[05/14/2026, 09:00:40]   [5] IDENTITY
+[05/14/2026, 09:00:40]     Prompt: "A quiet, real-feeling moment showing a child engaged in a spring-themed coloring activity at a small..."
+[05/14/2026, 09:00:40]     Target : output/raw/identity
+[05/14/2026, 09:00:40]     v1... [DALL-E 3] FAILED: DALL-E 3 error 400: The model 'dall-e-3' does not exist.
+[05/14/2026, 09:00:40]   
+[05/14/2026, 09:00:40]   Prompt log → output\vertex-gen\2026-05-14\_prompt-transforms.json
+[05/14/2026, 09:00:40]   === Done ===
+[05/14/2026, 09:00:40]   Inspiration images ready in output/raw/
+[05/14/2026, 09:00:40]   Then: npm run import:raw && npm run generate:captions
+[05/14/2026, 09:00:40] Done: generate-images-vertex.mjs
+[05/14/2026, 09:00:40] Inspiration images generated OK
+[05/14/2026, 09:00:40] Step 4/16: Generating today's deterministic puzzle posts (Maze/Wordsearch)...
+[05/14/2026, 09:00:40] Running: generate-puzzle-image-post.mjs --manifest output\prompts\activity-manifest-2026-05-14.json --category activity-maze
+[05/14/2026, 09:00:44]   [puzzle-post] manifest   : D:\Joymaze-Content\output\prompts\activity-manifest-2026-05-14.json
+[05/14/2026, 09:00:44]   [puzzle-post] targets    : 1:activity-maze:Airplanes
+[05/14/2026, 09:00:44]   [puzzle-post] generating maze assets for theme: Airplanes
+[05/14/2026, 09:00:44]   [maze-factory] title       : Airplanes Maze Puzzle
+[05/14/2026, 09:00:44]   [maze-factory] theme       : Airplanes
+[05/14/2026, 09:00:44]   [maze-factory] outDir      : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze
+[05/14/2026, 09:00:44]   [maze-factory] seed        : 4241573029
+[05/14/2026, 09:00:44]   [maze-factory] shape       : rectangle
+[05/14/2026, 09:00:44]   [maze-factory] difficulty  : easy
+[05/14/2026, 09:00:44]   [maze-factory] grid        : 8x8
+[05/14/2026, 09:00:44]   [maze-factory] solution    : 29 cells, 6 dead ends
+[05/14/2026, 09:00:44]   [maze-factory] wrote files:
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\activity.json
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\maze.json
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\path.json
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\blank.svg
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\blank.png
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\puzzle.png
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\solved.svg
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\solved.png
+[05/14/2026, 09:00:44]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\_benchmark-notes.json
+[05/14/2026, 09:00:44]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze
+[05/14/2026, 09:00:44]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\maze\maze-2026-05-14-slot01-airplanes.png
+[05/14/2026, 09:00:44]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot01-airplanes-maze\post.png
+[05/14/2026, 09:00:44]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\maze\maze-2026-05-14-slot01-airplanes.png
+[05/14/2026, 09:00:44]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\maze\maze-2026-05-14-slot01-airplanes.json
+[05/14/2026, 09:00:44] Done: generate-puzzle-image-post.mjs
+[05/14/2026, 09:00:44] Running: generate-puzzle-image-post.mjs --manifest output\prompts\activity-manifest-2026-05-14.json --category activity-word-search
+[05/14/2026, 09:00:47]   [puzzle-post] manifest   : D:\Joymaze-Content\output\prompts\activity-manifest-2026-05-14.json
+[05/14/2026, 09:00:47]   [puzzle-post] targets    : 2:activity-word-search:Baby Animals
+[05/14/2026, 09:00:47]   [puzzle-post] generating word-search assets for theme: Baby Animals
+[05/14/2026, 09:00:47]   [wordsearch-factory] title      : Baby Animals Word Search
+[05/14/2026, 09:00:47]   [wordsearch-factory] theme      : Baby Animals
+[05/14/2026, 09:00:47]   [wordsearch-factory] outDir     : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search
+[05/14/2026, 09:00:47]   [wordsearch-factory] seed       : 1477228419
+[05/14/2026, 09:00:47]   [wordsearch-factory] difficulty : easy
+[05/14/2026, 09:00:47]   [wordsearch-factory] grid       : 10x10
+[05/14/2026, 09:00:47]   [wordsearch-factory] words      : STRATEGY, PATTERN, SEARCH, SOLVE
+[05/14/2026, 09:00:47]   [wordsearch-factory] directions : right, down
+[05/14/2026, 09:00:47]   [wordsearch-factory] wrote files:
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\activity.json
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\wordsearch.json
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\puzzle.json
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\blank.svg
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\blank.png
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\puzzle.png
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\solved.svg
+[05/14/2026, 09:00:47]     - D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\solved.png
+[05/14/2026, 09:00:47]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search
+[05/14/2026, 09:00:47]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\wordsearch\wordsearch-2026-05-14-slot02-baby-animals.png
+[05/14/2026, 09:00:47]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\2026-05-14-slot02-baby-animals-word-search\post.png
+[05/14/2026, 09:00:47]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\wordsearch\wordsearch-2026-05-14-slot02-baby-animals.png
+[05/14/2026, 09:00:47]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\wordsearch\wordsearch-2026-05-14-slot02-baby-animals.json
+[05/14/2026, 09:00:47] Done: generate-puzzle-image-post.mjs
+[05/14/2026, 09:00:47] Maze/Wordsearch puzzle posts generated OK
+[05/14/2026, 09:00:47] Step 5/16: Generating coloring puzzle post...
+[05/14/2026, 09:00:47] Running: generate-coloring-assets.mjs --imagen --theme Farm Animals --difficulty easy --slug coloring-farm-animals-easy
+[05/14/2026, 09:00:53]   [coloring-factory] imagen mode — calling Imagen 4.0
+[05/14/2026, 09:00:53]   [coloring-factory] wrote files (imagen mode):
+[05/14/2026, 09:00:53]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-farm-animals-easy\activity.json
+[05/14/2026, 09:00:53]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-farm-animals-easy\blank.png
+[05/14/2026, 09:00:53]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-farm-animals-easy\colored.png
+[05/14/2026, 09:00:53]     - D:\Joymaze-Content\output\challenge\generated-activity\coloring-farm-animals-easy\puzzle.png
+[05/14/2026, 09:00:53] Done: generate-coloring-assets.mjs
+[05/14/2026, 09:00:53] Running: generate-puzzle-image-post.mjs --type coloring --slug coloring-farm-animals-easy
+[05/14/2026, 09:00:54]   [puzzle-post] using existing assets in output\challenge\generated-activity\coloring-farm-animals-easy (skipping generator to preserve theme)
+[05/14/2026, 09:00:54]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\coloring-farm-animals-easy
+[05/14/2026, 09:00:54]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\coloring\coloring-farm-animals.png
+[05/14/2026, 09:00:54]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\coloring-farm-animals-easy\post.png
+[05/14/2026, 09:00:54]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\coloring\coloring-farm-animals.png
+[05/14/2026, 09:00:54]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\coloring\coloring-farm-animals.json
+[05/14/2026, 09:00:54] Done: generate-puzzle-image-post.mjs
+[05/14/2026, 09:00:54] coloring puzzle post generated OK
+[05/14/2026, 09:00:54] Step 6/16: Generating dot-to-dot puzzle post...
+[05/14/2026, 09:00:54] Running: generate-imagen-dottodot-assets.mjs --imagen --theme Mermaids --difficulty easy --slug dot-to-dot-mermaids-easy
+[05/14/2026, 09:01:05]   [imagen-dottodot] Step 1: generating coloring page...
+[05/14/2026, 09:01:05]   [coloring-factory] imagen mode — calling Imagen 4.0
+[05/14/2026, 09:01:05]   [coloring-factory] wrote files (imagen mode):
+[05/14/2026, 09:01:05]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy-coloring-tmp\activity.json
+[05/14/2026, 09:01:05]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy-coloring-tmp\blank.png
+[05/14/2026, 09:01:05]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy-coloring-tmp\colored.png
+[05/14/2026, 09:01:05]     - D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy-coloring-tmp\puzzle.png
+[05/14/2026, 09:01:05]   [imagen-dottodot] Step 2: extracting dot-to-dot...
+[05/14/2026, 09:01:05]   [dottodot-extractor] processing image: output\challenge\generated-activity\dot-to-dot-mermaids-easy-coloring-tmp\blank.png
+[05/14/2026, 09:01:05]   [dottodot-extractor] done → D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy
+[05/14/2026, 09:01:05]   [imagen-dottodot] done → output\challenge\generated-activity\dot-to-dot-mermaids-easy
+[05/14/2026, 09:01:05] Done: generate-imagen-dottodot-assets.mjs
+[05/14/2026, 09:01:05] Running: generate-puzzle-image-post.mjs --type dot-to-dot --slug dot-to-dot-mermaids-easy
+[05/14/2026, 09:01:08]   [puzzle-post] using existing assets in output\challenge\generated-activity\dot-to-dot-mermaids-easy (skipping generator to preserve theme)
+[05/14/2026, 09:01:08]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy
+[05/14/2026, 09:01:08]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\dot-to-dot\dot-to-dot-mermaids.png
+[05/14/2026, 09:01:08]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\dot-to-dot-mermaids-easy\post.png
+[05/14/2026, 09:01:08]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\dot-to-dot\dot-to-dot-mermaids.png
+[05/14/2026, 09:01:08]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\dot-to-dot\dot-to-dot-mermaids.json
+[05/14/2026, 09:01:08] Done: generate-puzzle-image-post.mjs
+[05/14/2026, 09:01:08] dot-to-dot puzzle post generated OK
+[05/14/2026, 09:01:08] Step 7/16: Generating matching puzzle post...
+[05/14/2026, 09:01:08] Running: generate-matching-assets.mjs --imagen --theme Treasure Map --difficulty easy --slug matching-treasure-map-easy
+[05/14/2026, 09:01:09]   [matching-factory] stickerTheme: animals (8 cards wired)
+[05/14/2026, 09:01:09]   [matching-factory] scene bg    : none (using solid fill)
+[05/14/2026, 09:01:09]   [matching-factory] title      : Animal Match
+[05/14/2026, 09:01:09]   [matching-factory] theme      : Treasure Map
+[05/14/2026, 09:01:09]   [matching-factory] family    : default
+[05/14/2026, 09:01:09]   [matching-factory] stickerTheme: animals
+[05/14/2026, 09:01:09]   [matching-factory] outDir    : D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy
+[05/14/2026, 09:01:09]   [matching-factory] seed      : 950084119
+[05/14/2026, 09:01:09]   [matching-factory] difficulty: easy
+[05/14/2026, 09:01:09]   [matching-factory] pairs     : 4 (6×2 grid)
+[05/14/2026, 09:01:09]   [matching-factory] words     : DISCOVER, FOCUS, EXPLORE, CIPHER
+[05/14/2026, 09:01:09]   [matching-factory] wrote files:
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\activity.json
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\matching.json
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\blank.svg
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\blank.png
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\solved.svg
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\solved.png
+[05/14/2026, 09:01:09]     - D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\puzzle.png
+[05/14/2026, 09:01:09] Done: generate-matching-assets.mjs
+[05/14/2026, 09:01:09] Running: generate-puzzle-image-post.mjs --type matching --slug matching-treasure-map-easy
+[05/14/2026, 09:01:11]   [puzzle-post] using existing assets in output\challenge\generated-activity\matching-treasure-map-easy (skipping generator to preserve theme)
+[05/14/2026, 09:01:11]   [puzzle-post] activityDir: D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy
+[05/14/2026, 09:01:11]   [puzzle-post] rawImage   : D:\Joymaze-Content\output\raw\matching\matching-treasure-map.png
+[05/14/2026, 09:01:11]   [puzzle-post] wrote post : D:\Joymaze-Content\output\challenge\generated-activity\matching-treasure-map-easy\post.png
+[05/14/2026, 09:01:11]   [puzzle-post] wrote raw  : D:\Joymaze-Content\output\raw\matching\matching-treasure-map.png
+[05/14/2026, 09:01:11]   [puzzle-post] wrote meta : D:\Joymaze-Content\output\raw\matching\matching-treasure-map.json
+[05/14/2026, 09:01:11] Done: generate-puzzle-image-post.mjs
+[05/14/2026, 09:01:11] matching puzzle post generated OK
+[05/14/2026, 09:01:11] Step 8/16: Generating story idea for next episode...
+[05/14/2026, 09:01:11] Running: generate-story-ideas.mjs --save
+[05/14/2026, 09:01:19]   === Joyo's Story Corner — Idea Generator ===
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]     Trends loaded: Pets/Home, Garden/Flowers, Birds/Sky ...
+[05/14/2026, 09:01:19]     Competitor intelligence loaded (2026-05-11)
+[05/14/2026, 09:01:19]     Hooks library loaded: 63 hooks
+[05/14/2026, 09:01:19]     Dynamic themes loaded: 30 themes
+[05/14/2026, 09:01:19]     Psychology triggers loaded: 7 triggers
+[05/14/2026, 09:01:19]     Story source bank loaded: 54 seeds
+[05/14/2026, 09:01:19]   Generating story concept...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   ════════════════════════════════════════════════════════════
+[05/14/2026, 09:01:19]     Episode 35: The Little Rabbit's Long Way Home
+[05/14/2026, 09:01:19]   ════════════════════════════════════════════════════════════
+[05/14/2026, 09:01:19]   Theme: A young rabbit's journey back to the burrow after a frightening night of fireworks
+[05/14/2026, 09:01:19]   Hook: Can a lost rabbit find home before dawn?
+[05/14/2026, 09:01:19]   Outro echo: Safe in the burrow
+[05/14/2026, 09:01:19]   Reel cut: 1, 2, 3, 4, 5, 6, 7, 8
+[05/14/2026, 09:01:19]   Style: Soft watercolor, warm pastel palette, visible paper grain
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 01 | ACT 1 | 7s]
+[05/14/2026, 09:01:19]     Narration: "The rabbit bolts from the burrow as fireworks light up the night sky."
+[05/14/2026, 09:01:19]     Image: Wide shot, low angle, fireworks exploding above. The rabbit — a small, quick rabbit with brown fur, bright green eyes, a...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 02 | ACT 1 | 7s]
+[05/14/2026, 09:01:19]     Narration: "If she doesn't find her way back before dawn, the open lawn becomes a dangerous place."
+[05/14/2026, 09:01:19]     Image: Establishing shot, slightly overhead angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a ...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 03 | ACT 2 | 8s]
+[05/14/2026, 09:01:19]     Narration: "She tries to follow the scent of fresh clover, but it's overwhelmed by the smell of smoke."
+[05/14/2026, 09:01:19]     Image: Mid-shot, eye-level angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose ...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 04 | ACT 2 | 8s]
+[05/14/2026, 09:01:19]     Narration: "As the night wears on, the rabbit's fear grows, and she becomes disoriented in the dark."
+[05/14/2026, 09:01:19]     Image: Close-up, low angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — look...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 05 | ACT 3 | 8s]
+[05/14/2026, 09:01:19]     Narration: "Just when she thinks all hope is lost, she curls up beneath a bush, shivering with fear."
+[05/14/2026, 09:01:19]     Image: Extreme close-up, slightly overhead angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a l...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 06 | ACT 3 | 8s]
+[05/14/2026, 09:01:19]     Narration: "But then she remembers a familiar patch of clover near the burrow and uses it to guide herself."
+[05/14/2026, 09:01:19]     Image: Mid-shot, eye-level angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose ...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 07 | ACT 3 | 8s]
+[05/14/2026, 09:01:19]     Narration: "With newfound determination, the rabbit follows the clover scent and finally sees the burrow entrance."
+[05/14/2026, 09:01:19]     Image: Wide shot, low angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — run...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   [Slide 08 | ACT 3 | 7s]
+[05/14/2026, 09:01:19]     Narration: "She slips inside just as the first light of dawn creeps over the lawn."
+[05/14/2026, 09:01:19]     Image: Close-up, slightly overhead angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pi...
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   Saved: D:\Joymaze-Content\output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:01:19]     → story.json (ready for generate-story-video.mjs)
+[05/14/2026, 09:01:19]     → image-prompts.md (full prompt set for Gemini/ChatGPT)
+[05/14/2026, 09:01:19]     → reel-image-prompts.md (generate these 5 slides first for StoryReelV2)
+[05/14/2026, 09:01:19]   
+[05/14/2026, 09:01:19]   Next: generate the 5 selected reel images from reel-image-prompts.md first, then backfill the rest if needed.
+[05/14/2026, 09:01:19]   Then: npm run generate:story:openai -- --story ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:01:19] Done: generate-story-ideas.mjs
+[05/14/2026, 09:01:19] Story idea scaffolded in output/stories/
+[05/14/2026, 09:01:19] Step 9/16: Generating Story Reel V2 (Imagen -> Remotion)...
+[05/14/2026, 09:01:19]   Story: output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:01:19] Running: generate-story-reel-audio.mjs --story D:\Joymaze-Content\output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:03:14]   === JoyMaze Story Reel Audio Generator ===
+[05/14/2026, 09:03:14]   Story    : output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:03:14]   Episode : 35 — The Little Rabbit's Long Way Home
+[05/14/2026, 09:03:14]   TTS     : Kokoro TTS (af_bella)
+[05/14/2026, 09:03:14]   Reel    : slides 1, 2, 3, 4, 5, 6, 7, 8
+[05/14/2026, 09:03:14]   
+[05/14/2026, 09:03:14]     [Intro]: "Episode 35. The Little Rabbit's Long Way Home."... done (?)
+[05/14/2026, 09:03:14]     [Hook]: "On a summer evening in a suburban garden. Can a lost rabbit find home before dawn?"... done (?)
+[05/14/2026, 09:03:14]     Slide 1: "The rabbit bolts from the burrow as fireworks light up the night sky."... done (?)
+[05/14/2026, 09:03:14]     Slide 2: "If she doesn't find her way back before dawn, the open lawn becomes a dangerous place."... done (?)
+[05/14/2026, 09:03:14]     Slide 3: "She tries to follow the scent of fresh clover, but it's overwhelmed by the smell of smoke."... done (?)
+[05/14/2026, 09:03:14]     Slide 4: "As the night wears on, the rabbit's fear grows, and she becomes disoriented in the dark."... done (?)
+[05/14/2026, 09:03:14]     Slide 5: "Just when she thinks all hope is lost, she curls up beneath a bush, shivering with fear."... done (?)
+[05/14/2026, 09:03:14]     Slide 6: "But then she remembers a familiar patch of clover near the burrow and uses it to guide herself."... done (?)
+[05/14/2026, 09:03:14]     Slide 7: "With newfound determination, the rabbit follows the clover scent and finally sees the burrow entrance."... done (?)
+[05/14/2026, 09:03:14]     Slide 8: "She slips inside just as the first light of dawn creeps over the lawn."... done (?)
+[05/14/2026, 09:03:14]   
+[05/14/2026, 09:03:14]     Updated story.json with narrationPath entries.
+[05/14/2026, 09:03:14]     Audio: output\stories\ep35-the-little-rabbit-s-long-way-home\tts
+[05/14/2026, 09:03:14]   
+[05/14/2026, 09:03:14]     Next: run the scheduler — render-video.mjs will pick up narration automatically.
+[05/14/2026, 09:03:14] Done: generate-story-reel-audio.mjs
+[05/14/2026, 09:03:14] Story Reel V2 audio generated
+[05/14/2026, 09:03:14] Running: generate-story-reel-images.mjs --story D:\Joymaze-Content\output\stories\ep35-the-little-rabbit-s-long-way-home --continue-on-error
+[05/14/2026, 09:03:46]   === JoyMaze Story Reel Image Generator ===
+[05/14/2026, 09:03:46]   Story    : output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:03:46]   Title    : The Little Rabbit's Long Way Home
+[05/14/2026, 09:03:46]   Mode     : reel-first
+[05/14/2026, 09:03:46]   Slides   : 1, 2, 3, 4, 5, 6, 7, 8
+[05/14/2026, 09:03:46]   Prompt   : output\stories\ep35-the-little-rabbit-s-long-way-home\reel-image-prompts.md
+[05/14/2026, 09:03:46]   Output   : 1024x1536 PNG (vertical default)
+[05/14/2026, 09:03:46]   Fallback : none
+[05/14/2026, 09:03:46]   On error : continue and log fallback-needed slides
+[05/14/2026, 09:03:46]   
+[05/14/2026, 09:03:46]   Slide 01 -> 01.png
+[05/14/2026, 09:03:46]     Narration: "The rabbit bolts from the burrow as fireworks light up the night sky."
+[05/14/2026, 09:03:46]     Prompt: Wide shot, low angle, fireworks exploding above. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nos...
+[05/14/2026, 09:03:46]     Saved 01.png (2722 KB)
+[05/14/2026, 09:03:46]   Slide 02 -> 02.png
+[05/14/2026, 09:03:46]     Narration: "If she doesn't find her way back before dawn, the open lawn becomes a dangerous place."
+[05/14/2026, 09:03:46]     Prompt: Establishing shot, slightly overhead angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — s...
+[05/14/2026, 09:03:46]     Saved 02.png (3064 KB)
+[05/14/2026, 09:03:46]   Slide 03 -> 03.png
+[05/14/2026, 09:03:46]     Narration: "She tries to follow the scent of fresh clover, but it's overwhelmed by the smell of smoke."
+[05/14/2026, 09:03:46]     Prompt: Mid-shot, eye-level angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — sniffs the air, tr...
+[05/14/2026, 09:03:46]   Slide 04 -> 04.png
+[05/14/2026, 09:03:46]     Narration: "As the night wears on, the rabbit's fear grows, and she becomes disoriented in the dark."
+[05/14/2026, 09:03:46]     Prompt: Close-up, low angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — looks up at the sky, con...
+[05/14/2026, 09:03:46]     Saved 04.png (2433 KB)
+[05/14/2026, 09:03:46]   Slide 05 -> 05.png
+[05/14/2026, 09:03:46]     Narration: "Just when she thinks all hope is lost, she curls up beneath a bush, shivering with fear."
+[05/14/2026, 09:03:46]     Prompt: Extreme close-up, slightly overhead angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — cu...
+[05/14/2026, 09:03:46]     Saved 05.png (2816 KB)
+[05/14/2026, 09:03:46]   Slide 06 -> 06.png
+[05/14/2026, 09:03:46]     Narration: "But then she remembers a familiar patch of clover near the burrow and uses it to guide herself."
+[05/14/2026, 09:03:46]     Prompt: Mid-shot, eye-level angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — stands up, looking...
+[05/14/2026, 09:03:46]     Saved 06.png (2480 KB)
+[05/14/2026, 09:03:46]   Slide 07 -> 07.png
+[05/14/2026, 09:03:46]     Narration: "With newfound determination, the rabbit follows the clover scent and finally sees the burrow entrance."
+[05/14/2026, 09:03:46]     Prompt: Wide shot, low angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — runs towards the burrow...
+[05/14/2026, 09:03:46]     Saved 07.png (2376 KB)
+[05/14/2026, 09:03:46]   Slide 08 -> 08.png
+[05/14/2026, 09:03:46]     Narration: "She slips inside just as the first light of dawn creeps over the lawn."
+[05/14/2026, 09:03:46]     Prompt: Close-up, slightly overhead angle. The rabbit — a small, quick rabbit with brown fur, bright green eyes, and a little pink nose — slips insi...
+[05/14/2026, 09:03:46]   
+[05/14/2026, 09:03:46]   Done. Log -> output\stories\ep35-the-little-rabbit-s-long-way-home\_reel-image-generation.json
+[05/14/2026, 09:03:46]   Summary  : generated=6, skipped=0, fallback-needed=2
+[05/14/2026, 09:03:46]   Next     : complete fallback generation for the marked slides, then rerun with --force for any final replacements if needed.
+[05/14/2026, 09:03:46]   [stderr] Generation failed [unknown]: Imagen did not return an image
+[05/14/2026, 09:03:46]   [stderr]   Generation failed [unknown]: Imagen did not return an image
+[05/14/2026, 09:03:46] Done: generate-story-reel-images.mjs
+[05/14/2026, 09:03:46] Running: render-video.mjs --comp StoryReelV2 --story D:\Joymaze-Content\output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:03:47] ERROR in render-video.mjs: Command failed: D:\node\node.exe D:\Joymaze-Content\scripts\render-video.mjs --comp StoryReelV2 --story D:\Joymaze-Content\output\stories\ep35-the-little-rabbit-s-long-way-home
+
+❌  Render failed: StoryReelV2 missing required image assets: 08.png, 03.png
+
+[05/14/2026, 09:03:47]   [err] ❌  Render failed: StoryReelV2 missing required image assets: 08.png, 03.png
+[05/14/2026, 09:03:47] Story Reel V2 render failed, run manually: node scripts/render-video.mjs --comp StoryReelV2 --story output\stories\ep35-the-little-rabbit-s-long-way-home
+[05/14/2026, 09:03:47] Step 10/16: Generating today's ASMR brief...
+[05/14/2026, 09:03:47] Running: generate-asmr-brief.mjs --save
+[05/14/2026, 09:03:50]   JoyMaze ASMR Brief Generator
+[05/14/2026, 09:03:50]     Type: coloring | Date: 2026-05-14
+[05/14/2026, 09:03:50]   
+[05/14/2026, 09:03:50]     Loading context (style guide + archetypes + analytics)...
+[05/14/2026, 09:03:50]       Recent themes: magical forest, rainbow islands, rainbow maze, wordsearch butterfly garden, wordsearch cloud kingdom
+[05/14/2026, 09:03:50]     Calling Groq (llama-3.3-70b-versatile)...
+[05/14/2026, 09:03:50]   
+[05/14/2026, 09:03:50]     ================================================================================
+[05/14/2026, 09:03:50]     ASMR Brief — Rainbow Forest (coloring)
+[05/14/2026, 09:03:50]     Folder: output/asmr/coloring-rainbow-forest/
+[05/14/2026, 09:03:50]     Hook:   "Watch Colors Come Alive"
+[05/14/2026, 09:03:50]   
+[05/14/2026, 09:03:50]     Image 1 prompt (blank):
+[05/14/2026, 09:03:50]       A whimsical forest scene with trees, flowers, and animals in black line art, waiting to be colored. Portrait orientation, 9:16 aspect ratio (1080x1920 pixels). White background.
+[05/14/2026, 09:03:50]   
+[05/14/2026, 09:03:50]     Image 2 prompt (finished):
+[05/14/2026, 09:03:50]       A fully colored whimsical forest scene with vibrant trees, flowers, and animals, identical to the blank version but now filled with kid-friendly colors. Portrait orientation, 9:16 aspect ratio (1080x1920 pixels).
+[05/14/2026, 09:03:50]     ================================================================================
+[05/14/2026, 09:03:50]   
+[05/14/2026, 09:03:50]     Saved to: output/asmr/coloring-rainbow-forest/
+[05/14/2026, 09:03:50]       activity.json  — ready for npm run generate:asmr
+[05/14/2026, 09:03:50]       brief.md       — your Gemini image prompts
+[05/14/2026, 09:03:50]   
+[05/14/2026, 09:03:50]     Next: open output/asmr/coloring-rainbow-forest/brief.md
+[05/14/2026, 09:03:50] Done: generate-asmr-brief.mjs
+[05/14/2026, 09:03:50] ASMR: folder identified -> coloring-rainbow-forest
+[05/14/2026, 09:03:50] ASMR type: coloring
+[05/14/2026, 09:03:50] ASMR: running engine generate-coloring-assets.mjs...
+[05/14/2026, 09:03:50] Running: generate-coloring-assets.mjs --out-dir D:\Joymaze-Content\output\asmr\coloring-rainbow-forest --difficulty medium
+[05/14/2026, 09:03:50]   [coloring-factory] title      : Color the Scene
+[05/14/2026, 09:03:50]   [coloring-factory] theme      : Color the Scene
+[05/14/2026, 09:03:50]   [coloring-factory] family    : animals
+[05/14/2026, 09:03:50]   [coloring-factory] outDir    : D:\Joymaze-Content\output\asmr\coloring-rainbow-forest
+[05/14/2026, 09:03:50]   [coloring-factory] seed      : 3781717590
+[05/14/2026, 09:03:50]   [coloring-factory] difficulty: medium
+[05/14/2026, 09:03:50]   [coloring-factory] objects   : 9 (4×3 grid)
+[05/14/2026, 09:03:50]   [coloring-factory] wrote files:
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\activity.json
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\coloring.json
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\blank.svg
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\blank.png
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\colored.svg
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\colored.png
+[05/14/2026, 09:03:50]     - D:\Joymaze-Content\output\asmr\coloring-rainbow-forest\puzzle.png
+[05/14/2026, 09:03:50] Done: generate-coloring-assets.mjs
+[05/14/2026, 09:03:50] ASMR: engine OK, activity.json restored
+[05/14/2026, 09:03:50] ASMR: rendering video...
+[05/14/2026, 09:03:50] Running: render-video.mjs --comp AsmrReveal --asmr output/asmr/coloring-rainbow-forest/activity.json
+[05/14/2026, 09:05:18]   🎬  Remotion Render
+[05/14/2026, 09:05:18]       Composition : AsmrReveal
+[05/14/2026, 09:05:18]       Duration    : 960 frames (32.0s @ 30fps)
+[05/14/2026, 09:05:18]       Blank       : output/asmr/coloring-rainbow-forest/blank.png
+[05/14/2026, 09:05:18]       Solved      : output/asmr/coloring-rainbow-forest/colored.png
+[05/14/2026, 09:05:18]       Hook        : "Watch Colors Come Alive"
+[05/14/2026, 09:05:18]       Audio       : assets/audio/crayon.mp3
+[05/14/2026, 09:05:18]       Path color  : #22BB44
+[05/14/2026, 09:05:18]       Output      : D:\Joymaze-Content\output\videos\AsmrReveal-1778738631361.mp4
+[05/14/2026, 09:05:18]   
+[05/14/2026, 09:05:18]       Bundling compositions...
+[05/14/2026, 09:05:18]       Bundled in 42.0s
+[05/14/2026, 09:05:18]   
+[05/14/2026, 09:05:18]       Rendering...
+[05/14/2026, 09:05:18]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 93%       Progress: 94%       Progress: 100%   
+[05/14/2026, 09:05:18]   
+[05/14/2026, 09:05:18]       ✓ Done in 38.7s → D:\Joymaze-Content\output\videos\AsmrReveal-1778738631361.mp4
+[05/14/2026, 09:05:18]   
+[05/14/2026, 09:05:18]       Extracting thumbnail (frame 90)...
+[05/14/2026, 09:05:18]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\AsmrReveal-1778738631361-thumb.jpg
+[05/14/2026, 09:05:18] Done: render-video.mjs
+[05/14/2026, 09:05:18] ASMR video rendered OK
+[05/14/2026, 09:05:18] ASMR brief ready in output/asmr/
+[05/14/2026, 09:05:18] Step 11/16: Generating today's challenge brief + video...
+[05/14/2026, 09:05:18] Running: generate-challenge-brief.mjs --save
+[05/14/2026, 09:05:20]   JoyMaze Challenge Brief Generator
+[05/14/2026, 09:05:20]     Type: word-search (WORD SEARCH) | Date: 2026-05-14
+[05/14/2026, 09:05:20]   
+[05/14/2026, 09:05:20]     Loading context...
+[05/14/2026, 09:05:20]       Recent themes: generated activity, garden friends, summer vacation
+[05/14/2026, 09:05:20]     Calling Groq (llama-3.3-70b-versatile)...
+[05/14/2026, 09:05:20]   
+[05/14/2026, 09:05:20]     ================================================================================
+[05/14/2026, 09:05:20]     Challenge Brief — Summer Fun (WORD SEARCH)
+[05/14/2026, 09:05:20]     Folder: output/challenge/word-search-summer-fun/
+[05/14/2026, 09:05:20]     Hook:   "Can they find all 7 words in 60 seconds?"
+[05/14/2026, 09:05:20]     CTA:    "Drop your kid's solve time below"
+[05/14/2026, 09:05:20]   
+[05/14/2026, 09:05:20]     Image prompt:
+[05/14/2026, 09:05:20]       A 10x10 word search grid with 7 hidden summer-themed words (e.g. SUN, BEACH, ICECREAM) in clean black letters on a white background. Word list shown below the grid. Portrait orientation, 9:16 aspect ratio (1080x1920 pixels). White background.
+[05/14/2026, 09:05:20]     ================================================================================
+[05/14/2026, 09:05:20]   
+[05/14/2026, 09:05:20]     Saved to: output/challenge/word-search-summer-fun/
+[05/14/2026, 09:05:20]       activity.json  — ready for npm run animate:challenge
+[05/14/2026, 09:05:20]       brief.md       — your Gemini image prompt
+[05/14/2026, 09:05:20]   
+[05/14/2026, 09:05:20]     Next: open output/challenge/word-search-summer-fun/brief.md
+[05/14/2026, 09:05:20] Done: generate-challenge-brief.mjs
+[05/14/2026, 09:05:20] Challenge brief ready in output/challenge/
+[05/14/2026, 09:05:20] Challenge: folder identified -> word-search-summer-fun
+[05/14/2026, 09:05:20] Challenge: generating puzzle.png via Imagen...
+[05/14/2026, 09:05:20] Running: generate-challenge-puzzle.mjs --challenge D:\Joymaze-Content\output\challenge\word-search-summer-fun
+[05/14/2026, 09:05:25]   GEN   puzzle.png in output\challenge\word-search-summer-fun ...
+[05/14/2026, 09:05:25]   OK    (718KB)
+[05/14/2026, 09:05:25] Done: generate-challenge-puzzle.mjs
+[05/14/2026, 09:05:25] Challenge: puzzle.png generated OK
+[05/14/2026, 09:05:25] Challenge: rendering video...
+[05/14/2026, 09:05:25] Running: render-video.mjs --comp ActivityChallenge --challenge output/challenge/word-search-summer-fun
+[05/14/2026, 09:08:02]   🎬  Remotion Render
+[05/14/2026, 09:08:02]       Composition : ActivityChallenge
+[05/14/2026, 09:08:02]       Duration    : 1950 frames (65.0s @ 30fps)
+[05/14/2026, 09:08:02]       Hook        : "Can they find all 7 words in 60 seconds?"
+[05/14/2026, 09:08:02]       Path color  : #22BB44
+[05/14/2026, 09:08:02]       Output      : D:\Joymaze-Content\output\videos\ActivityChallenge-1778738726742.mp4
+[05/14/2026, 09:08:02]   
+[05/14/2026, 09:08:02]       Bundling compositions...
+[05/14/2026, 09:08:02]       Bundled in 33.5s
+[05/14/2026, 09:08:02]   
+[05/14/2026, 09:08:02]       Rendering...
+[05/14/2026, 09:08:02]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 93%       Progress: 94%       Progress: 100%   
+[05/14/2026, 09:08:02]   
+[05/14/2026, 09:08:02]       ✓ Done in 116.7s → D:\Joymaze-Content\output\videos\ActivityChallenge-1778738726742.mp4
+[05/14/2026, 09:08:02]   
+[05/14/2026, 09:08:02]       Extracting thumbnail (frame 90)...
+[05/14/2026, 09:08:02]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\ActivityChallenge-1778738726742-thumb.jpg
+[05/14/2026, 09:08:02] Done: render-video.mjs
+[05/14/2026, 09:08:02] Challenge video rendered OK
+[05/14/2026, 09:08:02] Step 12/16: Generating animal facts brief...
+[05/14/2026, 09:08:02] Running: generate-animal-facts-brief.mjs --save
+[05/14/2026, 09:08:07]   JoyMaze Animal Facts Planner
+[05/14/2026, 09:08:07]     Date: 2026-05-14
+[05/14/2026, 09:08:07]   
+[05/14/2026, 09:08:07]     Next episode: 22
+[05/14/2026, 09:08:07]     Recent episodes: ep17-fennec-fox, ep18-hedgehog, ep19-pangolin, ep20-sea-otter, ep21-quokka
+[05/14/2026, 09:08:07]     Calling Groq (llama-3.3-70b-versatile)...
+[05/14/2026, 09:08:07]   
+[05/14/2026, 09:08:07]     Animal: Okapi
+[05/14/2026, 09:08:07]     Open:   "Okapi, spotted legs, a secret in the rainforest deep!"
+[05/14/2026, 09:08:07]     Beat 1: Okapi, striped like a zebra but with a longer neck so fine
+[05/14/2026, 09:08:07]     Loop:   Okapi, a secret kept, in the heart of the forest, where magic is wept
+[05/14/2026, 09:08:07]   
+[05/14/2026, 09:08:07]     Saved to: output/longform/animal/ep22-okapi
+[05/14/2026, 09:08:07] Done: generate-animal-facts-brief.mjs
+[05/14/2026, 09:08:07] Animal brief ready in output/longform/animal/
+[05/14/2026, 09:08:07] Step 13/16: Generating Animal Facts Song Short (full pipeline)...
+[05/14/2026, 09:08:07]   Episode: ep22-okapi
+[05/14/2026, 09:08:07] Animal: generating narration audio...
+[05/14/2026, 09:08:07] Running: generate-animal-narration.mjs --episode D:\Joymaze-Content\output\longform\animal\ep22-okapi
+[05/14/2026, 09:08:23]   JoyMaze Animal Facts Narration Generator
+[05/14/2026, 09:08:23]     Animal: Okapi
+[05/14/2026, 09:08:23]     Episode: D:\Joymaze-Content\output\longform\animal\ep22-okapi
+[05/14/2026, 09:08:23]     Writing style: loaded
+[05/14/2026, 09:08:23]     Psychology triggers: 7 loaded
+[05/14/2026, 09:08:23]     Intelligence context: loaded
+[05/14/2026, 09:08:23]     TTS provider: openai
+[05/14/2026, 09:08:23]   
+[05/14/2026, 09:08:23]     HOOK
+[05/14/2026, 09:08:23]       Skip: no copy generated
+[05/14/2026, 09:08:23]     NAME REVEAL
+[05/14/2026, 09:08:23]       "It's an Okapi!"
+[05/14/2026, 09:08:23]       Generating TTS... done
+[05/14/2026, 09:08:23]       narration-namereveal.mp3 → 0.8s audio
+[05/14/2026, 09:08:23]   
+[05/14/2026, 09:08:23]     Skip: fact1 — not found in episode.json
+[05/14/2026, 09:08:23]     Skip: fact2 — not found in episode.json
+[05/14/2026, 09:08:23]     Skip: fact3 — not found in episode.json
+[05/14/2026, 09:08:23]     Skip: fact4 — not found in episode.json
+[05/14/2026, 09:08:23]     Skip: fact5 — not found in episode.json
+[05/14/2026, 09:08:23]     OUTRO CTA
+[05/14/2026, 09:08:23]       Generating copy... done
+[05/14/2026, 09:08:23]       "What's the craziest thing Okapi does to hide in the jungle? Ask a grown-up to help you write your an..."
+[05/14/2026, 09:08:23]       Generating TTS... done
+[05/14/2026, 09:08:23]       narration-outro-cta.mp3 → 7.1s audio
+[05/14/2026, 09:08:23]   
+[05/14/2026, 09:08:23]     OUTRO CTA SHORT
+[05/14/2026, 09:08:23]       Generating copy... done
+[05/14/2026, 09:08:23]       "Can you spot Okapi's superpower?"
+[05/14/2026, 09:08:23]       Generating TTS... done
+[05/14/2026, 09:08:23]       narration-outro-cta-short.mp3 → 1.6s audio
+[05/14/2026, 09:08:23]   
+[05/14/2026, 09:08:23]     episode.json updated.
+[05/14/2026, 09:08:23]   
+[05/14/2026, 09:08:23]     Narration complete.
+[05/14/2026, 09:08:23]     Files: narration-hook.mp3, narration-namereveal.mp3, narration-fact1.mp3, narration-fact2.mp3, narration-fact3.mp3, narration-fact4.mp3, narration-fact5.mp3, narration-outro-cta.mp3, narration-outro-cta-short.mp3
+[05/14/2026, 09:08:23] Done: generate-animal-narration.mjs
+[05/14/2026, 09:08:23] Animal: narration OK
+[05/14/2026, 09:08:23] Animal: submitting Suno song...
+[05/14/2026, 09:08:23] Running: generate-animal-song-sunoapi.mjs --episode D:\Joymaze-Content\output\longform\animal\ep22-okapi --kind song --command all
+[05/14/2026, 09:09:19]   Submitted song task: 834882d90b1e8c6a77335c18eb02939a
+[05/14/2026, 09:09:19]   Status: PENDING
+[05/14/2026, 09:09:19]   Status: PENDING
+[05/14/2026, 09:09:19]   Status: TEXT_SUCCESS
+[05/14/2026, 09:09:19]   Status: SUCCESS
+[05/14/2026, 09:09:19]   {
+[05/14/2026, 09:09:19]     "ok": true,
+[05/14/2026, 09:09:19]     "command": "all",
+[05/14/2026, 09:09:19]     "kind": "song",
+[05/14/2026, 09:09:19]     "taskId": "834882d90b1e8c6a77335c18eb02939a",
+[05/14/2026, 09:09:19]     "status": "SUCCESS",
+[05/14/2026, 09:09:19]     "downloads": [
+[05/14/2026, 09:09:19]       {
+[05/14/2026, 09:09:19]         "option": 1,
+[05/14/2026, 09:09:19]         "file": "song-option-1.mp3",
+[05/14/2026, 09:09:19]         "title": "Okapi Animal Facts Song",
+[05/14/2026, 09:09:19]         "duration": 114.96,
+[05/14/2026, 09:09:19]         "audioUrl": "https://tempfile.aiquickdraw.com/r/36aef13fc08d4fc28e5dda04d886f5bd.mp3",
+[05/14/2026, 09:09:19]         "streamAudioUrl": "https://musicfile.removeai.ai/NjRhZDE5N2YtOTE5Yy00YzBmLWE2YjYtYjE4OWVhYzYzNzMx"
+[05/14/2026, 09:09:19]       },
+[05/14/2026, 09:09:19]       {
+[05/14/2026, 09:09:19]         "option": 2,
+[05/14/2026, 09:09:19]         "file": "song-option-2.mp3",
+[05/14/2026, 09:09:19]         "title": "Okapi Animal Facts Song",
+[05/14/2026, 09:09:19]         "duration": 64.12,
+[05/14/2026, 09:09:19]         "audioUrl": "https://tempfile.aiquickdraw.com/r/a73791d3270c4f628a3931f5ddaa71c9.mp3",
+[05/14/2026, 09:09:19]         "streamAudioUrl": "https://musicfile.removeai.ai/MzlhNzFkNWUtMjU5Mi00MWM1LTg1NmUtN2YzOTJhODdhYzlh"
+[05/14/2026, 09:09:19]       }
+[05/14/2026, 09:09:19]     ]
+[05/14/2026, 09:09:19]   }
+[05/14/2026, 09:09:19] Done: generate-animal-song-sunoapi.mjs
+[05/14/2026, 09:09:19] Animal: Suno song OK
+[05/14/2026, 09:09:19] Animal: submitting Suno background...
+[05/14/2026, 09:09:19] Running: generate-animal-song-sunoapi.mjs --episode D:\Joymaze-Content\output\longform\animal\ep22-okapi --kind background --command all
+[05/14/2026, 09:10:27]   Submitted background task: c5bd7d046a65bee75461ec8d48988197
+[05/14/2026, 09:10:27]   Status: PENDING
+[05/14/2026, 09:10:27]   Status: PENDING
+[05/14/2026, 09:10:27]   Status: TEXT_SUCCESS
+[05/14/2026, 09:10:27]   Status: FIRST_SUCCESS
+[05/14/2026, 09:10:27]   Status: SUCCESS
+[05/14/2026, 09:10:27]   {
+[05/14/2026, 09:10:27]     "ok": true,
+[05/14/2026, 09:10:27]     "command": "all",
+[05/14/2026, 09:10:27]     "kind": "background",
+[05/14/2026, 09:10:27]     "taskId": "c5bd7d046a65bee75461ec8d48988197",
+[05/14/2026, 09:10:27]     "status": "SUCCESS",
+[05/14/2026, 09:10:27]     "downloads": [
+[05/14/2026, 09:10:27]       {
+[05/14/2026, 09:10:27]         "option": 1,
+[05/14/2026, 09:10:27]         "file": "background-option-1.mp3",
+[05/14/2026, 09:10:27]         "title": "Okapi Background",
+[05/14/2026, 09:10:27]         "duration": 78.04,
+[05/14/2026, 09:10:27]         "audioUrl": "https://tempfile.aiquickdraw.com/r/fdf36b7517ea4c7a8d13b490a8ae2da2.mp3",
+[05/14/2026, 09:10:27]         "streamAudioUrl": "https://musicfile.removeai.ai/YjNlMDI5YmItYWRjNC00NjY0LWFmMTctYzJkMDk2ZDdhNGZj"
+[05/14/2026, 09:10:27]       },
+[05/14/2026, 09:10:27]       {
+[05/14/2026, 09:10:27]         "option": 2,
+[05/14/2026, 09:10:27]         "file": "background-option-2.mp3",
+[05/14/2026, 09:10:27]         "title": "Okapi Background",
+[05/14/2026, 09:10:27]         "duration": 134.92,
+[05/14/2026, 09:10:27]         "audioUrl": "https://tempfile.aiquickdraw.com/r/15c8b4bc81bb49319038d8654f3aa855.mp3",
+[05/14/2026, 09:10:27]         "streamAudioUrl": "https://musicfile.removeai.ai/OGIxMTlmMjUtMjIyYy00MDYzLTg3MTYtYTIxY2Q4NzJjOTNl"
+[05/14/2026, 09:10:27]       }
+[05/14/2026, 09:10:27]     ]
+[05/14/2026, 09:10:27]   }
+[05/14/2026, 09:10:27] Done: generate-animal-song-sunoapi.mjs
+[05/14/2026, 09:10:27] Animal: Suno background OK
+[05/14/2026, 09:10:27] Animal: generating moment images (Imagen)...
+[05/14/2026, 09:10:27] Running: generate-animal-moments.mjs --episode D:\Joymaze-Content\output\longform\animal\ep22-okapi
+[05/14/2026, 09:11:39]   Generating animal moments for Okapi in output\longform\animal\ep22-okapi
+[05/14/2026, 09:11:39]   GEN   moment1.png ... OK (1441KB)
+[05/14/2026, 09:11:39]   GEN   moment2.png ... OK (1223KB)
+[05/14/2026, 09:11:39]   GEN   moment3.png ... OK (1481KB)
+[05/14/2026, 09:11:39]   GEN   moment4.png ... OK (1358KB)
+[05/14/2026, 09:11:39]   GEN   moment5.png ... OK (1114KB)
+[05/14/2026, 09:11:39]     [rate limit pause] GEN   moment6.png ... OK (1407KB)
+[05/14/2026, 09:11:39]   GEN   moment7.png ... OK (1433KB)
+[05/14/2026, 09:11:39]   GEN   moment8.png ... OK (1186KB)
+[05/14/2026, 09:11:39]   GEN   moment9.png ... OK (1358KB)
+[05/14/2026, 09:11:39]   GEN   moment10.png ... OK (1334KB)
+[05/14/2026, 09:11:39]   
+[05/14/2026, 09:11:39]   Done. 10 generated, 0 skipped, 0 failed / 10 total
+[05/14/2026, 09:11:39] Done: generate-animal-moments.mjs
+[05/14/2026, 09:11:39] Animal: moments OK
+[05/14/2026, 09:11:39] Animal: downloading B-roll...
+[05/14/2026, 09:11:39] Running: download-broll.mjs --episode D:\Joymaze-Content\output\longform\animal\ep22-okapi
+[05/14/2026, 09:11:39]   JoyMaze B-Roll Downloader
+[05/14/2026, 09:11:39]     Animal: Okapi
+[05/14/2026, 09:11:39]     Episode: D:\Joymaze-Content\output\longform\animal\ep22-okapi
+[05/14/2026, 09:11:39]     Sources: Pixabay (animated) → Pexels (live)
+[05/14/2026, 09:11:39]     Mode: normal
+[05/14/2026, 09:11:39]   
+[05/14/2026, 09:11:39]     Skip: fact1 — not in episode.json
+[05/14/2026, 09:11:39]     Skip: fact2 — not in episode.json
+[05/14/2026, 09:11:39]     Skip: fact3 — not in episode.json
+[05/14/2026, 09:11:39]     Skip: fact4 — not in episode.json
+[05/14/2026, 09:11:39]     Skip: fact5 — not in episode.json
+[05/14/2026, 09:11:39]   
+[05/14/2026, 09:11:39]     B-roll complete: 0/5 clips downloaded, 5 using illustrated image fallback
+[05/14/2026, 09:11:39] Done: download-broll.mjs
+[05/14/2026, 09:11:39] Animal: B-roll OK
+[05/14/2026, 09:11:39] Animal: rendering video...
+[05/14/2026, 09:11:39] Running: render-video.mjs --comp AnimalFactsSongShort --episode output/longform/animal/ep22-okapi
+[05/14/2026, 09:15:50]   🎬  Remotion Render
+[05/14/2026, 09:15:50]       Composition : AnimalFactsSongShort
+[05/14/2026, 09:15:50]       Duration    : 3450 frames (115.0s @ 30fps)
+[05/14/2026, 09:15:50]       Output      : D:\Joymaze-Content\output\videos\AnimalFactsSongShort-1778739100437.mp4
+[05/14/2026, 09:15:50]   
+[05/14/2026, 09:15:50]       Bundling compositions...
+[05/14/2026, 09:15:50]       Bundled in 36.7s
+[05/14/2026, 09:15:50]   
+[05/14/2026, 09:15:50]       Rendering...
+[05/14/2026, 09:15:50]       Progress: 0%       Progress: 1%       Progress: 2%       Progress: 3%       Progress: 4%       Progress: 5%       Progress: 6%       Progress: 7%       Progress: 8%       Progress: 9%       Progress: 10%       Progress: 11%       Progress: 12%       Progress: 13%       Progress: 14%       Progress: 15%       Progress: 16%       Progress: 17%       Progress: 18%       Progress: 19%       Progress: 20%       Progress: 21%       Progress: 22%       Progress: 23%       Progress: 24%       Progress: 25%       Progress: 26%       Progress: 27%       Progress: 28%       Progress: 29%       Progress: 30%       Progress: 31%       Progress: 32%       Progress: 33%       Progress: 34%       Progress: 35%       Progress: 36%       Progress: 37%       Progress: 38%       Progress: 39%       Progress: 40%       Progress: 41%       Progress: 42%       Progress: 43%       Progress: 44%       Progress: 45%       Progress: 46%       Progress: 47%       Progress: 48%       Progress: 49%       Progress: 50%       Progress: 51%       Progress: 52%       Progress: 53%       Progress: 54%       Progress: 55%       Progress: 56%       Progress: 57%       Progress: 58%       Progress: 59%       Progress: 60%       Progress: 61%       Progress: 62%       Progress: 63%       Progress: 64%       Progress: 65%       Progress: 66%       Progress: 67%       Progress: 68%       Progress: 69%       Progress: 70%       Progress: 71%       Progress: 72%       Progress: 73%       Progress: 74%       Progress: 75%       Progress: 76%       Progress: 77%       Progress: 78%       Progress: 79%       Progress: 80%       Progress: 81%       Progress: 82%       Progress: 83%       Progress: 84%       Progress: 85%       Progress: 86%       Progress: 87%       Progress: 88%       Progress: 89%       Progress: 90%       Progress: 91%       Progress: 92%       Progress: 93%       Progress: 94%       Progress: 100%   
+[05/14/2026, 09:15:50]   
+[05/14/2026, 09:15:50]       ✓ Done in 207.8s → D:\Joymaze-Content\output\videos\AnimalFactsSongShort-1778739100437.mp4
+[05/14/2026, 09:15:50]   
+[05/14/2026, 09:15:50]       Extracting thumbnail (frame 90)...
+[05/14/2026, 09:15:50]       ✓ Thumbnail → D:\Joymaze-Content\output\videos\AnimalFactsSongShort-1778739100437-thumb.jpg
+[05/14/2026, 09:15:50]   [stderr] [warn] song.mp3 not found — using song-option-1.mp3 for duration probe
+[05/14/2026, 09:15:50]   [stderr] [warn] background.mp3 not found — using background-option-1.mp3
+[05/14/2026, 09:15:50] Done: render-video.mjs
+[05/14/2026, 09:15:50] Animal Facts video rendered OK
+[05/14/2026, 09:15:50] Step 14/16: Generating today's X text posts...
+[05/14/2026, 09:15:50] Running: generate-x-posts.mjs 
+[05/14/2026, 09:15:52]   === JoyMaze X Text Post Generator ===
+[05/14/2026, 09:15:52]   Mode: LIVE | Date: 2026-05-14
+[05/14/2026, 09:15:52]   Calling Groq...
+[05/14/2026, 09:15:52]   
+[05/14/2026, 09:15:52]   ── Post scores ──
+[05/14/2026, 09:15:52]   ✓ [1] story-hook | total: 0.76 | scroll:0.7 rel:0.6 promo:1 eng:0.7 clr:0.8
+[05/14/2026, 09:15:52]   ✓ [2] puzzle | total: 0.72 | scroll:0.78 rel:0.3 promo:1 eng:0.7 clr:0.8
+[05/14/2026, 09:15:52]   ✓ [3] insight | total: 0.78 | scroll:0.78 rel:0.6 promo:1 eng:0.7 clr:0.8
+[05/14/2026, 09:15:52]   ✓ [4] identity | total: 0.76 | scroll:0.7 rel:0.6 promo:1 eng:0.7 clr:0.8
+[05/14/2026, 09:15:52]   
+[05/14/2026, 09:15:52]   Saved 4 X text posts → D:\Joymaze-Content\output\queue\x-text-2026-05-14.json
+[05/14/2026, 09:15:52]   Scores saved → output/scores/x-text-scores-2026-05-14.json | batch avg: 0.75
+[05/14/2026, 09:15:52]   All posts passed quality threshold.
+[05/14/2026, 09:15:52] Done: generate-x-posts.mjs
+[05/14/2026, 09:15:52] X text posts saved to output/queue/x-text-YYYY-MM-DD.json
+[05/14/2026, 09:15:52] Step 15/16: Collecting + reporting analytics (3 days since last run)...
+[05/14/2026, 09:15:52] Running: collect-analytics.mjs 
+[05/14/2026, 09:15:53]   === JoyMaze Analytics Collector ===
+[05/14/2026, 09:15:53]   Mode: LIVE
+[05/14/2026, 09:15:53]   Lookback: 7 days
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   Pinterest is in SANDBOX mode — analytics API is not available.
+[05/14/2026, 09:15:53]   Once Standard access is approved, update PINTEREST_API_BASE in .env to:
+[05/14/2026, 09:15:53]     PINTEREST_API_BASE=https://api.pinterest.com
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   Running in dry-run mode instead.
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   Date range: 2026-05-07 to 2026-05-14
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   Found 275 content item(s) across queue + archive.
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]     2026-03-28-coloring-preview-08 [archive/2026-03-28] pin:1111192908079485762
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079485762/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-00 [archive/2026-03-28] pin:1111192908079486093
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079486093/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-01 [archive/2026-03-28] pin:1111192908079461646
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079461646/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-02 [archive/2026-03-28] pin:1111192908079461830
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079461830/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-03 [archive/2026-03-28] pin:1111192908079461789
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079461789/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-04 [archive/2026-03-28] pin:1111192908079461792
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079461792/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-05 [archive/2026-03-28] pin:1111192908079461794
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079461794/analytics
+[05/14/2026, 09:15:53]     2026-03-28-general-06 [archive/2026-03-28] pin:1111192908079461802
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079461802/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-dot-to-dot-00 [archive/2026-04-01] pin:1111192908079717539
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717539/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-matching-01 [archive/2026-04-01] pin:1111192908079717550
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717550/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-maze-02 [archive/2026-04-01] pin:1111192908079717563
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717563/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-maze-04 [archive/2026-04-01] pin:1111192908079717586
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717586/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-sudoku-08 [archive/2026-04-01] pin:1111192908079717601
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717601/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-tracing-07 [archive/2026-04-01] pin:1111192908079717610
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717610/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-word-search-05 [archive/2026-04-01] pin:1111192908079717625
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717625/analytics
+[05/14/2026, 09:15:53]     2026-04-01-activity-word-search-09 [archive/2026-04-01] pin:1111192908079717635
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717635/analytics
+[05/14/2026, 09:15:53]     2026-04-01-pattern-interrupt-03 [archive/2026-04-01] pin:1111192908079717662
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717662/analytics
+[05/14/2026, 09:15:53]     2026-04-01-story-06 [archive/2026-04-01] pin:1111192908079717683
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079717683/analytics
+[05/14/2026, 09:15:53]     2026-04-02-activity-dot-to-dot-00 [archive/2026-04-02] pin:1111192908079782928
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782928/analytics
+[05/14/2026, 09:15:53]     2026-04-02-activity-matching-02 [archive/2026-04-02] pin:1111192908079782930
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782930/analytics
+[05/14/2026, 09:15:53]     2026-04-02-activity-maze-03 [archive/2026-04-02] pin:1111192908079782934
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782934/analytics
+[05/14/2026, 09:15:53]     2026-04-02-activity-quiz-05 [archive/2026-04-02] pin:1111192908079782940
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782940/analytics
+[05/14/2026, 09:15:53]     2026-04-02-activity-sudoku-01 [archive/2026-04-02] pin:1111192908079782942
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782942/analytics
+[05/14/2026, 09:15:53]     2026-04-02-pattern-interrupt-04 [archive/2026-04-02] pin:1111192908079782945
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782945/analytics
+[05/14/2026, 09:15:53]     2026-04-02-story-06 [archive/2026-04-02] pin:1111192908079782948
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782948/analytics
+[05/14/2026, 09:15:53]     2026-04-02-story-07 [archive/2026-04-02] pin:1111192908079782951
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782951/analytics
+[05/14/2026, 09:15:53]     2026-04-02-story-08 [archive/2026-04-02] pin:1111192908079782952
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782952/analytics
+[05/14/2026, 09:15:53]     2026-04-02-story-09 [archive/2026-04-02] pin:1111192908079782957
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079782957/analytics
+[05/14/2026, 09:15:53]     2026-04-03-activity-coloring-00 [archive/2026-04-03] pin:1111192908079842630
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842630/analytics
+[05/14/2026, 09:15:53]     2026-04-03-activity-dot-to-dot-01 [archive/2026-04-03] pin:1111192908079842631
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842631/analytics
+[05/14/2026, 09:15:53]     2026-04-03-activity-matching-02 [archive/2026-04-03] pin:1111192908079842635
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842635/analytics
+[05/14/2026, 09:15:53]     2026-04-03-activity-quiz-04 [archive/2026-04-03] pin:1111192908079842639
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842639/analytics
+[05/14/2026, 09:15:53]     2026-04-03-activity-word-search-08 [archive/2026-04-03] pin:1111192908079842659
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842659/analytics
+[05/14/2026, 09:15:53]     2026-04-03-activity-word-search-09 [archive/2026-04-03] pin:1111192908079842662
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842662/analytics
+[05/14/2026, 09:15:53]     2026-04-03-pattern-interrupt-03 [archive/2026-04-03] pin:1111192908079842665
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842665/analytics
+[05/14/2026, 09:15:53]     2026-04-03-story-04 [archive/2026-04-03] pin:1111192908079842667
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842667/analytics
+[05/14/2026, 09:15:53]     2026-04-03-story-05 [archive/2026-04-03] pin:1111192908079842670
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842670/analytics
+[05/14/2026, 09:15:53]     2026-04-03-story-06 [archive/2026-04-03] pin:1111192908079842672
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842672/analytics
+[05/14/2026, 09:15:53]     2026-04-03-story-07 [archive/2026-04-03] pin:1111192908079842678
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842678/analytics
+[05/14/2026, 09:15:53]     2026-04-03-story-marketing-07 [archive/2026-04-03] pin:1111192908079842680
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842680/analytics
+[05/14/2026, 09:15:53]     2026-04-03-story-marketing-08 [archive/2026-04-03] pin:1111192908079842682
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079842682/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-coloring-00 [archive/2026-04-04] pin:1111192908079910165
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910165/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-dot-to-dot-01 [archive/2026-04-04] pin:1111192908079910168
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910168/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-matching-02 [archive/2026-04-04] pin:1111192908079910172
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910172/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-maze-03 [archive/2026-04-04] pin:1111192908079910178
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910178/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-quiz-05 [archive/2026-04-04] pin:1111192908079910192
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910192/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-sudoku-10 [archive/2026-04-04] pin:1111192908079910194
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910194/analytics
+[05/14/2026, 09:15:53]     2026-04-04-activity-word-search-11 [archive/2026-04-04] pin:1111192908079910198
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910198/analytics
+[05/14/2026, 09:15:53]     2026-04-04-pattern-interrupt-04 [archive/2026-04-04] pin:1111192908079910200
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910200/analytics
+[05/14/2026, 09:15:53]     2026-04-04-story-06 [archive/2026-04-04] pin:1111192908079910201
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910201/analytics
+[05/14/2026, 09:15:53]     2026-04-04-story-07 [archive/2026-04-04] pin:1111192908079910202
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910202/analytics
+[05/14/2026, 09:15:53]     2026-04-04-story-08 [archive/2026-04-04] pin:1111192908079910204
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910204/analytics
+[05/14/2026, 09:15:53]     2026-04-04-story-marketing-09 [archive/2026-04-04] pin:1111192908079910208
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079910208/analytics
+[05/14/2026, 09:15:53]     2026-04-05-activity-dot-to-dot-00 [archive/2026-04-05] pin:1111192908079973161
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973161/analytics
+[05/14/2026, 09:15:53]     2026-04-05-activity-matching-01 [archive/2026-04-05] pin:1111192908079973163
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973163/analytics
+[05/14/2026, 09:15:53]     2026-04-05-activity-quiz-02 [archive/2026-04-05] pin:1111192908079973167
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973167/analytics
+[05/14/2026, 09:15:53]     2026-04-05-activity-tracing-08 [archive/2026-04-05] pin:1111192908079973169
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973169/analytics
+[05/14/2026, 09:15:53]     2026-04-05-activity-word-search-09 [archive/2026-04-05] pin:1111192908079973170
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973170/analytics
+[05/14/2026, 09:15:53]     2026-04-05-story-03 [archive/2026-04-05] pin:1111192908079973175
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973175/analytics
+[05/14/2026, 09:15:53]     2026-04-05-story-04 [archive/2026-04-05] pin:1111192908079973177
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973177/analytics
+[05/14/2026, 09:15:53]     2026-04-05-story-05 [archive/2026-04-05] pin:1111192908079973182
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973182/analytics
+[05/14/2026, 09:15:53]     2026-04-05-story-06 [archive/2026-04-05] pin:1111192908079973187
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973187/analytics
+[05/14/2026, 09:15:53]     2026-04-05-story-07 [archive/2026-04-05] pin:1111192908079973190
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908079973190/analytics
+[05/14/2026, 09:15:53]     2026-04-06-activity-coloring-00 [archive/2026-04-06] pin:1111192908080032027
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032027/analytics
+[05/14/2026, 09:15:53]     2026-04-06-activity-dot-to-dot-01 [archive/2026-04-06] pin:1111192908080032033
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032033/analytics
+[05/14/2026, 09:15:53]     2026-04-06-activity-maze-02 [archive/2026-04-06] pin:1111192908080032043
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032043/analytics
+[05/14/2026, 09:15:53]     2026-04-06-activity-sudoku-08 [archive/2026-04-06] pin:1111192908080032048
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032048/analytics
+[05/14/2026, 09:15:53]     2026-04-06-activity-word-search-09 [archive/2026-04-06] pin:1111192908080032051
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032051/analytics
+[05/14/2026, 09:15:53]     2026-04-06-pattern-interrupt-03 [archive/2026-04-06] pin:1111192908080032065
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032065/analytics
+[05/14/2026, 09:15:53]     2026-04-06-story-04 [archive/2026-04-06] pin:1111192908080032073
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032073/analytics
+[05/14/2026, 09:15:53]     2026-04-06-story-05 [archive/2026-04-06] pin:1111192908080032078
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032078/analytics
+[05/14/2026, 09:15:53]     2026-04-06-story-06 [archive/2026-04-06] pin:1111192908080032087
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032087/analytics
+[05/14/2026, 09:15:53]     2026-04-06-story-marketing-07 [archive/2026-04-06] pin:1111192908080032110
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080032110/analytics
+[05/14/2026, 09:15:53]     2026-04-07-activity-coloring-00 [archive/2026-04-07] pin:1111192908080081521
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081521/analytics
+[05/14/2026, 09:15:53]     2026-04-07-activity-matching-02 [archive/2026-04-07] pin:1111192908080081523
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081523/analytics
+[05/14/2026, 09:15:53]     2026-04-07-activity-maze-03 [archive/2026-04-07] pin:1111192908080081527
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081527/analytics
+[05/14/2026, 09:15:53]     2026-04-07-activity-word-search-09 [archive/2026-04-07] pin:1111192908080081530
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081530/analytics
+[05/14/2026, 09:15:53]     2026-04-07-pattern-interrupt-04 [archive/2026-04-07] pin:1111192908080081603
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081603/analytics
+[05/14/2026, 09:15:53]     2026-04-07-story-05 [archive/2026-04-07] pin:1111192908080081605
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081605/analytics
+[05/14/2026, 09:15:53]     2026-04-07-story-06 [archive/2026-04-07] pin:1111192908080081607
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081607/analytics
+[05/14/2026, 09:15:53]     2026-04-07-story-07 [archive/2026-04-07] pin:1111192908080081609
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081609/analytics
+[05/14/2026, 09:15:53]     2026-04-07-story-marketing-08 [archive/2026-04-07] pin:1111192908080081670
+[05/14/2026, 09:15:53]       [SANDBOX] Would fetch: GET /v5/pins/1111192908080081670/analytics
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   --- Summary ---
+[05/14/2026, 09:15:53]   Collected: 0 | Skipped: 275 | Errors: 0
+[05/14/2026, 09:15:53] Done: collect-analytics.mjs
+[05/14/2026, 09:15:53] Running: analytics-report.mjs 
+[05/14/2026, 09:15:53]   === JoyMaze Analytics Report ===
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   Loaded 275 content items.
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   # JoyMaze Analytics Report
+[05/14/2026, 09:15:53]   Generated: 2026-05-14T06:15
+[05/14/2026, 09:15:53]   Period: Last 7 days
+[05/14/2026, 09:15:53]   Items with analytics: 0 / 0 posted
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   No analytics data available yet.
+[05/14/2026, 09:15:53]   
+[05/14/2026, 09:15:53]   To collect analytics:
+[05/14/2026, 09:15:53]     1. Ensure Pinterest Standard API access is approved
+[05/14/2026, 09:15:53]     2. Update .env: PINTEREST_API_BASE=https://api.pinterest.com
+[05/14/2026, 09:15:53]     3. Run: npm run analytics:collect
+[05/14/2026, 09:15:53] Done: analytics-report.mjs
+[05/14/2026, 09:15:53] Next analytics run in 3 days.
+[05/14/2026, 09:15:53] Note: posting handled by hourly Task Scheduler (post-content.mjs --scheduled --limit 2)
+[05/14/2026, 09:15:53] === Daily Morning Job Complete ===
+[Thu 05/14/2026  9:15:53.75] Completed successfully 
