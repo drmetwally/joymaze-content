@@ -13,15 +13,14 @@
  */
 
 import cron from 'node-cron';
-import { execFile } from 'child_process';
+import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const execFileAsync = promisify(execFile);
+const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const NODE = process.execPath;
 const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 const args = process.argv.slice(2);
@@ -42,24 +41,37 @@ function log(msg) {
 async function runDailyCommand() {
   const passthrough = args.filter((arg) => arg !== '--now' && arg !== '--post-now');
   log(`Running canonical daily pipeline: npm run daily${passthrough.length ? ` -- ${passthrough.join(' ')}` : ''}`);
-  try {
-    const cmdArgs = ['run', 'daily'];
-    if (passthrough.length) cmdArgs.push('--', ...passthrough);
-    const { stdout, stderr } = await execFileAsync(NPM, cmdArgs, {
+  return new Promise((resolve, reject) => {
+    const passthroughArgs = passthrough.length ? ['--', ...passthrough] : [];
+    const child = spawn(NPM, ['run', 'daily', ...passthroughArgs], {
       cwd: ROOT,
       env: { ...process.env },
-      timeout: 0,
-      shell: true,  // required on Windows — npm.cmd is a batch file, execFile can't spawn it without shell
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
-    if (stdout.trim()) stdout.trim().split('\n').forEach((line) => log(`  ${line}`));
-    if (stderr.trim()) stderr.trim().split('\n').forEach((line) => log(`  [stderr] ${line}`));
-    log('Canonical daily pipeline completed.');
-  } catch (err) {
-    log(`ERROR in npm run daily: ${err.message}`);
-    if (err.stdout) err.stdout.split('\n').forEach((line) => line && log(`  ${line}`));
-    if (err.stderr) err.stderr.split('\n').forEach((line) => line && log(`  [err] ${line}`));
-    throw err;
-  }
+
+    child.stdout.on('data', (chunk) => {
+      chunk.toString().split('\n').forEach((line) => { if (line.trim()) log(`  ${line}`); });
+    });
+    child.stderr.on('data', (chunk) => {
+      chunk.toString().split('\n').forEach((line) => { if (line.trim()) log(`  [stderr] ${line}`); });
+    });
+
+    child.on('close', (code) => {
+      if (code === 0) {
+        log('Canonical daily pipeline completed.');
+        resolve();
+      } else {
+        const err = new Error(`npm run daily exited with code ${code}`);
+        log(`ERROR in npm run daily: ${err.message}`);
+        reject(err);
+      }
+    });
+
+    child.on('error', (err) => {
+      log(`ERROR spawning npm run daily: ${err.message}`);
+      reject(err);
+    });
+  });
 }
 
 // ── 4 AM Creative Posting Job ─────────────────────────────────────────────────

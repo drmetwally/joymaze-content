@@ -306,6 +306,25 @@ async function main() {
       }
     }
 
+    // ── PASS 2.5: Pixabay broadened family/habitat search (rare animals) ────
+    if (!picked && hasPixabay) {
+      try {
+        const familyPrompt = `What broader animal family or habitat does "${episode.animalName}" belong to? Give a 1-2 word search term for finding animated cartoon videos of similar animals (e.g. "giraffe family", "african savanna", "deep sea fish"). Output ONLY the search term, nothing else.`;
+        const familyTerm = (await callGroq(familyPrompt)).trim().replace(/['".,]/g, '').toLowerCase();
+        if (familyTerm && familyTerm !== animalLower && familyTerm.length > 2) {
+          const query = `${familyTerm} cartoon`;
+          if (DRY_RUN) {
+            console.log(`    Would search Pixabay (family broadened): "${query}"`);
+          } else {
+            process.stdout.write(`    Pixabay family: "${query}"...`);
+            const res = await pixabaySearch(query, 'animation');
+            picked = pickBestPixabayClip(res);
+            console.log(picked ? ` found (${picked.duration}s, ${picked.width}px)` : ' no clip');
+          }
+        }
+      } catch { /* non-fatal — pass 3 will run next */ }
+    }
+
     // ── PASS 3: Pixabay all video types (includes film clips) ─────────────
     if (!picked && hasPixabay) {
       const query = animalLower;

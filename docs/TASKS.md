@@ -1,5 +1,5 @@
 # JoyMaze — Persistent Task Board
-Last updated: 2026-05-05
+Last updated: 2026-05-09
 
 > This file is the single source of truth for in-progress and queued work.
 > Claude reads this at session start and updates status as tasks complete.
@@ -133,6 +133,36 @@ X account permanently suspended for spam. Decision: do NOT appeal. Start fresh.
   - After Story Reel, Animal Facts, and Find-the-Difference challenge reel are in a good state, stop major pipeline building.
   - Primary focus becomes posting, automation reliability, polishing, and marketing KPIs.
   - Main business goals: views, subscribers, and sales for books and app.
+
+## TODAY — 2026-05-11
+
+- [x] **FIX-001** — Kokoro TTS voice path: `D:\voices` junction recreated → TTS works
+- [x] **FIX-002** — Story reel audio timeout: 60s → 300s in daily-run.mjs
+- [x] **FIX-003** — Story reel render gated on audio success (was running unconditionally)
+- [x] **FIX-004** — Challenge puzzle: null imagePrompt fallback added (no more process.exit(1) on old briefs)
+- [x] **FIX-005** — Animal render: song-option-N.mp3 filename scan added to animalEpisodeToSongShortProps()
+- [x] **Log cleanup** — 35 stale/completed docs archived to docs/archive/; CLAUDE.md locked decisions updated; memory file created
+- [ ] Run `npm run daily` — first full unattended end-to-end test with all 5 fixes applied
+
+## TODAY — 2026-05-09
+
+- [ ] Run `npm run daily` — full pipeline run (validates new fast Imagen model)
+- [ ] Audit all creatives — images, reels, videos
+- [ ] Linkage check — confirm import-raw and generate-captions point to new pipeline outputs
+- [ ] Run import-raw + generate-captions
+- [ ] Update brief generator to include full pipeline output
+- [ ] Post all ready content manually (Pinterest, Instagram, YouTube — everything except X auto)
+
+## X WARMUP — 2026-05-09 to 2026-05-15
+
+> X account (@playjoymaze) was silent ~2 weeks. Manual re-warm only. Auto-posting held until 2026-05-16.
+> Post 1-2 times/day manually using `npm run brief` copy. No hashtags, soft CTAs only.
+> `x-posts.yml` stays disabled (`if: false`) until **2026-05-16**.
+
+- [ ] Days 1-7 (2026-05-09 to 2026-05-15) — post 1-2 X posts manually per day
+- [ ] **2026-05-16** — remove `if: false` from `x-posts.yml`, run `npm run cooldown:clear`, push
+
+---
 
 ## ACTIVE SPRINT — DUAL TRACK (2026-04-30)
 

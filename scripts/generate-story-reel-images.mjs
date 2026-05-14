@@ -210,6 +210,10 @@ function classifyGenerationError(err) {
   if (/50[0-9]|service unavailable|rai response|failed to retrieve|server error|internal (server|error)/i.test(message)) {
     return { type: 'transient', retryable: true, message };
   }
+  // Empty predictions = infrastructure flakiness (not a content block) — retry resolves it
+  if (/did not return an image|no image returned|empty.*prediction|prediction.*empty/i.test(message)) {
+    return { type: 'transient', retryable: true, message };
+  }
   return { type: 'unknown', retryable: false, message };
 }
 

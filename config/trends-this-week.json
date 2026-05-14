@@ -1,6 +1,6 @@
 {
-  "generated": "2026-05-04",
-  "valid_until": "2026-05-11",
+  "generated": "2026-05-11",
+  "valid_until": "2026-05-18",
   "sources": [
     "seasonal_calendar"
   ],
@@ -19,10 +19,22 @@
     },
     {
       "theme": "Camping/Outdoors",
-      "score": 30
+      "score": 60
     },
     {
       "theme": "Sports/Games",
+      "score": 30
+    },
+    {
+      "theme": "Summer",
+      "score": 30
+    },
+    {
+      "theme": "Beach",
+      "score": 30
+    },
+    {
+      "theme": "Vehicles/Transport",
       "score": 30
     }
   ],
@@ -36,18 +48,26 @@
   "rising_searches": [
     "mothers day printables",
     "mothers day activities for kids",
-    "memorial day activities for kids"
+    "memorial day activities for kids",
+    "summer activities for kids",
+    "summer printables"
   ],
   "upcoming_moments": [
     {
       "event": "Mother's Day",
-      "date": "2026-05-11",
-      "days_away": 7
+      "date": "2026-05-10",
+      "days_away": 0
     },
     {
       "event": "Memorial Day",
-      "date": "2026-05-26",
-      "days_away": 22
+      "date": "2026-05-25",
+      "days_away": 15
+    },
+    {
+      "event": "Summer Break",
+      "date": "2026-06-07",
+      "days_away": 28,
+      "is_break": true
     }
   ],
   "caption_keywords": [

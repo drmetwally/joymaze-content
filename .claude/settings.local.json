@@ -173,7 +173,9 @@
       "PowerShell(Get-Command *)",
       "Bash(dir \"C:\\\\Users\\\\BESOO\\\\Downloads\\\\cowboy_animals 2875602 \\(CMYK\\)\")",
       "Bash(dir \"C:\\\\Users\\\\BESOO\\\\Downloads\\\\cowboy_animals 2875602 \\(CMYK\\)\\\\sources\")",
-      "Bash(gh api *)"
+      "Bash(gh api *)",
+      "Bash(git stash *)",
+      "Bash(git merge *)"
     ]
   }
 }

@@ -258,6 +258,7 @@ function buildActivityJson(type, brief) {
     hookDurationSec: 2.5,
     holdAfterSec:   2.5,
     imagePath:      'puzzle.png',
+    imagePrompt:    brief.imagePrompt,
     showJoyo:       true,
   };
 }

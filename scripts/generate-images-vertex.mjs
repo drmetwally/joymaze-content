@@ -164,16 +164,15 @@ function cleanForDallE3(prompt) {
     .replace(/\bbare feet\b/gi, 'feet');
 }
 
-// --- DALL-E 3 call (for child/family scenes that Imagen safety-filters) ---
-async function generateImageDallE3(promptText) {
-  if (DRY_RUN) return Buffer.from('dry-run');
+// --- DALL-E call helper (shared by dall-e-3 and dall-e-2) ---
+async function callDallEModel(model, promptText) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new Error('OPENAI_API_KEY not set');
   const res = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
     body: JSON.stringify({
-      model: 'dall-e-3',
+      model,
       prompt: promptText,
       n: 1,
       size: '1024x1024',
@@ -183,10 +182,31 @@ async function generateImageDallE3(promptText) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(`DALL-E 3 error ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new Error(`DALL-E ${model} error ${res.status}: ${err.error?.message || res.statusText}`);
   }
   const data = await res.json();
   return Buffer.from(data.data[0].b64_json, 'base64');
+}
+
+// --- DALL-E 3 call (for child/family scenes that Imagen safety-filters) ---
+// Fallback chain: dall-e-3 → dall-e-2 → Vertex Imagen
+async function generateImageDallE3(promptText) {
+  if (DRY_RUN) return Buffer.from('dry-run');
+  try {
+    return await callDallEModel('dall-e-3', promptText);
+  } catch (e3) {
+    const msg = String(e3.message || '');
+    if (/does not exist|model_not_found|invalid_model/i.test(msg) || /^DALL-E dall-e-3 error 400/.test(msg)) {
+      console.warn(`    [DALL-E 3 unavailable] ${msg} — trying DALL-E 2...`);
+      try {
+        return await callDallEModel('dall-e-2', promptText);
+      } catch (e2) {
+        console.warn(`    [DALL-E 2 unavailable] ${e2.message} — falling back to Vertex Imagen...`);
+        return generateImage(promptText);
+      }
+    }
+    throw e3;
+  }
 }
 
 // --- Imagen 4.0 call ---

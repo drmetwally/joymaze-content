@@ -117,13 +117,35 @@ async function generateOpenAITTS(text, outputPath, speed = 0.75, voice = 'shimme
   await fs.writeFile(outputPath, buffer);
 }
 
-async function generateKokoroTTS(text, outputPath, speed = 1.0) {
+// Singleton — loaded once and reused across all slides to avoid re-initialising the
+// 82M ONNX model per call (re-init was the root cause of the hang on slide 7+).
+let _kokoroTts = null;
+async function getKokoroTts() {
+  if (_kokoroTts) return _kokoroTts;
   const { KokoroTTS } = await import('kokoro-js');
-  const tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
+  _kokoroTts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
     dtype: 'q8',
     device: 'cpu',
   });
-  const audio = await tts.generate(text, { voice: 'af_bella', speed });
+  return _kokoroTts;
+}
+
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`TTS timeout after ${ms}ms — slide: ${label}`)), ms)
+    ),
+  ]);
+}
+
+async function generateKokoroTTS(text, outputPath, speed = 1.0) {
+  const tts = await getKokoroTts();
+  const audio = await withTimeout(
+    tts.generate(text, { voice: 'af_bella', speed }),
+    30000,
+    outputPath
+  );
   await audio.save(outputPath);
 }
 

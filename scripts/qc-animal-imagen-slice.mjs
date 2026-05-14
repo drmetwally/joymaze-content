@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 const ROOT = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\//, process.platform === 'win32' ? '' : '/'));
-const MODEL = 'imagen-4.0-generate-001';
+const MODEL = 'imagen-4.0-fast-generate-001';
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 const args = process.argv.slice(2);

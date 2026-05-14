@@ -2,7 +2,7 @@
 
 > Follow top to bottom. Every day.
 
-Last updated: 2026-05-09
+Last updated: 2026-05-13
 
 ---
 
@@ -12,7 +12,7 @@ Last updated: 2026-05-09
 |------|------|------|---------|
 | 1 | Archive + briefs + Story Reel V2 auto-render | 3–5 min | `npm run daily` |
 | 2A | Inspiration images (5) | 10–15 min | Gemini → `output/raw/<slot>/` |
-| 2B | Activity puzzle images (maze+ws auto; coloring+dottodot engine; matching manual) | 5–10 min | engines + 1 manual |
+| 2B | Activity puzzle images (maze+ws auto; coloring+dottodot+matching engine; find-diff manual) | 5–10 min | engines only |
 | 2C | ASMR images (2) | 5 min | Gemini → `output/asmr/[folder]/` |
 | 2D | Challenge image (1) | 2 min | Gemini → `output/challenge/[folder]/puzzle.png` |
 | 2E | Story slides (7, optional) | 10 min | Gemini → `output/stories/[folder]/` |
@@ -116,6 +116,10 @@ npm run puzzlepost:generate -- --type coloring --slug <generated-slug>
 # Dot-to-Dot via Imagen (coloring page → contour extraction → puzzle)
 npm run dottodot:imagen
 npm run puzzlepost:generate -- --type dot-to-dot --slug <generated-slug>
+
+# Matching — sticker cards via Imagen (baking + all 7 themes supported as of 2026-05-13)
+npm run generate:matching:assets -- --theme "<Theme Name>" --difficulty hard
+npm run puzzlepost:generate -- --type matching --slug <generated-slug>
 ```
 
 Output lands in `output/challenge/generated-activity/{slug}/`. The slug is printed at the end of each generator run.
@@ -124,7 +128,6 @@ Output lands in `output/challenge/generated-activity/{slug}/`. The slug is print
 
 | Type | Folder | Name pattern |
 |------|--------|-------------|
-| Matching | `output/raw/matching/` | `matching-{theme}.png` |
 | Tracing | `output/raw/tracing/` | `tracing-{theme}.png` |
 
 **Work in progress — not ready:**
@@ -420,13 +423,13 @@ npm run post:scheduled:dry   # Dry-run posting locally
 
 | Platform | Account | Status | Posting |
 |----------|---------|--------|---------|
-| X | @playjoymaze | Active — no API credits | Posts queued, won't fire until credits added at console.x.com |
-| Pinterest | joymaze.pp@gmail.com | New — no API keys yet | Paused |
-| Instagram | joymaze.pp@gmail.com | New — no API keys yet | Paused |
-| TikTok | joymaze.pp@gmail.com | New — no API keys yet | Paused |
+| X | @playjoymaze | Warmup ended 2026-05-07 — **re-enable pending** | `x-posts.yml` has `if: false` guard. Action: remove guard + `npm run cooldown:clear` + push + update Secrets |
+| Pinterest | joymaze.pp@gmail.com | No API — manual posting only | No Developer App yet |
+| Instagram | joymaze.pp@gmail.com | No API — account created | No Meta Developer App yet |
+| TikTok | — | Not started — deferred | Focus longform engine first |
 | YouTube | joymaze.pp@gmail.com | Live | Active (4 AM Actions) |
 
-**To resume X posting:** Add credits at console.x.com — no code changes needed, queued posts will fire automatically.
+**To re-enable X posting:** Remove `if: false` from `.github/workflows/x-posts.yml` + update GitHub Secrets with new @playjoymaze API keys + `npm run cooldown:clear` + `git push`.
 
 ---
 
@@ -496,7 +499,7 @@ git add output/posting-cooldown.json && git commit -m "cooldown: active" && git 
 | Challenge audio is silent | Run dry-run — look for `[sfx] not found` warnings; check file names match exactly |
 | Challenge: no path drawn in solve | `extract:path` not run yet, or `blank.png` missing |
 | Challenge: no word highlights in solve | `extract:wordsearch` not run yet, or `solved.png` has low-contrast highlights |
-| Story Reel V2 not rendered after Step 1 | Check scheduler log — Imagen may have failed. Run manually: `npm run generate:story:reel-images -- --story <folder>` |
+| Story Reel V2 not rendered after Step 1 | Check scheduler log — Imagen 503/500 errors retry automatically (30s/60s backoff). If still failed, run manually: `npm run generate:story:reel-images -- --story <folder>` |
 | Story Reel V2: images look identical | Use `--force` to regenerate; check `reel-image-prompts.md` prompts are ≥40 words |
 | Story Reel V2: missing image error | Reel-image-prompts.md prompts matched wrong slide numbers — check `reelSlideOrder` in `story.json` |
 | Animal Song Short: narration dry-run OK but render fails | Confirm `narration-hook.mp3`, `narration-namereveal.mp3`, `narration-outro-cta-short.mp3` exist in episode folder |
@@ -566,7 +569,7 @@ MONDAY AUTOMATIC (npm run daily + GitHub Actions):
 
 DAILY (all 4 reel lanes run through intelligence):
   Image prompts  ← generate-prompts.mjs (themes + hooks + pattern-interrupts + series tag)
-  Puzzle posts   ← activity-manifest-YYYY-MM-DD.json → generate-puzzle-image-post.mjs (maze + word-search only for now)
+  Puzzle posts   ← activity-manifest-YYYY-MM-DD.json → generate-puzzle-image-post.mjs (maze + word-search auto; coloring/dottodot/matching engine)
   Story Reel V2  ← generate-story-ideas.mjs (trends + perf-weights + competitor + hooks + virality)
                  → generate-story-reel-images.mjs (Imagen) → render-video.mjs StoryReelV2
   Animal Song    ← generate-animal-facts-brief.mjs (all 9 config files + virality)

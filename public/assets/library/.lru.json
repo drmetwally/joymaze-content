@@ -1,11 +1,11 @@
 {
   "ocean:character": [
-    "public/assets/stickers/matching/ocean/turtle.png",
     "public/assets/stickers/matching/ocean/dolphin.png",
     "public/assets/stickers/matching/ocean/fish.png",
     "public/assets/stickers/matching/ocean/crab.png",
     "public/assets/stickers/matching/ocean/seahorse.png",
-    "public/assets/stickers/matching/ocean/octopus.png"
+    "public/assets/stickers/matching/ocean/octopus.png",
+    "public/assets/stickers/matching/ocean/turtle.png"
   ],
   "ocean:scene": [
     "assets/generated/coloring-pages/ocean/ocean.png",
@@ -18,5 +18,13 @@
     "public/assets/stickers/matching/animals/dog.png",
     "public/assets/stickers/matching/animals/rabbit.png",
     "public/assets/stickers/matching/animals/elephant.png"
+  ],
+  "space:character": [
+    "public/assets/stickers/matching/space/astronaut.png",
+    "public/assets/stickers/matching/space/star.png",
+    "public/assets/stickers/matching/space/ufo.png",
+    "public/assets/stickers/matching/space/moon.png",
+    "public/assets/stickers/matching/space/rocket.png",
+    "public/assets/stickers/matching/space/planet.png"
   ]
 }

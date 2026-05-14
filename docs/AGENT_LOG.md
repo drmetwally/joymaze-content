@@ -480,4 +480,379 @@ node scripts/generate-images-vertex.mjs --inspiration-only --dry-run
 - `import:raw` — it already handles these folders
 - Story Reel V2 image generation path
 - Any existing Imagen usage in other scripts
+
+---
+
+## TASK: Automate full ASMR pipeline inside daily-run.mjs
+**Date:** 2026-05-09
+**Status:** SPEC — ready for Gemini (OpenClaw) implementation
+**Assigned to:** Gemini / OC
+
+---
+
+### Problem statement
+
+`npm run daily` calls `generate-asmr-brief.mjs --save`, which creates `output/asmr/${type}-${slug}/` with `activity.json` and `brief.md`. After that, the pipeline stops and all remaining steps are manual: puzzle image generation (blank.png + solved.png), path extraction, and Remotion render. This means ASMR video production requires human intervention every day even though all the inputs are deterministic once the brief exists. The goal is to extend the `WITH_ASMR_BRIEF` block in `scripts/daily-run.mjs` to run the full pipeline automatically: brief → engine → extract (type-dependent) → render.
+
+---
+
+### Bridge analysis
+
+#### Key facts about `activity.json` (written by `generate-asmr-brief.mjs`)
+
+`buildActivityJson()` writes exactly these fields:
+- `title` — brief.theme (string)
+- `type` — the puzzle type string (`maze`, `coloring`, `wordsearch`, `dotdot`)
+- `revealType` — same value as `type`
+- `hookText` — 3–6 word hook string
+- `hookAlternatives` — array of 3 strings
+- `theme` — a canned description string (e.g. "Watch the maze path reveal itself")
+- `music` — `null`
+
+**It does NOT write `blankImage`, `solvedImage`, `slug`, or `difficulty`.** The slug is encoded only in the folder name (`${type}-${slug}`), not inside the JSON. Difficulty is not stored at all. The engine scripts can be called with any `--slug` and `--theme` values; we will pass `type` and derive slug from the folder name.
+
+**Output folder formula:** `output/asmr/${type}-${slug}/` — where `slug` comes from `brief.slug` (the Groq-generated kebab string). The folder name is the source of truth.
+
+---
+
+#### Puzzle type: maze
+
+**Engine script:** `scripts/generate-maze-assets.mjs`
+
+**CLI args accepted:**
+- `--theme <string>` (required for seed)
+- `--title <string>` (optional, defaults to `--theme`)
+- `--difficulty <easy|medium|hard|difficult|extreme>` (default: medium)
+- `--slug <string>` (overrides auto-generated slug)
+- `--out-dir <path>` (relative to ROOT — writes all output there)
+- `--seed`, `--shape`, `--rows`, `--cols`, `--path-color` (optional)
+- `--dry-run`
+
+**Output files written (to `--out-dir`):**
+`maze.json`, `path.json`, `activity.json` (overwrites!), `_benchmark-notes.json`, `blank.svg`, `blank.png`, `solved.svg`, `solved.png`, `puzzle.png`
+
+**Custom output dir:** YES — `--out-dir` is supported. Pass the ASMR folder directly.
+
+**Critical caveat:** The engine writes its own `activity.json` to `outDir`, which would **overwrite** the ASMR brief's `activity.json`. Gemini must handle this: save the ASMR `activity.json` before calling the engine, then restore it after. See Implementation Plan.
+
+**Extract script:** `scripts/extract-maze-path.mjs`
+
+**Extract CLI:** Accepts `--asmr <folder-path-or-activity.json>`. Both forms work:
+- `node scripts/extract-maze-path.mjs --asmr output/asmr/maze-slug/`
+- `node scripts/extract-maze-path.mjs output/asmr/maze-slug/activity.json`
+
+**Extract output:** `path.json` written into the same folder as the input `activity.json`.
+
+**Note:** Since `generate-maze-assets.mjs` already writes `path.json` when run with `--out-dir`, the extract step re-derives from actual rendered pixels and is authoritative. Always run extract after the engine.
+
+---
+
+#### Puzzle type: wordsearch
+
+**Engine script:** `scripts/generate-wordsearch-assets.mjs`
+
+**CLI args accepted:**
+- `--theme <string>`, `--title <string>`, `--difficulty <string>`, `--slug <string>`
+- `--out-dir <path>` (relative to ROOT)
+- `--seed`, `--words`, `--countdown`, `--dry-run`
+
+**Output files written (to `--out-dir`):**
+`activity.json` (overwrites!), `wordsearch.json`, `puzzle.json`, `blank.svg`, `blank.png`, `solved.svg`, `solved.png`, `puzzle.png`
+
+**Custom output dir:** YES — `--out-dir` supported. Same overwrite caveat as maze.
+
+**Extract script:** `scripts/extract-wordsearch-path.mjs`
+
+**Extract CLI:** `--asmr output/asmr/wordsearch-slug/` or positional path to `activity.json`.
+
+**Extract output:** `wordsearch.json` written into the same folder as `activity.json`.
+
+**Note:** The extract script re-derives word rects from image pixel diff and is authoritative for AI-generated images. Always run extract after the engine.
+
+---
+
+#### Puzzle type: coloring
+
+**Engine script:** `scripts/generate-coloring-assets.mjs`
+
+**CLI args accepted:**
+- `--theme <string>`, `--title <string>`, `--difficulty <string>`, `--slug <string>`
+- `--out-dir <path>` (relative to ROOT)
+- `--imagen` (uses Imagen AI to generate the coloring image)
+- `--seed`, `--force`, `--dry-run`
+
+**Output files written (to `--out-dir`):**
+- Without `--imagen`: `activity.json` (overwrites!), `coloring.json`, `blank.svg`, `blank.png`, `colored.svg`, `colored.png`, `puzzle.png`
+- With `--imagen`: `activity.json` (overwrites!), `blank.png`, `colored.png`, `puzzle.png`
+
+**Key difference:** Coloring outputs `colored.png` instead of `solved.png`. `render-video.mjs` line 678 handles this: `activity.solvedImage ?? (revealType === 'coloring' ? 'colored.png' : 'solved.png')`. No rename needed.
+
+**Custom output dir:** YES — `--out-dir` supported.
+
+**Extract script:** NONE. Coloring uses a top-to-bottom wipe between `blank.png` and `colored.png`.
+
+**Note:** Always pass `--force` so the engine regenerates even if `puzzle.png` already exists from a previous run.
+
+---
+
+#### Puzzle type: dotdot
+
+**Engine script:** Cannot use `generate-imagen-dottodot-assets.mjs` wrapper — it hardcodes its output to `output/challenge/generated-activity/${slug}` and has no `--out-dir` flag. Use the two inner scripts directly instead.
+
+**Step A:** `scripts/generate-coloring-assets.mjs --imagen` into a temp folder `output/challenge/generated-activity/asmr-tmp-${slug}`
+
+**Step B:** `scripts/generate-dottodot-from-image.mjs --source-image <tmp>/blank.png --out-dir <asmr-folder>` (this script supports `--out-dir`)
+
+**Output files (in asmr folder after step B):** `blank.svg`, `blank.png`, `solved.svg`, `solved.png`, `dots.json`, `activity.json` (overwrites!)
+
+**Extract script:** `scripts/extract-dotdot-path.mjs`
+
+**Extract CLI:** `--asmr output/asmr/dotdot-slug/`. Reads `blank.png` + `solved.png`, writes `dots.json`.
+
+**Cleanup:** Delete the temp folder after step B succeeds. Do NOT clean up on failure — leaves debug artifacts.
+
+---
+
+### Implementation plan
+
+#### 1. New helper function `getLatestAsmrFolder()`
+
+Add directly below `getLatestStoryFolder()` in `scripts/daily-run.mjs` (around line 98):
+
+```js
+async function getLatestAsmrFolder() {
+  const asmrDir = path.join(ROOT, 'output', 'asmr');
+  try {
+    const entries = await fs.readdir(asmrDir, { withFileTypes: true });
+    const dirs = entries.filter((e) => e.isDirectory());
+    if (dirs.length === 0) return null;
+    const withMtime = await Promise.all(
+      dirs.map(async (d) => {
+        const full = path.join(asmrDir, d.name);
+        const stat = await fs.stat(full).catch(() => null);
+        return stat ? { full, name: d.name, mtime: stat.mtimeMs } : null;
+      })
+    );
+    const sorted = withMtime.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
+    return sorted[0] ?? null; // { full, name, mtime } or null
+  } catch {
+    return null;
+  }
+}
+```
+
+Returns `{ full: '/abs/path/output/asmr/maze-ocean-animals', name: 'maze-ocean-animals', mtime: ... }` or `null`.
+
+---
+
+#### 2. Replace the `WITH_ASMR_BRIEF` block (lines 349–360)
+
+```js
+if (WITH_ASMR_BRIEF) {
+  stepNum++;
+  log(`Step ${stepNum}/${totalSteps}: Generating today's ASMR brief...`);
+  const asmrOk = await runScript('generate-asmr-brief.mjs', ['--save']);
+  if (!asmrOk) {
+    log('ASMR brief failed, run manually: npm run generate:asmr:brief');
+    await appendLog('ASMR brief FAILED');
+  } else {
+    log('ASMR brief ready in output/asmr/');
+    await appendLog('ASMR brief generated OK');
+
+    const asmrEntry = await getLatestAsmrFolder();
+    if (!asmrEntry) {
+      log('ASMR: could not find latest asmr folder, skipping pipeline');
+    } else {
+      const { full: asmrFolder, name: asmrFolderName } = asmrEntry;
+      const activityJsonPath = path.join(asmrFolder, 'activity.json');
+      let activity = null;
+      try {
+        activity = JSON.parse(await fs.readFile(activityJsonPath, 'utf-8'));
+      } catch (err) {
+        log(`ASMR: could not read activity.json: ${err.message}, skipping pipeline`);
+      }
+
+      if (activity) {
+        const asmrType = activity.type ?? activity.revealType;
+        const asmrSlug = asmrFolderName.replace(/^[^-]+-/, '');
+        const asmrDifficulty = 'medium';
+        const asmrTheme = activity.title ?? asmrSlug.replace(/-/g, ' ');
+        const asmrRelFolder = path.relative(ROOT, asmrFolder).replace(/\\/g, '/');
+        const asmrActivityJsonRel = `${asmrRelFolder}/activity.json`;
+        const savedActivity = JSON.stringify(activity, null, 2);
+
+        log(`ASMR: type=${asmrType}, slug=${asmrSlug}, theme=${asmrTheme}`);
+
+        let engineOk = false;
+        let extractOk = false;
+
+        if (asmrType === 'maze') {
+          engineOk = await runScript('generate-maze-assets.mjs', [
+            '--theme', asmrTheme, '--slug', asmrSlug,
+            '--difficulty', asmrDifficulty, '--out-dir', asmrRelFolder,
+          ], 60_000);
+          if (engineOk) {
+            await fs.writeFile(activityJsonPath, savedActivity, 'utf-8');
+            log('ASMR maze: engine OK, activity.json restored');
+            extractOk = await runScript('extract-maze-path.mjs', ['--asmr', asmrRelFolder], 60_000);
+            if (!extractOk) log('ASMR maze: path extraction failed — engine path.json used as fallback');
+          } else {
+            log('ASMR maze: engine failed'); await appendLog('ASMR maze engine FAILED');
+          }
+
+        } else if (asmrType === 'wordsearch') {
+          engineOk = await runScript('generate-wordsearch-assets.mjs', [
+            '--theme', asmrTheme, '--slug', asmrSlug,
+            '--difficulty', asmrDifficulty, '--out-dir', asmrRelFolder,
+          ], 60_000);
+          if (engineOk) {
+            await fs.writeFile(activityJsonPath, savedActivity, 'utf-8');
+            log('ASMR wordsearch: engine OK, activity.json restored');
+            extractOk = await runScript('extract-wordsearch-path.mjs', ['--asmr', asmrRelFolder], 60_000);
+            if (!extractOk) log('ASMR wordsearch: extraction failed — engine wordsearch.json used as fallback');
+          } else {
+            log('ASMR wordsearch: engine failed'); await appendLog('ASMR wordsearch engine FAILED');
+          }
+
+        } else if (asmrType === 'coloring') {
+          engineOk = await runScript('generate-coloring-assets.mjs', [
+            '--imagen', '--theme', asmrTheme, '--slug', asmrSlug,
+            '--difficulty', asmrDifficulty, '--out-dir', asmrRelFolder, '--force',
+          ], 120_000);
+          if (engineOk) {
+            await fs.writeFile(activityJsonPath, savedActivity, 'utf-8');
+            log('ASMR coloring: engine OK, activity.json restored');
+            extractOk = true; // no extract step for coloring
+          } else {
+            log('ASMR coloring: engine failed'); await appendLog('ASMR coloring engine FAILED');
+          }
+
+        } else if (asmrType === 'dotdot') {
+          const tmpFolderRel = `output/challenge/generated-activity/asmr-tmp-${asmrSlug}`;
+          const tmpFolderAbs = path.join(ROOT, tmpFolderRel);
+          const coloringOk = await runScript('generate-coloring-assets.mjs', [
+            '--imagen', '--theme', asmrTheme, '--slug', `asmr-tmp-${asmrSlug}`,
+            '--difficulty', asmrDifficulty, '--out-dir', tmpFolderRel, '--force',
+          ], 120_000);
+          if (coloringOk) {
+            const sourceImageRel = `${tmpFolderRel}/blank.png`;
+            const dottodotOk = await runScript('generate-dottodot-from-image.mjs', [
+              '--source-image', sourceImageRel, '--theme', asmrTheme,
+              '--slug', asmrSlug, '--difficulty', asmrDifficulty,
+              '--out-dir', asmrRelFolder, '--force',
+            ], 120_000);
+            if (dottodotOk) {
+              await fs.writeFile(activityJsonPath, savedActivity, 'utf-8');
+              log('ASMR dotdot: engine OK, activity.json restored');
+              engineOk = true;
+              extractOk = await runScript('extract-dotdot-path.mjs', ['--asmr', asmrRelFolder], 60_000);
+              if (!extractOk) log('ASMR dotdot: dot extraction failed');
+              await fs.rm(tmpFolderAbs, { recursive: true, force: true }).catch(() => {});
+            } else {
+              log('ASMR dotdot: dottodot-from-image step failed'); await appendLog('ASMR dotdot engine FAILED');
+            }
+          } else {
+            log('ASMR dotdot: coloring step failed'); await appendLog('ASMR dotdot coloring FAILED');
+          }
+
+        } else {
+          log(`ASMR: unknown type "${asmrType}", skipping pipeline`);
+        }
+
+        if (engineOk) {
+          log(`ASMR: rendering ${asmrType} video...`);
+          const renderOk = await runScript('render-video.mjs', [
+            '--comp', 'AsmrReveal', '--asmr', asmrActivityJsonRel,
+          ], 600_000);
+          if (renderOk) {
+            log('ASMR video rendered → output/videos/');
+            await appendLog(`ASMR ${asmrType} video rendered OK`);
+          } else {
+            log(`ASMR render failed — run manually: node scripts/render-video.mjs --comp AsmrReveal --asmr ${asmrActivityJsonRel}`);
+            await appendLog(`ASMR ${asmrType} render FAILED`);
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+#### 3. `totalSteps` update
+
+No change needed. The `WITH_ASMR_BRIEF` term stays as `(WITH_ASMR_BRIEF ? 1 : 0)`. All engine/extract/render sub-steps are gated inside the brief's success block and do not get their own step numbers.
+
+---
+
+### Risk flags
+
+1. **`activity.json` overwrite** — Every engine script writes its own `activity.json` to `outDir`. The implementation saves and restores the brief's version after each engine call. Gemini must verify the restore logic and confirm `render-video.mjs` reads `hookText`, `revealType`, and `type` correctly from the restored version.
+
+2. **`--out-dir` path resolution** — Engine scripts do `path.resolve(ROOT, OUT_DIR_ARG)`. The `--out-dir` value must be relative to ROOT (e.g. `output/asmr/maze-ocean-animals`), not absolute. The code uses `path.relative(ROOT, asmrFolder).replace(/\\/g, '/')` — the backslash replace is critical on Windows.
+
+3. **`dotdot` type string** — The brief writes `type: 'dotdot'`. Verify that `render-video.mjs` `AsmrReveal` handles `revealType === 'dotdot'` (not `'dot-to-dot'`). If it only handles `'dot-to-dot'`, add a mapping in the restore step: `activity.revealType = 'dot-to-dot'` before writing back.
+
+4. **Render timeout** — Keep `600_000` (10 min) for the render call. Do not use the default 120,000ms.
+
+5. **`generate-dottodot-from-image.mjs` `--source-image` in dry-run** — In `--dry-run` mode the path check is skipped, so `runScript` dry-run propagation works without the source image existing. In live mode, the coloring step must succeed first. The implementation is correctly sequenced.
+
+6. **dotdot temp folder on failure** — If `generate-dottodot-from-image.mjs` fails, the temp folder `output/challenge/generated-activity/asmr-tmp-${slug}/` is left behind for debugging. Do not add a finally-cleanup — it would delete useful debug files on failure.
+
+7. **Extract step on maze/wordsearch** — The engine already writes `path.json` / `wordsearch.json` to the ASMR folder. Running the extract script afterward overwrites with pixel-derived values. If extract fails, the engine's version is still present and the render will likely succeed. Non-fatal failure.
+
+8. **Difficulty defaulting to `'medium'`** — The brief's `activity.json` does not record difficulty. The implementation defaults to `'medium'` for all engine calls. This is appropriate for ASMR (visual quality is the same; only grid density changes). If a future brief version adds a `difficulty` field, read it from `activity.json` instead.
 - Puffin benchmark polish added a second durable rule on 2026-05-07: the final expanded Animal Facts moment should usually be a clear emotional/factual payoff image, not merely a generic return-flight or scenic hold. Future episodes should end on home/family/food-delivery resolve when the material supports it.
+
+---
+
+### 2026-05-11 | Claude | FIX-001 | Kokoro TTS voice path — Windows/Node.js 24 directory junction
+
+**Status:** FIXED
+
+**Bug:** `import.meta.dirname` inside `kokoro-js` resolves to `D:\dist` (Node.js 24 regression on Windows), not the package folder. Kokoro silently fails to load voice files — TTS step produced no audio.
+
+**Fix:** Directory junction `D:\voices` → `D:\Joymaze-Content\node_modules\kokoro-js\voices\` created via `mklink /J`. No code change needed.
+
+**Permanence:** Must recreate the junction after any `npm install` or drive wipe. See memory file `project_kokoro_tts_fix.md` and CLAUDE.md locked decision row.
+
+---
+
+### 2026-05-11 | Claude | FIX-002 | Story reel audio timeout too short in daily-run.mjs
+
+**Status:** FIXED
+
+**Bug:** `generate-story-reel-audio.mjs` timeout was 60_000ms in `daily-run.mjs`. Actual run for 8 slides = 80–90s → step was killed before completion, producing a silent video.
+
+**Fix:** Timeout raised to `300_000` ms in `daily-run.mjs`. Locked in CLAUDE.md.
+
+---
+
+### 2026-05-11 | Claude | FIX-003 | Story reel render not gated on audio success
+
+**Status:** FIXED
+
+**Bug:** Render step in `daily-run.mjs` ran unconditionally even when audio step failed, producing a silent video.
+
+**Fix:** Render now only executes if the audio step returns success (truthy exit code). Locked in CLAUDE.md.
+
+---
+
+### 2026-05-11 | Claude | FIX-004 | Challenge puzzle crashes on null imagePrompt (old briefs)
+
+**Status:** FIXED
+
+**Bug:** `generate-challenge-puzzle.mjs` called `process.exit(1)` when `activity.imagePrompt` was null — old briefs predate the field.
+
+**Fix:** Script now synthesizes a fallback prompt from `theme` + `puzzleType` when `imagePrompt` is null, then continues normally. Locked in CLAUDE.md.
+
+---
+
+### 2026-05-11 | Claude | FIX-005 | Animal render fails — song.mp3 not found (Suno saves as song-option-1.mp3)
+
+**Status:** FIXED
+
+**Bug:** `render-video.mjs` (`animalEpisodeToSongShortProps()`) looked for `song.mp3` but Suno saves the file as `song-option-1.mp3` (or `song-option-N.mp3`). Render failed silently with "song.mp3 not found".
+
+**Fix:** Function now scans for `song-option-N.mp3` pattern as fallback when `song.mp3` is absent. Locked in CLAUDE.md.

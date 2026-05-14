@@ -44,7 +44,8 @@
       "location": null,
       "dateNote": null,
       "sourceConfidence": 0.7,
-      "rationale": "Natural homecoming arc with built-in stakes and visual clarity."
+      "rationale": "Natural homecoming arc with built-in stakes and visual clarity.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_rescue_elephant_001",
@@ -82,7 +83,8 @@
       "location": null,
       "dateNote": null,
       "sourceConfidence": 0.7,
-      "rationale": "Large emotional contrast and clear rescue visuals."
+      "rationale": "Large emotional contrast and clear rescue visuals.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_penguin_001",
@@ -118,7 +120,8 @@
       "location": "Antarctica",
       "dateNote": "winter breeding season",
       "sourceConfidence": 0.92,
-      "rationale": "Parent-child bond with survival tension."
+      "rationale": "Parent-child bond with survival tension.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_rescue_dolphin_001",
@@ -154,7 +157,8 @@
       "location": null,
       "dateNote": null,
       "sourceConfidence": 0.68,
-      "rationale": "Elegant rescue lane with strong sound/motion imagery."
+      "rationale": "Elegant rescue lane with strong sound/motion imagery.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_cat_001",
@@ -191,7 +195,8 @@
       "location": null,
       "dateNote": null,
       "sourceConfidence": 0.74,
-      "rationale": "Parent rescue and home shift, very relatable for viewers."
+      "rationale": "Parent rescue and home shift, very relatable for viewers.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_turtle_001",
@@ -228,7 +233,8 @@
       "location": "sandy nesting beaches",
       "dateNote": "night hatch season",
       "sourceConfidence": 0.93,
-      "rationale": "Classic high-stakes survival lane with immediate visuals."
+      "rationale": "Classic high-stakes survival lane with immediate visuals.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_dog_001",
@@ -261,7 +267,8 @@
       "virality": 0.9,
       "brand_safe": true,
       "source": "starter_bank",
-      "rationale": "Simple loyalty lane, very strong emotional payoff."
+      "rationale": "Simple loyalty lane, very strong emotional payoff.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_goose_001",
@@ -293,7 +300,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "starter_bank",
-      "rationale": "Strong protection and motion-based tension."
+      "rationale": "Strong protection and motion-based tension.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_fox_001",
@@ -325,7 +333,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "starter_bank",
-      "rationale": "Clear homecoming lane with sensory detail potential."
+      "rationale": "Clear homecoming lane with sensory detail potential.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_otter_001",
@@ -358,7 +367,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "starter_bank",
-      "rationale": "Tender parent-young bond with clear memorable imagery."
+      "rationale": "Tender parent-young bond with clear memorable imagery.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_swan_001",
@@ -392,7 +402,8 @@
       "virality": 0.89,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Strong parent protection image, instantly legible on mobile and highly saveable."
+      "rationale": "Strong parent protection image, instantly legible on mobile and highly saveable.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_elephant_002",
@@ -426,7 +437,8 @@
       "virality": 0.91,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Classic herd empathy arc with huge emotional contrast and obvious progression."
+      "rationale": "Classic herd empathy arc with huge emotional contrast and obvious progression.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_goose_002",
@@ -460,7 +472,8 @@
       "virality": 0.9,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Loyal return and stay-behind stories travel well because the sacrifice is instantly understood."
+      "rationale": "Loyal return and stay-behind stories travel well because the sacrifice is instantly understood.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_pigeon_001",
@@ -494,7 +507,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Homecoming plus a single guiding light gives a very strong loopable final image."
+      "rationale": "Homecoming plus a single guiding light gives a very strong loopable final image.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_penguin_002",
@@ -527,7 +541,8 @@
       "virality": 0.89,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "One of the clearest parent-sacrifice archetypes in nature."
+      "rationale": "One of the clearest parent-sacrifice archetypes in nature.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_sealion_001",
@@ -560,7 +575,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Recognition-through-noise is emotionally strong and easy to narrate."
+      "rationale": "Recognition-through-noise is emotionally strong and easy to narrate.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_puffin_001",
@@ -594,7 +610,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Simple need-based stakes and a very strong visual object, the last fish."
+      "rationale": "Simple need-based stakes and a very strong visual object, the last fish.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_koala_001",
@@ -628,7 +645,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Heat-protection stories feel current and the visual is emotionally soft but urgent."
+      "rationale": "Heat-protection stories feel current and the visual is emotionally soft but urgent.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_horse_001",
@@ -662,7 +680,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Side-by-side endurance stories are emotionally obvious and easy to stage visually."
+      "rationale": "Side-by-side endurance stories are emotionally obvious and easy to stage visually.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_rabbit_001",
@@ -696,7 +715,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "A frightened small-animal homecoming arc with strong garden visuals and parent empathy."
+      "rationale": "A frightened small-animal homecoming arc with strong garden visuals and parent empathy.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_deer_001",
@@ -730,7 +750,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Quiet waiting arcs are emotionally powerful when the final return image lands."
+      "rationale": "Quiet waiting arcs are emotionally powerful when the final return image lands.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_fox_002",
@@ -763,7 +784,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Resource scarcity plus return-home tension is a strong survival lane for narration."
+      "rationale": "Resource scarcity plus return-home tension is a strong survival lane for narration.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_reunion_whale_001",
@@ -796,7 +818,8 @@
       "virality": 0.89,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Voice-led reunion is easy to narrate and gives a very strong final reveal image."
+      "rationale": "Voice-led reunion is easy to narrate and gives a very strong final reveal image.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_gorilla_001",
@@ -829,7 +852,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Waiting and looking back is a deeply readable parent image for mobile video."
+      "rationale": "Waiting and looking back is a deeply readable parent image for mobile video.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_crane_001",
@@ -862,7 +886,8 @@
       "virality": 0.85,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Migration lag stories carry built-in motion, loneliness, and payoff."
+      "rationale": "Migration lag stories carry built-in motion, loneliness, and payoff.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_cat_002",
@@ -896,7 +921,8 @@
       "virality": 0.9,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "This is soft but extremely relatable, a save/share lane for parents with pets."
+      "rationale": "This is soft but extremely relatable, a save/share lane for parents with pets.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_beaver_001",
@@ -929,7 +955,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Tiny character solving a real structural problem gives clean progression and payoff."
+      "rationale": "Tiny character solving a real structural problem gives clean progression and payoff.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_lamb_001",
@@ -963,7 +990,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Sound-led homecoming is extremely legible and tender."
+      "rationale": "Sound-led homecoming is extremely legible and tender.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_orangutan_001",
@@ -996,7 +1024,8 @@
       "virality": 0.85,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Night routine and extra parental effort make this emotionally sticky for parents."
+      "rationale": "Night routine and extra parental effort make this emotionally sticky for parents.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_reunion_wolf_001",
@@ -1030,7 +1059,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "researched_bank",
-      "rationale": "Call-and-answer structure is excellent for short-form narration and payoff."
+      "rationale": "Call-and-answer structure is excellent for short-form narration and payoff.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_rescue_beaver_001",
@@ -1064,7 +1094,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Physical obstruction plus family teamwork gives this rescue lane clean visual progression."
+      "rationale": "Physical obstruction plus family teamwork gives this rescue lane clean visual progression.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_rescue_seal_001",
@@ -1098,7 +1129,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Strong rescue stakes with a tiny visible exit make it mobile-legible."
+      "rationale": "Strong rescue stakes with a tiny visible exit make it mobile-legible.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_rescue_giraffe_001",
@@ -1132,7 +1164,8 @@
       "virality": 0.85,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Large-scale contrast and repeated effort give this rescue story emotional lift."
+      "rationale": "Large-scale contrast and repeated effort give this rescue story emotional lift.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_rescue_hummingbird_001",
@@ -1166,7 +1199,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Very clear visual problem and a tiny fragile protagonist make this easy to feel."
+      "rationale": "Very clear visual problem and a tiny fragile protagonist make this easy to feel.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_migration_monarch_001",
@@ -1200,7 +1234,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Migration with a tiny hero and one visible turning point is highly reel-friendly."
+      "rationale": "Migration with a tiny hero and one visible turning point is highly reel-friendly.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_migration_salmon_001",
@@ -1234,7 +1269,8 @@
       "virality": 0.85,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Natural repeat-and-breakthrough structure gives strong narrative rhythm."
+      "rationale": "Natural repeat-and-breakthrough structure gives strong narrative rhythm.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_migration_crane_001",
@@ -1269,7 +1305,8 @@
       "virality": 0.83,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Visually clear line-break and line-return make migration readable on mobile."
+      "rationale": "Visually clear line-break and line-return make migration readable on mobile.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_migration_whale_001",
@@ -1303,7 +1340,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Song-led migration has strong audio imagination and emotional pull."
+      "rationale": "Song-led migration has strong audio imagination and emotional pull.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_migration_caribou_001",
@@ -1337,7 +1375,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Migration crossing gives immediate stakes and a strong family-scale frame."
+      "rationale": "Migration crossing gives immediate stakes and a strong family-scale frame.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_horse_001",
@@ -1371,7 +1410,8 @@
       "virality": 0.85,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Loyalty shown through one repeated choice feels clear and touching."
+      "rationale": "Loyalty shown through one repeated choice feels clear and touching.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_goose_001",
@@ -1405,7 +1445,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "A visible choice not to leave gives loyalty lane a strong hook."
+      "rationale": "A visible choice not to leave gives loyalty lane a strong hook.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_meerkat_001",
@@ -1439,7 +1480,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "The hold-at-the-door structure is tiny, tense, and highly shareable."
+      "rationale": "The hold-at-the-door structure is tiny, tense, and highly shareable.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_otter_001",
@@ -1473,7 +1515,8 @@
       "virality": 0.88,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "One tiny gripping detail gives this loyalty story a strong screenshot moment."
+      "rationale": "One tiny gripping detail gives this loyalty story a strong screenshot moment.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_fox_001",
@@ -1507,7 +1550,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Survival through one simple discovered rule works well for kids-story pacing."
+      "rationale": "Survival through one simple discovered rule works well for kids-story pacing.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_puffin_001",
@@ -1541,7 +1585,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Clear need, worsening weather, and one final success create strong reel tension."
+      "rationale": "Clear need, worsening weather, and one final success create strong reel tension.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_frog_001",
@@ -1575,7 +1620,8 @@
       "virality": 0.84,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Macro-scale visuals and one tiny physical solution make this memorable."
+      "rationale": "Macro-scale visuals and one tiny physical solution make this memorable.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_kangaroo_001",
@@ -1609,7 +1655,8 @@
       "virality": 0.86,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "A single protective body action carries the whole emotional meaning."
+      "rationale": "A single protective body action carries the whole emotional meaning.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_polarbear_001",
@@ -1643,7 +1690,8 @@
       "virality": 0.87,
       "brand_safe": true,
       "source": "curated_expansion",
-      "rationale": "Parent modeling rather than just rescuing gives this lane a stronger identity."
+      "rationale": "Parent modeling rather than just rescuing gives this lane a stronger identity.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_salmon_002",
@@ -1682,7 +1730,8 @@
       "location": "cold river mouths and spawning streams",
       "dateNote": "autumn run season",
       "sourceConfidence": 0.94,
-      "rationale": "A real homecoming incident with a concrete invisible cue, scent, that turns into a clean emotional reveal."
+      "rationale": "A real homecoming incident with a concrete invisible cue, scent, that turns into a clean emotional reveal.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_orca_001",
@@ -1720,7 +1769,8 @@
       "location": "cold coastal waters",
       "dateNote": null,
       "sourceConfidence": 0.9,
-      "rationale": "Immediate physical stakes, one repeated protective action, and a very readable documentary-emotional spine."
+      "rationale": "Immediate physical stakes, one repeated protective action, and a very readable documentary-emotional spine.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_loyalty_wolf_002",
@@ -1758,7 +1808,8 @@
       "location": "snow forest",
       "dateNote": null,
       "sourceConfidence": 0.82,
-      "rationale": "This gives loyalty a costly stay-behind choice without drifting into humanized romance or vague waiting."
+      "rationale": "This gives loyalty a costly stay-behind choice without drifting into humanized romance or vague waiting.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_survival_muskox_001",
@@ -1796,7 +1847,8 @@
       "location": "Arctic tundra",
       "dateNote": "winter",
       "sourceConfidence": 0.93,
-      "rationale": "A real behavior with one iconic shape, a circle, and a tiny center-run that makes the stakes instantly visual."
+      "rationale": "A real behavior with one iconic shape, a circle, and a tiny center-run that makes the stakes instantly visual.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_parent_crocodile_001",
@@ -1834,7 +1886,8 @@
       "location": "warm riverbanks and marsh edges",
       "dateNote": "hatching season",
       "sourceConfidence": 0.94,
-      "rationale": "It has factual surprise, strong contrast, and a last-one-left-behind micro-incident that tells cleanly."
+      "rationale": "It has factual surprise, strong contrast, and a last-one-left-behind micro-incident that tells cleanly.",
+      "decay_weeks": 1
     },
     {
       "id": "story_seed_homecoming_manatee_001",
@@ -1872,7 +1925,8 @@
       "location": "slow green river channels",
       "dateNote": null,
       "sourceConfidence": 0.8,
-      "rationale": "Recognition-through-water silhouette gives homecoming a fresh visual lane without losing emotional clarity."
+      "rationale": "Recognition-through-water silhouette gives homecoming a fresh visual lane without losing emotional clarity.",
+      "decay_weeks": 1
     }
   ]
 }

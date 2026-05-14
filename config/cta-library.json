@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-05-04",
+    "last_updated": "2026-05-11",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_platform_per_type": 8,
     "description": "Winning CTA patterns by platform and content type. Merged with hardcoded CTAS in generate-captions.mjs."
@@ -10,17 +10,6 @@
     "pinterest": {
       "app": [
         {
-          "id": "cta_pinterest_app_20260407_000",
-          "text": "Download free — they will ask for the next one before you know it.",
-          "performance_score": null,
-          "outbound_click_rate_pct": null,
-          "source": "intelligence_refresh",
-          "added_week": "2026-04-07",
-          "times_used": 0,
-          "decay_weeks": 7,
-          "brand_safe": true
-        },
-        {
           "id": "cta_pinterest_app_20260416_001",
           "text": "Pin this for later: Your quiet afternoon starts with a single tap.",
           "performance_score": null,
@@ -28,7 +17,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 3,
+          "decay_weeks": 4,
           "brand_safe": true
         }
       ],
@@ -41,7 +30,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-12",
           "times_used": 0,
-          "decay_weeks": 5,
+          "decay_weeks": 6,
           "brand_safe": true
         }
       ],
@@ -55,7 +44,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-20",
           "times_used": 0,
-          "decay_weeks": 2,
+          "decay_weeks": 3,
           "brand_safe": true
         },
         {
@@ -66,7 +55,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         }
       ]
@@ -81,7 +70,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         }
       ],
@@ -96,7 +85,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 3,
+          "decay_weeks": 4,
           "brand_safe": true
         },
         {
@@ -107,7 +96,7 @@
           "source": "competitor_analysis",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         }
       ]
@@ -123,7 +112,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 3,
+          "decay_weeks": 4,
           "brand_safe": true
         }
       ]
@@ -139,7 +128,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-16",
           "times_used": 0,
-          "decay_weeks": 3,
+          "decay_weeks": 4,
           "brand_safe": true
         },
         {
@@ -150,7 +139,7 @@
           "source": "intelligence_refresh",
           "added_week": "2026-04-27",
           "times_used": 0,
-          "decay_weeks": 1,
+          "decay_weeks": 2,
           "brand_safe": true
         }
       ]
