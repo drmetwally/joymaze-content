@@ -3171,3 +3171,17 @@ ode --check clean. Ran --save --lane homecoming twice � ep29 and ep30 both gen
 - Dot-to-dot and matching posts manually regenerated — themes now correct.
 
 **What's next:** Tomorrow's unattended run will test all fixes end-to-end (insects guard, animal art style consistency, dot-to-dot/matching theme accuracy).
+
+---
+
+## 2026-05-14 — SFX library populated + B-roll architecture audit + daily-run.mjs cleanup
+
+**What was done:**
+- Confirmed StoryReelV2 SFX wiring: render-video.mjs resolves sfx via story lane → story-audio-plan.json tag → sfx-library.json file. Chain fully wired as of this session.
+- Audited sfx-library.json: 8 existing tags had files missing on disk; 4 new tags (payoff_release, hook_observed, middle_night, middle_motion) referenced in story-audio-plan.json lanePlans but absent from sfx-library.json. All 12 gaps filled.
+- Downloaded 10/12 files via Freesound API (download-sfx-missing.mjs). 2 files (payoff_release, hook_observed) needed manual broader queries — downloaded directly from cdn.freesound.org.
+- Freesound API key confirmed correct: `olxn50cNjgzNlcHztMqDV5LNbxSNVL7VqDwl1qnl` (capital L at position 32). Agent initially hardcoded lowercase l — fixed.
+- Confirmed AnimalFactsSongShort architecture: uses ONLY moment*.png (Imagen stills) + song audio. Zero B-roll video logic. download-broll.mjs was running unnecessarily every daily run.
+- Removed download-broll.mjs Step E from daily-run.mjs Animal Facts pipeline. B-roll script kept intact for future AnimalFactsEpisode (long-form) use only.
+
+**What's next:** Full unattended daily run tomorrow to confirm SFX wiring produces audio in StoryReelV2.

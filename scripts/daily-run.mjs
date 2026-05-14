@@ -582,15 +582,9 @@ async function runMain() {
         log('Animal: moments OK');
       }
 
-      // Step E — B-roll download + transcode
-      log('Animal: downloading B-roll...');
-      const brollOk = await runScript('download-broll.mjs', ['--episode', animalFolder.full], 120_000);
-      if (!brollOk) {
-        log('Animal: B-roll download failed — run manually: npm run longform:animal:broll -- --episode ' + path.relative(ROOT, animalFolder.full));
-        await appendLog('Animal B-roll FAILED');
-      } else {
-        log('Animal: B-roll OK');
-      }
+      // Step E — B-roll skipped: AnimalFactsSongShort uses moment*.png (Imagen stills) only.
+      // B-roll clips are never consumed by the renderer. Run longform:animal:broll manually
+      // only when testing the legacy AnimalFactsEpisode composition.
 
       // Step F — Remotion render
       log('Animal: rendering video...');

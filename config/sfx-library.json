@@ -111,6 +111,22 @@
     "ext_migration_act2": {
       "file": "assets/sfx/external/freesound/migration/distant-wind-ambience-118118.mp3",
       "volume": 0.16
+    },
+    "payoff_release": {
+      "file": "assets/sfx/emotional/payoff_release.mp3",
+      "volume": 0.18
+    },
+    "hook_observed": {
+      "file": "assets/sfx/nature/hook_observed.mp3",
+      "volume": 0.14
+    },
+    "middle_night": {
+      "file": "assets/sfx/nature/middle_night.mp3",
+      "volume": 0.16
+    },
+    "middle_motion": {
+      "file": "assets/sfx/nature/middle_motion.mp3",
+      "volume": 0.17
     }
   },
   "_note": "Add files to assets/sfx/ subfolders. Render script resolves tags at render time — missing files fall back silently."
