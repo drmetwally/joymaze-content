@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-05-11",
+    "last_updated": "2026-05-18",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries": 30,
     "description": "Dynamic extension of THEME_POOL in generate-prompts.mjs. Never mutate the hardcoded pool — add here only."
@@ -15,7 +15,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "rationale": "Leverages the 'Library/Reading Joy' trend for National Library Week, focusing on creative character development for digital activities."
     },
@@ -27,7 +27,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "This theme aligns with 'National Library Week' and offers a novel angle on reading and imaginative play."
     },
@@ -39,7 +39,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "A specific focus on kitchen activities and recipes provides a fresh take on 'Food and Cooking' which was too broad."
     },
@@ -51,7 +51,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "This theme visually ties acts of kindness to nature, making it distinct from general community or kindness challenges."
     },
@@ -63,69 +63,9 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Focuses on creative writing and poetry, identified as a content gap beyond general fine motor skill development."
-    },
-    {
-      "name": "Earth Day Let's Recycle Matching Activity",
-      "added_week": "2026-04-16",
-      "source": "competitor_analysis",
-      "confidence": 0.75,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Viral theme from competitor intelligence"
-    },
-    {
-      "name": "Seasonal and Holiday-Specific Content",
-      "added_week": "2026-04-19",
-      "source": "competitor_analysis",
-      "confidence": 0.75,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Viral theme from competitor intelligence"
-    },
-    {
-      "name": "Educational and Skill-Building Focus",
-      "added_week": "2026-04-19",
-      "source": "competitor_analysis",
-      "confidence": 0.75,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Viral theme from competitor intelligence"
-    },
-    {
-      "name": "Nostalgia and Throwback Kid Aesthetic",
-      "added_week": "2026-04-19",
-      "source": "competitor_analysis",
-      "confidence": 0.75,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Viral theme from competitor intelligence"
-    },
-    {
-      "name": "screen-free alternatives to tablet time",
-      "added_week": "2026-04-19",
-      "source": "competitor_analysis",
-      "confidence": 0.75,
-      "performance_score": null,
-      "times_used": 0,
-      "last_used": null,
-      "decay_weeks": 3,
-      "brand_safe": true,
-      "rationale": "Viral theme from competitor intelligence"
     },
     {
       "name": "Screen-free activities and digital detox",
@@ -135,7 +75,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Viral theme from competitor intelligence"
     },
@@ -147,7 +87,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Viral theme from competitor intelligence"
     },
@@ -159,7 +99,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "rationale": "Viral theme from competitor intelligence"
     },
@@ -171,7 +111,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "This expands on nature themes by focusing on 'tiny worlds' and small creatures, offering a novel angle for discovery beyond general outdoor play."
     },
@@ -183,7 +123,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Mother's Day is a strong upcoming moment, and printables for handmade gifts or cards are a direct response to rising searches."
     },
@@ -195,7 +135,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Bugs/Insects are trending, and focusing on their structures (nests, webs, homes) offers a unique, educational, and creative theme."
     },
@@ -207,7 +147,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Building on 'Weather Wonders' from competitor analysis, this theme provides specific indoor activities for spring weather, addressing a common parent need."
     },
@@ -219,7 +159,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "This blends the trending 'Forest/Woodland' theme with a touch of fantasy, encouraging imaginative design and creative play distinct from just animals."
     },
@@ -231,7 +171,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "rationale": "Viral theme from competitor intelligence"
     },
@@ -243,7 +183,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Space exploration is a noted holiday theme (Space Day) and offers rich visual and educational potential not currently in dynamic pools."
     },
@@ -255,7 +195,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Mythical creatures and fantasy worlds inspire creativity and storytelling, filling a gap for imaginative play printables."
     },
@@ -267,7 +207,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Activities explaining weather phenomena are engaging and educational, providing a fresh angle for skill-building content."
     },
@@ -279,7 +219,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Exploring community helpers and professions offers relatable learning and imaginative role-play opportunities for young children."
     },
@@ -291,7 +231,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Viral theme from competitor intelligence"
     },
@@ -303,7 +243,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "rationale": "Viral theme from competitor intelligence"
     },
@@ -315,7 +255,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Competitor analysis identified a gap in dedicated printables for lesser-known May holidays beyond Mother's Day, offering a unique content angle."
     },
@@ -327,7 +267,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "There's a gap in culturally themed printables for the 4-8 age group, allowing for simple, engaging introductions to world traditions."
     },
@@ -339,7 +279,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Activities that gamify daily routines and skill-building are a content gap, appealing to parents seeking purposeful engagement."
     },
@@ -351,7 +291,7 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Printable props for imaginative play scenarios offer a screen-free alternative that encourages creativity without requiring physical craft materials."
     },
@@ -363,9 +303,69 @@
       "performance_score": null,
       "times_used": 0,
       "last_used": null,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "rationale": "Printables focused on atmospheric phenomena provide engaging, educational content that is not currently saturated in the market."
+    },
+    {
+      "name": "Little Chef Culinary Adventures",
+      "added_week": "2026-05-18",
+      "source": "competitor_analysis",
+      "confidence": 0.9,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Competitor analysis highlighted 'Little Chef' as a specific new theme idea, aligning with home-based, engaging activities."
+    },
+    {
+      "name": "Inventor's Workshop STEM Exploration",
+      "added_week": "2026-05-18",
+      "source": "competitor_analysis",
+      "confidence": 0.88,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "This theme was identified as a specific new idea in competitor analysis, focusing on building and design challenges."
+    },
+    {
+      "name": "Community Helpers Neighborhood Exploration",
+      "added_week": "2026-05-18",
+      "source": "competitor_analysis",
+      "confidence": 0.85,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Competitor analysis suggested this theme to encourage imaginative play and learning about local environments."
+    },
+    {
+      "name": "Memorial Day Makers",
+      "added_week": "2026-05-18",
+      "source": "trend_analysis",
+      "confidence": 0.92,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Timely for Memorial Day, this theme allows for content focused on gratitude and community without being overly somber."
+    },
+    {
+      "name": "Summer Road Trip Readiness",
+      "added_week": "2026-05-18",
+      "source": "trend_analysis",
+      "confidence": 0.87,
+      "performance_score": null,
+      "times_used": 0,
+      "last_used": null,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "rationale": "Aligns with rising searches for 'summer activities for kids' and offers practical, engaging content for travel preparation."
     }
   ]
 }

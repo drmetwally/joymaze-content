@@ -1,29 +1,34 @@
 {
-  "generated": "2026-05-11",
-  "valid_until": "2026-05-18",
+  "generated": "2026-05-18",
+  "valid_until": "2026-05-25",
   "sources": [
+    "google_trends",
     "seasonal_calendar"
   ],
   "trending_themes": [
     {
-      "theme": "Pets/Home",
-      "score": 150
-    },
-    {
-      "theme": "Garden/Flowers",
-      "score": 150
-    },
-    {
-      "theme": "Birds/Sky",
-      "score": 150
-    },
-    {
       "theme": "Camping/Outdoors",
-      "score": 60
+      "score": 140
     },
     {
       "theme": "Sports/Games",
-      "score": 30
+      "score": 110
+    },
+    {
+      "theme": "Ocean Animals",
+      "score": 100
+    },
+    {
+      "theme": "Music Instruments",
+      "score": 100
+    },
+    {
+      "theme": "Unicorns",
+      "score": 80
+    },
+    {
+      "theme": "Vehicles/Transport",
+      "score": 60
     },
     {
       "theme": "Summer",
@@ -32,42 +37,41 @@
     {
       "theme": "Beach",
       "score": 30
-    },
-    {
-      "theme": "Vehicles/Transport",
-      "score": 30
     }
   ],
   "boost_themes": [
-    "Pets/Home",
-    "Garden/Flowers",
-    "Birds/Sky",
     "Camping/Outdoors",
-    "Sports/Games"
+    "Sports/Games",
+    "Ocean Animals",
+    "Music Instruments",
+    "Unicorns"
   ],
   "rising_searches": [
-    "mothers day printables",
-    "mothers day activities for kids",
-    "memorial day activities for kids",
-    "summer activities for kids",
-    "summer printables"
+    "free summer coloring pages for kids",
+    "coloring pages for kids summer",
+    "fish coloring pages for kids",
+    "music coloring pages for kids",
+    "graduation coloring pages for kids",
+    "wedding coloring pages for kids",
+    "disney coloring pages for kids",
+    "unicorn coloring pages for kids"
   ],
   "upcoming_moments": [
     {
-      "event": "Mother's Day",
-      "date": "2026-05-10",
-      "days_away": 0
-    },
-    {
       "event": "Memorial Day",
-      "date": "2026-05-25",
-      "days_away": 15
+      "date": "2026-05-26",
+      "days_away": 8
     },
     {
       "event": "Summer Break",
-      "date": "2026-06-07",
-      "days_away": 28,
+      "date": "2026-06-08",
+      "days_away": 21,
       "is_break": true
+    },
+    {
+      "event": "Father's Day",
+      "date": "2026-06-15",
+      "days_away": 28
     }
   ],
   "caption_keywords": [
@@ -75,7 +79,7 @@
     "printable",
     "quiet time",
     "ages 4-8",
-    "mothers day printables",
-    "memorial day activities for kids"
+    "memorial day activities for kids",
+    "summer activities for kids"
   ]
 }

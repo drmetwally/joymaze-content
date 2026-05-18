@@ -1,38 +1,12 @@
 {
   "_meta": {
     "schema_version": 1,
-    "last_updated": "2026-05-11",
+    "last_updated": "2026-05-18",
     "managed_by": "scripts/apply-intelligence.mjs",
     "max_entries_per_type": 12,
     "description": "Winning hook patterns with real performance scores. Injected into generate-prompts.mjs system prompt and generate-captions.mjs as additional examples."
   },
   "hooks": [
-    {
-      "id": "hook_20260407_000",
-      "hook_type": "sensory_hook",
-      "text": "Hear the pencil on paper. That sound means they found it.",
-      "performance_score": null,
-      "save_rate_pct": null,
-      "source": "competitor_analysis",
-      "added_week": "2026-04-07",
-      "times_used": 0,
-      "decay_weeks": 7,
-      "brand_safe": true,
-      "archetype_fit": []
-    },
-    {
-      "id": "hook_20260407_001",
-      "hook_type": "relief_hook",
-      "text": "Ten quiet minutes you did not have to manufacture.",
-      "performance_score": null,
-      "save_rate_pct": null,
-      "source": "competitor_analysis",
-      "added_week": "2026-04-07",
-      "times_used": 0,
-      "decay_weeks": 7,
-      "brand_safe": true,
-      "archetype_fit": []
-    },
     {
       "id": "hook_comp_20260411_000",
       "hook_type": "problem_solution",
@@ -42,7 +16,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -55,7 +29,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -68,7 +42,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -81,7 +55,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -94,7 +68,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -107,7 +81,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -120,7 +94,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -133,7 +107,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-11",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -146,7 +120,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -159,7 +133,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 6,
+      "decay_weeks": 7,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -172,7 +146,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "permission_giver",
@@ -188,7 +162,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "aspirational_parent",
@@ -204,7 +178,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "peaceful_moment",
@@ -220,7 +194,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "time_saver",
@@ -236,7 +210,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "myth_buster",
@@ -252,7 +226,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "calm_creator",
@@ -268,7 +242,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-12",
       "times_used": 0,
-      "decay_weeks": 5,
+      "decay_weeks": 6,
       "brand_safe": true,
       "archetype_fit": [
         "developmental_booster",
@@ -284,7 +258,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": [
         "I worry I'm giving my kid too much screen time."
@@ -299,7 +273,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": [
         "I'm the kind of parent who makes good choices."
@@ -314,7 +288,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": [
         "I'd love just 20 minutes where I know they're okay.",
@@ -330,7 +304,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": [
         "I want to be the parent who makes good choices.",
@@ -346,7 +320,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": [
         "Nothing holds their attention for long.",
@@ -362,7 +336,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": [
         "Nothing holds their attention for long."
@@ -377,7 +351,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -390,7 +364,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -403,7 +377,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-13",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -416,7 +390,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -429,7 +403,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -442,7 +416,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -455,7 +429,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 4,
+      "decay_weeks": 5,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -468,7 +442,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "understood",
@@ -484,7 +458,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "good_choices",
@@ -500,7 +474,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "guilt_to_pride",
@@ -516,7 +490,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "engagement",
@@ -532,7 +506,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "quiet_time",
@@ -548,7 +522,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "validation",
@@ -564,7 +538,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -577,7 +551,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-04-16",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -590,7 +564,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "transformation_hint",
@@ -606,7 +580,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 3,
+      "decay_weeks": 4,
       "brand_safe": true,
       "archetype_fit": [
         "imagery",
@@ -622,7 +596,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "emotional_mirror",
@@ -638,7 +612,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "emotional_mirror"
@@ -653,7 +627,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "identity_hook"
@@ -668,7 +642,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "transformation_hint"
@@ -683,7 +657,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "relief_hook"
@@ -698,7 +672,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "curiosity_gap"
@@ -713,7 +687,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-04-20",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": [
         "secret_insider"
@@ -728,7 +702,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -741,7 +715,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 2,
+      "decay_weeks": 3,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -754,7 +728,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": [
         "identity",
@@ -770,7 +744,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": [
         "relief",
@@ -786,7 +760,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": [
         "sensory",
@@ -802,7 +776,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": [
         "transformation",
@@ -818,7 +792,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-04",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": [
         "emotion",
@@ -834,7 +808,7 @@
       "source": "competitor_analysis",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 1,
+      "decay_weeks": 2,
       "brand_safe": true,
       "archetype_fit": []
     },
@@ -847,7 +821,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": [
         "identity",
@@ -863,7 +837,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": [
         "relief",
@@ -879,7 +853,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": [
         "emotional_mirror",
@@ -895,7 +869,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": [
         "transformation",
@@ -911,7 +885,7 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": [
         "sensory",
@@ -927,17 +901,109 @@
       "source": "intelligence_refresh",
       "added_week": "2026-05-11",
       "times_used": 0,
-      "decay_weeks": 0,
+      "decay_weeks": 1,
       "brand_safe": true,
       "archetype_fit": [
         "identity",
         "transformation"
       ]
+    },
+    {
+      "id": "hook_comp_20260518_000",
+      "hook_type": "insight",
+      "text": "Keep them busy, happy, and even a little smarter with the right mix of summer activities",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "competitor_analysis",
+      "added_week": "2026-05-18",
+      "times_used": 0,
+      "decay_weeks": 1,
+      "brand_safe": true,
+      "archetype_fit": []
+    },
+    {
+      "id": "hook_20260518_000",
+      "hook_type": "identity_hook",
+      "text": "The quiet hum of a child deeply focused? That's the sound of a parent who knows.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-05-18",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "identity",
+        "emotion"
+      ]
+    },
+    {
+      "id": "hook_20260518_001",
+      "hook_type": "emotional_mirror",
+      "text": "That little sigh of 'nothing to do' just melted away, didn't it?",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-05-18",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "emotion",
+        "relief"
+      ]
+    },
+    {
+      "id": "hook_20260518_002",
+      "hook_type": "transformation_hint",
+      "text": "Imagine their eyes, wide with discovery, not just distraction.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-05-18",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "transformation",
+        "imagery"
+      ]
+    },
+    {
+      "id": "hook_20260518_003",
+      "hook_type": "relief_hook",
+      "text": "Twenty minutes. Just twenty minutes where you know they're truly okay.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-05-18",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "relief",
+        "emotion"
+      ]
+    },
+    {
+      "id": "hook_20260518_004",
+      "hook_type": "secret_insider",
+      "text": "Here's what the best parents know about turning screen time into discovery time.",
+      "performance_score": null,
+      "save_rate_pct": null,
+      "source": "intelligence_refresh",
+      "added_week": "2026-05-18",
+      "times_used": 0,
+      "decay_weeks": 0,
+      "brand_safe": true,
+      "archetype_fit": [
+        "identity",
+        "curiosity"
+      ]
     }
   ],
   "hook_type_index": {
     "sensory_hook": [
-      "hook_20260407_000",
       "hook_20260412_005",
       "hook_20260413_004",
       "hook_20260416_003",
@@ -946,14 +1012,14 @@
       "hook_20260511_004"
     ],
     "relief_hook": [
-      "hook_20260407_001",
       "hook_20260412_003",
       "hook_20260413_002",
       "hook_20260416_004",
       "hook_20260420_007",
       "hook_20260420_003",
       "hook_20260504_001",
-      "hook_20260511_001"
+      "hook_20260511_001",
+      "hook_20260518_003"
     ],
     "problem_solution": [
       "hook_comp_20260411_000",
@@ -970,7 +1036,8 @@
       "hook_20260420_001",
       "hook_20260504_000",
       "hook_20260511_000",
-      "hook_20260511_005"
+      "hook_20260511_005",
+      "hook_20260518_000"
     ],
     "curiosity_gap": [
       "hook_comp_20260411_002",
@@ -985,7 +1052,8 @@
       "hook_comp_20260413_000",
       "hook_comp_20260413_002",
       "hook_comp_20260504_000",
-      "hook_comp_20260504_001"
+      "hook_comp_20260504_001",
+      "hook_comp_20260518_000"
     ],
     "engagement_question": [
       "hook_comp_20260411_004",
@@ -999,7 +1067,8 @@
       "hook_20260416_000",
       "hook_20260420_000",
       "hook_20260504_004",
-      "hook_20260511_002"
+      "hook_20260511_002",
+      "hook_20260518_001"
     ],
     "transformation_hint": [
       "hook_20260412_002",
@@ -1009,7 +1078,8 @@
       "hook_comp_20260420_001",
       "hook_20260420_002",
       "hook_20260504_003",
-      "hook_20260511_003"
+      "hook_20260511_003",
+      "hook_20260518_002"
     ],
     "save_hook": [
       "hook_comp_20260413_001",
@@ -1019,7 +1089,8 @@
       "hook_comp_20260511_000"
     ],
     "secret_insider": [
-      "hook_20260420_006"
+      "hook_20260420_006",
+      "hook_20260518_004"
     ],
     "pattern_interrupt": []
   }

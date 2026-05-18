@@ -1,13 +1,13 @@
 {
   "_meta": {
     "schema_version": 1,
-    "generated_at": "2026-05-11T06:01:20.121Z",
-    "week_of": "2026-05-11",
+    "generated_at": "2026-05-18T08:50:07.503Z",
+    "week_of": "2026-05-18",
     "status": "applied",
-    "applied_at": "2026-05-11T06:01:20.475Z",
-    "entropy_score": 2,
+    "applied_at": "2026-05-18T08:50:07.595Z",
+    "entropy_score": 5,
     "inputs_summary": {
-      "analytics_posts_analyzed": 56,
+      "analytics_posts_analyzed": 0,
       "posts_with_analytics": 0,
       "competitor_searches_performed": 6,
       "trends_boost_themes": [
@@ -22,192 +22,204 @@
   },
   "new_themes": [
     {
-      "name": "Quirky May Celebrations",
+      "name": "Little Chef Culinary Adventures",
+      "confidence": 0.9,
+      "brand_safe": true,
+      "source": "competitor_analysis",
+      "rationale": "Competitor analysis highlighted 'Little Chef' as a specific new theme idea, aligning with home-based, engaging activities.",
+      "_review_reason": "borderline, needs human judgment"
+    },
+    {
+      "name": "Inventor's Workshop STEM Exploration",
       "confidence": 0.88,
       "brand_safe": true,
       "source": "competitor_analysis",
-      "rationale": "Competitor analysis identified a gap in dedicated printables for lesser-known May holidays beyond Mother's Day, offering a unique content angle."
+      "rationale": "This theme was identified as a specific new idea in competitor analysis, focusing on building and design challenges."
     },
     {
-      "name": "Global Adventures: Cultural Explorations",
+      "name": "Community Helpers Neighborhood Exploration",
       "confidence": 0.85,
       "brand_safe": true,
       "source": "competitor_analysis",
-      "rationale": "There's a gap in culturally themed printables for the 4-8 age group, allowing for simple, engaging introductions to world traditions."
+      "rationale": "Competitor analysis suggested this theme to encourage imaginative play and learning about local environments."
     },
     {
-      "name": "Everyday Explorer: Life Skills & Chores",
+      "name": "Memorial Day Makers",
+      "confidence": 0.92,
+      "brand_safe": true,
+      "source": "trend_analysis",
+      "rationale": "Timely for Memorial Day, this theme allows for content focused on gratitude and community without being overly somber."
+    },
+    {
+      "name": "Summer Road Trip Readiness",
       "confidence": 0.87,
       "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Activities that gamify daily routines and skill-building are a content gap, appealing to parents seeking purposeful engagement."
-    },
-    {
-      "name": "Imagination Props: Printable Play Sets",
-      "confidence": 0.86,
-      "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Printable props for imaginative play scenarios offer a screen-free alternative that encourages creativity without requiring physical craft materials."
-    },
-    {
-      "name": "Weather Wonders: Clouds & Rainbows",
-      "confidence": 0.84,
-      "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Printables focused on atmospheric phenomena provide engaging, educational content that is not currently saturated in the market."
+      "source": "trend_analysis",
+      "rationale": "Aligns with rising searches for 'summer activities for kids' and offers practical, engaging content for travel preparation."
     }
   ],
   "new_hooks": [
     {
       "hook_type": "identity_hook",
-      "text": "The kind of parent who finds magic in a quiet afternoon.",
+      "text": "The quiet hum of a child deeply focused? That's the sound of a parent who knows.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
         "identity",
-        "transformation"
+        "emotion"
       ],
-      "rationale": "This hook directly affirms the desired parental identity, moving them from guilt to feeling understood and capable."
-    },
-    {
-      "hook_type": "relief_hook",
-      "text": "Just 20 minutes. That's all you need to feel like you nailed it today.",
-      "brand_safe": true,
-      "source": "intelligence_refresh",
-      "archetype_fit": [
-        "relief",
-        "transformation"
-      ],
-      "rationale": "Addresses the parent's desire for a manageable, impactful activity, offering immediate relief from the pressure of 'doing it all'."
+      "rationale": "Addresses the parent's desire to be seen as making good choices and reinforces their identity.",
+      "_review_reason": "borderline, needs human judgment"
     },
     {
       "hook_type": "emotional_mirror",
-      "text": "That little sigh of concentration? It's the sound of learning.",
+      "text": "That little sigh of 'nothing to do' just melted away, didn't it?",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
-        "emotional_mirror",
-        "identity"
+        "emotion",
+        "relief"
       ],
-      "rationale": "Mirrors a specific, relatable parent observation and reinterprets it positively, fostering a sense of understanding."
+      "rationale": "Directly acknowledges a common parent struggle and offers immediate emotional relief.",
+      "_review_reason": "borderline, needs human judgment"
     },
     {
       "hook_type": "transformation_hint",
-      "text": "Imagine their face when they realize they built this entirely themselves.",
+      "text": "Imagine their eyes, wide with discovery, not just distraction.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
         "transformation",
+        "imagery"
+      ],
+      "rationale": "Paints a vivid picture of a desired outcome, shifting the focus from passive screen time to active engagement.",
+      "_review_reason": "borderline, needs human judgment"
+    },
+    {
+      "hook_type": "relief_hook",
+      "text": "Twenty minutes. Just twenty minutes where you know they're truly okay.",
+      "brand_safe": true,
+      "source": "intelligence_refresh",
+      "archetype_fit": [
+        "relief",
         "emotion"
       ],
-      "rationale": "Paints a vivid picture of the child's achievement and the parent's pride, hinting at the transformative power of the activity."
+      "rationale": "Directly addresses the parent's need for a brief, worry-free period, offering permission and understanding.",
+      "_review_reason": "borderline, needs human judgment"
     },
     {
       "hook_type": "sensory_hook",
-      "text": "The soft scratch of a pencil, a world unfolding on the page.",
+      "text": "The soft scratch of a crayon, a world unfolding on paper.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
         "sensory",
-        "emotion"
+        "imagery"
       ],
-      "rationale": "Evokes a calming, tactile experience that contrasts with the often overwhelming sensory input of screens, appealing to a desire for quiet engagement."
+      "rationale": "Evokes a calming, engaging sensory experience, contrasting with the digital world.",
+      "_review_reason": "borderline, needs human judgment"
     },
     {
-      "hook_type": "identity_hook",
-      "text": "You're already the parent who chooses purpose over distraction.",
+      "hook_type": "secret_insider",
+      "text": "Here's what the best parents know about turning screen time into discovery time.",
       "brand_safe": true,
       "source": "intelligence_refresh",
       "archetype_fit": [
         "identity",
-        "transformation"
+        "curiosity"
       ],
-      "rationale": "Affirms the parent's existing values and choices, providing permission and validation for their screen-time decisions."
+      "rationale": "Offers a sense of exclusive knowledge and empowers parents by positioning them as 'in the know'.",
+      "_review_reason": "borderline, needs human judgment"
     }
   ],
   "new_ctas": [
     {
       "platform": "instagram",
       "type": "app",
-      "text": "Tap the link in bio to discover how every moment can matter.",
+      "text": "Tap the link in bio to transform their next screen moment into pure discovery.",
       "brand_safe": false,
       "source": "intelligence_refresh",
-      "rationale": "Subtly guides to the app by emphasizing the core brand promise of purposeful engagement."
+      "rationale": "Benefit-oriented and action-focused, directly linking to the app for a positive outcome.",
+      "_reject_reason": "competitor mentions"
     },
     {
       "platform": "pinterest",
-      "type": "seasonal",
-      "text": "Pin this for a screen-free summer moment they'll actually love.",
+      "type": "both",
+      "text": "Pin this idea for a quiet afternoon that feels like a win.",
       "brand_safe": false,
       "source": "competitor_analysis",
-      "rationale": "Leverages competitor patterns of seasonal, shareable content with a clear benefit and screen-free positioning."
+      "rationale": "Leverages Pinterest's save-first culture and highlights the emotional benefit for parents.",
+      "_reject_reason": "competitor mentions"
     },
     {
       "platform": "x",
       "type": "engagement",
-      "text": "What's one small win you celebrated with your child today? Share below!",
+      "text": "What's one small win you've had with screen-free play this week? Share your magic below!",
       "brand_safe": false,
       "source": "intelligence_refresh",
-      "rationale": "Encourages direct community engagement by inviting parents to share positive, relatable experiences."
+      "rationale": "Promotes community interaction and encourages parents to share positive experiences, reinforcing the brand's values.",
+      "_reject_reason": "competitor mentions"
     },
     {
       "platform": "instagram",
-      "type": "engagement",
-      "text": "Double tap if you're the parent who turns everyday moments into quiet victories.",
+      "type": "app",
+      "text": "Ready for that 'I made a good choice' feeling? Find the app in our profile.",
       "brand_safe": false,
       "source": "intelligence_refresh",
-      "rationale": "Drives engagement by affirming the desired parental identity and values, making the interaction feel personal."
+      "rationale": "Connects directly to the parent's inner world and desire for validation, guiding them to the app.",
+      "_reject_reason": "competitor mentions"
     }
   ],
   "new_pattern_interrupts": [
     {
-      "subtype": "did-you-know",
-      "topic": "Engaging with visual puzzles like dot-to-dots significantly improves a child's number sequencing skills, a foundational math readiness step.",
-      "visual": "A child intently connecting dots, a finished dot-to-dot revealing an object.",
-      "confidence": 0.85,
-      "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Highlights a specific, often overlooked educational benefit of a common activity, appealing to parents' desire for learning outcomes."
-    },
-    {
       "subtype": "surprising-stat",
-      "topic": "Children who regularly engage in activities requiring fine motor control, like tracing or coloring, show improved handwriting speed and legibility by up to 30%.",
-      "visual": "A close-up of a child's hand holding a pencil, focused on tracing a line.",
-      "confidence": 0.88,
+      "topic": "Children who regularly engage in spatial reasoning activities like dot-to-dot and mazes show up to a 12% improvement in early math skills.",
+      "visual": "Image of a child concentrating on a dot-to-dot or maze, with subtle math symbols in the background.",
+      "confidence": 0.9,
       "brand_safe": true,
-      "source": "competitor_analysis",
-      "rationale": "Provides a concrete, surprising statistic that validates the value of fine motor skill activities, addressing parental concerns about development."
+      "source": "intelligence_refresh",
+      "rationale": "Provides a concrete, surprising educational benefit linked to core JoyMaze activities, addressing parent's learning concerns."
     },
     {
       "subtype": "myth-bust",
-      "topic": "Myth: Educational apps are just digital textbooks. Fact: Interactive digital activities, when designed mindfully, can offer personalized feedback and adaptive challenges traditional workbooks can't.",
-      "visual": "Split screen showing a child with a workbook and a child with a tablet, both engaged.",
-      "confidence": 0.82,
+      "topic": "Myth: Kids need constant novel stimulation to stay engaged. Fact: Deep focus on a single, engaging activity like a complex maze builds sustained attention, a skill more valuable than endless novelty.",
+      "visual": "Split image: one side chaotic with many toys/screens, other side a child calmly focused on a single activity.",
+      "confidence": 0.88,
       "brand_safe": true,
       "source": "intelligence_refresh",
-      "rationale": "Directly addresses screen-time guilt by reframing the benefits of well-designed digital activities, offering permission."
+      "rationale": "Challenges a common parenting belief and highlights the long-term value of JoyMaze's focused activities."
+    },
+    {
+      "subtype": "did-you-know",
+      "topic": "Did you know? Tracing activities don't just build fine motor skills; they also enhance visual memory and pre-reading readiness by training the eyes to follow lines and shapes.",
+      "visual": "Close-up of a child's hand tracing, with subtle hints of letters or patterns emerging.",
+      "confidence": 0.85,
+      "brand_safe": true,
+      "source": "competitor_analysis",
+      "rationale": "Expands on the perceived benefits of tracing, linking it to broader cognitive development identified as a competitor focus."
     },
     {
       "subtype": "counterintuitive",
-      "topic": "Counterintuitive: The 'messy' act of creative exploration, even digitally, builds more neural pathways for problem-solving than strictly following instructions.",
-      "visual": "A child coloring outside the lines or creating an imaginative drawing on a tablet.",
-      "confidence": 0.83,
+      "topic": "Counterintuitive: Giving a child a 'challenge' can be more calming than endless 'entertainment.' The satisfaction of solving a puzzle quiets the mind in a way passive viewing can't.",
+      "visual": "Image of a child looking thoughtfully at a puzzle, contrasted with a child passively watching a screen (subtly).",
+      "confidence": 0.87,
       "brand_safe": true,
       "source": "intelligence_refresh",
-      "rationale": "Challenges a common parenting belief, providing permission for less structured creative play and highlighting its cognitive benefits."
+      "rationale": "Addresses the desire for calm and engagement, offering a fresh perspective on what truly benefits a child's mind."
     }
   ],
   "intelligence_summary": {
-    "top_performing_archetype_this_week": "No data yet",
-    "weakest_archetype_this_week": "No data yet",
-    "recommended_focus_shift": "Prioritize content that directly addresses screen-time guilt by highlighting purposeful engagement and skill-building, especially around upcoming holidays like Memorial Day and Summer.",
+    "top_performing_archetype_this_week": "N/A",
+    "weakest_archetype_this_week": "N/A",
+    "recommended_focus_shift": "Prioritize content that frames screen-time choices as intentional acts of good parenting, leveraging seasonal themes and fine motor skill development.",
     "competitor_patterns_detected": [
-      "Seasonal and Holiday-Specific Focus",
-      "Developmental Skill Integration",
-      "Emotional Connection/Keepsakes",
-      "Screen-Free Play Emphasis"
+      "Emphasis on nature and outdoor play",
+      "Seasonal and holiday-themed content (Mother's Day, May)",
+      "Focus on fine motor skill development",
+      "Problem/solution framing for screen-free alternatives",
+      "Highlighting ease and simplicity for parents"
     ],
-    "hook_gap_identified": "Hooks that explicitly affirm parental identity and offer emotional relief or transformation.",
+    "hook_gap_identified": "Identity-shifting and emotional mirror hooks are underrepresented.",
     "cta_fatigue_detected": false
   }
 }
